@@ -6,3 +6,7 @@ canvas.ytd-img-shadow {
     max-width: var(--yt-img-max-width, 100%);
     border-radius: var(--yt-img-border-radius, none);
 }
+
+img.yt-img-shadow {
+    display: none !important; /* todo: remove this when it is fast enough to be hidden before it is loaded */
+}
