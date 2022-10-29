@@ -1,0 +1,96 @@
+{
+  "name": "clickbait",
+  "version": "1.0.0",
+  "description": "",
+  "main": "background.js",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.197",
+    "@types/firefox-webext-browser": "^94.0.1",
+    "@types/jest": "^29.1.2",
+    "@types/react": "^18.0.21",
+    "@types/react-dom": "^18.0.6",
+    "@types/selenium-webdriver": "^4.1.5",
+    "@types/wicg-mediasession": "^1.1.4",
+    "@typescript-eslint/eslint-plugin": "^5.39.0",
+    "@typescript-eslint/parser": "^5.39.0",
+    "chromedriver": "^106.0.1",
+    "concurrently": "^7.4.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "eslint": "^8.24.0",
+    "eslint-plugin-react": "^7.31.8",
+    "fork-ts-checker-webpack-plugin": "^7.2.13",
+    "jest": "^29.1.2",
+    "jest-environment-jsdom": "^29.1.2",
+    "rimraf": "^3.0.2",
+    "schema-utils": "^4.0.0",
+    "selenium-webdriver": "^4.5.0",
+    "speed-measure-webpack-plugin": "^1.5.0",
+    "ts-jest": "^29.0.3",
+    "ts-loader": "^9.4.1",
+    "ts-node": "^10.9.1",
+    "typescript": "4.8",
+    "web-ext": "^7.2.0",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-merge": "^5.8.0"
+  },
+  "scripts": {
+    "web-run": "npm run web-run:chrome",
+    "web-sign": "web-ext sign -s dist",
+    "web-run:firefox": "cd dist && web-ext run --start-url https://addons.mozilla.org/firefox/addon/ublock-origin/",
+    "web-run:firefox-android": "cd dist && web-ext run -t firefox-android --firefox-apk org.mozilla.fenix",
+    "web-run:chrome": "cd dist && web-ext run --start-url https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm -t chromium",
+    "build": "npm run build:chrome",
+    "build:chrome": "webpack --env browser=chrome --config webpack/webpack.prod.js",
+    "build:firefox": "webpack --env browser=firefox --config webpack/webpack.prod.js",
+    "build:safari": "webpack --env browser=safari --config webpack/webpack.prod.js",
+    "build:edge": "webpack --env browser=edge --config webpack/webpack.prod.js",
+    "build:dev": "npm run build:dev:chrome",
+    "build:dev:chrome": "webpack --env browser=chrome --config webpack/webpack.dev.js",
+    "build:dev:firefox": "webpack --env browser=firefox --config webpack/webpack.dev.js",
+    "build:watch": "npm run build:watch:chrome",
+    "build:watch:chrome": "webpack --env browser=chrome --config webpack/webpack.dev.js --watch",
+    "build:watch:firefox": "webpack --env browser=firefox --config webpack/webpack.dev.js --watch",
+    "ci:invidious": "ts-node ci/invidiousCI.ts",
+    "dev": "npm run build:dev && concurrently \"npm run web-run\" \"npm run build:watch\"",
+    "dev:firefox": "npm run build:dev:firefox && concurrently \"npm run web-run:firefox\" \"npm run build:watch:firefox\"",
+    "dev:firefox-android": "npm run build:dev:firefox && concurrently \"npm run web-run:firefox-android\" \"npm run build:watch:firefox\"",
+    "clean": "rimraf dist",
+    "test": "npm run build:chrome && npx jest",
+    "test-without-building": "npx jest",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "funding": [
+    {
+      "type": "individual",
+      "url": "https://sponsor.ajay.app/donate"
+    },
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/ajayyy-org"
+    },
+    {
+      "type": "patreon",
+      "url": "https://www.patreon.com/ajayyy"
+    },
+    {
+      "type": "individual",
+      "url": "https://paypal.me/ajayyy"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajayyy/SponsorBlock.git"
+  },
+  "author": "Ajay Ramachandran",
+  "license": "LGPL-3.0-or-later",
+  "private": true
+}

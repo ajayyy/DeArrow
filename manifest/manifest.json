@@ -1,0 +1,82 @@
+{
+    "name": "__MSG_fullName__",
+    "short_name": "Clickbait",
+    "version": "5.1.2",
+    "default_locale": "en",
+    "description": "__MSG_Description__",
+    "homepage_url": "https://sponsor.ajay.app",
+    "content_scripts": [{
+        "run_at": "document_start",
+        "matches": [
+            "https://*.youtube.com/*",
+            "https://www.youtube-nocookie.com/embed/*"
+        ],
+        "all_frames": true,
+        "js": [
+            "./js/content.js"
+        ],
+        "css": [
+            "content.css"
+        ]
+    }],
+    "web_accessible_resources": [
+    ],
+    "permissions": [
+        "storage",
+        "https://sponsor.ajay.app/*"
+    ],
+    "optional_permissions": [
+        "*://*/*"
+    ],
+    "browser_action": {
+        "default_title": "SponsorBlock",
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icons/IconSponsorBlocker16px.png",
+            "32": "icons/IconSponsorBlocker32px.png",
+            "64": "icons/LogoSponsorBlocker64px.png",
+            "128": "icons/LogoSponsorBlocker128px.png"
+        },
+        "theme_icons": [
+            {
+                "light": "icons/IconSponsorBlocker16px.png",
+                "dark": "icons/IconSponsorBlocker16px.png",
+                "size": 16
+            },
+            {
+                "light": "icons/IconSponsorBlocker32px.png",
+                "dark": "icons/IconSponsorBlocker32px.png",
+                "size": 32
+            },
+            {
+                "light": "icons/LogoSponsorBlocker64px.png",
+                "dark": "icons/LogoSponsorBlocker64px.png",
+                "size": 64
+            },
+            {
+                "light": "icons/LogoSponsorBlocker128px.png",
+                "dark": "icons/LogoSponsorBlocker128px.png",
+                "size": 128
+            }
+        ]
+    }, 
+    "background": {
+        "scripts":[
+        "./js/background.js"
+        ]
+    },
+    "icons": {
+        "16": "icons/IconSponsorBlocker16px.png",
+        "32": "icons/IconSponsorBlocker32px.png",
+        "64": "icons/LogoSponsorBlocker64px.png",
+        "128": "icons/LogoSponsorBlocker128px.png",
+        "256": "icons/LogoSponsorBlocker256px.png",
+        "512": "icons/LogoSponsorBlocker512px.png",
+        "1024": "icons/LogoSponsorBlocker1024px.png"
+    },
+    "options_ui": {
+        "page": "options/options.html",
+        "open_in_tab": true
+    },
+    "manifest_version": 2
+}  

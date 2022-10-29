@@ -1,0 +1,10 @@
+{
+    "fullName": {
+        "message": "Clickbait PoC",
+        "description": "Name of the extension."
+    },
+    "Description": {
+        "message": "Clickbait stuff",
+        "description": "Description of the extension."
+    }
+}

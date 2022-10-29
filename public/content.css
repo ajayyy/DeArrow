@@ -1,0 +1,8 @@
+canvas.ytd-img-shadow {
+    display: block;
+    margin-left: var(--yt-img-margin-left, auto);
+    margin-right: var(--yt-img-margin-right, auto);
+    max-height: var(--yt-img-max-height, none);
+    max-width: var(--yt-img-max-width, 100%);
+    border-radius: var(--yt-img-border-radius, none);
+}
