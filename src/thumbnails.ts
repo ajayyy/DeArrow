@@ -77,8 +77,8 @@ export async function createThumbnailElement(videoID: VideoID, width: number, he
 
     //todo: prevent video from loading more than single frame
     video.addEventListener("loadeddata", () => {
-        //todo: what about videos with different aspect ratio
-        canvas.getContext("2d")?.drawImage(video, 0, 0, width, height);
+        const calculateWidth = height * video.videoWidth / video.videoHeight;
+        canvas.getContext("2d")?.drawImage(video, (width - calculateWidth) / 2, 0, calculateWidth, height);
         
         console.log(videoID, (Date.now() - start) / 1000, "full");
         ready();
