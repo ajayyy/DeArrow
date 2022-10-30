@@ -270,7 +270,12 @@ async function renderThumbnail(videoID: VideoID, width: number,
     })
 }
 
-export async function createThumbnailElement(videoID: VideoID, width: number,
+/**
+ * Returns a canvas that will be drawn to once the thumbnail is ready.
+ * 
+ * Starts with lower resolution and replaces it with higher resolution when ready.
+ */
+export async function createThumbnailCanvas(videoID: VideoID, width: number,
         height: number, saveVideo: boolean, ready: () => unknown): Promise<HTMLCanvasElement | null> {
     const urls = await getPlaybackUrl(videoID, width, height);
     if (!urls) return null;
@@ -282,19 +287,34 @@ export async function createThumbnailElement(videoID: VideoID, width: number,
     canvas.height = height;
 
     renderThumbnail(videoID, 0, 0, saveVideo, timestamp).then((smallerCanvasInfo) => {
-        if (!smallerCanvasInfo) return;
-        // if (!smallerCanvasInfo || smallerCanvasInfo.width < width || smallerCanvasInfo.height < height) {
-        //     // Try to generate a larger one too and replace it
-        //     // todo: how to delay this until we need it?
-        // }
+        if (!smallerCanvasInfo || smallerCanvasInfo.width < width || smallerCanvasInfo.height < height) {
+            
+            // Try to generate a larger one too and replace it when ready
+            // todo: use a better metric than a fixed delay, count number of loading items and use a priority system
+            setTimeout(() => {
+                renderThumbnail(videoID, width, height, saveVideo, timestamp).then((largerCanvasInfo) => {
+                    if (!largerCanvasInfo) return;
     
-        const calculateWidth = height * smallerCanvasInfo.width / smallerCanvasInfo.height;
-        canvas.getContext("2d")?.drawImage(smallerCanvasInfo.canvas, (width - calculateWidth) / 2, 0, calculateWidth, height);
+                    drawCentered(canvas, width, height, largerCanvasInfo);
+                    if (!smallerCanvasInfo) ready();
+                }).catch(() => {}); //eslint-disable-line @typescript-eslint/no-empty-function
+            }, 6000);
+            
 
+            if (!smallerCanvasInfo) return;
+        }
+    
+        drawCentered(canvas, width, height, smallerCanvasInfo);
         ready();
     }).catch(() => {}); //eslint-disable-line @typescript-eslint/no-empty-function
 
     return canvas;
+}
+
+function drawCentered(canvas: HTMLCanvasElement, width: number, height: number,
+        imageInfo: RenderedThumbnailVideo): void {
+    const calculateWidth = height * imageInfo.width / imageInfo.height;
+    canvas.getContext("2d")?.drawImage(imageInfo.canvas, (width - calculateWidth) / 2, 0, calculateWidth, height);
 }
 
 function createVideo(url: string, timestamp: number): HTMLVideoElement {
@@ -318,7 +338,7 @@ export async function replaceThumbnail(element: HTMLElement): Promise<boolean> {
         const width = 720;
         const height = 404;
 
-        const thumbnail = await createThumbnailElement(videoID, width, height, false, () => {
+        const thumbnail = await createThumbnailCanvas(videoID, width, height, false, () => {
             thumbnail!.style.removeProperty("display");
         });
 
