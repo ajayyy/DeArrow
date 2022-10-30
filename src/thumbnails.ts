@@ -1,10 +1,50 @@
 export type VideoID = string & { videoIDBrand : never };
 
-export async function getPlaybackUrl(videoID: VideoID, 
-        width: number, height: number): Promise<{ best: string; smallest: string } | null> {
+export interface PlaybackUrl {
+    url: string;
+    width: number;
+    height: number;
+}
+
+interface ThumbnailVideoBase {
+    video: HTMLVideoElement | null;
+    width: number;
+    height: number;
+    onReady: Array<(video: RenderedThumbnailVideo) => void>;
+    timestamp: number;
+}
+
+export type RenderedThumbnailVideo = ThumbnailVideoBase & {
+    canvas: HTMLCanvasElement;
+    rendered: true;
+}
+
+export type ThumbnailVideo = RenderedThumbnailVideo | ThumbnailVideoBase & {
+    rendered: false;
+};
+
+export interface ThumbnailData {
+    video: ThumbnailVideo[];
+    playbackUrls: PlaybackUrl[];
+    lastUsed: number;
+}
+
+export interface Format {
+    url: string;
+    width: number;
+    height: number;
+}
+
+//todo: set a max size of this and delete some after a while
+const cache: Record<VideoID, ThumbnailData> = {};
+
+async function fetchFormats(videoID: VideoID, ignoreCache: boolean): Promise<Format[]> {
+    if (!ignoreCache && cache[videoID]?.playbackUrls) {
+        return cache[videoID].playbackUrls;
+    }
+
     const start = Date.now();
-    //todo: use innertube, for now return fixed url
-    //todo: request from background script
+
     const url = "https://www.youtube.com/youtubei/v1/player";
     const data = {
         context: {
@@ -40,18 +80,43 @@ export async function getPlaybackUrl(videoID: VideoID,
                     .reverse()
                     .filter((format) => format.width && format.height)
                     .sort((a, b) => a?.width - b?.width);
-                const format = sorted.find(f => f?.width >= width && f?.height >= height);
 
-                if (format) {
-                    console.log(videoID, (Date.now() - start) / 1000, "innerTube");
-                    return {
-                        best: format.url,
-                        smallest: sorted[0].url
-                    };
-                }
+                console.log(videoID, (Date.now() - start) / 1000, "innerTube");
+                cache[videoID] ??= {
+                    video: [],
+                    playbackUrls: [],
+                    lastUsed: Date.now()
+                };
+                cache[videoID].playbackUrls = sorted.map((format) => ({
+                    url: format.url,
+                    width: format.width,
+                    height: format.height
+                }))
+
+                return cache[videoID].playbackUrls;
             }
         }
     } catch (e) {} //eslint-disable-line no-empty
+
+    return [];
+}
+
+export async function getPlaybackUrl(videoID: VideoID, 
+        width?: number, height?: number, ignoreCache = false): Promise<string | null> {
+    const formats = await fetchFormats(videoID, ignoreCache);
+    //todo: handle fetching fromats twice at the same time, lock or something
+
+    if (width && height) {
+        const bestFormat = formats?.find(f => f?.width >= width && f?.height >= height);
+
+        if (bestFormat) {
+            if (cache[videoID]) cache[videoID].lastUsed = Date.now();
+
+            return bestFormat?.url;
+        }
+    } else if (formats?.length > 0) {
+        return formats[0].url;
+    }
 
     return null;
 }
@@ -62,47 +127,173 @@ export function getThumbnailTimestamp(videoID: VideoID): number {
     return 20.4;
 }
 
-export async function createThumbnailElement(videoID: VideoID, width: number, height: number, ready: () => unknown): Promise<HTMLElement | null> {
+async function renderThumbnail(videoID: VideoID, width: number, 
+        height: number, saveVideo: boolean, timestamp: number): Promise<RenderedThumbnailVideo | null> {
     const start = Date.now();
-    
+
+    if (cache[videoID]?.video?.length > 0) {
+        const bestVideo = (width && height) ? cache[videoID].video.find(v => v.width >= width && v.height >= height && timestamp === v.timestamp)
+            : cache[videoID].video[cache[videoID].video.length - 1];
+
+        if (bestVideo?.rendered) {
+            return bestVideo;
+        } else if (bestVideo) {
+            await new Promise((resolve) => {
+                bestVideo?.onReady.push(resolve);
+            });
+        }
+    }
+
+    let url = await getPlaybackUrl(videoID, width, height);
+    if (!url) return null; //todo: handle null url, example: byXHW0dvu2U
+
+    let video = createVideo(url, timestamp);
+    let tries = 1;
+    cache[videoID] ??= {
+        video: [],
+        playbackUrls: [],
+        lastUsed: Date.now()
+    };
+    cache[videoID].video.push({
+        video: video,
+        width: width,
+        height: height,
+        rendered: false,
+        onReady: [],
+        timestamp
+    });
+
+    return new Promise((resolve, reject) => {
+        let resolved = false;
+
+        const loadedData = () => {
+            const betterVideo = cache[videoID].video.find(v => v.width >= width && v.height >= height 
+                    && v.timestamp === timestamp && v.rendered);
+            if (betterVideo) {
+                video.remove();
+                resolved = true;
+
+                reject("Already rendered");
+                return;
+            }
+
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext("2d")?.drawImage(video, 0, 0);
+
+            const videoInfo: RenderedThumbnailVideo = {
+                canvas,
+                video: saveVideo ? video : null,
+                width: video.videoWidth,
+                height: video.videoHeight,
+                rendered: true,
+                onReady: [],
+                timestamp
+            };
+
+            cache[videoID] ??= {
+                video: [],
+                playbackUrls: [],
+                lastUsed: Date.now()
+            };
+            const currentVideoInfoIndex = cache[videoID].video.findIndex(v => v.width === video.videoWidth 
+                    && v.height === video.videoHeight && v.timestamp === timestamp);
+            const currentVideoInfo = currentVideoInfoIndex !== -1 ? cache[videoID].video[currentVideoInfoIndex] : null;
+            if (currentVideoInfo) {
+                for (const callback of currentVideoInfo.onReady) {
+                    callback(videoInfo);
+                }
+
+                cache[videoID].video[currentVideoInfoIndex] = videoInfo;
+            } else {
+                cache[videoID].video.push(videoInfo);
+            }
+
+            console.log(videoID, (Date.now() - start) / 1000, width > 0 ? "full" : "smaller");
+
+            if (!saveVideo) video.remove();
+
+            resolved = true;
+            resolve(videoInfo);
+        };
+
+        const errorHandler = async () => {
+            if (!resolved) {
+                // Try creating the video again
+                video.remove();
+
+                if (tries++ > 5) {
+                    // Give up
+                    if (cache[videoID]?.video) {
+                        cache[videoID].video = cache[videoID].video.filter(v => v.width !== width && v.height !== height && v.timestamp !== timestamp);
+                    }
+
+                    console.error(`Failed to render thumbnail for ${videoID} after ${tries} tries`);
+                    return;
+                }
+
+                url = await getPlaybackUrl(videoID, width, height, true);
+                if (!url) {
+                    resolve(null);
+                    return;
+                }
+
+                cache[videoID] ??= {
+                    video: [],
+                    playbackUrls: [],
+                    lastUsed: Date.now()
+                };
+                const index = cache[videoID].video.findIndex(v => v.width === width && v.height === height 
+                        && v.timestamp === timestamp);
+                if (index !== -1) {
+                    cache[videoID].video[index].video = video;
+                } else {
+                    cache[videoID].video.push({
+                        video: video,
+                        width: width,
+                        height: height,
+                        rendered: false,
+                        onReady: [],
+                        timestamp
+                    });
+                }
+
+                video = createVideo(url, timestamp);
+                video.addEventListener("loadeddata", loadedData);
+                video.addEventListener("error", () => void errorHandler());
+            }
+        };
+
+        video.addEventListener("error", () => void errorHandler());
+        video.addEventListener("loadeddata", loadedData);
+    })
+}
+
+export async function createThumbnailElement(videoID: VideoID, width: number,
+        height: number, saveVideo: boolean, ready: () => unknown): Promise<HTMLCanvasElement | null> {
     const urls = await getPlaybackUrl(videoID, width, height);
     if (!urls) return null;
 
     const timestamp = getThumbnailTimestamp(videoID);
-    const smallestVideo = createVideo(urls.smallest, timestamp);
 
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
 
-    let bestVideoLoaded = false
-    let readyCalled = false;
-
-    const listener = (isBestVideo: boolean, video: HTMLVideoElement) => {
-        if (!isBestVideo && bestVideoLoaded) return;
-        if (isBestVideo) bestVideoLoaded = true;
-
-        const calculateWidth = height * video.videoWidth / video.videoHeight;
-        canvas.getContext("2d")?.drawImage(video, (width - calculateWidth) / 2, 0, calculateWidth, height);
-        
-        console.log(videoID, (Date.now() - start) / 1000, isBestVideo ? "full" : "smaller");
-        if (!readyCalled) ready();
-        readyCalled = true;
-        
-        video.remove();
-
-        if (!isBestVideo) {
-            //todo: wait until all low res have loaded
-            setTimeout(() => {
-                const bestVideo = createVideo(urls.best, timestamp);
-                bestVideo.addEventListener("loadeddata", () => listener(true, bestVideo));
-            }, 2000);
-        }
-    }
-
-    //todo: prevent video from loading more than single frame
-    smallestVideo.addEventListener("loadeddata", () => listener(false, smallestVideo));
+    renderThumbnail(videoID, 0, 0, saveVideo, timestamp).then((smallerCanvasInfo) => {
+        if (!smallerCanvasInfo) return;
+        // if (!smallerCanvasInfo || smallerCanvasInfo.width < width || smallerCanvasInfo.height < height) {
+        //     // Try to generate a larger one too and replace it
+        //     // todo: how to delay this until we need it?
+        // }
     
+        const calculateWidth = height * smallerCanvasInfo.width / smallerCanvasInfo.height;
+        canvas.getContext("2d")?.drawImage(smallerCanvasInfo.canvas, (width - calculateWidth) / 2, 0, calculateWidth, height);
+
+        ready();
+    }).catch(() => {}); //eslint-disable-line @typescript-eslint/no-empty-function
+
     return canvas;
 }
 
@@ -122,14 +313,12 @@ export async function replaceThumbnail(element: HTMLElement): Promise<boolean> {
     const link = element.querySelector("#thumbnail") as HTMLAnchorElement;
 
     if (image && link) {
-        //todo: don't use src for this as it actually loads in later than other elements
-        // #thumbnail url seems to be the fastest, even faster than title
-        // fastest would be to preload via /browser request
+        // todo: fastest would be to preload via /browser request
         const videoID = link.href?.match(/\?v=(.{11})/)?.[1] as VideoID;
         const width = 720;
         const height = 404;
 
-        const thumbnail = await createThumbnailElement(videoID, width, height, () => {
+        const thumbnail = await createThumbnailElement(videoID, width, height, false, () => {
             thumbnail!.style.removeProperty("display");
         });
 
