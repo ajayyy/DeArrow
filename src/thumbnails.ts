@@ -360,7 +360,7 @@ export function startThumbnailListener(): void {
     let stop = 0;
     setInterval(() => {
         // if (stop > 8) return;
-        const newElements = [...document.querySelectorAll("ytd-rich-grid-media")].filter((element) => !elementsDealtWith.has(element));
+        const newElements = [...document.querySelectorAll("ytd-rich-grid-media, ytd-compact-video-renderer")].filter((element) => !elementsDealtWith.has(element));
         for (const element of newElements) {
             elementsDealtWith.add(element);
 
