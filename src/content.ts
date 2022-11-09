@@ -1,3 +1,3 @@
-import { startThumbnailListener } from "./thumbnails";
+import { startThumbnailListener } from "./videoBranding/videoBranding";
 
 startThumbnailListener();
