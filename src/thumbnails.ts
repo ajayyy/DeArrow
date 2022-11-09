@@ -127,6 +127,11 @@ export function getThumbnailTimestamp(videoID: VideoID): number {
     return 20.4;
 }
 
+// eslint-disable-next-line require-await, @typescript-eslint/no-unused-vars
+export async function getTitle(videoID: VideoID): Promise<string> {
+    return "Some title goes here";
+}
+
 async function renderThumbnail(videoID: VideoID, width: number, 
         height: number, saveVideo: boolean, timestamp: number): Promise<RenderedThumbnailVideo | null> {
     const start = Date.now();
@@ -328,13 +333,10 @@ function createVideo(url: string, timestamp: number): HTMLVideoElement {
     return video;
 }
 
-export async function replaceThumbnail(element: HTMLElement): Promise<boolean> {
+export async function replaceThumbnail(element: HTMLElement, videoID: VideoID): Promise<boolean> {
     const image = element.querySelector(".ytd-thumbnail img") as HTMLImageElement;
-    const link = element.querySelector("#thumbnail") as HTMLAnchorElement;
 
-    if (image && link) {
-        // todo: fastest would be to preload via /browser request
-        const videoID = link.href?.match(/\?v=(.{11})/)?.[1] as VideoID;
+    if (image) {
         const width = 720;
         const height = 404;
 
@@ -354,6 +356,35 @@ export async function replaceThumbnail(element: HTMLElement): Promise<boolean> {
     return !!image;
 }
 
+export async function replaceTitle(element: HTMLElement, videoID: VideoID): Promise<boolean> {
+    const titleElement = element.querySelector("#video-title") as HTMLElement;
+
+    //todo: add an option to not hide title
+    titleElement.style.visibility = "hidden";
+
+    const title = await getTitle(videoID);
+    if (title) {
+        titleElement.innerText = title;
+    }
+
+    titleElement.style.visibility = "visible";
+    return true;
+}
+
+export function replaceBranding(element: HTMLElement): Promise<[boolean, boolean]> {
+    const link = element.querySelector("#thumbnail") as HTMLAnchorElement;
+
+    if (link) {
+        // todo: fastest would be to preload via /browser request
+        const videoID = link.href?.match(/\?v=(.{11})/)?.[1] as VideoID;
+
+        return Promise.all([replaceThumbnail(element, videoID),
+            replaceTitle(element, videoID)]) as Promise<[boolean, boolean]>;
+    }
+
+    return new Promise((resolve) => resolve([false, false]));
+}
+
 export function startThumbnailListener(): void {
     // hacky prototype
     const elementsDealtWith = new Set<Element>();
@@ -364,7 +395,7 @@ export function startThumbnailListener(): void {
         for (const element of newElements) {
             elementsDealtWith.add(element);
 
-            void replaceThumbnail(element as HTMLElement);
+            void replaceBranding(element as HTMLElement);
 
             stop++;
             return;
