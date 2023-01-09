@@ -6,5 +6,29 @@
     "Description": {
         "message": "Clickbait stuff",
         "description": "Description of the extension."
+    },
+    "Submit": {
+        "message": "Submit"
+    },
+    "chooseDescriptive": {
+        "message": "Choose the most descriptive"
+    },
+    "Original": {
+        "message": "Original"
+    },
+    "UnknownError": {
+        "message": "Unknown Error"
+    },
+    "CurrentTime": {
+        "message": "Current Time"
+    },
+    "resetCustomTitle": {
+        "message": "Reset Title"
+    },
+    "resetIcon": {
+        "message": "Reset Icon"
+    },
+    "Vote": {
+        "message": "Vote"
     }
 }

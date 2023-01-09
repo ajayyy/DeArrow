@@ -8,5 +8,138 @@ canvas.ytd-img-shadow {
 }
 
 img.yt-img-shadow {
-    display: none !important; /* todo: remove this when it is fast enough to be hidden before it is loaded */
+    display: none !important; /* todo: remove this when it is fast enough to be hidden before it is loaded, or inject dynamically based on config */
+}
+
+.cbThumbnail {
+    width: 20%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    transition: width 0.3s ease-in-out, font-size 0.3s ease-in-out;
+
+    margin-left: 1%;
+    margin-right: 1%;
+}
+
+.cbThumbnail.cbThumbnailLarge {
+    width: 40%;
+
+    font-size: 1.3em;
+}
+
+.cbThumbnailImg {
+    width: 100%;
+
+    cursor: pointer;
+}
+
+.cbTitle {
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+    transition: font-size 0.3s ease-in-out;
+}
+
+.cbTitle > span:focus {
+    outline: none;
+}
+
+.cbTitleLarge {
+    font-size: 2.5em;
+}
+
+#cbSubmitMenu {
+    position: absolute;
+    margin-top: 3em;
+    z-index: 10000;
+	background-color: rgba(28, 28, 28, 0.9);
+    color: white;
+    font-size: 12px;
+
+    width: 100%;
+    border-radius: 5px;
+    line-height: normal;
+}
+
+.submissionMenuInner {
+    padding: 15px;
+}
+
+.cbButton.cbSubmitButton {
+	vertical-align: top;
+
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.cbSubmitButtonImage {
+    height: 60%;
+	top: 0;
+	bottom: 0;
+	display: block;
+	margin: auto;
+}
+
+.resetCustomTitle {
+    display: inline;
+    margin: 5px;
+
+    height: 1em;
+    margin: 0;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+.cbButton {
+    background: transparent;
+    border-radius: 50%;
+    border: none;
+    margin: 0;
+    padding: 0;
+
+    cursor: pointer;
+}
+
+.cbNoticeButton {
+	background: none;
+	color: rgb(235, 235, 235);
+	border: none;
+	display: inline-block;
+	font-size: 13.3333px;
+
+	cursor: pointer;
+
+	margin-right: 10px;
+
+    padding: 2px 5px;
+}
+
+.cbNoticeButton:hover {
+	background-color: rgba(235, 235, 235, 0.2);
+	border-radius: 4px;
+
+	transition: background-color 0.2s;
+}
+
+.cbVoteButton {
+    font-size: 3em;
+    background-color: rgba(235, 235, 235, 0.096);
+    border: 2px rgba(235, 235, 235, 0.5) solid;
+
+    border-radius: 4px;
+}
+
+.cbSubmitInstructions {
+    margin-top: 4px;
+    margin-bottom: 4px;
+
+    font-size: 2em;
+}
+
+.cbLine {
+    border: 0;
+    border-top: 1px solid white;
 }

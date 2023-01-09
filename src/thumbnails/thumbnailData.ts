@@ -1,5 +1,13 @@
-import { VideoID } from "../videoBranding/videoBranding";
+import { BrandingUUID, VideoID } from "../videoBranding/videoBranding";
 import { cacheUsed, getFromCache, setupCache } from "./thumbnailDataCache";
+
+export interface ThumbnailResult {
+    timestamp?: number;
+    original: boolean;
+    votes: number;
+    locked: boolean;
+    UUID: BrandingUUID;
+}
 
 interface Format {
     url: string;
