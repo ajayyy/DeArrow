@@ -7,7 +7,7 @@ import { VideoID } from "../videoBranding/videoBranding";
 export enum ThumbnailType {
     CurrentTime,
     SpecifiedTime,
-    OfficialImage
+    Original
 }
 
 export interface ThumbnailComponentProps {
@@ -34,7 +34,7 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
     const [drawInterval, setDrawInterval] = React.useState<NodeJS.Timer | null>(null);
 
     React.useEffect(() => {
-        if (props.type !== ThumbnailType.OfficialImage) {
+        if (props.type !== ThumbnailType.Original) {
             waitFor(() => canvasRef?.current).then(() => {
                 if (time && props.type === ThumbnailType.SpecifiedTime) {
                     renderThumbnail(props.videoID, canvasWidth, canvasHeight, false, time).then((rendered) => {
@@ -97,7 +97,7 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                     }
                 }}>
             {
-                props.type === ThumbnailType.OfficialImage ?
+                props.type === ThumbnailType.Original ?
                 <img className="cbThumbnailImg" src={`https://i.ytimg.com/vi/${props.videoID}/hq720.jpg`}></img> :
                 null
             }

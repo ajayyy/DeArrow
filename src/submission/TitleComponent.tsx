@@ -1,8 +1,8 @@
 import React = require("react");
-import { TitleResult } from "../titles/titleData";
+import { RenderedTitleSubmission } from "./TitleDrawerComponent";
 
 export interface TitleComponentProps {
-    submission: TitleResult;
+    submission: RenderedTitleSubmission;
     large: boolean;
     onSelectOrUpdate: (title: string) => void;
 }

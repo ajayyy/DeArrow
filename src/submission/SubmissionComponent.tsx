@@ -1,7 +1,10 @@
 import React = require("react");
+import { CustomThumbnailResult } from "../thumbnails/thumbnailData";
+import { getCurrentPageTitle } from "../titles/titleData";
 import { BrandingResult, VideoID } from "../videoBranding/videoBranding";
-import { ThumbnailDrawerComponent } from "./ThumbnailDrawerComponent";
-import { TitleDrawerComponent } from "./TitleDrawerComponent";
+import { ThumbnailType } from "./ThumbnailComponent";
+import { RenderedThumbnailSubmission, ThumbnailDrawerComponent } from "./ThumbnailDrawerComponent";
+import { RenderedTitleSubmission, TitleDrawerComponent } from "./TitleDrawerComponent";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -10,18 +13,45 @@ export interface SubmissionComponentProps {
 }
 
 export const SubmissionComponent = (props: SubmissionComponentProps) => {
-    const [selectedTitle, setSelectedTitle] = React.useState(props.submissions.titles[0]);
+    const originalTitle = getCurrentPageTitle() || chrome.i18n.getMessage("OriginalTitle");
+    const titles: RenderedTitleSubmission[] = [{
+        title: originalTitle
+    }, {
+        title: chrome.i18n.getMessage("TypeYourOwnTitleHere")
+    }, ...props.submissions.titles
+    .filter((s) => s.title !== originalTitle)
+    .map((s) => ({
+        title: s.title
+    }))];
+
+
+    const thumbnails: RenderedThumbnailSubmission[] = [{
+        type: ThumbnailType.Original
+    }, {
+        type: ThumbnailType.CurrentTime
+    }, ...props.submissions.thumbnails
+    .filter((s) => !s.original)
+    .map((s: CustomThumbnailResult) => ({
+        timestamp: s.timestamp,
+        type: ThumbnailType.SpecifiedTime
+    }))];
+
+    const selectedTitle = React.useRef(titles[0]);
+    const selectedThumbnail = React.useRef(thumbnails[0]);
 
     return (
         <div className="submissionMenuInner">
-            {/* No original, since that's handled internally */}
             <div style={{ display: "flex" }}>
-                <ThumbnailDrawerComponent video={props.video} videoId={props.videoID} existingSubmissions={props.submissions.thumbnails.filter((s) => !s.original)}></ThumbnailDrawerComponent>
+                <ThumbnailDrawerComponent 
+                    video={props.video} 
+                    videoId={props.videoID} 
+                    existingSubmissions={thumbnails}
+                    onSelect={(t) => selectedThumbnail.current = t}></ThumbnailDrawerComponent>
             </div>
 
             <div>
-                <TitleDrawerComponent existingSubmissions={props.submissions.titles} 
-                    onSelectOrUpdate={(t) => setSelectedTitle(t)}></TitleDrawerComponent>
+                <TitleDrawerComponent existingSubmissions={titles} 
+                    onSelectOrUpdate={(t) => selectedTitle.current = t}></TitleDrawerComponent>
             </div>
 
             <hr className="cbLine">

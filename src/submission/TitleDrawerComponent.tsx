@@ -1,10 +1,13 @@
 import React = require("react");
-import { TitleResult } from "../titles/titleData";
 import { TitleComponent } from "./TitleComponent";
 
 export interface TitleDrawerComponentProps {
-    existingSubmissions: TitleResult[];
-    onSelectOrUpdate: (title: TitleResult) => void;
+    existingSubmissions: RenderedTitleSubmission[];
+    onSelectOrUpdate: (title: RenderedTitleSubmission) => void;
+}
+
+export interface RenderedTitleSubmission {
+    title: string;
 }
 
 export const TitleDrawerComponent = (props: TitleDrawerComponentProps) => {
@@ -20,7 +23,7 @@ export const TitleDrawerComponent = (props: TitleDrawerComponentProps) => {
 function getTitles(props: TitleDrawerComponentProps,
         selectedTitle: number, setSelectedTitle: (val: number) => void): JSX.Element[] {
     const titles: JSX.Element[] = [];
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < Math.max(5, props.existingSubmissions.length); i++) {
         titles.push(
             <TitleComponent
                 large={selectedTitle === i}

@@ -1,13 +1,22 @@
 import { BrandingUUID, VideoID } from "../videoBranding/videoBranding";
 import { cacheUsed, getFromCache, setupCache } from "./thumbnailDataCache";
 
-export interface ThumbnailResult {
-    timestamp?: number;
-    original: boolean;
+interface PartialThumbnailResult {
     votes: number;
     locked: boolean;
     UUID: BrandingUUID;
 }
+
+export type CustomThumbnailResult = PartialThumbnailResult & {
+    timestamp: number;
+    original: false;
+};
+
+export type OriginalThumbnailResult = PartialThumbnailResult & {
+    original: true;
+};
+
+export type ThumbnailResult = CustomThumbnailResult | OriginalThumbnailResult;
 
 interface Format {
     url: string;
