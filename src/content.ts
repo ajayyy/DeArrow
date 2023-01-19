@@ -1,6 +1,6 @@
 import { waitFor } from "@ajayyy/maze-utils";
 import { SubmitButton } from "./submission/submitButton";
-import { startThumbnailListener, VideoID } from "./videoBranding/videoBranding";
+import { BrandingUUID, startThumbnailListener, VideoID } from "./videoBranding/videoBranding";
 
 
 //todo: replace this
@@ -8,7 +8,99 @@ const submitButton = new SubmitButton();
 // waits internally
 waitFor(() => document.querySelector("video")).then((video) => {
     submitButton.attachToPage(video!, "pXoZQsZP2PY" as VideoID, false, false).catch(console.log);
+
+    setTimeout(() => {
+        submitButton.setSubmissions({
+            thumbnails: [{
+                original: true,
+                votes: 10,
+                locked: false,
+                UUID: "sampleUUID" as BrandingUUID
+            }, {
+                timestamp: 10,
+                original: false,
+                votes: 10,
+                locked: false,
+                UUID: "sampleUUID" as BrandingUUID
+            }, {
+                timestamp: 20,
+                original: false,
+                votes: 10,
+                locked: false,
+                UUID: "sampleUUID" as BrandingUUID
+            }, {
+                timestamp: 30,
+                original: false,
+                votes: 10,
+                locked: false,
+                UUID: "sampleUUID" as BrandingUUID
+            }],
+            titles: [{
+                title: "sample title",
+                original: false,
+                votes: 10,
+                locked: false,
+                UUID: "sampleUUID" as BrandingUUID
+            }, {
+                title: "sample title 2",
+                original: false,
+                votes: 10,
+                locked: false,
+                UUID: "sampleUUID" as BrandingUUID
+            }, {
+                title: "original title 2",
+                original: true,
+                votes: 10,
+                locked: false,
+                UUID: "sampleUUID" as BrandingUUID
+            }]
+        });
+    }, 5000);
+    
+    setTimeout(() => {
+        submitButton.setSubmissions({
+            thumbnails: [{
+                original: true,
+                votes: 10,
+                locked: false,
+                UUID: "sampleUUID" as BrandingUUID
+            }, {
+                timestamp: 25,
+                original: false,
+                votes: 10,
+                locked: false,
+                UUID: "sampleUUID" as BrandingUUID
+            }, {
+                timestamp: 20,
+                original: false,
+                votes: 10,
+                locked: false,
+                UUID: "sampleUUID" as BrandingUUID
+            }],
+            titles: [{
+                title: "sample title",
+                original: false,
+                votes: 10,
+                locked: false,
+                UUID: "sampleUUID" as BrandingUUID
+            }, {
+                title: "some completely different title",
+                original: false,
+                votes: 10,
+                locked: false,
+                UUID: "sampleUUID" as BrandingUUID
+            }, {
+                title: "original title 2",
+                original: true,
+                votes: 10,
+                locked: false,
+                UUID: "sampleUUID" as BrandingUUID
+            }]
+        });
+    }, 10000);
 }).catch(console.log);
+
+
 
 
 // Direct Links after the config is loaded

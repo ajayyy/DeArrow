@@ -23,7 +23,7 @@ export const TitleDrawerComponent = (props: TitleDrawerComponentProps) => {
 function getTitles(props: TitleDrawerComponentProps,
         selectedTitle: number, setSelectedTitle: (val: number) => void): JSX.Element[] {
     const titles: JSX.Element[] = [];
-    for (let i = 0; i < Math.max(5, props.existingSubmissions.length); i++) {
+    for (let i = 0; i < Math.min(5, props.existingSubmissions.length); i++) {
         titles.push(
             <TitleComponent
                 large={selectedTitle === i}

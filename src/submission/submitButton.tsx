@@ -2,7 +2,7 @@ import * as React from "react";
 import { createRoot, Root } from "react-dom/client";
 import { getYouTubeTitleNode } from "@ajayyy/maze-utils/lib/elements"
 import { waitFor } from "@ajayyy/maze-utils"
-import { BrandingResult, BrandingUUID, VideoID } from "../videoBranding/videoBranding";
+import { BrandingResult, VideoID } from "../videoBranding/videoBranding";
 import { SubmissionComponent } from "./SubmissionComponent";
 
 export class SubmitButton {
@@ -15,52 +15,21 @@ export class SubmitButton {
 
     submissions: BrandingResult;
 
+    video: HTMLVideoElement;
+    videoID: VideoID;
+
     constructor() {
         this.submissions = {
-            thumbnails: [{
-                    timestamp: 10,
-                    original: false,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }, {
-                    timestamp: 20,
-                    original: false,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }, {
-                    timestamp: 30,
-                    original: false,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-            }],
-            titles: [{
-                title: "sample title",
-                original: false,
-                votes: 10,
-                locked: false,
-                UUID: "sampleUUID" as BrandingUUID
-            }, {
-                title: "sample title 2",
-                original: false,
-                votes: 10,
-                locked: false,
-                UUID: "sampleUUID" as BrandingUUID
-            }, {
-                title: "original title 2",
-                original: true,
-                votes: 10,
-                locked: false,
-                UUID: "sampleUUID" as BrandingUUID
-            }]
+            thumbnails: [],
+            titles: []
         }
     }
 
     async attachToPage(video: HTMLVideoElement, videoID: VideoID, onMobileYouTube: boolean, onInvidious: boolean): Promise<void> {
-        const referenceNode = await waitFor(() => getYouTubeTitleNode());
+        this.video = video;
+        this.videoID = videoID;
 
+        const referenceNode = await waitFor(() => getYouTubeTitleNode());
         if (referenceNode) {
             if (!referenceNode.contains(this.button)) {
                 if (!this.button) {
@@ -120,10 +89,8 @@ export class SubmitButton {
         }
     }
 
-    // //todo: add the ones that could potentially be voted on
-    // setSubmissions(submissions: BrandingResult): void {
-        // this.submissions = submissions;
-        // todo: see if this resets all the canvases
-        // this.root.render(<SubmissionComponent video={video} videoID={videoID} submissions={this.submissions} />);
-    // }
+    setSubmissions(submissions: BrandingResult): void {
+        this.submissions = submissions;
+        this.root.render(<SubmissionComponent video={this.video} videoID={this.videoID} submissions={this.submissions} />);
+    }
 }

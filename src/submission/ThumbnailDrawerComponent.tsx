@@ -34,7 +34,7 @@ export const ThumbnailDrawerComponent = (props: ThumbnailDrawerComponentProps) =
 function getThumbnails(props: ThumbnailDrawerComponentProps, 
         selectedThumbnail: number, setSelectedThumbnail: (val: number) => void): JSX.Element[] {
     const thumbnails: JSX.Element[] = [];
-    const renderCount = Math.max(5, props.existingSubmissions.length);
+    const renderCount = Math.min(5, props.existingSubmissions.length);
     for (let i = 0; i < renderCount; i++) {
         thumbnails.push(
             <ThumbnailComponent

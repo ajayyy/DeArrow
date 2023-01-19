@@ -19,8 +19,8 @@ export const TitleComponent = (props: TitleComponentProps) => {
                     e.stopPropagation();
                     props.onSelectOrUpdate((e.target as HTMLDivElement).innerText);
                 }}
-                onKeyDown={(e) => e.stopPropagation()}>
-                {props.submission.title}
+                onKeyDown={(e) => e.stopPropagation()}
+                dangerouslySetInnerHTML={{ __html: props.submission.title }}>
             </span>
 
             <button className="resetCustomTitle cbButton" 

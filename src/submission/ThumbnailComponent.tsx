@@ -29,28 +29,42 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
     const hoveredCanvasRef = React.useRef<HTMLCanvasElement>(null);
     const [hovered, setHovered] = React.useState(false);
     const [time, setTime] = React.useState(props.type === ThumbnailType.CurrentTime ? props.video.currentTime : props.time);
-    const [error, setError] = React.useState(false);
-
+    const [error, setError] = React.useState(false)
+    const lastTime = React.useRef(null) as React.MutableRefObject<number | null>;
     const [drawInterval, setDrawInterval] = React.useState<NodeJS.Timer | null>(null);
 
-    React.useEffect(() => {
-        if (props.type !== ThumbnailType.Original) {
+    // State is only used for the current time thumbnail, otherwise stay updated to upstream value
+    if (props.time && time !== props.time) {
+        setTime(props.time);
+    }
+
+    if (props.type === ThumbnailType.CurrentTime) {
+        React.useEffect(() => {
             waitFor(() => canvasRef?.current).then(() => {
-                if (time && props.type === ThumbnailType.SpecifiedTime) {
+                renderCurrentFrame(props.video, canvasRef.current!);
+                setTime(props.video.currentTime);
+            }).catch(() => setError(true));
+        }, []);
+    }
+
+    if (time != null && props.type === ThumbnailType.SpecifiedTime) {
+        React.useEffect(() => {
+            if (props.type !== ThumbnailType.Original && time !== lastTime.current) {
+                lastTime.current = time ?? null;
+    
+                waitFor(() => canvasRef?.current).then(() => {
                     renderThumbnail(props.videoID, canvasWidth, canvasHeight, false, time).then((rendered) => {
                         if (rendered) {
-                            drawCentered(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height, rendered.width, rendered.height, rendered.canvas);
+                            drawCentered(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height,
+                                rendered.width, rendered.height, rendered.canvas);
                         } else {
                             setError(true);
                         }
                     }).catch(() => setError(true));
-                } else if (props.type === ThumbnailType.CurrentTime) {
-                    renderCurrentFrame(props.video, canvasRef.current!);
-                    setTime(props.video.currentTime);
-                }
-            }).catch(() => setError(true));
-        }
-    }, []);
+                }).catch(() => setError(true));
+            }
+        }, [time]);
+    }
 
     const updateRender = () => {
         if (props.type === ThumbnailType.CurrentTime && hoveredCanvasRef.current) {
