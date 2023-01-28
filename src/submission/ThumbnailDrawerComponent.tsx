@@ -10,7 +10,7 @@ export interface ThumbnailDrawerComponentProps {
     onSelect: (submission: RenderedThumbnailSubmission) => void;
 }
 
-type NoTimeRenderedThumbnailSubmission = {
+interface NoTimeRenderedThumbnailSubmission {
     type: ThumbnailType.CurrentTime | ThumbnailType.Original;
 }
 

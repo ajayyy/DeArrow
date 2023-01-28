@@ -50,7 +50,6 @@ export class SubmitButton {
                             this.container.style.display = "none";
                         }
                     });
-                    
                 }
 
                 referenceNode.appendChild(this.button);
