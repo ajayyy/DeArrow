@@ -2,7 +2,7 @@ import * as React from "react";
 import { getFormattedTime } from "@ajayyy/maze-utils/lib/formating";
 import { drawCentered, renderThumbnail } from "../thumbnails/thumbnailRenderer";
 import { waitFor } from "@ajayyy/maze-utils"
-import { VideoID } from "../videoBranding/videoBranding";
+import { VideoID } from "@ajayyy/maze-utils/lib/video";
 
 export enum ThumbnailType {
     CurrentTime,

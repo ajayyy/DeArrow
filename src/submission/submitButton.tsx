@@ -2,8 +2,10 @@ import * as React from "react";
 import { createRoot, Root } from "react-dom/client";
 import { getYouTubeTitleNode } from "@ajayyy/maze-utils/lib/elements"
 import { waitFor } from "@ajayyy/maze-utils"
-import { BrandingResult, VideoID } from "../videoBranding/videoBranding";
+import { BrandingResult } from "../videoBranding/videoBranding";
 import { SubmissionComponent } from "./SubmissionComponent";
+import { getVideo, getVideoID, isOnMobileYouTube } from "@ajayyy/maze-utils/lib/video";
+import { log } from "../utils/logger";
 
 export class SubmitButton {
     button: HTMLButtonElement;
@@ -15,9 +17,6 @@ export class SubmitButton {
 
     submissions: BrandingResult;
 
-    video: HTMLVideoElement;
-    videoID: VideoID;
-
     constructor() {
         this.submissions = {
             thumbnails: [],
@@ -25,9 +24,11 @@ export class SubmitButton {
         }
     }
 
-    async attachToPage(video: HTMLVideoElement, videoID: VideoID, onMobileYouTube: boolean, onInvidious: boolean): Promise<void> {
-        this.video = video;
-        this.videoID = videoID;
+    async attachToPage(): Promise<void> {
+        if (!getVideo() || !getVideoID()) {
+            log("Not attaching submit button, no video");
+            return;
+        }
 
         const referenceNode = await waitFor(() => getYouTubeTitleNode());
         if (referenceNode) {
@@ -65,15 +66,15 @@ export class SubmitButton {
                     this.root = createRoot(this.container);
                     //todo: setup params, call this class and then test
                     //todo: don't render right away if not visible
-                    this.root.render(<SubmissionComponent video={video} videoID={videoID} submissions={this.submissions} />);
+                    this.root.render(<SubmissionComponent video={getVideo()!} videoID={getVideoID()!} submissions={this.submissions} />);
 
-                    if (onMobileYouTube) {
+                    if (isOnMobileYouTube()) {
                         if (this.mutationObserver) {
                             this.mutationObserver.disconnect();
                         }
                         
                         this.mutationObserver = new MutationObserver(() => 
-                            void this.attachToPage(video, videoID, onMobileYouTube, onInvidious));
+                            void this.attachToPage());
         
                         this.mutationObserver.observe(referenceNode, { 
                             childList: true,
@@ -90,6 +91,6 @@ export class SubmitButton {
 
     setSubmissions(submissions: BrandingResult): void {
         this.submissions = submissions;
-        this.root.render(<SubmissionComponent video={this.video} videoID={this.videoID} submissions={this.submissions} />);
+        this.root.render(<SubmissionComponent video={getVideo()!} videoID={getVideoID()!} submissions={this.submissions} />);
     }
 }

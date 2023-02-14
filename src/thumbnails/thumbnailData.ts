@@ -1,5 +1,6 @@
-import { BrandingUUID, VideoID } from "../videoBranding/videoBranding";
+import { BrandingUUID } from "../videoBranding/videoBranding";
 import { cacheUsed, getFromCache, setupCache } from "./thumbnailDataCache";
+import { VideoID } from "@ajayyy/maze-utils/lib/video";
 
 interface PartialThumbnailResult {
     votes: number;

@@ -1,10 +1,11 @@
 import React = require("react");
 import { CustomThumbnailResult } from "../thumbnails/thumbnailData";
 import { getCurrentPageTitle } from "../titles/titleData";
-import { BrandingResult, VideoID } from "../videoBranding/videoBranding";
+import { BrandingResult } from "../videoBranding/videoBranding";
 import { ThumbnailType } from "./ThumbnailComponent";
 import { RenderedThumbnailSubmission, ThumbnailDrawerComponent } from "./ThumbnailDrawerComponent";
 import { RenderedTitleSubmission, TitleDrawerComponent } from "./TitleDrawerComponent";
+import { VideoID } from "@ajayyy/maze-utils/lib/video";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;

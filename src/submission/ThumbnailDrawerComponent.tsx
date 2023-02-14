@@ -1,7 +1,7 @@
 import React = require("react");
-import { VideoID } from "../videoBranding/videoBranding";
 import { ThumbnailComponent } from "./ThumbnailComponent";
 import { ThumbnailType } from "./ThumbnailComponent";
+import { VideoID } from "@ajayyy/maze-utils/lib/video";
 
 export interface ThumbnailDrawerComponentProps {
     video: HTMLVideoElement;

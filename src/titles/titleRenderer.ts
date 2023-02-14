@@ -1,5 +1,5 @@
-import { VideoID } from "../videoBranding/videoBranding";
 import { getTitle } from "./titleData";
+import { VideoID } from "@ajayyy/maze-utils/lib/video";
 
 export async function replaceTitle(element: HTMLElement, videoID: VideoID): Promise<boolean> {
     const titleElement = element.querySelector("#video-title") as HTMLElement;

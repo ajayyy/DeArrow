@@ -1,6 +1,6 @@
-import { VideoID } from "../videoBranding/videoBranding";
 import { getPlaybackUrl, getThumbnailTimestamp } from "./thumbnailData";
 import { getFromCache, RenderedThumbnailVideo, setupCache } from "./thumbnailDataCache";
+import { VideoID } from "@ajayyy/maze-utils/lib/video";
 
 export async function renderThumbnail(videoID: VideoID, width: number,
     height: number, saveVideo: boolean, timestamp: number): Promise<RenderedThumbnailVideo | null> {

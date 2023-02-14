@@ -1,9 +1,9 @@
+import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
 import { replaceTitle } from "../titles/titleRenderer";
 
-export type VideoID = string & { videoIDBrand : never };
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
 
 export interface BrandingResult {
