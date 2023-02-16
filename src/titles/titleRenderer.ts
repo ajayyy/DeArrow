@@ -1,5 +1,5 @@
-import { getTitle } from "./titleData";
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { getVideoBranding } from "../dataFetching";
 
 export async function replaceTitle(element: HTMLElement, videoID: VideoID): Promise<boolean> {
     const titleElement = element.querySelector("#video-title") as HTMLElement;
@@ -7,7 +7,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID): Prom
     //todo: add an option to not hide title
     titleElement.style.visibility = "hidden";
 
-    const title = await getTitle(videoID);
+    const title = (await getVideoBranding(videoID, false))?.titles?.[0]?.title;
     console.log(title, titleElement.textContent, titleElement.innerHTML)
     if (title) {
         titleElement.innerText = title;

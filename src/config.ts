@@ -1,8 +1,24 @@
 import { ProtoConfig } from "@ajayyy/maze-utils/lib/config";
+import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { ThumbnailSubmission } from "./thumbnails/thumbnailData";
 import { logError } from "./utils/logger";
 
 export interface Permission {
     canSubmit: boolean;
+}
+
+export type UnsubmittedThumbnailSubmission = ThumbnailSubmission & {
+    selected?: boolean;
+}
+
+export interface UnsubmittedTitleSubmission {
+    title: string;
+    selected?: boolean;
+}
+
+export interface UnsubmittedSubmission {
+    thumbnails: UnsubmittedThumbnailSubmission[];
+    titles: UnsubmittedTitleSubmission[];
 }
 
 interface SBConfig {
@@ -12,6 +28,7 @@ interface SBConfig {
 
 interface SBStorage {
     navigationApiAvailable: boolean;
+    unsubmitted: Record<VideoID, UnsubmittedSubmission>;
 }
 
 class ConfigClass extends ProtoConfig<SBConfig, SBStorage> {
@@ -34,7 +51,8 @@ const syncDefaults = {
 };
 
 const localDefaults = {
-    navigationApiAvailable: false
+    navigationApiAvailable: false,
+    unsubmitted: {}
 };
 
 const Config = new ConfigClass(syncDefaults, localDefaults, migrateOldSyncFormats);

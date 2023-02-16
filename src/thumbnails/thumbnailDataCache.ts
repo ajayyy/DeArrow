@@ -28,12 +28,12 @@ export interface ThumbnailData {
     playbackUrls: PlaybackUrl[];
 }
 
-interface ThumbnailDataInternal extends ThumbnailData {
+interface ThumbnailDataCacheRecord extends ThumbnailData {
     lastUsed: number;
 }
 
 //todo: set a max size of this and delete some after a while
-const cache: Record<VideoID, ThumbnailDataInternal> = {};
+const cache: Record<VideoID, ThumbnailDataCacheRecord> = {};
 
 export function getFromCache(videoID: VideoID): ThumbnailData | undefined {
     return cache[videoID];

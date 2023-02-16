@@ -3,7 +3,7 @@ import { TitleComponent } from "./TitleComponent";
 
 export interface TitleDrawerComponentProps {
     existingSubmissions: RenderedTitleSubmission[];
-    onSelectOrUpdate: (title: RenderedTitleSubmission) => void;
+    onSelectOrUpdate: (title: RenderedTitleSubmission, oldTitle: string) => void;
 }
 
 export interface RenderedTitleSubmission {
@@ -27,12 +27,12 @@ function getTitles(props: TitleDrawerComponentProps,
         titles.push(
             <TitleComponent
                 large={selectedTitle === i}
-                onSelectOrUpdate={(title) => {
+                onSelectOrUpdate={(title, oldTitle) => {
                     setSelectedTitle(i);
                     props.onSelectOrUpdate({
                         ...props.existingSubmissions[i],
                         title
-                    });
+                    }, oldTitle);
                 }}
                 key={i}
                 submission={props.existingSubmissions[i]}

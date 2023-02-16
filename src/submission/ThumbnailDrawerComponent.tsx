@@ -2,12 +2,13 @@ import React = require("react");
 import { ThumbnailComponent } from "./ThumbnailComponent";
 import { ThumbnailType } from "./ThumbnailComponent";
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 
 export interface ThumbnailDrawerComponentProps {
     video: HTMLVideoElement;
     videoId: VideoID;
     existingSubmissions: RenderedThumbnailSubmission[];
-    onSelect: (submission: RenderedThumbnailSubmission) => void;
+    onSelect: (submission: ThumbnailSubmission, oldTime: number | undefined) => void;
 }
 
 interface NoTimeRenderedThumbnailSubmission {
@@ -19,7 +20,7 @@ interface TimeRenderedThumbnailSubmission {
     type: ThumbnailType.SpecifiedTime;
 }
 
-export type RenderedThumbnailSubmission = NoTimeRenderedThumbnailSubmission | TimeRenderedThumbnailSubmission;
+export type RenderedThumbnailSubmission = (NoTimeRenderedThumbnailSubmission | TimeRenderedThumbnailSubmission);
 
 export const ThumbnailDrawerComponent = (props: ThumbnailDrawerComponentProps) => {
     const [selectedThumbnail, setSelectedThumbnail] = React.useState(0);
@@ -40,9 +41,9 @@ function getThumbnails(props: ThumbnailDrawerComponentProps,
             <ThumbnailComponent
                 video={props.video}
                 large={selectedThumbnail === i}
-                onClick={() => {
+                onClick={(submission, oldTime) => {
                     setSelectedThumbnail(i);
-                    props.onSelect(props.existingSubmissions[i]);
+                    props.onSelect(submission, oldTime);
                 }}
                 type={props.existingSubmissions[i].type}
                 videoID={props.videoId}

@@ -3,6 +3,7 @@ import { getFormattedTime } from "@ajayyy/maze-utils/lib/formating";
 import { drawCentered, renderThumbnail } from "../thumbnails/thumbnailRenderer";
 import { waitFor } from "@ajayyy/maze-utils"
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 
 export enum ThumbnailType {
     CurrentTime,
@@ -13,7 +14,7 @@ export enum ThumbnailType {
 export interface ThumbnailComponentProps {
     video: HTMLVideoElement;
     large: boolean;
-    onClick: () => void;
+    onClick: (thumbnail: ThumbnailSubmission, oldTime: number | undefined) => void;
     type: ThumbnailType;
     videoID: VideoID;
     time?: number;
@@ -83,13 +84,23 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
         <div className={`cbThumbnail${props.large ? " cbThumbnailLarge" : ""}`}
                 style={style}
                 onClick={() => {
-                    props.onClick();
-
+                    const originalTime = time;
+                    let newTime = time;
                     if (props.type === ThumbnailType.CurrentTime && canvasRef.current 
-                            && time !== props.video.currentTime) {
+                        && time !== props.video.currentTime) {
                         renderCurrentFrame(props.video, canvasRef.current);
-                        setTime(props.video.currentTime);
+
+                        newTime = props.video.currentTime;
+                        setTime(newTime);
                     }
+
+                    props.onClick(props.type === ThumbnailType.Original ? {
+                        original: true
+                    } : {
+                        original: false,
+                        timestamp: newTime!
+                    }, originalTime);
+
                 }}
                 onMouseEnter={() => {
                     setHovered(true);

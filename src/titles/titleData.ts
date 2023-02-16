@@ -1,18 +1,15 @@
 import { BrandingUUID } from "../videoBranding/videoBranding";
 import { getYouTubeTitleNode } from "@ajayyy/maze-utils/lib/elements"
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
 
-export interface TitleResult {
+export interface TitleSubmission {
     title: string;
     original: boolean;
+}
+
+export interface TitleResult extends TitleSubmission {
     votes: number;
     locked: boolean;
     UUID: BrandingUUID;
-}
-
-// eslint-disable-next-line require-await, @typescript-eslint/no-unused-vars
-export async function getTitle(videoID: VideoID): Promise<string | null> {
-    return null;
 }
 
 export function getCurrentPageTitle(): string | null {

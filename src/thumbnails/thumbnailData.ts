@@ -8,16 +8,19 @@ interface PartialThumbnailResult {
     UUID: BrandingUUID;
 }
 
-export type CustomThumbnailResult = PartialThumbnailResult & {
+export type CustomThumbnailSubmission = {
     timestamp: number;
     original: false;
 };
+export type CustomThumbnailResult = PartialThumbnailResult & CustomThumbnailSubmission;
 
-export type OriginalThumbnailResult = PartialThumbnailResult & {
+export type OriginalThumbnailSubmission = {
     original: true;
 };
+export type OriginalThumbnailResult = PartialThumbnailResult & OriginalThumbnailSubmission;
 
 export type ThumbnailResult = CustomThumbnailResult | OriginalThumbnailResult;
+export type ThumbnailSubmission = CustomThumbnailSubmission | OriginalThumbnailSubmission;
 
 interface Format {
     url: string;
@@ -103,10 +106,4 @@ export async function getPlaybackUrl(videoID: VideoID,
     }
 
     return null;
-}
-
-//eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function getThumbnailTimestamp(videoID: VideoID): number {
-    //todo: fetch from server
-    return 20.4;
 }

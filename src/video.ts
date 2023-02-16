@@ -1,25 +1,29 @@
 import { BackgroundToContentMessage } from "./types/messaging";
 import { logError } from "./utils/logger";
-import { ChannelIDInfo, checkIfNewVideoID, setupVideoModule, VideoID } from "@ajayyy/maze-utils/lib/video"
+import { ChannelIDInfo, checkIfNewVideoID, getVideoID, setupVideoModule, VideoID } from "@ajayyy/maze-utils/lib/video"
 import Config from "./config";
 import { SubmitButton } from "./submission/submitButton";
 import { BrandingUUID } from "./videoBranding/videoBranding";
+import { getVideoBranding } from "./dataFetching";
 
 
 const submitButton = new SubmitButton();
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-function videoIDChange(id: VideoID | null): void {
+async function videoIDChange(videoID: VideoID | null): Promise<void> {
+    if (!videoID || videoID === getVideoID()) return;
+    
+    const branding = await getVideoBranding(videoID, true);
+    if (branding) {
+        submitButton.setSubmissions(branding);
+    }
+}
 
-    // sponsorsLookup();
+function resetValues() {
+    submitButton.clearSubmissions();
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
 function channelIDChange(channelIDInfo: ChannelIDInfo): void {
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-function resetValues() {
 }
 
 function videoElementChange(newVideo: boolean) {
@@ -126,7 +130,7 @@ export function setupCBVideoModule(): void {
     });
 
     setupVideoModule({
-        videoIDChange,
+        videoIDChange: (videoID) => void videoIDChange(videoID).catch(logError),
         channelIDChange,
         videoElementChange,
         resetValues
