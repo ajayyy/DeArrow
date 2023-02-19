@@ -1,16 +1,18 @@
 import { BackgroundToContentMessage } from "./types/messaging";
 import { logError } from "./utils/logger";
-import { ChannelIDInfo, checkIfNewVideoID, getVideoID, setupVideoModule, VideoID } from "@ajayyy/maze-utils/lib/video"
+import { ChannelIDInfo, checkIfNewVideoID, setupVideoModule, VideoID } from "@ajayyy/maze-utils/lib/video"
 import Config from "./config";
 import { SubmitButton } from "./submission/submitButton";
-import { BrandingUUID } from "./videoBranding/videoBranding";
+import { replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
 import { getVideoBranding } from "./dataFetching";
 
 
 const submitButton = new SubmitButton();
 
 async function videoIDChange(videoID: VideoID | null): Promise<void> {
-    if (!videoID || videoID === getVideoID()) return;
+    if (!videoID) return;
+
+    replaceCurrentVideoBranding().catch(logError);
     
     const branding = await getVideoBranding(videoID, true);
     if (branding) {
@@ -28,97 +30,7 @@ function channelIDChange(channelIDInfo: ChannelIDInfo): void {
 
 function videoElementChange(newVideo: boolean) {
     if (newVideo) {
-        submitButton.attachToPage().catch(console.log);
-
-        setTimeout(() => {
-            submitButton.setSubmissions({
-                thumbnails: [{
-                    original: true,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }, {
-                    timestamp: 10,
-                    original: false,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }, {
-                    timestamp: 20,
-                    original: false,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }, {
-                    timestamp: 30,
-                    original: false,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }],
-                titles: [{
-                    title: "sample title",
-                    original: false,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }, {
-                    title: "sample title 2",
-                    original: false,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }, {
-                    title: "original title 2",
-                    original: true,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }]
-            });
-        }, 5000);
-        
-        setTimeout(() => {
-            submitButton.setSubmissions({
-                thumbnails: [{
-                    original: true,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }, {
-                    timestamp: 25,
-                    original: false,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }, {
-                    timestamp: 20,
-                    original: false,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }],
-                titles: [{
-                    title: "sample title",
-                    original: false,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }, {
-                    title: "some completely different title",
-                    original: false,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }, {
-                    title: "original title 2",
-                    original: true,
-                    votes: 10,
-                    locked: false,
-                    UUID: "sampleUUID" as BrandingUUID
-                }]
-            });
-        }, 10000);
+        submitButton.attachToPage().catch(logError);
     }
 }
 

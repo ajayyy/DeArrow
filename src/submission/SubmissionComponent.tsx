@@ -72,6 +72,8 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                 setExtraUnsubmittedTitles(unsubmittedTitles
                     .filter((t) => titles.every((s) => s.title !== t.title)));
             }
+
+            Config.forceLocalUpdate("unsubmitted");
         } else {
             setExtraUnsubmittedThumbnails([]);
             setExtraUnsubmittedTitles([]);
@@ -100,6 +102,8 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             } else {
                                 unsubmitted.thumbnails.push(t);
                             }
+
+                            Config.forceLocalUpdate("unsubmitted");
                         }
                     }}></ThumbnailDrawerComponent>
             </div>
@@ -125,6 +129,8 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                                     title: t.title
                                 });
                             }
+
+                            Config.forceLocalUpdate("unsubmitted");
                         }
                     }}></TitleDrawerComponent>
             </div>

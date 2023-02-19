@@ -150,7 +150,7 @@ export async function createThumbnailCanvas(videoID: VideoID, width: number,
     let timestamp = forcedTimestamp as number;
     if (timestamp === null) {
         const branding = await getVideoBranding(videoID, false);
-        if (branding && !branding.thumbnails[0].original) {
+        if (branding?.thumbnails?.[0] && !branding.thumbnails[0].original) {
             timestamp = branding.thumbnails[0].timestamp;
         } else {
             // Original thumbnail will be shown automatically
@@ -213,7 +213,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, t
 
         // Trigger a fetch to start, and display the original thumbnail if necessary
         getVideoBranding(videoID, false).then((branding) => {
-            if (branding && branding.thumbnails[0].original) {
+            if (branding && branding.thumbnails[0]?.original) {
                 image.style.setProperty("display", "block", "important");
             }
         }).catch(logError);

@@ -15,7 +15,7 @@ export class SubmitButton {
     button: HTMLButtonElement;
     buttonImage: HTMLImageElement;
     container: HTMLElement;
-    root: Root;
+    root: Root | null;
 
     mutationObserver?: MutationObserver;
 
@@ -70,7 +70,7 @@ export class SubmitButton {
                     this.root = createRoot(this.container);
                     //todo: setup params, call this class and then test
                     //todo: don't render right away if not visible
-                    this.root.render(<SubmissionComponent video={getVideo()!} videoID={getVideoID()!} submissions={this.submissions} submitClicked={this.submitPressed} />);
+                    this.root.render(<SubmissionComponent video={getVideo()!} videoID={getVideoID()!} submissions={this.submissions} submitClicked={(title, thumbnail) => this.submitPressed(title, thumbnail)} />);
 
                     if (isOnMobileYouTube()) {
                         if (this.mutationObserver) {
@@ -110,7 +110,7 @@ export class SubmitButton {
 
     setSubmissions(submissions: BrandingResult): void {
         this.submissions = submissions;
-        this.root.render(<SubmissionComponent video={getVideo()!} videoID={getVideoID()!} submissions={this.submissions} submitClicked={this.submitPressed} />);
+        this.root?.render(<SubmissionComponent video={getVideo()!} videoID={getVideoID()!} submissions={this.submissions} submitClicked={(title, thumbnail) => this.submitPressed(title, thumbnail)} />);
     }
 
     private async submitPressed(title: TitleSubmission, thumbnail: ThumbnailSubmission): Promise<void> {

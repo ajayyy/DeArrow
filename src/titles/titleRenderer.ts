@@ -1,13 +1,14 @@
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import { getVideoBranding } from "../dataFetching";
 
-export async function replaceTitle(element: HTMLElement, videoID: VideoID): Promise<boolean> {
-    const titleElement = element.querySelector("#video-title") as HTMLElement;
+export async function replaceTitle(element: HTMLElement, videoID: VideoID, queryByHash: boolean): Promise<boolean> {
+    const titleElement = element.querySelector("#video-title, yt-formatted-string") as HTMLElement;
+    //todo: don't replace, but add on another element
 
     //todo: add an option to not hide title
     titleElement.style.visibility = "hidden";
 
-    const title = (await getVideoBranding(videoID, false))?.titles?.[0]?.title;
+    const title = (await getVideoBranding(videoID, queryByHash))?.titles?.[0]?.title;
     console.log(title, titleElement.textContent, titleElement.innerHTML)
     if (title) {
         titleElement.innerText = title;

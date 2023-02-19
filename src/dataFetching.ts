@@ -18,6 +18,8 @@ interface VideoBrandingCacheRecord {
 const cache: Record<VideoID, VideoBrandingCacheRecord> = {};
 const cacheLimit = 1000;
 
+const activeRequests: Record<VideoID, Promise<BrandingResult | null>> = {};
+
 export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): Promise<VideoBrandingCacheRecord | null> {
     const cachedValue = cache[videoID];
 
@@ -26,32 +28,39 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): 
         return cachedValue;
     }
 
-    let result: BrandingResult | null = null;
-    if (queryByHash) {
-        const request = await sendRequestToServer("GET", `/api/branding/${(await getHash(videoID, 1)).slice(0, 4)}`);
+    activeRequests[videoID] ??= (async () => {
+        let result: BrandingResult | null = null;
+        if (queryByHash) {
+            const request = await sendRequestToServer("GET", `/api/branding/${(await getHash(videoID, 1)).slice(0, 4)}`);
 
-        if (request.ok) {
-            try {
-                const json = JSON.parse(request.responseText);
-                result = json?.[videoID];
-            } catch (e) {
-                logError(`Getting video branding for ${videoID} failed: ${e}`);
+            if (request.ok || request.status === 404) {
+                try {
+                    const json = JSON.parse(request.responseText);
+                    result = json?.[videoID];
+                } catch (e) {
+                    logError(`Getting video branding for ${videoID} failed: ${e}`);
+                }
+            }
+        } else {
+            const request = await sendRequestToServer("GET", "/api/branding", {
+                videoID
+            });
+
+            if (request.ok || request.status === 404) {
+                try {
+                    result = JSON.parse(request.responseText);
+                } catch (e) {
+                    logError(`Getting video branding for ${videoID} failed: ${e}`);
+                }
             }
         }
-    } else {
-        const request = await sendRequestToServer("GET", "/api/branding", {
-            videoID
-        });
 
-        if (request.ok) {
-            try {
-                result = JSON.parse(request.responseText);
-            } catch (e) {
-                logError(`Getting video branding for ${videoID} failed: ${e}`);
-            }
-        }
-    }
-    
+        return result;
+    })();
+
+    const result = await activeRequests[videoID];
+    delete activeRequests[videoID];
+
     if (result) {
         cache[videoID] = {
             titles: result.titles,
@@ -72,8 +81,8 @@ export function submitVideoBranding(videoID: VideoID, title: TitleSubmission, th
     return sendRequestToServer("POST", "/api/branding", {
         userID: Config.config!.userID,
         videoID,
-        titles: title,
-        thumbnails: thumbnail
+        title,
+        thumbnail
     });
 }
 

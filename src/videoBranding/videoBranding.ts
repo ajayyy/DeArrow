@@ -1,4 +1,6 @@
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { getYouTubeTitleNodeSelector } from "@ajayyy/maze-utils/lib/elements";
+import { getVideoID, VideoID } from "@ajayyy/maze-utils/lib/video";
+import { waitForElement } from "@ajayyy/maze-utils/lib/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
@@ -11,7 +13,21 @@ export interface BrandingResult {
     thumbnails: ThumbnailResult[];
 }
 
-export function replaceBranding(element: HTMLElement): Promise<[boolean, boolean]> {
+export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]> {
+    const title = await waitForElement(getYouTubeTitleNodeSelector()) as HTMLElement;
+    const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
+    const videoID = getVideoID();
+
+    if (title && videoID !== null) {
+        promises[0] = replaceTitle(title, videoID, true);
+    }
+
+    //todo: replace thumbnail in background of .ytp-cued-thumbnail-overlay-image
+
+    return Promise.all(promises);
+}
+
+export function replaceVideoCardBranding(element: HTMLElement): Promise<[boolean, boolean]> {
     const link = element.querySelector("#thumbnail") as HTMLAnchorElement;
 
     if (link) {
@@ -19,7 +35,7 @@ export function replaceBranding(element: HTMLElement): Promise<[boolean, boolean
         const videoID = link.href?.match(/\?v=(.{11})/)?.[1] as VideoID;
 
         return Promise.all([replaceThumbnail(element, videoID),
-            replaceTitle(element, videoID)]) as Promise<[boolean, boolean]>;
+            replaceTitle(element, videoID, false)]) as Promise<[boolean, boolean]>;
     }
 
     return new Promise((resolve) => resolve([false, false]));
@@ -35,7 +51,7 @@ export function startThumbnailListener(): void {
         for (const element of newElements) {
             elementsDealtWith.add(element);
 
-            void replaceBranding(element as HTMLElement);
+            void replaceVideoCardBranding(element as HTMLElement);
 
             // stop++;
             return;
