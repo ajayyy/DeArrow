@@ -122,22 +122,26 @@ export class SubmitButton {
             // Set the unsubmitted as selected
             const unsubmitted = Config.local!.unsubmitted[getVideoID()!];
             if (unsubmitted) {
-                unsubmitted.titles.forEach((t) => t.selected = false);
-                unsubmitted.thumbnails.forEach((t) => t.selected = false);
+                if (Config.config!.keepUnsubmitted && !chrome.extension.inIncognitoContext) {
+                    unsubmitted.titles.forEach((t) => t.selected = false);
+                    unsubmitted.thumbnails.forEach((t) => t.selected = false);
 
-                if (thumbnail.original && !unsubmitted.thumbnails.find((t) => t.original)) {
-                    unsubmitted.thumbnails.push({
-                        original: true,
-                        selected: true
-                    });
+                    if (thumbnail.original && !unsubmitted.thumbnails.find((t) => t.original)) {
+                        unsubmitted.thumbnails.push({
+                            original: true,
+                            selected: true
+                        });
+                    }
+
+                    const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === title.title);
+                    if (unsubmittedTitle) unsubmittedTitle.selected = true;
+                    
+                    const unsubmittedThumbnail = unsubmitted.thumbnails.find((t) => (t.original && thumbnail.original) 
+                        || (!t.original && !thumbnail.original && t.timestamp === thumbnail.timestamp))
+                    if (unsubmittedThumbnail) unsubmittedThumbnail.selected = true;
+                } else {
+                    delete Config.local!.unsubmitted[getVideoID()!];
                 }
-
-                const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === title.title);
-                if (unsubmittedTitle) unsubmittedTitle.selected = true;
-                
-                const unsubmittedThumbnail = unsubmitted.thumbnails.find((t) => (t.original && thumbnail.original) 
-                    || (!t.original && !thumbnail.original && t.timestamp === thumbnail.timestamp))
-                if (unsubmittedThumbnail) unsubmittedThumbnail.selected = true;
             }
         }
     }

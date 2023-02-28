@@ -24,6 +24,7 @@ export interface UnsubmittedSubmission {
 interface SBConfig {
     userID: string | null;
     invidiousInstances: string[];
+    keepUnsubmitted: boolean;
 }
 
 interface SBStorage {
@@ -47,7 +48,8 @@ function migrateOldSyncFormats(config: SBConfig) {
 
 const syncDefaults = {
     userID: null,
-    invidiousInstances: []
+    invidiousInstances: [],
+    keepUnsubmitted: true
 };
 
 const localDefaults = {
