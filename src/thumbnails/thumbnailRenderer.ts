@@ -1,7 +1,7 @@
 import { getPlaybackUrl } from "./thumbnailData";
 import { getFromCache, RenderedThumbnailVideo, setupCache } from "./thumbnailDataCache";
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
-import { getVideoBranding } from "../dataFetching";
+import { getVideoThumbnailIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
 
 export async function renderThumbnail(videoID: VideoID, width: number,
@@ -149,9 +149,9 @@ export async function createThumbnailCanvas(videoID: VideoID, width: number,
 
     let timestamp = forcedTimestamp as number;
     if (timestamp === null) {
-        const branding = await getVideoBranding(videoID, false);
-        if (branding?.thumbnails?.[0] && !branding.thumbnails[0].original) {
-            timestamp = branding.thumbnails[0].timestamp;
+        const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, false);
+        if (thumbnail && !thumbnail.original) {
+            timestamp = thumbnail.timestamp;
         } else {
             // Original thumbnail will be shown automatically
             return null;
@@ -212,8 +212,8 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, t
         const height = 404;
 
         // Trigger a fetch to start, and display the original thumbnail if necessary
-        getVideoBranding(videoID, false).then((branding) => {
-            if (branding && branding.thumbnails[0]?.original) {
+        getVideoThumbnailIncludingUnsubmitted(videoID, false).then((thumbnail) => {
+            if (thumbnail && thumbnail.original) {
                 image.style.setProperty("display", "block", "important");
             }
         }).catch(logError);

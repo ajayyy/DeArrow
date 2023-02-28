@@ -8,10 +8,10 @@ import { BrandingResult } from "./videoBranding/videoBranding";
 import { logError } from "./utils/logger";
 import { getHash } from "@ajayyy/maze-utils/lib/hash";
 import Config from "./config";
+import { generateUserID } from "@ajayyy/maze-utils/lib/setup";
+import { BrandingUUID } from "./videoBranding/videoBranding";
 
-interface VideoBrandingCacheRecord {
-    titles: TitleResult[];
-    thumbnails: ThumbnailResult[];
+interface VideoBrandingCacheRecord extends BrandingResult {
     lastUsed: number;
 }
 
@@ -19,6 +19,36 @@ const cache: Record<VideoID, VideoBrandingCacheRecord> = {};
 const cacheLimit = 1000;
 
 const activeRequests: Record<VideoID, Promise<BrandingResult | null>> = {};
+
+
+export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, queryByHash: boolean): Promise<ThumbnailResult | null> {
+    const unsubmitted = Config.local!.unsubmitted[videoID]?.thumbnails?.find(t => t.selected);
+    if (unsubmitted) {
+        return {
+            ...unsubmitted,
+            votes: 0,
+            locked: false,
+            UUID: generateUserID() as BrandingUUID
+        };
+    }
+
+    return (await getVideoBranding(videoID, queryByHash))?.thumbnails[0] ?? null;
+}
+
+export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, queryByHash: boolean): Promise<TitleResult | null> {
+    const unsubmitted = Config.local!.unsubmitted[videoID]?.titles?.find(t => t.selected);
+    if (unsubmitted) {
+        return {
+            ...unsubmitted,
+            votes: 0,
+            locked: false,
+            UUID: generateUserID() as BrandingUUID,
+            original: false
+        };
+    }
+
+    return (await getVideoBranding(videoID, queryByHash))?.titles[0] ?? null;
+}
 
 export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): Promise<VideoBrandingCacheRecord | null> {
     const cachedValue = cache[videoID];

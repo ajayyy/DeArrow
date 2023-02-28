@@ -1,5 +1,5 @@
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
-import { getVideoBranding } from "../dataFetching";
+import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 
 export async function replaceTitle(element: HTMLElement, videoID: VideoID, queryByHash: boolean): Promise<boolean> {
     const titleElement = element.querySelector("#video-title, yt-formatted-string") as HTMLElement;
@@ -8,7 +8,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, query
     //todo: add an option to not hide title
     titleElement.style.visibility = "hidden";
 
-    const title = (await getVideoBranding(videoID, queryByHash))?.titles?.[0]?.title;
+    const title = (await getVideoTitleIncludingUnsubmitted(videoID, queryByHash))?.title;
     console.log(title, titleElement.textContent, titleElement.innerHTML)
     if (title) {
         titleElement.innerText = title;
