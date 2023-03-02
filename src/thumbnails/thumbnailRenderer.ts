@@ -212,6 +212,9 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, t
         const width = 720;
         const height = 404;
 
+        // TODO: Add option not to hide all thumbnails by default
+        image.style.display = "none";
+
         // Trigger a fetch to start, and display the original thumbnail if necessary
         getVideoThumbnailIncludingUnsubmitted(videoID, false).then((thumbnail) => {
             if (thumbnail && thumbnail.original) {
@@ -223,7 +226,10 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, t
             thumbnail!.style.removeProperty("display");
         });
 
-        if (!thumbnail) return false;
+        if (!thumbnail) {
+            image.style.removeProperty("display");
+            return false;
+        }
 
         image.style.display = "none";
         thumbnail.classList.add("style-scope");
