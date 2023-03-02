@@ -161,6 +161,7 @@ export async function createThumbnailCanvas(videoID: VideoID, width: number,
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
+    canvas.style.display = "none";
 
     renderThumbnail(videoID, 0, 0, saveVideo, timestamp).then((smallerCanvasInfo) => {
         if (!smallerCanvasInfo || smallerCanvasInfo.width < width || smallerCanvasInfo.height < height) {
@@ -225,7 +226,6 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, t
         if (!thumbnail) return false;
 
         image.style.display = "none";
-        thumbnail.style.display = "none";
         thumbnail.classList.add("style-scope");
         thumbnail.classList.add("ytd-img-shadow");
         image.parentElement?.appendChild(thumbnail);

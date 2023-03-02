@@ -13,13 +13,18 @@ export interface BrandingResult {
     thumbnails: ThumbnailResult[];
 }
 
+export enum BrandingLocation {
+    Related,
+    Watch
+}
+
 export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]> {
     const title = await waitForElement(getYouTubeTitleNodeSelector()) as HTMLElement;
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
     const videoID = getVideoID();
 
     if (title && videoID !== null) {
-        promises[0] = replaceTitle(title, videoID, true);
+        promises[0] = replaceTitle(title, videoID, BrandingLocation.Watch, true);
     }
 
     //todo: replace thumbnail in background of .ytp-cued-thumbnail-overlay-image
@@ -35,7 +40,7 @@ export function replaceVideoCardBranding(element: HTMLElement): Promise<[boolean
         const videoID = link.href?.match(/\?v=(.{11})/)?.[1] as VideoID;
 
         return Promise.all([replaceThumbnail(element, videoID),
-            replaceTitle(element, videoID, false)]) as Promise<[boolean, boolean]>;
+            replaceTitle(element, videoID, BrandingLocation.Related, false)]) as Promise<[boolean, boolean]>;
     }
 
     return new Promise((resolve) => resolve([false, false]));
