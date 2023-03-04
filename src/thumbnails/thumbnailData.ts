@@ -61,15 +61,17 @@ async function fetchFormats(videoID: VideoID, ignoreCache: boolean): Promise<For
                 url: string;
                 width: number;
                 height: number;
+                mimeType: string;
             }
 
             const response = await result.json();
             const formats = response?.streamingData?.adaptiveFormats as Format[];
             if (formats) {
+                const containsVp9 = formats.some((format) => format.mimeType.includes("vp9"));
                 // Should already be reverse sorted, but reverse sort just incase (not slow if it is correct already)
                 const sorted = formats
                     .reverse()
-                    .filter((format) => format.width && format.height)
+                    .filter((format) => format.width && format.height && (!containsVp9 || format.mimeType.includes("vp9")))
                     .sort((a, b) => a?.width - b?.width);
 
                 console.log(videoID, (Date.now() - start) / 1000, "innerTube");
