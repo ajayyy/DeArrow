@@ -9,23 +9,31 @@ export async function renderThumbnail(videoID: VideoID, width: number,
     const start = Date.now();
 
     const existingCache = getFromCache(videoID);
+    let reusedVideo: HTMLVideoElement | null = null;
     if (existingCache && existingCache?.video?.length > 0) {
-        const bestVideo = (width && height) ? existingCache.video.find(v => v.width >= width && v.height >= height && timestamp === v.timestamp)
-            : existingCache.video[existingCache.video.length - 1];
+        const bestVideos = ((width && height) ? existingCache.video.filter(v => v.width >= width && v.height >= height)
+            : existingCache.video).sort((a, b) => b.width - a.width);
 
-        if (bestVideo?.rendered) {
-            return bestVideo;
-        } else if (bestVideo) {
+        const sameTimestamp = bestVideos.sort((a, b) => b.width - a.width).find(v => v.timestamp === timestamp);
+
+        if (sameTimestamp?.rendered) {
+            return sameTimestamp;
+        } else if (sameTimestamp) {
             await new Promise((resolve) => {
-                bestVideo?.onReady.push(resolve);
+                sameTimestamp.onReady.push(resolve);
             });
+
+            return sameTimestamp as unknown as RenderedThumbnailVideo;
+        } else if (bestVideos.length > 0) {
+            reusedVideo = bestVideos[0].video;
         }
     }
 
     let url = await getPlaybackUrl(videoID, width, height);
     if (!url) return null; //todo: handle null url, example: byXHW0dvu2U
 
-    let video = createVideo(url, timestamp);
+    let video = createVideo(reusedVideo, url, timestamp);
+
     let tries = 1;
     const videoCache = setupCache(videoID);
     videoCache.video.push({
@@ -82,13 +90,20 @@ export async function renderThumbnail(videoID: VideoID, width: number,
 
             console.log(videoID, (Date.now() - start) / 1000, width > 0 ? "full" : "smaller");
 
-            if (!saveVideo) video.remove();
+            if (!saveVideo) {
+                video.src = "";
+                video.remove();
+            } else {
+                video.removeEventListener("loadeddata", loadedData);
+                video.removeEventListener("seeked", loadedData)
+                video.removeEventListener("error", errorHandler);
+            }
 
             resolved = true;
             resolve(videoInfo);
         };
 
-        const errorHandler = async () => {
+        const errorHandler = () => void (async () => {
             if (!resolved) {
                 // Try creating the video again
                 video.remove();
@@ -126,14 +141,18 @@ export async function renderThumbnail(videoID: VideoID, width: number,
                     });
                 }
 
-                video = createVideo(url, timestamp);
+                video = createVideo(null, url, timestamp);
                 video.addEventListener("loadeddata", loadedData);
-                video.addEventListener("error", () => void errorHandler());
+                video.addEventListener("error", errorHandler);
             }
-        };
+        })();
 
-        video.addEventListener("error", () => void errorHandler());
-        video.addEventListener("loadeddata", loadedData);
+        video.addEventListener("error", errorHandler);
+        if (reusedVideo) {
+            video.addEventListener("seeked", loadedData);
+        } else {
+            video.addEventListener("loadeddata", loadedData);
+        }
     })
 }
 
@@ -194,9 +213,9 @@ export function drawCentered(canvas: HTMLCanvasElement, width: number, height: n
     canvas.getContext("2d")?.drawImage(originalSurface, (width - calculateWidth) / 2, 0, calculateWidth, height);
 }
 
-function createVideo(url: string, timestamp: number): HTMLVideoElement {
-    const video = document.createElement("video");
-    video.src = url;
+function createVideo(existingVideo: HTMLVideoElement | null, url: string, timestamp: number): HTMLVideoElement {
+    const video = existingVideo ?? document.createElement("video");
+    if (!existingVideo) video.src = url;
     video.currentTime = timestamp;
     video.controls = false;
     video.pause();
