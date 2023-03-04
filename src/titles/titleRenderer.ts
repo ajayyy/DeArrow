@@ -1,15 +1,48 @@
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { getVideoID, VideoID } from "@ajayyy/maze-utils/lib/video";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
 import { BrandingLocation } from "../videoBranding/videoBranding";
 
+interface WatchTitleMutationObserverInfo {
+    observer: MutationObserver;
+    element: HTMLElement;
+}
+
+let watchTitleMutationObserverInfo: WatchTitleMutationObserverInfo | null = null;
+
 export async function replaceTitle(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation, queryByHash: boolean): Promise<boolean> {
-    const originalTitleElement = element.querySelector(`${getTitleSelector(brandingLocation)}:not(.cbCustomTitle)`) as HTMLElement;
+    const getOriginalTitleElement = (element) => element.querySelector(`${getTitleSelector(brandingLocation)}:not(.cbCustomTitle)`) as HTMLElement;
+    const originalTitleElement = getOriginalTitleElement(element);
     const titleElement = element.querySelector(".cbCustomTitle") as HTMLElement ?? createTitleElement(originalTitleElement, brandingLocation);
 
     //todo: add an option to not hide title
     titleElement.style.visibility = "hidden";
     originalTitleElement.style.display = "none";
+
+    if (brandingLocation === BrandingLocation.Watch 
+            && (!watchTitleMutationObserverInfo || watchTitleMutationObserverInfo.element !== originalTitleElement)) {
+        watchTitleMutationObserverInfo?.observer?.disconnect();
+
+        let oldText = originalTitleElement.textContent;
+        const observer = new MutationObserver(() => {
+            const currentOriginalTitleElement = getOriginalTitleElement(element);
+            if (oldText === currentOriginalTitleElement?.textContent) return;
+
+            oldText = currentOriginalTitleElement?.textContent;
+            void replaceTitle(element, getVideoID(), brandingLocation, queryByHash);
+        });
+
+        observer.observe(element, {
+            characterData: true,
+            subtree: true,
+            childList: true
+        });
+
+        watchTitleMutationObserverInfo = {
+            observer,
+            element: originalTitleElement
+        };
+    }
 
     try {
         const title = (await getVideoTitleIncludingUnsubmitted(videoID, queryByHash))?.title;
