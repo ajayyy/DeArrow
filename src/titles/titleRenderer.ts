@@ -29,7 +29,8 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, brand
             if (oldText === currentOriginalTitleElement?.textContent) return;
 
             oldText = currentOriginalTitleElement?.textContent;
-            void replaceTitle(element, getVideoID(), brandingLocation, queryByHash);
+            const videoID = getVideoID();
+            if (videoID !== null) void replaceTitle(element, videoID, brandingLocation, queryByHash);
         });
 
         observer.observe(element, {
