@@ -34,6 +34,7 @@ interface ThumbnailDataCacheRecord extends ThumbnailData {
 
 //todo: set a max size of this and delete some after a while
 const cache: Record<VideoID, ThumbnailDataCacheRecord> = {};
+const cacheLimit = 2000;
 
 export function getFromCache(videoID: VideoID): ThumbnailData | undefined {
     return cache[videoID];
@@ -46,6 +47,11 @@ export function setupCache(videoID: VideoID): ThumbnailData {
             playbackUrls: [],
             lastUsed: Date.now()
         };
+
+        if (Object.keys(cache).length > cacheLimit) {
+            const oldest = Object.entries(cache).reduce((a, b) => a[1].lastUsed < b[1].lastUsed ? a : b);
+            delete cache[oldest[0]];
+        }
     }
 
     return cache[videoID];
