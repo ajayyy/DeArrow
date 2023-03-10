@@ -161,7 +161,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
  * 
  * Starts with lower resolution and replaces it with higher resolution when ready.
  */
-export async function createThumbnailCanvas(videoID: VideoID, width: number,
+export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | null, videoID: VideoID, width: number,
     height: number, forcedTimestamp: number | null, saveVideo: boolean, ready: (canvas: HTMLCanvasElement) => unknown): Promise<HTMLCanvasElement | null> {
     const urls = await getPlaybackUrl(videoID, width, height);
     if (!urls) return null;
@@ -177,7 +177,7 @@ export async function createThumbnailCanvas(videoID: VideoID, width: number,
         }
     }
 
-    const canvas = document.createElement("canvas");
+    const canvas = existingCanvas ?? document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
     canvas.style.display = "none";
@@ -246,7 +246,9 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
             }
         }).catch(logError);
 
-        const thumbnail = await createThumbnailCanvas(videoID, width, height, timestamp ?? null, false, (thumbnail) => {
+        const existingCanvas = image.parentElement?.querySelector(".cbCustomThumbnailCanvas") as HTMLCanvasElement | null;
+
+        const thumbnail = await createThumbnailCanvas(existingCanvas, videoID, width, height, timestamp ?? null, false, (thumbnail) => {
             thumbnail!.style.removeProperty("display");
         });
 
@@ -258,6 +260,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
         image.style.display = "none";
         thumbnail.classList.add("style-scope");
         thumbnail.classList.add("ytd-img-shadow");
+        thumbnail.classList.add("cbCustomThumbnailCanvas");
         thumbnail.style.height = "100%";
         image.parentElement?.appendChild(thumbnail);
     }
