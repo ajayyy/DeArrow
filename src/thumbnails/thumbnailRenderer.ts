@@ -162,7 +162,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
  * Starts with lower resolution and replaces it with higher resolution when ready.
  */
 export async function createThumbnailCanvas(videoID: VideoID, width: number,
-    height: number, forcedTimestamp: number | null, saveVideo: boolean, ready: () => unknown): Promise<HTMLCanvasElement | null> {
+    height: number, forcedTimestamp: number | null, saveVideo: boolean, ready: (canvas: HTMLCanvasElement) => unknown): Promise<HTMLCanvasElement | null> {
     const urls = await getPlaybackUrl(videoID, width, height);
     if (!urls) return null;
 
@@ -192,7 +192,7 @@ export async function createThumbnailCanvas(videoID: VideoID, width: number,
                     if (!largerCanvasInfo) return;
 
                     drawCentered(canvas, width, height, largerCanvasInfo.width, largerCanvasInfo.height, largerCanvasInfo.canvas);
-                    if (!smallerCanvasInfo) ready();
+                    if (!smallerCanvasInfo) ready(canvas);
                 }).catch(() => { }); //eslint-disable-line @typescript-eslint/no-empty-function
             }, 6000);
 
@@ -201,7 +201,7 @@ export async function createThumbnailCanvas(videoID: VideoID, width: number,
         }
 
         drawCentered(canvas, width, height, smallerCanvasInfo.width, smallerCanvasInfo.height, smallerCanvasInfo.canvas);
-        ready();
+        ready(canvas);
     }).catch(() => { }); //eslint-disable-line @typescript-eslint/no-empty-function
 
     return canvas;
@@ -246,7 +246,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
             }
         }).catch(logError);
 
-        const thumbnail = await createThumbnailCanvas(videoID, width, height, timestamp ?? null, false, () => {
+        const thumbnail = await createThumbnailCanvas(videoID, width, height, timestamp ?? null, false, (thumbnail) => {
             thumbnail!.style.removeProperty("display");
         });
 
