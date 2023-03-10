@@ -4,7 +4,7 @@ import { waitForElement } from "@ajayyy/maze-utils/lib/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
-import { replaceTitle } from "../titles/titleRenderer";
+import { findOrCreateShowOriginalButton, hideShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
 
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
 
@@ -18,16 +18,31 @@ export enum BrandingLocation {
     Watch
 }
 
+export interface VideoBrandingInstance {
+    showCustomBranding: boolean;
+    updateBranding: () => Promise<void>;
+}
+
+const videoBrandingInstances: Record<VideoID, VideoBrandingInstance> = {}
+
 export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]> {
     const title = await waitForElement(getYouTubeTitleNodeSelector()) as HTMLElement;
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
     const videoID = getVideoID();
 
-    if (title && videoID !== null) {
-        promises[0] = replaceTitle(title, videoID, BrandingLocation.Watch, true);
-    }
+    if (videoID !== null) {
+        if (title) {
+            const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
+                async () => void await replaceCurrentVideoBranding());
+            const showCustomBranding = videoBrandingInstance.showCustomBranding;
+    
+            promises[0] = replaceTitle(title, videoID, showCustomBranding, BrandingLocation.Watch, true);
 
-    //todo: replace thumbnail in background of .ytp-cued-thumbnail-overlay-image
+            void handleShowOriginalButton(title, videoID, BrandingLocation.Watch, promises);
+        }
+
+        //todo: replace thumbnail in background of .ytp-cued-thumbnail-overlay-image
+    }
 
     return Promise.all(promises);
 }
@@ -39,11 +54,62 @@ export function replaceVideoCardBranding(element: HTMLElement): Promise<[boolean
         // todo: fastest would be to preload via /browser request
         const videoID = link.href?.match(/\?v=(.{11})/)?.[1] as VideoID;
 
-        return Promise.all([replaceThumbnail(element, videoID),
-            replaceTitle(element, videoID, BrandingLocation.Related, false)]) as Promise<[boolean, boolean]>;
+        const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
+            async () => void await replaceVideoCardBranding(element));
+        const showCustomBranding = videoBrandingInstance.showCustomBranding;
+
+        const promises = [replaceThumbnail(element, videoID, showCustomBranding),
+            replaceTitle(element, videoID, showCustomBranding, BrandingLocation.Related, false)] as [Promise<boolean>, Promise<boolean>];
+
+        void handleShowOriginalButton(element, videoID, BrandingLocation.Related, promises);
+
+        return Promise.all(promises) as Promise<[boolean, boolean]>;
     }
 
     return new Promise((resolve) => resolve([false, false]));
+}
+
+async function handleShowOriginalButton(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation, promises: [Promise<boolean>, Promise<boolean>]): Promise<HTMLElement | null> {
+    hideShowOriginalButton(element);
+
+    const result = await Promise.race(promises);
+    if (result || (await Promise.all(promises)).some((r) => r)) {
+        return await findOrCreateShowOriginalButton(element, brandingLocation, videoID);
+    }
+
+    return null;
+}
+
+function getAndUpdateVideoBrandingInstances(videoID: VideoID, updateBranding: () => Promise<void>): VideoBrandingInstance {
+    if (!videoBrandingInstances[videoID]) {
+        videoBrandingInstances[videoID] = {
+            showCustomBranding: true,
+            updateBranding
+        }
+    } else {
+        videoBrandingInstances[videoID].updateBranding = updateBranding;
+    }
+
+    return videoBrandingInstances[videoID];
+}
+
+export async function toggleShowCustom(videoID: VideoID): Promise<boolean> {
+    if (videoBrandingInstances[videoID]) {
+        const newValue = !videoBrandingInstances[videoID].showCustomBranding;
+        videoBrandingInstances[videoID].showCustomBranding = newValue;
+        await videoBrandingInstances[videoID].updateBranding();
+
+        return newValue;
+    }
+
+    // Assume still showing, but something has gone very wrong if it gets here
+    return true;
+}
+
+export function clearVideoBrandingInstances(): void {
+    for (const videoID in videoBrandingInstances) {
+        delete videoBrandingInstances[videoID];
+    }
 }
 
 export function startThumbnailListener(): void {

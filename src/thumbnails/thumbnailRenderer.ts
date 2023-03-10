@@ -224,8 +224,13 @@ function createVideo(existingVideo: HTMLVideoElement | null, url: string, timest
     return video;
 }
 
-export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, timestamp?: number): Promise<boolean> {
+export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, timestamp?: number): Promise<boolean> {
     const image = element.querySelector(".ytd-thumbnail img") as HTMLImageElement;
+
+    if (!showCustomBranding) {
+        image?.style?.removeProperty("display");
+        return false;
+    }
 
     if (image) {
         const width = 720;

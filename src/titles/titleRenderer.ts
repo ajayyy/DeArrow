@@ -1,7 +1,7 @@
 import { getVideoID, VideoID } from "@ajayyy/maze-utils/lib/video";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
-import { BrandingLocation } from "../videoBranding/videoBranding";
+import { BrandingLocation, toggleShowCustom } from "../videoBranding/videoBranding";
 
 interface WatchTitleMutationObserverInfo {
     observer: MutationObserver;
@@ -10,27 +10,27 @@ interface WatchTitleMutationObserverInfo {
 
 let watchTitleMutationObserverInfo: WatchTitleMutationObserverInfo | null = null;
 
-export async function replaceTitle(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation, queryByHash: boolean): Promise<boolean> {
-    const getOriginalTitleElement = (element) => element.querySelector(`${getTitleSelector(brandingLocation)}:not(.cbCustomTitle)`) as HTMLElement;
-    const originalTitleElement = getOriginalTitleElement(element);
+export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, brandingLocation: BrandingLocation, queryByHash: boolean): Promise<boolean> {
+    const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const titleElement = element.querySelector(".cbCustomTitle") as HTMLElement ?? createTitleElement(originalTitleElement, brandingLocation);
 
-    //todo: add an option to not hide title
-    titleElement.style.visibility = "hidden";
-    originalTitleElement.style.display = "none";
-
+    if (!showCustomBranding) {
+        showOriginalTitle(titleElement, originalTitleElement, brandingLocation);
+        return false;
+    }
+    
     if (brandingLocation === BrandingLocation.Watch 
             && (!watchTitleMutationObserverInfo || watchTitleMutationObserverInfo.element !== originalTitleElement)) {
         watchTitleMutationObserverInfo?.observer?.disconnect();
 
         let oldText = originalTitleElement.textContent;
         const observer = new MutationObserver(() => {
-            const currentOriginalTitleElement = getOriginalTitleElement(element);
+            const currentOriginalTitleElement = getOriginalTitleElement(element, brandingLocation);
             if (oldText === currentOriginalTitleElement?.textContent) return;
 
             oldText = currentOriginalTitleElement?.textContent;
             const videoID = getVideoID();
-            if (videoID !== null) void replaceTitle(element, videoID, brandingLocation, queryByHash);
+            if (videoID !== null) void replaceTitle(element, videoID, showCustomBranding, brandingLocation, queryByHash);
         });
 
         observer.observe(element, {
@@ -44,6 +44,23 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, brand
             element: originalTitleElement
         };
     }
+    
+    //todo: add an option to not hide title
+    titleElement.style.display = "none";
+    originalTitleElement.style.display = "none";
+
+    if (brandingLocation !== BrandingLocation.Watch) {
+        // To be able to show the show original button in the right place
+        titleElement.parentElement!.style.display = "flex";
+        titleElement.parentElement!.style.alignItems = "center";
+        titleElement.parentElement!.style.justifyContent = "space-between";
+
+        // For channel pages to make sure the show original button can be on the right
+        const metaElement = element.querySelector("#meta") as HTMLElement;
+        if (metaElement) {
+            metaElement.style.width = "100%";
+        }
+    }
 
     try {
         const title = (await getVideoTitleIncludingUnsubmitted(videoID, queryByHash))?.title;
@@ -53,14 +70,25 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, brand
         } else if (originalTitleElement?.textContent) {
             // TODO: Allow customizing this rule
             // innerText is blank when visibility hidden
-            const modifiedTitle = toTitleCase(originalTitleElement.textContent.trim());
+            const originalText = originalTitleElement.textContent.trim();
+            const modifiedTitle = toTitleCase(originalText);
+            if (originalText === modifiedTitle) {
+                showOriginalTitle(titleElement, originalTitleElement, brandingLocation);
+                return false;
+            }
+
             titleElement.innerText = modifiedTitle;
             titleElement.title = modifiedTitle;
         } else {
             originalTitleElement.style.removeProperty("display");
         }
 
-        titleElement.style.visibility = "visible";
+        if (originalTitleElement.parentElement?.title) {
+            // Inside element should handle title fine
+            originalTitleElement.parentElement.title = "";
+        }
+
+        titleElement.style.removeProperty("display");
         return true;
     } catch (e) {
         logError(e);
@@ -68,6 +96,19 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, brand
 
         return false;
     }
+}
+
+function showOriginalTitle(titleElement: HTMLElement, originalTitleElement: HTMLElement, brandingLocation: BrandingLocation) {
+    titleElement.style.display = "none";
+    originalTitleElement.style.removeProperty("display");
+
+    if (brandingLocation === BrandingLocation.Watch) {
+        watchTitleMutationObserverInfo?.observer?.disconnect();
+    }
+}
+
+function getOriginalTitleElement(element: HTMLElement, brandingLocation: BrandingLocation) {
+    return element.querySelector(`${getTitleSelector(brandingLocation)}:not(.cbCustomTitle)`) as HTMLElement;
 }
 
 function getTitleSelector(brandingLocation: BrandingLocation): string {
@@ -81,13 +122,63 @@ function getTitleSelector(brandingLocation: BrandingLocation): string {
     }
 }
 
-function createTitleElement(originalElement: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
-    const titleElement = brandingLocation === BrandingLocation.Related ? originalElement.cloneNode() as HTMLElement 
+function createTitleElement(originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
+    const titleElement = brandingLocation === BrandingLocation.Related ? originalTitleElement.cloneNode() as HTMLElement 
         : document.createElement("div");
     titleElement.classList.add("cbCustomTitle");
 
-    originalElement.parentElement?.appendChild(titleElement);
+    originalTitleElement.parentElement?.appendChild(titleElement);
     return titleElement;
+}
+
+export function hideShowOriginalButton(originalTitleElement: HTMLElement): void {
+    const buttonElement = originalTitleElement.parentElement?.querySelector(".cbShowOriginal") as HTMLElement;
+    if (buttonElement) {
+        buttonElement.style.display = "none";
+    }
+}
+
+export function findOrCreateShowOriginalButton(element: HTMLElement, brandingLocation: BrandingLocation, videoID: VideoID): HTMLElement {
+    const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
+    const buttonElement = originalTitleElement.parentElement?.querySelector(".cbShowOriginal") as HTMLElement 
+        ?? createShowOriginalButton(originalTitleElement, brandingLocation);
+    
+    buttonElement.setAttribute("videoID", videoID);
+    buttonElement.style.removeProperty("display");
+    return buttonElement;
+}
+
+function createShowOriginalButton(originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
+    const buttonElement = document.createElement("button");
+    buttonElement.classList.add("cbShowOriginal");
+    buttonElement.classList.add("cbButton");
+    if (brandingLocation === BrandingLocation.Watch) buttonElement.classList.add("cbDontHide");
+
+    const buttonImage = document.createElement("img");
+    buttonElement.draggable = false;
+    buttonImage.className = "cbShowOriginalImage";
+    buttonImage.src = chrome.runtime.getURL("icons/logo.svg");
+    buttonElement.appendChild(buttonImage);
+    
+    buttonElement.addEventListener("click", (e) => void (async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const videoID = buttonElement.getAttribute("videoID");
+        if (videoID) {
+            const custom = await toggleShowCustom(videoID as VideoID);
+            if (custom) {
+                buttonImage.classList.remove("cbOriginalShown");
+                if (brandingLocation !== BrandingLocation.Watch) buttonElement.classList.remove("cbDontHide");
+            } else {
+                buttonImage.classList.add("cbOriginalShown");
+                buttonElement.classList.add("cbDontHide");
+            }
+        }
+    })(e));
+
+    originalTitleElement.parentElement?.appendChild(buttonElement);
+    return buttonElement;
 }
 
 // https://stackoverflow.com/a/196991

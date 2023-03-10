@@ -3,7 +3,7 @@ import { logError } from "./utils/logger";
 import { ChannelIDInfo, checkIfNewVideoID, setupVideoModule, VideoID } from "@ajayyy/maze-utils/lib/video"
 import Config from "./config";
 import { SubmitButton } from "./submission/submitButton";
-import { replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
+import { clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
 import { getVideoBranding } from "./dataFetching";
 
 
@@ -22,6 +22,8 @@ async function videoIDChange(videoID: VideoID | null): Promise<void> {
 
 function resetValues() {
     submitButton.clearSubmissions();
+
+    clearVideoBrandingInstances();
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars

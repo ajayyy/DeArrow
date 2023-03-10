@@ -144,6 +144,7 @@ img.yt-img-shadow {
     display: none;
     opacity: 1;
     transition: opacity 0.2s;
+    margin-right: 0;
 }
 
 .cbShowOriginal img {
@@ -162,6 +163,10 @@ img.yt-img-shadow {
     display: inline !important;
 }
 
-*:hover > .cbShowOriginal {
+*:hover > * > * > .cbShowOriginal {
     display: inline !important;
+}
+
+.cbShowOriginal img.cbShowOriginalImage {
+    height: 20px;
 }
