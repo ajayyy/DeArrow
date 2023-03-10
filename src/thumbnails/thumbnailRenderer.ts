@@ -258,6 +258,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
         image.style.display = "none";
         thumbnail.classList.add("style-scope");
         thumbnail.classList.add("ytd-img-shadow");
+        thumbnail.style.height = "100%";
         image.parentElement?.appendChild(thumbnail);
     }
 
