@@ -5,6 +5,8 @@ import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
 import { findOrCreateShowOriginalButton, hideShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
+import { setThumbnailListener } from "@ajayyy/maze-utils/lib/thumbnailManagement";
+import Config from "../config";
 
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
 
@@ -45,6 +47,10 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
     }
 
     return Promise.all(promises);
+}
+
+export async function replaceVideoCardsBranding(elements: HTMLElement[]): Promise<[boolean, boolean][]> {
+    return await Promise.all(elements.map((e) => replaceVideoCardBranding(e)));
 }
 
 export function replaceVideoCardBranding(element: HTMLElement): Promise<[boolean, boolean]> {
@@ -113,19 +119,7 @@ export function clearVideoBrandingInstances(): void {
 }
 
 export function startThumbnailListener(): void {
-    // hacky prototype
-    const elementsDealtWith = new Set<Element>();
-    // let stop = 0;
-    setInterval(() => {
-        // if (stop > 8) return;
-        const newElements = [...document.querySelectorAll("ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer")].filter((element) => !elementsDealtWith.has(element));
-        for (const element of newElements) {
-            elementsDealtWith.add(element);
-
-            void replaceVideoCardBranding(element as HTMLElement);
-
-            // stop++;
-            return;
-        }
-    }, 10);
+    const selector = "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer";
+    setThumbnailListener((e) => void replaceVideoCardsBranding(e),
+        () => {}, () => Config.isReady(), selector); // eslint-disable-line @typescript-eslint/no-empty-function
 }

@@ -5,6 +5,7 @@ import Config from "./config";
 import { SubmitButton } from "./submission/submitButton";
 import { clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
 import { getVideoBranding } from "./dataFetching";
+import * as documentScript from "../dist/js/document.js";
 
 
 const submitButton = new SubmitButton();
@@ -47,6 +48,7 @@ export function setupCBVideoModule(): void {
         videoIDChange: (videoID) => void videoIDChange(videoID).catch(logError),
         channelIDChange,
         videoElementChange,
-        resetValues
+        resetValues,
+        documentScript
     }, () => Config);
 }
