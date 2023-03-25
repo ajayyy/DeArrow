@@ -4,7 +4,7 @@ import { waitForElement } from "@ajayyy/maze-utils/lib/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
-import { findOrCreateShowOriginalButton, hideShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
+import { findOrCreateShowOriginalButton, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
 import { setThumbnailListener } from "@ajayyy/maze-utils/lib/thumbnailManagement";
 import Config from "../config";
 
@@ -76,16 +76,11 @@ export function replaceVideoCardBranding(element: HTMLElement): Promise<[boolean
 }
 
 export async function handleShowOriginalButton(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation, promises: [Promise<boolean>, Promise<boolean>]): Promise<HTMLElement | null> {
-    hideShowOriginalButton(element);
+    await hideAndUpdateShowOriginalButton(element, brandingLocation);
 
     const result = await Promise.race(promises);
     if (result || (await Promise.all(promises)).some((r) => r)) {
         return await findOrCreateShowOriginalButton(element, brandingLocation, videoID);
-    } else {
-        const button = await findOrCreateShowOriginalButton(element, brandingLocation, videoID);
-        if (button) {
-            button.remove();
-        }
     }
 
     return null;

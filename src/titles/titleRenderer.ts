@@ -1,6 +1,7 @@
 import { getVideoID, VideoID } from "@ajayyy/maze-utils/lib/video";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
+import { getOrCreateTitleButtonContainer } from "../utils/titleButton";
 import { BrandingLocation, toggleShowCustom, handleShowOriginalButton } from "../videoBranding/videoBranding";
 
 interface WatchTitleMutationObserverInfo {
@@ -15,11 +16,6 @@ let lastWatchVideoID: VideoID | null = null;
 export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, brandingLocation: BrandingLocation, queryByHash: boolean): Promise<boolean> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const titleElement = element.querySelector(".cbCustomTitle") as HTMLElement ?? createTitleElement(originalTitleElement, brandingLocation);
-
-    if (!showCustomBranding) {
-        showOriginalTitle(titleElement, originalTitleElement);
-        return false;
-    }
 
     if (brandingLocation === BrandingLocation.Watch) {
         if ((!watchTitleMutationObserverInfo || watchTitleMutationObserverInfo.element !== originalTitleElement)) {
@@ -105,6 +101,10 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         }
 
         titleElement.style.removeProperty("display");
+
+        if (!showCustomBranding) {
+            showOriginalTitle(titleElement, originalTitleElement);
+        }
         return true;
     } catch (e) {
         logError(e);
@@ -143,24 +143,34 @@ function createTitleElement(originalTitleElement: HTMLElement, brandingLocation:
     return titleElement;
 }
 
-export function hideShowOriginalButton(originalTitleElement: HTMLElement): void {
-    const buttonElement = originalTitleElement.parentElement?.querySelector(".cbShowOriginal") as HTMLElement;
+export async function hideAndUpdateShowOriginalButton(element: HTMLElement, brandingLocation: BrandingLocation): Promise<void> {
+    const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
+    const buttonElement = await findShowOriginalButton(originalTitleElement, brandingLocation);
     if (buttonElement) {
-        buttonElement.style.display = "none";
+        resetShowOriginalButton(buttonElement, brandingLocation);
+        buttonElement.style.setProperty("display", "none", "important");
     }
 }
 
-export function findOrCreateShowOriginalButton(element: HTMLElement, brandingLocation: BrandingLocation, videoID: VideoID): HTMLElement {
+export async function findShowOriginalButton(originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): Promise<HTMLElement> {
+    const referenceNode = brandingLocation === BrandingLocation.Watch 
+        ? (await getOrCreateTitleButtonContainer()) : originalTitleElement.parentElement;
+    return referenceNode?.querySelector(".cbShowOriginal") as HTMLElement;
+}
+
+export async function findOrCreateShowOriginalButton(element: HTMLElement, brandingLocation: BrandingLocation,
+        videoID: VideoID): Promise<HTMLElement> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
-    const buttonElement = originalTitleElement.parentElement?.querySelector(".cbShowOriginal") as HTMLElement 
-        ?? createShowOriginalButton(originalTitleElement, brandingLocation);
-    
+    const buttonElement = await findShowOriginalButton(originalTitleElement, brandingLocation) 
+        ?? await createShowOriginalButton(originalTitleElement, brandingLocation);
+
     buttonElement.setAttribute("videoID", videoID);
     buttonElement.style.removeProperty("display");
     return buttonElement;
 }
 
-function createShowOriginalButton(originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
+async function createShowOriginalButton(originalTitleElement: HTMLElement,
+        brandingLocation: BrandingLocation): Promise<HTMLElement> {
     const buttonElement = document.createElement("button");
     buttonElement.classList.add("cbShowOriginal");
     buttonElement.classList.add("cbButton");
@@ -180,8 +190,7 @@ function createShowOriginalButton(originalTitleElement: HTMLElement, brandingLoc
         if (videoID) {
             const custom = await toggleShowCustom(videoID as VideoID);
             if (custom) {
-                buttonImage.classList.remove("cbOriginalShown");
-                if (brandingLocation !== BrandingLocation.Watch) buttonElement.classList.remove("cbDontHide");
+                resetShowOriginalButtonFromElements(buttonElement, buttonImage, brandingLocation)
             } else {
                 buttonImage.classList.add("cbOriginalShown");
                 buttonElement.classList.add("cbDontHide");
@@ -189,8 +198,25 @@ function createShowOriginalButton(originalTitleElement: HTMLElement, brandingLoc
         }
     })(e));
 
-    originalTitleElement.parentElement?.appendChild(buttonElement);
+    if (brandingLocation === BrandingLocation.Watch) {
+        const referenceNode = await getOrCreateTitleButtonContainer();
+        referenceNode?.prepend(buttonElement);
+    } else {
+        originalTitleElement.parentElement?.appendChild(buttonElement);
+    }
+
     return buttonElement;
+}
+
+function resetShowOriginalButton(buttonElement: HTMLElement, brandingLocation: BrandingLocation) {
+    const buttonImage = buttonElement.querySelector(".cbShowOriginalImage") as HTMLElement;
+    resetShowOriginalButtonFromElements(buttonElement, buttonImage, brandingLocation);
+}
+
+function resetShowOriginalButtonFromElements(buttonElement: HTMLElement, buttonImage: HTMLElement,
+        brandingLocation: BrandingLocation) {
+    buttonImage.classList.remove("cbOriginalShown");
+    if (brandingLocation !== BrandingLocation.Watch) buttonElement.classList.remove("cbDontHide");
 }
 
 // https://stackoverflow.com/a/196991

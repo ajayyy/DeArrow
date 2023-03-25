@@ -1,7 +1,5 @@
 import * as React from "react";
 import { createRoot, Root } from "react-dom/client";
-import { getYouTubeTitleNode } from "@ajayyy/maze-utils/lib/elements"
-import { waitFor } from "@ajayyy/maze-utils"
 import { BrandingResult } from "../videoBranding/videoBranding";
 import { SubmissionComponent } from "./SubmissionComponent";
 import { getVideo, getVideoID, isOnMobileYouTube } from "@ajayyy/maze-utils/lib/video";
@@ -10,6 +8,7 @@ import { TitleSubmission } from "../titles/titleData";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { submitVideoBranding } from "../dataFetching";
 import Config from "../config";
+import { getOrCreateTitleButtonContainer } from "../utils/titleButton";
 
 export class SubmitButton {
     button: HTMLButtonElement;
@@ -34,7 +33,7 @@ export class SubmitButton {
             return;
         }
 
-        const referenceNode = await waitFor(() => getYouTubeTitleNode());
+        const referenceNode = await getOrCreateTitleButtonContainer();
         if (referenceNode) {
             if (!referenceNode.contains(this.button)) {
                 if (!this.button) {
@@ -87,8 +86,7 @@ export class SubmitButton {
                     }
                 }
     
-                referenceNode.appendChild(this.container);
-                referenceNode.style.display = "flex";
+                referenceNode.parentElement?.appendChild(this.container);
             }
         }
     }
