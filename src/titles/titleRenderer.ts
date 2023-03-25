@@ -1,7 +1,7 @@
 import { getVideoID, VideoID } from "@ajayyy/maze-utils/lib/video";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
-import { BrandingLocation, toggleShowCustom } from "../videoBranding/videoBranding";
+import { BrandingLocation, toggleShowCustom, handleShowOriginalButton } from "../videoBranding/videoBranding";
 
 interface WatchTitleMutationObserverInfo {
     observer: MutationObserver;
@@ -9,42 +9,58 @@ interface WatchTitleMutationObserverInfo {
 }
 
 let watchTitleMutationObserverInfo: WatchTitleMutationObserverInfo | null = null;
+let lastWatchTitle = "";
+let lastWatchVideoID: VideoID | null = null;
 
 export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, brandingLocation: BrandingLocation, queryByHash: boolean): Promise<boolean> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const titleElement = element.querySelector(".cbCustomTitle") as HTMLElement ?? createTitleElement(originalTitleElement, brandingLocation);
 
     if (!showCustomBranding) {
-        showOriginalTitle(titleElement, originalTitleElement, brandingLocation);
+        showOriginalTitle(titleElement, originalTitleElement);
         return false;
     }
+
+    if (brandingLocation === BrandingLocation.Watch) {
+        if ((!watchTitleMutationObserverInfo || watchTitleMutationObserverInfo.element !== originalTitleElement)) {
+            watchTitleMutationObserverInfo?.observer?.disconnect();
     
-    if (brandingLocation === BrandingLocation.Watch 
-            && (!watchTitleMutationObserverInfo || watchTitleMutationObserverInfo.element !== originalTitleElement)) {
-        watchTitleMutationObserverInfo?.observer?.disconnect();
+            let oldText = originalTitleElement.textContent;
+            const observer = new MutationObserver(() => {
+                const currentOriginalTitleElement = getOriginalTitleElement(element, brandingLocation);
+                if (oldText === currentOriginalTitleElement?.textContent) return;
+    
+                oldText = currentOriginalTitleElement?.textContent;
+                const videoID = getVideoID();
+                if (videoID !== null) {
+                    void handleShowOriginalButton(element, videoID, brandingLocation,
+                        [replaceTitle(element, videoID, showCustomBranding, brandingLocation, queryByHash),
+                            Promise.resolve(false)]);
+                }
+            });
+    
+            observer.observe(element, {
+                characterData: true,
+                subtree: true,
+                childList: true
+            });
+    
+            watchTitleMutationObserverInfo = {
+                observer,
+                element: originalTitleElement
+            };
+        }
 
-        let oldText = originalTitleElement.textContent;
-        const observer = new MutationObserver(() => {
-            const currentOriginalTitleElement = getOriginalTitleElement(element, brandingLocation);
-            if (oldText === currentOriginalTitleElement?.textContent) return;
+        if (lastWatchVideoID && originalTitleElement?.textContent && watchTitleMutationObserverInfo
+                && videoID !== lastWatchVideoID && originalTitleElement.textContent === lastWatchTitle) {
+            // Don't reset it if it hasn't changed videos yet, will be handled by mutation observer
+            return false;
+        }
 
-            oldText = currentOriginalTitleElement?.textContent;
-            const videoID = getVideoID();
-            if (videoID !== null) void replaceTitle(element, videoID, showCustomBranding, brandingLocation, queryByHash);
-        });
-
-        observer.observe(element, {
-            characterData: true,
-            subtree: true,
-            childList: true
-        });
-
-        watchTitleMutationObserverInfo = {
-            observer,
-            element: originalTitleElement
-        };
+        lastWatchTitle = originalTitleElement?.textContent ?? "";
+        lastWatchVideoID = videoID;
     }
-    
+
     //todo: add an option to not hide title
     titleElement.style.display = "none";
     originalTitleElement.style.display = "none";
@@ -73,7 +89,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
             const originalText = originalTitleElement.textContent.trim();
             const modifiedTitle = toTitleCase(originalText);
             if (originalText === modifiedTitle) {
-                showOriginalTitle(titleElement, originalTitleElement, brandingLocation);
+                showOriginalTitle(titleElement, originalTitleElement);
                 return false;
             }
 
@@ -98,13 +114,9 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     }
 }
 
-function showOriginalTitle(titleElement: HTMLElement, originalTitleElement: HTMLElement, brandingLocation: BrandingLocation) {
+function showOriginalTitle(titleElement: HTMLElement, originalTitleElement: HTMLElement) {
     titleElement.style.display = "none";
     originalTitleElement.style.removeProperty("display");
-
-    if (brandingLocation === BrandingLocation.Watch) {
-        watchTitleMutationObserverInfo?.observer?.disconnect();
-    }
 }
 
 function getOriginalTitleElement(element: HTMLElement, brandingLocation: BrandingLocation) {

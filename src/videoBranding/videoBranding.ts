@@ -75,12 +75,17 @@ export function replaceVideoCardBranding(element: HTMLElement): Promise<[boolean
     return new Promise((resolve) => resolve([false, false]));
 }
 
-async function handleShowOriginalButton(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation, promises: [Promise<boolean>, Promise<boolean>]): Promise<HTMLElement | null> {
+export async function handleShowOriginalButton(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation, promises: [Promise<boolean>, Promise<boolean>]): Promise<HTMLElement | null> {
     hideShowOriginalButton(element);
 
     const result = await Promise.race(promises);
     if (result || (await Promise.all(promises)).some((r) => r)) {
         return await findOrCreateShowOriginalButton(element, brandingLocation, videoID);
+    } else {
+        const button = await findOrCreateShowOriginalButton(element, brandingLocation, videoID);
+        if (button) {
+            button.remove();
+        }
     }
 
     return null;
