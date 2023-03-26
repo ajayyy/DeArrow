@@ -66,6 +66,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         titleElement.parentElement!.style.display = "flex";
         titleElement.parentElement!.style.alignItems = "center";
         titleElement.parentElement!.style.justifyContent = "space-between";
+        titleElement.parentElement!.style.width = "100%";
 
         // For channel pages to make sure the show original button can be on the right
         const metaElement = element.querySelector("#meta") as HTMLElement;
