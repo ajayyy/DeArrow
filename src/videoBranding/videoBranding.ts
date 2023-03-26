@@ -1,6 +1,6 @@
 import { getYouTubeTitleNodeSelector } from "@ajayyy/maze-utils/lib/elements";
 import { getVideoID, VideoID } from "@ajayyy/maze-utils/lib/video";
-import { waitForElement } from "@ajayyy/maze-utils/lib/dom";
+import { isVisible, waitForElement } from "@ajayyy/maze-utils/lib/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
@@ -32,7 +32,7 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
     const videoID = getVideoID();
 
-    if (videoID !== null) {
+    if (videoID !== null && isVisible(title)) {
         if (title) {
             const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
                 async () => void await replaceCurrentVideoBranding());
@@ -114,7 +114,10 @@ export async function toggleShowCustom(videoID: VideoID): Promise<boolean> {
 
 export function clearVideoBrandingInstances(): void {
     for (const videoID in videoBrandingInstances) {
-        delete videoBrandingInstances[videoID];
+        // Only clear if it is not on the page anymore
+        if (!document.querySelector(`.cbButton[videoid="${videoID}"]`)) {
+            delete videoBrandingInstances[videoID];
+        }
     }
 }
 
