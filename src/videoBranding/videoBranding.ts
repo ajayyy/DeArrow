@@ -54,7 +54,7 @@ export async function replaceVideoCardsBranding(elements: HTMLElement[]): Promis
 }
 
 export function replaceVideoCardBranding(element: HTMLElement): Promise<[boolean, boolean]> {
-    const link = element.querySelector("#thumbnail") as HTMLAnchorElement;
+    const link = element.querySelector("a#thumbnail") as HTMLAnchorElement;
 
     if (link) {
         // todo: fastest would be to preload via /browser request
@@ -122,7 +122,7 @@ export function clearVideoBrandingInstances(): void {
 }
 
 export function startThumbnailListener(): void {
-    const selector = "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer";
+    const selector = "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer";
     setThumbnailListener((e) => void replaceVideoCardsBranding(e),
         () => {}, () => Config.isReady(), selector); // eslint-disable-line @typescript-eslint/no-empty-function
 }

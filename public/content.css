@@ -170,3 +170,8 @@ img.yt-img-shadow {
 .cbShowOriginal img.cbShowOriginalImage {
     height: 20px;
 }
+
+/* For playlist titles to be properly spaced out with show original button */
+ytd-playlist-panel-video-renderer #video-title {
+    width: 100%;
+}
