@@ -1,4 +1,5 @@
 {
     "serverAddress": "https://sponsor.ajay.app",
-    "testingServerAddress": "https://sponsor.ajay.app/test"
+    "testingServerAddress": "https://sponsor.ajay.app/test",
+    "debug": false
 }
