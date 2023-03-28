@@ -1,6 +1,7 @@
 import { BrandingUUID } from "../videoBranding/videoBranding";
 import { cacheUsed, getFromCache, setupCache } from "./thumbnailDataCache";
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { log } from "../utils/logger";
 
 interface PartialThumbnailResult {
     votes: number;
@@ -74,7 +75,7 @@ async function fetchFormats(videoID: VideoID, ignoreCache: boolean): Promise<For
                     .filter((format) => format.width && format.height && (!containsVp9 || format.mimeType.includes("vp9")))
                     .sort((a, b) => a?.width - b?.width);
 
-                console.log(videoID, (Date.now() - start) / 1000, "innerTube");
+                log(videoID, (Date.now() - start) / 1000, "innerTube");
                 const videoCache = setupCache(videoID);
                 videoCache.playbackUrls = sorted.map((format) => ({
                     url: format.url,

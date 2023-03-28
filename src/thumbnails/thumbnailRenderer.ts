@@ -2,7 +2,7 @@ import { getPlaybackUrl } from "./thumbnailData";
 import { getFromCache, RenderedThumbnailVideo, setupCache } from "./thumbnailDataCache";
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import { getVideoThumbnailIncludingUnsubmitted } from "../dataFetching";
-import { logError } from "../utils/logger";
+import { log, logError } from "../utils/logger";
 
 export async function renderThumbnail(videoID: VideoID, width: number,
     height: number, saveVideo: boolean, timestamp: number): Promise<RenderedThumbnailVideo | null> {
@@ -88,7 +88,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
                 videoCache.video.push(videoInfo);
             }
 
-            console.log(videoID, (Date.now() - start) / 1000, width > 0 ? "full" : "smaller");
+            log(videoID, (Date.now() - start) / 1000, width > 0 ? "full" : "smaller");
 
             if (!saveVideo) {
                 video.src = "";
