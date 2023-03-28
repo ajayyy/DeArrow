@@ -42,7 +42,7 @@ async function fetchFormats(videoID: VideoID, ignoreCache: boolean): Promise<For
         context: {
             client: {
                 clientName: "WEB",
-                clientVersion: "2.20211129.09.00"
+                clientVersion: "2.20230327.07.00"
             }
         },
         videoId: videoID
