@@ -168,11 +168,15 @@ export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | 
 
     let timestamp = forcedTimestamp as number;
     if (timestamp === null) {
-        const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, false);
-        if (thumbnail && !thumbnail.original) {
-            timestamp = thumbnail.timestamp;
-        } else {
-            // Original thumbnail will be shown automatically
+        try {
+            const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, false);
+            if (thumbnail && !thumbnail.original) {
+                timestamp = thumbnail.timestamp;
+            } else {
+                // Original thumbnail will be shown automatically
+                return null;
+            }
+        } catch (e) {
             return null;
         }
     }
