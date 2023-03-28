@@ -21,10 +21,15 @@ export interface UnsubmittedSubmission {
     titles: UnsubmittedTitleSubmission[];
 }
 
+export enum TitleFormatting {
+    CapitalizeWords,
+}
+
 interface SBConfig {
     userID: string | null;
     invidiousInstances: string[];
     keepUnsubmitted: boolean;
+    titleFormatting: TitleFormatting;
 }
 
 interface SBStorage {
@@ -49,7 +54,8 @@ function migrateOldSyncFormats(config: SBConfig) {
 const syncDefaults = {
     userID: null,
     invidiousInstances: [],
-    keepUnsubmitted: true
+    keepUnsubmitted: true,
+    titleFormatting: TitleFormatting.CapitalizeWords
 };
 
 const localDefaults = {

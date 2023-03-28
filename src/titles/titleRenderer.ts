@@ -1,4 +1,5 @@
 import { getVideoID, VideoID } from "@ajayyy/maze-utils/lib/video";
+import Config, { TitleFormatting } from "../config";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
 import { getOrCreateTitleButtonContainer } from "../utils/titleButton";
@@ -84,7 +85,8 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
             // TODO: Allow customizing this rule
             // innerText is blank when visibility hidden
             const originalText = originalTitleElement.textContent.trim();
-            const modifiedTitle = toTitleCase(originalText);
+            const modifiedTitle = Config.config!.titleFormatting === TitleFormatting.CapitalizeWords ?
+                toTitleCase(originalText) : originalText;
             if (originalText === modifiedTitle) {
                 showOriginalTitle(titleElement, originalTitleElement);
                 return false;
