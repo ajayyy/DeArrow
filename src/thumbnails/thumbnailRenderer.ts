@@ -228,7 +228,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
     const image = element.querySelector(".ytd-thumbnail img") as HTMLImageElement;
 
     if (!showCustomBranding) {
-        image?.style?.removeProperty("display");
+        image.style.setProperty("display", "block", "important");
         return false;
     }
 
@@ -241,7 +241,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
 
         // Trigger a fetch to start, and display the original thumbnail if necessary
         getVideoThumbnailIncludingUnsubmitted(videoID, false).then((thumbnail) => {
-            if (thumbnail && thumbnail.original) {
+            if (!thumbnail || thumbnail.original) {
                 image.style.setProperty("display", "block", "important");
             }
         }).catch(logError);
@@ -253,7 +253,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
         });
 
         if (!thumbnail) {
-            image.style.removeProperty("display");
+            image.style.setProperty("display", "block", "important");
             return false;
         }
 
