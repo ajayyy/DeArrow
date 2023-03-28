@@ -75,8 +75,8 @@ ytd-thumbnail img {
     padding: 0;
     vertical-align: top;
 
-    margin-left: 5px;
-    margin-right: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
 
     cursor: pointer;
 }
@@ -167,7 +167,7 @@ ytd-thumbnail img {
     display: inline !important;
 }
 
-.cbShowOriginal img.cbShowOriginalImage {
+.cbShowOriginal img.cbShowOriginalImage, .cbSubmitButton .cbSubmitButtonImage {
     height: 20px;
 }
 
