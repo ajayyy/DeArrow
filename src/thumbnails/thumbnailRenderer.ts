@@ -59,6 +59,11 @@ export async function renderThumbnail(videoID: VideoID, width: number,
                 return;
             }
 
+            log("videoLoaded", video.currentTime, video.readyState, video.seeking)
+            if (video.readyState < 2 || video.seeking) {
+                setTimeout(loadedData, 50);
+                return;
+            }
             const canvas = document.createElement("canvas");
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
