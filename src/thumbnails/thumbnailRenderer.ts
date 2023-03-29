@@ -219,7 +219,8 @@ export function drawCentered(canvas: HTMLCanvasElement, width: number, height: n
 
 function createVideo(existingVideo: HTMLVideoElement | null, url: string, timestamp: number): HTMLVideoElement {
     const video = existingVideo ?? document.createElement("video");
-    if (!existingVideo) video.src = url;
+    // https://stackoverflow.com/a/69074004
+    if (!existingVideo) video.src = `${url}#t=${timestamp}-${timestamp + 0.001}`;
     video.currentTime = timestamp;
     video.controls = false;
     video.pause();
