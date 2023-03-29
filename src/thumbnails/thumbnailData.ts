@@ -91,8 +91,8 @@ async function fetchFormats(videoID: VideoID, ignoreCache: boolean): Promise<For
     return [];
 }
 
-export async function getPlaybackUrl(videoID: VideoID,
-    width?: number, height?: number, ignoreCache = false): Promise<string | null> {
+export async function getPlaybackFormats(videoID: VideoID,
+    width?: number, height?: number, ignoreCache = false): Promise<Format | null> {
     const formats = await fetchFormats(videoID, ignoreCache);
     //todo: handle fetching fromats twice at the same time, lock or something
 
@@ -102,10 +102,10 @@ export async function getPlaybackUrl(videoID: VideoID,
         if (bestFormat) {
             cacheUsed(videoID);
 
-            return bestFormat?.url;
+            return bestFormat;
         }
     } else if (formats?.length > 0) {
-        return formats[0].url;
+        return formats[0];
     }
 
     return null;

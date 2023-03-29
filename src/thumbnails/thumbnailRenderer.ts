@@ -1,4 +1,4 @@
-import { getPlaybackUrl } from "./thumbnailData";
+import { getPlaybackFormats } from "./thumbnailData";
 import { getFromCache, RenderedThumbnailVideo, setupCache } from "./thumbnailDataCache";
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import { getVideoThumbnailIncludingUnsubmitted } from "../dataFetching";
@@ -19,27 +19,27 @@ export async function renderThumbnail(videoID: VideoID, width: number,
         if (sameTimestamp?.rendered) {
             return sameTimestamp;
         } else if (sameTimestamp) {
-            await new Promise((resolve) => {
-                sameTimestamp.onReady.push(resolve);
+            return new Promise((resolve) => {
+                sameTimestamp.onReady.push((a) => {
+                    resolve(a)
+                });
             });
-
-            return sameTimestamp as unknown as RenderedThumbnailVideo;
         } else if (bestVideos.length > 0) {
             reusedVideo = bestVideos[0].video;
         }
     }
 
-    let url = await getPlaybackUrl(videoID, width, height);
-    if (!url) return null; //todo: handle null url, example: byXHW0dvu2U
+    let format = await getPlaybackFormats(videoID, width, height);
+    if (!format) return null; //todo: handle null url, example: byXHW0dvu2U
 
-    let video = createVideo(reusedVideo, url, timestamp);
+    let video = createVideo(reusedVideo, format.url, timestamp);
 
     let tries = 1;
     const videoCache = setupCache(videoID);
     videoCache.video.push({
         video: video,
-        width: width,
-        height: height,
+        width: format.width,
+        height: format.height,
         rendered: false,
         onReady: [],
         timestamp
@@ -59,7 +59,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
                 return;
             }
 
-            log("videoLoaded", video.currentTime, video.readyState, video.seeking)
+            log(videoID, "videoLoaded", video.currentTime, video.readyState, video.seeking)
             if (video.readyState < 2 || video.seeking) {
                 setTimeout(loadedData, 50);
                 return;
@@ -124,29 +124,29 @@ export async function renderThumbnail(videoID: VideoID, width: number,
                     return;
                 }
 
-                url = await getPlaybackUrl(videoID, width, height, true);
-                if (!url) {
+                format = await getPlaybackFormats(videoID, width, height, true);
+                if (format === null) {
                     resolve(null);
                     return;
                 }
 
                 const videoCache = setupCache(videoID);
-                const index = videoCache.video.findIndex(v => v.width === width && v.height === height
-                    && v.timestamp === timestamp);
+                const index = videoCache.video.findIndex(v => v.width === format?.width 
+                    && v.height === format?.height && v.timestamp === timestamp);
                 if (index !== -1) {
                     videoCache.video[index].video = video;
                 } else {
                     videoCache.video.push({
                         video: video,
-                        width: width,
-                        height: height,
+                        width: format?.width,
+                        height: format?.height,
                         rendered: false,
                         onReady: [],
                         timestamp
                     });
                 }
 
-                video = createVideo(null, url, timestamp);
+                video = createVideo(null, format?.url, timestamp);
                 video.addEventListener("loadeddata", loadedData);
                 video.addEventListener("error", errorHandler);
             }
@@ -168,7 +168,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
  */
 export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | null, videoID: VideoID, width: number,
     height: number, forcedTimestamp: number | null, saveVideo: boolean, ready: (canvas: HTMLCanvasElement) => unknown): Promise<HTMLCanvasElement | null> {
-    const urls = await getPlaybackUrl(videoID, width, height);
+    const urls = await getPlaybackFormats(videoID, width, height);
     if (!urls) return null;
 
     let timestamp = forcedTimestamp as number;
