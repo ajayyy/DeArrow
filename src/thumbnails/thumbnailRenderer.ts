@@ -203,7 +203,7 @@ export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | 
                     drawCentered(canvas, width, height, largerCanvasInfo.width, largerCanvasInfo.height, largerCanvasInfo.canvas);
                     if (!smallerCanvasInfo) ready(canvas);
                 }).catch(() => { }); //eslint-disable-line @typescript-eslint/no-empty-function
-            }, 6000);
+            }, 1500);
 
 
             if (!smallerCanvasInfo) return;
