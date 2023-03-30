@@ -20,7 +20,6 @@ const cacheLimit = 1000;
 
 const activeRequests: Record<VideoID, Promise<Record<VideoID, BrandingResult> | null>> = {};
 
-
 export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, queryByHash: boolean): Promise<ThumbnailResult | null> {
     const unsubmitted = Config.local!.unsubmitted[videoID]?.thumbnails?.find(t => t.selected);
     if (unsubmitted) {
@@ -116,13 +115,20 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): 
     return cache[videoID];
 }
 
-export function submitVideoBranding(videoID: VideoID, title: TitleSubmission, thumbnail: ThumbnailSubmission): Promise<FetchResponse> {
-    return sendRequestToServer("POST", "/api/branding", {
+export function clearCache(videoID: VideoID) {
+    delete cache[videoID];
+}
+
+export async function submitVideoBranding(videoID: VideoID, title: TitleSubmission, thumbnail: ThumbnailSubmission): Promise<FetchResponse> {
+    const result = await sendRequestToServer("POST", "/api/branding", {
         userID: Config.config!.userID,
         videoID,
         title,
         thumbnail
     });
+
+    clearCache(videoID);
+    return result;
 }
 
 export function sendRequestToServer(type: string, url: string, data = {}): Promise<FetchResponse> {
