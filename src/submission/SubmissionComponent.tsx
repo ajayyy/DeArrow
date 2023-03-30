@@ -50,7 +50,6 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
     const [extraUnsubmittedThumbnails, setExtraUnsubmittedThumbnails] = React.useState<RenderedThumbnailSubmission[]>([]);
     const [extraUnsubmittedTitles, setExtraUnsubmittedTitles] = React.useState<RenderedTitleSubmission[]>([]);
     React.useEffect(() => {
-        console.log(props.submissions, props.submissions.titles.some((t) => t.votes >= 0), props.submissions.titles.sort((a, b) => b.votes - a.votes)
         .sort((a, b) => +b.locked - +a.locked)[0])
         if (props.submissions.titles.some((t) => t.votes >= 0)) {
             selectedTitle.current = props.submissions.titles.sort((a, b) => b.votes - a.votes)
