@@ -18,7 +18,7 @@ interface VideoBrandingCacheRecord extends BrandingResult {
 const cache: Record<VideoID, VideoBrandingCacheRecord> = {};
 const cacheLimit = 1000;
 
-const activeRequests: Record<VideoID, Promise<BrandingResult | null>> = {};
+const activeRequests: Record<VideoID, Promise<Record<VideoID, BrandingResult> | null>> = {};
 
 
 export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, queryByHash: boolean): Promise<ThumbnailResult | null> {
@@ -59,14 +59,14 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): 
     }
 
     activeRequests[videoID] ??= (async () => {
-        let result: BrandingResult | null = null;
+        let result: Record<VideoID, BrandingResult> | null = null;
         if (queryByHash) {
             const request = await sendRequestToServer("GET", `/api/branding/${(await getHash(videoID, 1)).slice(0, 4)}`);
 
             if (request.ok || request.status === 404) {
                 try {
                     const json = JSON.parse(request.responseText);
-                    result = json?.[videoID];
+                    result = json;
                 } catch (e) {
                     logError(`Getting video branding for ${videoID} failed: ${e}`);
                 }
@@ -78,7 +78,9 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): 
 
             if (request.ok || request.status === 404) {
                 try {
-                    result = JSON.parse(request.responseText);
+                    result = {
+                        [videoID]: JSON.parse(request.responseText)
+                    };
                 } catch (e) {
                     logError(`Getting video branding for ${videoID} failed: ${e}`);
                 }
@@ -88,19 +90,26 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): 
         return result;
     })();
 
-    const result = await activeRequests[videoID];
+    const results = await activeRequests[videoID];
     delete activeRequests[videoID];
 
-    if (result) {
-        cache[videoID] = {
-            titles: result.titles,
-            thumbnails: result.thumbnails,
-            lastUsed: Date.now()
-        };
+    if (results) {
+        for (const [key, result] of Object.entries(results)) {
+            cache[key] = {
+                titles: result.titles,
+                thumbnails: result.thumbnails,
+                lastUsed: key === videoID ? Date.now() : 0
+            };
+        }
 
-        if (Object.keys(cache).length > cacheLimit) {
-            const oldestKey = Object.keys(cache).reduce((a, b) => cache[a].lastUsed < cache[b].lastUsed ? a : b);
-            delete cache[oldestKey];
+        const keys = Object.keys(cache);
+        if (keys.length > cacheLimit) {
+            const numberToDelete = keys.length - cacheLimit;
+
+            for (let i = 0; i < numberToDelete; i++) {
+                const oldestKey = keys.reduce((a, b) => cache[a].lastUsed < cache[b].lastUsed ? a : b);
+                delete cache[oldestKey];
+            }
         }
     }
 
