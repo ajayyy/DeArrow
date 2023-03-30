@@ -20,13 +20,30 @@ export const TitleComponent = (props: TitleComponentProps) => {
                 onInput={(e) => {
                     e.stopPropagation();
 
-                    const newTitle = (e.target as HTMLDivElement).innerText;
-                    props.onSelectOrUpdate(newTitle, title.current);
-                    title.current = newTitle;
-
-                    setTitleChanged(newTitle !== props.submission.title);
+                    const target = e.target as HTMLTextAreaElement;
+                    const newTitle = target.innerText;
+                    
+                    if (newTitle !== title.current) {
+                        props.onSelectOrUpdate(newTitle, title.current);
+                        title.current = newTitle;
+    
+                        setTitleChanged(newTitle !== props.submission.title);
+                    }
                 }}
-                onKeyDown={(e) => e.stopPropagation()}
+                onKeyDown={(e) => {
+                    e.stopPropagation()
+
+                    // Prevent newlines
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                    }
+                }}
+                onPaste={(e) => {
+                    e.preventDefault();
+
+                    const text = e.clipboardData?.getData("text/plain");
+                    document.execCommand("insertText", false, text);
+                }}
                 dangerouslySetInnerHTML={{ __html: props.submission.title }}>
             </span>
 
