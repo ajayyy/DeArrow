@@ -103,6 +103,14 @@ ytd-thumbnail img {
     vertical-align: middle;
 }
 
+.cbTitleLarge .resetCustomTitle {
+    height: 2em;
+}
+
+.cbTitleLarge img.resetCustomTitle {
+    height: 1em;
+}
+
 .cbNoticeButton {
 	background: none;
 	color: rgb(235, 235, 235);
