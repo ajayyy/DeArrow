@@ -41,11 +41,13 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
 
     if (props.type === ThumbnailType.CurrentTime) {
         React.useEffect(() => {
-            waitFor(() => canvasRef?.current).then(() => {
+            waitFor(() => canvasRef?.current && props.video.duration > 0 && props.video.readyState > 2).then(() => {
+                canvasRef.current!.getContext("2d")!.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+
                 renderCurrentFrame(props.video, canvasRef.current!);
                 setTime(props.video.currentTime);
             }).catch(() => setError(true));
-        }, []);
+        }, [props.videoID]);
     }
 
     if (time != null && props.type === ThumbnailType.SpecifiedTime) {
