@@ -10,6 +10,7 @@ export interface TitleComponentProps {
 export const TitleComponent = (props: TitleComponentProps) => {
     const titleRef = React.useRef<HTMLDivElement>(null);
     const title = React.useRef(props.submission.title);
+    const [titleChanged, setTitleChanged] = React.useState(false);
 
     return (
         <div className={`cbTitle${props.large ? " cbTitleLarge" : ""}`}
@@ -22,6 +23,8 @@ export const TitleComponent = (props: TitleComponentProps) => {
                     const newTitle = (e.target as HTMLDivElement).innerText;
                     props.onSelectOrUpdate(newTitle, title.current);
                     title.current = newTitle;
+
+                    setTitleChanged(newTitle !== props.submission.title);
                 }}
                 onKeyDown={(e) => e.stopPropagation()}
                 dangerouslySetInnerHTML={{ __html: props.submission.title }}>
@@ -33,8 +36,11 @@ export const TitleComponent = (props: TitleComponentProps) => {
                     props.onSelectOrUpdate(props.submission.title, titleRef.current!.innerText);
                     titleRef.current!.innerText = props.submission.title;
                     title.current = props.submission.title;
+
+                    setTitleChanged(false);
                 }}>
-                <img src={chrome.runtime.getURL("icons/refresh.svg")} alt={chrome.i18n.getMessage("resetIcon")} className="resetCustomTitle" />
+                <img style={{ display: props.large && titleChanged ? "block" : "none" }} 
+                    src={chrome.runtime.getURL("icons/reset.svg")} alt={chrome.i18n.getMessage("resetIcon")} className="resetCustomTitle" />
             </button>
         </div>
     );

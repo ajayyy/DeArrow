@@ -21,6 +21,7 @@
     }],
     "web_accessible_resources": [
         "icons/refresh.svg",
+        "icons/reset.svg",
         "icons/pencil.svg",
         "icons/logo.svg",
         "js/document.js"

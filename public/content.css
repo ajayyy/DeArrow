@@ -103,6 +103,10 @@ ytd-thumbnail img {
     vertical-align: middle;
 }
 
+.cbTitle:not(.cbTitleLarge) {
+    cursor: pointer !important;
+}
+
 .cbTitleLarge .resetCustomTitle {
     height: 2em;
 }
