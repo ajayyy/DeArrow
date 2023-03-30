@@ -28,7 +28,6 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
         title: s.title
     }))];
 
-
     const thumbnails: RenderedThumbnailSubmission[] = [{
         type: ThumbnailType.Original
     }, {

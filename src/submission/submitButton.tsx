@@ -69,7 +69,7 @@ export class SubmitButton {
                     this.root = createRoot(this.container);
                     //todo: setup params, call this class and then test
                     //todo: don't render right away if not visible
-                    this.root.render(<SubmissionComponent video={getVideo()!} videoID={getVideoID()!} submissions={this.submissions} submitClicked={(title, thumbnail) => this.submitPressed(title, thumbnail)} />);
+                    this.render();
 
                     if (isOnMobileYouTube()) {
                         if (this.mutationObserver) {
@@ -92,7 +92,7 @@ export class SubmitButton {
     }
 
     close(): void {
-        this.container.style.display = "none";
+        if (this.container) this.container.style.display = "none";
     }
 
     open(): void {
@@ -108,6 +108,10 @@ export class SubmitButton {
 
     setSubmissions(submissions: BrandingResult): void {
         this.submissions = submissions;
+        this.render();
+    }
+
+    render(): void {
         this.root?.render(<SubmissionComponent video={getVideo()!} videoID={getVideoID()!} submissions={this.submissions} submitClicked={(title, thumbnail) => this.submitPressed(title, thumbnail)} />);
     }
 

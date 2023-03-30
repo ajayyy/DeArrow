@@ -3,6 +3,7 @@ import Config, { TitleFormatting } from "../config";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
 import { getOrCreateTitleButtonContainer } from "../utils/titleButton";
+import { submitButton } from "../video";
 import { BrandingLocation, toggleShowCustom, handleShowOriginalButton } from "../videoBranding/videoBranding";
 
 interface WatchTitleMutationObserverInfo {
@@ -33,6 +34,9 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
                     void handleShowOriginalButton(element, videoID, brandingLocation,
                         [replaceTitle(element, videoID, showCustomBranding, brandingLocation, queryByHash),
                             Promise.resolve(false)]);
+
+                    // Also update submit button title
+                    submitButton.render();
                 }
             });
     

@@ -8,7 +8,7 @@ import { getVideoBranding } from "./dataFetching";
 import * as documentScript from "../dist/js/document.js";
 
 
-const submitButton = new SubmitButton();
+export const submitButton = new SubmitButton();
 
 async function videoIDChange(videoID: VideoID | null): Promise<void> {
     if (!videoID) return;
@@ -27,6 +27,7 @@ async function videoIDChange(videoID: VideoID | null): Promise<void> {
 
 function resetValues() {
     submitButton.clearSubmissions();
+    submitButton.close();
 
     clearVideoBrandingInstances();
 }
