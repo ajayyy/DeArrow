@@ -8,7 +8,7 @@ import { TitleSubmission } from "../titles/titleData";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { submitVideoBranding } from "../dataFetching";
 import Config from "../config";
-import { getOrCreateTitleButtonContainer } from "../utils/titleButton";
+import { getOrCreateTitleButtonContainer } from "../utils/titleBar";
 
 export class SubmitButton {
     button: HTMLButtonElement;

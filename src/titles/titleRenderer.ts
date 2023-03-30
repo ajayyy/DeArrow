@@ -2,7 +2,7 @@ import { getVideoID, VideoID } from "@ajayyy/maze-utils/lib/video";
 import Config, { TitleFormatting } from "../config";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
-import { getOrCreateTitleButtonContainer } from "../utils/titleButton";
+import { getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { submitButton } from "../video";
 import { BrandingLocation, toggleShowCustom, handleShowOriginalButton } from "../videoBranding/videoBranding";
 

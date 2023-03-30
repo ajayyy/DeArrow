@@ -6,6 +6,7 @@ import { SubmitButton } from "./submission/submitButton";
 import { clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
 import { getVideoBranding } from "./dataFetching";
 import * as documentScript from "../dist/js/document.js";
+import { listenForBadges } from "./utils/titleBar";
 
 
 export const submitButton = new SubmitButton();
@@ -39,22 +40,13 @@ function channelIDChange(channelIDInfo: ChannelIDInfo): void {
 function videoElementChange(newVideo: boolean) {
     if (newVideo) {
         submitButton.attachToPage().catch(logError);
+
+        listenForBadges().catch(logError);
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
 function windowListenerHandler(event: MessageEvent) {
-    const data = event.data;
-
-    if (data.type === "newElement" && data.name === "ytd-badge-supported-renderer") {
-        // Move unlisted badge up one if required
-        const badges = document.querySelectorAll("ytd-badge-supported-renderer");
-        for (const badge of badges) {
-            if (badge && badge.parentElement?.id === "title" && badge.parentElement.parentElement) {
-                const parent = badge.parentElement;
-                parent!.parentElement!.insertBefore(badge, parent.nextSibling!);
-            }
-        }
-    }
 }
 
 export function setupCBVideoModule(): void {
