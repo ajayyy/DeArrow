@@ -1,3 +1,3 @@
 import { init } from "@ajayyy/maze-utils/lib/injected/document";
 
-init();
+init(["ytd-thumbnail", "ytd-badge-supported-renderer"]);

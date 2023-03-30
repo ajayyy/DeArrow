@@ -41,6 +41,21 @@ function videoElementChange(newVideo: boolean) {
     }
 }
 
+function windowListenerHandler(event: MessageEvent) {
+    const data = event.data;
+
+    if (data.type === "newElement" && data.name === "ytd-badge-supported-renderer") {
+        // Move unlisted badge up one if required
+        const badges = document.querySelectorAll("ytd-badge-supported-renderer");
+        for (const badge of badges) {
+            if (badge && badge.parentElement?.id === "title" && badge.parentElement.parentElement) {
+                const parent = badge.parentElement;
+                parent!.parentElement!.insertBefore(badge, parent.nextSibling!);
+            }
+        }
+    }
+}
+
 export function setupCBVideoModule(): void {
     chrome.runtime.onMessage.addListener((request: BackgroundToContentMessage) => {
         if (request.message === "update") {
@@ -53,6 +68,7 @@ export function setupCBVideoModule(): void {
         channelIDChange,
         videoElementChange,
         resetValues,
+        windowListenerHandler,
         documentScript
     }, () => Config);
 }
