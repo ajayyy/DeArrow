@@ -55,16 +55,21 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
             if (props.type !== ThumbnailType.Original && time !== lastTime.current) {
                 lastTime.current = time ?? null;
     
-                waitFor(() => canvasRef?.current).then(() => {
-                    renderThumbnail(props.videoID, canvasWidth, canvasHeight, false, time).then((rendered) => {
+                renderThumbnail(props.videoID, canvasWidth, canvasHeight, false, time).then((rendered) => {
+                    waitFor(() => canvasRef?.current).then(() => {
                         if (rendered) {
                             drawCentered(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height,
                                 rendered.width, rendered.height, rendered.canvas);
                         } else {
                             setError(true);
                         }
-                    }).catch(() => setError(true));
-                }).catch(() => setError(true));
+                    }).catch(() => {
+                        setError(true)
+                    });
+                }).catch(() => {
+                    setError(true)
+                });
+                
             }
         }, [time]);
     }
