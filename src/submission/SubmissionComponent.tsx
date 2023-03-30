@@ -43,15 +43,42 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
     const selectedThumbnail = React.useRef<ThumbnailSubmission>({
         original: true
     });
+    const [selectedTitleIndex, setSelectedTitleIndex] = React.useState(0);
+    const [selectedThumbnailIndex, setSelectedThumbnailIndex] = React.useState(0);
 
     // Load existing unsubmitted thumbnails whenever a videoID change happens
     const [extraUnsubmittedThumbnails, setExtraUnsubmittedThumbnails] = React.useState<RenderedThumbnailSubmission[]>([]);
     const [extraUnsubmittedTitles, setExtraUnsubmittedTitles] = React.useState<RenderedTitleSubmission[]>([]);
     React.useEffect(() => {
-        selectedTitle.current = titles[0];
-        selectedThumbnail.current = {
-            original: true
-        };
+        console.log(props.submissions, props.submissions.titles.some((t) => t.votes >= 0), props.submissions.titles.sort((a, b) => b.votes - a.votes)
+        .sort((a, b) => +b.locked - +a.locked)[0])
+        if (props.submissions.titles.some((t) => t.votes >= 0)) {
+            selectedTitle.current = props.submissions.titles.sort((a, b) => b.votes - a.votes)
+                .sort((a, b) => +b.locked - +a.locked)[0];
+            setSelectedTitleIndex(titles.findIndex((t) => t.title === selectedTitle.current.title));
+        } else {
+            selectedTitle.current = titles[0];
+            setSelectedTitleIndex(0);
+        }
+
+        if (props.submissions.thumbnails.some((t) => t.votes >= 0)) {
+            const best = props.submissions.thumbnails.sort((a, b) => b.votes - a.votes)
+                .sort((a, b) => +b.locked - +a.locked)[0];
+            selectedThumbnail.current = best;
+
+            if (!best.original) {
+                setSelectedThumbnailIndex(thumbnails.findIndex((t) => t.type === ThumbnailType.SpecifiedTime
+                    && t.timestamp === best.timestamp));
+            } else {
+                // Original always 0
+                setSelectedThumbnailIndex(0);
+            }
+        } else {
+            selectedThumbnail.current = {
+                original: true
+            };
+            setSelectedThumbnailIndex(0);
+        }
 
         const unsubmitted = Config.local!.unsubmitted[props.videoID];
         if (unsubmitted) {
@@ -86,7 +113,9 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                     video={props.video} 
                     videoId={props.videoID} 
                     existingSubmissions={[...thumbnails, ...extraUnsubmittedThumbnails]}
-                    onSelect={(t, oldTime) => {
+                    selectedThumbnailIndex={selectedThumbnailIndex}
+                    onSelect={(t, oldTime, i) => {
+                        setSelectedThumbnailIndex(i);
                         selectedThumbnail.current = t;
 
                         if (!t.original) {
@@ -108,8 +137,10 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             </div>
 
             <div>
-                <TitleDrawerComponent existingSubmissions={[...titles, ...extraUnsubmittedTitles]} 
-                    onSelectOrUpdate={(t, oldTitle) => {
+                <TitleDrawerComponent existingSubmissions={[...titles, ...extraUnsubmittedTitles]}
+                    selectedTitleIndex={selectedTitleIndex}
+                    onSelectOrUpdate={(t, oldTitle, i) => {
+                        setSelectedTitleIndex(i);
                         selectedTitle.current = t;
 
                         if (t.title !== originalTitle) {

@@ -8,7 +8,8 @@ export interface ThumbnailDrawerComponentProps {
     video: HTMLVideoElement;
     videoId: VideoID;
     existingSubmissions: RenderedThumbnailSubmission[];
-    onSelect: (submission: ThumbnailSubmission, oldTime: number | undefined) => void;
+    selectedThumbnailIndex: number;
+    onSelect: (submission: ThumbnailSubmission, oldTime: number | undefined, index: number) => void;
 }
 
 interface NoTimeRenderedThumbnailSubmission {
@@ -23,17 +24,15 @@ interface TimeRenderedThumbnailSubmission {
 export type RenderedThumbnailSubmission = (NoTimeRenderedThumbnailSubmission | TimeRenderedThumbnailSubmission);
 
 export const ThumbnailDrawerComponent = (props: ThumbnailDrawerComponentProps) => {
-    const [selectedThumbnail, setSelectedThumbnail] = React.useState(0);
-    
     return (
         <>
-            {getThumbnails(props, selectedThumbnail, setSelectedThumbnail)}
+            {getThumbnails(props, props.selectedThumbnailIndex)}
         </>
     );
 };
 
 function getThumbnails(props: ThumbnailDrawerComponentProps, 
-        selectedThumbnail: number, setSelectedThumbnail: (val: number) => void): JSX.Element[] {
+        selectedThumbnail: number): JSX.Element[] {
     const thumbnails: JSX.Element[] = [];
     const renderCount = Math.min(5, props.existingSubmissions.length);
     for (let i = 0; i < renderCount; i++) {
@@ -42,8 +41,7 @@ function getThumbnails(props: ThumbnailDrawerComponentProps,
                 video={props.video}
                 large={selectedThumbnail === i}
                 onClick={(submission, oldTime) => {
-                    setSelectedThumbnail(i);
-                    props.onSelect(submission, oldTime);
+                    props.onSelect(submission, oldTime, i);
                 }}
                 type={props.existingSubmissions[i].type}
                 videoID={props.videoId}
