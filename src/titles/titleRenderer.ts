@@ -67,15 +67,18 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     originalTitleElement.style.display = "none";
 
     if (brandingLocation !== BrandingLocation.Watch) {
+        const smallBrandingBox = !!titleElement.closest("ytd-grid-video-renderer");
+
         // To be able to show the show original button in the right place
         titleElement.parentElement!.style.display = "flex";
         titleElement.parentElement!.style.alignItems = "center";
+        if (smallBrandingBox) titleElement.parentElement!.style.alignItems = "flex-start";
         titleElement.parentElement!.style.justifyContent = "space-between";
         titleElement.parentElement!.style.width = "100%";
 
         // For channel pages to make sure the show original button can be on the right
         const metaElement = element.querySelector("#meta") as HTMLElement;
-        if (metaElement) {
+        if (metaElement && !smallBrandingBox) {
             metaElement.style.width = "100%";
         }
     }
