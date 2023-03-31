@@ -48,7 +48,7 @@ export const TitleComponent = (props: TitleComponentProps) => {
             </span>
 
             <button className="resetCustomTitle cbButton" 
-                title={chrome.i18n.getMessage("__MSG_resetCustomTitle__")}
+                title={chrome.i18n.getMessage("resetCustomTitle")}
                 onClick={() => {
                     props.onSelectOrUpdate(props.submission.title, titleRef.current!.innerText);
                     titleRef.current!.innerText = props.submission.title;
