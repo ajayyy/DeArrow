@@ -235,7 +235,7 @@ function createVideo(existingVideo: HTMLVideoElement | null, url: string, timest
 }
 
 export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, timestamp?: number): Promise<boolean> {
-    const image = element.querySelector(".ytd-thumbnail img") as HTMLImageElement;
+    const image = element.querySelector("ytd-thumbnail img") as HTMLImageElement;
 
     if (!showCustomBranding) {
         image.style.setProperty("display", "block", "important");
