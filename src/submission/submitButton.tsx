@@ -8,7 +8,7 @@ import { TitleSubmission } from "../titles/titleData";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { submitVideoBranding } from "../dataFetching";
 import Config from "../config";
-import { getOrCreateTitleButtonContainer } from "../utils/titleBar";
+import { addTitleChangeListener, getOrCreateTitleButtonContainer } from "../utils/titleBar";
 
 export class SubmitButton {
     button: HTMLButtonElement;
@@ -89,6 +89,10 @@ export class SubmitButton {
                 referenceNode.parentElement?.appendChild(this.container);
             }
         }
+
+        addTitleChangeListener(() => {
+            this.render();
+        });
     }
 
     close(): void {

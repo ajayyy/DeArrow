@@ -1,5 +1,7 @@
 import { waitFor } from "@ajayyy/maze-utils";
 import { getYouTubeTitleNode } from "@ajayyy/maze-utils/lib/elements";
+import { getOriginalTitleElement } from "../titles/titleRenderer";
+import { BrandingLocation } from "../videoBranding/videoBranding";
 
 export async function getOrCreateTitleButtonContainer(): Promise<HTMLElement | null> {
     const titleNode = await waitFor(() => getYouTubeTitleNode());
@@ -57,4 +59,36 @@ function moveBadge(badge: HTMLElement) {
         // Move badges (unlisted, funding) up one element to fix layout issues
         badge.parentElement!.parentElement!.insertBefore(badge, badge.parentElement!.nextSibling);
     }
+}
+
+let titleChangeObserver: MutationObserver | null = null;
+const titleChangeListeners: (() => void)[] = [];
+export async function listenForTitleChange() {
+    const titleNode = await waitFor(() => getYouTubeTitleNode());
+    if (titleNode) {
+        const originalTitleElement = getOriginalTitleElement(titleNode, BrandingLocation.Watch);
+        if (originalTitleElement) {
+            titleChangeObserver?.disconnect();
+
+            let oldText = originalTitleElement.textContent;
+            titleChangeObserver = new MutationObserver(() => {
+                if (oldText !== originalTitleElement.textContent) {
+                    oldText = originalTitleElement.textContent;
+                    for (const listener of titleChangeListeners) {
+                        listener();
+                    }
+                }
+            });
+
+            titleChangeObserver.observe(originalTitleElement, {
+                characterData: true,
+                subtree: true,
+                childList: true
+            });
+        }
+    }
+}
+
+export function addTitleChangeListener(listener: () => void) {
+    titleChangeListeners.push(listener);
 }

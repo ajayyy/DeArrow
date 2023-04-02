@@ -6,7 +6,7 @@ import { SubmitButton } from "./submission/submitButton";
 import { clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
 import { getVideoBranding } from "./dataFetching";
 import * as documentScript from "../dist/js/document.js";
-import { listenForBadges } from "./utils/titleBar";
+import { listenForBadges, listenForTitleChange } from "./utils/titleBar";
 
 
 export const submitButton = new SubmitButton();
@@ -42,6 +42,7 @@ function videoElementChange(newVideo: boolean) {
         submitButton.attachToPage().catch(logError);
 
         listenForBadges().catch(logError);
+        listenForTitleChange().catch(logError);
     }
 }
 

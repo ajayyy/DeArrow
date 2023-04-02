@@ -1,17 +1,10 @@
-import { getVideoID, VideoID } from "@ajayyy/maze-utils/lib/video";
+import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import Config, { TitleFormatting } from "../config";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
 import { getOrCreateTitleButtonContainer } from "../utils/titleBar";
-import { submitButton } from "../video";
-import { BrandingLocation, toggleShowCustom, handleShowOriginalButton } from "../videoBranding/videoBranding";
+import { BrandingLocation, toggleShowCustom } from "../videoBranding/videoBranding";
 
-interface WatchTitleMutationObserverInfo {
-    observer: MutationObserver;
-    element: HTMLElement;
-}
-
-let watchTitleMutationObserverInfo: WatchTitleMutationObserverInfo | null = null;
 let lastWatchTitle = "";
 let lastWatchVideoID: VideoID | null = null;
 
@@ -20,41 +13,9 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     const titleElement = element.querySelector(".cbCustomTitle") as HTMLElement ?? createTitleElement(originalTitleElement, brandingLocation);
 
     if (brandingLocation === BrandingLocation.Watch) {
-        if ((!watchTitleMutationObserverInfo || watchTitleMutationObserverInfo.element !== originalTitleElement)) {
-            watchTitleMutationObserverInfo?.observer?.disconnect();
-    
-            let oldText = originalTitleElement.textContent;
-            const observer = new MutationObserver(() => {
-                const currentOriginalTitleElement = getOriginalTitleElement(element, brandingLocation);
-                if (oldText === currentOriginalTitleElement?.textContent) return;
-    
-                oldText = currentOriginalTitleElement?.textContent;
-                const videoID = getVideoID();
-                if (videoID !== null) {
-                    void handleShowOriginalButton(element, videoID, brandingLocation,
-                        [replaceTitle(element, videoID, showCustomBranding, brandingLocation, queryByHash),
-                            Promise.resolve(false)]);
-
-                    // Also update submit button title
-                    submitButton.render();
-                }
-            });
-    
-            observer.observe(element, {
-                characterData: true,
-                subtree: true,
-                childList: true
-            });
-    
-            watchTitleMutationObserverInfo = {
-                observer,
-                element: originalTitleElement
-            };
-        }
-
-        if (lastWatchVideoID && originalTitleElement?.textContent && watchTitleMutationObserverInfo
+        if (lastWatchVideoID && originalTitleElement?.textContent 
                 && videoID !== lastWatchVideoID && originalTitleElement.textContent === lastWatchTitle) {
-            // Don't reset it if it hasn't changed videos yet, will be handled by mutation observer
+            // Don't reset it if it hasn't changed videos yet, will be handled by title change listener
             return false;
         }
 
@@ -129,7 +90,7 @@ function showOriginalTitle(titleElement: HTMLElement, originalTitleElement: HTML
     originalTitleElement.style.removeProperty("display");
 }
 
-function getOriginalTitleElement(element: HTMLElement, brandingLocation: BrandingLocation) {
+export function getOriginalTitleElement(element: HTMLElement, brandingLocation: BrandingLocation) {
     return element.querySelector(`${getTitleSelector(brandingLocation)}:not(.cbCustomTitle)`) as HTMLElement;
 }
 
