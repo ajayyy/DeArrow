@@ -11,10 +11,6 @@ ytd-thumbnail img {
     display: none !important; /* todo: remove this when it is fast enough to be hidden before it is loaded, or inject dynamically based on config */
 }
 
-[is-shorts] ytd-thumbnail img {
-    display: block !important;
-}
-
 .cbThumbnail {
     width: 20%;
     height: auto;

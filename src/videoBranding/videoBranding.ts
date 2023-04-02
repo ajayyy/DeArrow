@@ -58,7 +58,7 @@ export function replaceVideoCardBranding(element: HTMLElement): Promise<[boolean
 
     if (link) {
         // todo: fastest would be to preload via /browser request
-        const videoID = link.href?.match(/\?v=(.{11})/)?.[1] as VideoID;
+        const videoID = link.href?.match(/(?<=\?v=).{11}|(?<=\/shorts\/).{11}/)?.[0] as VideoID;
 
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
             async () => void await replaceVideoCardBranding(element));
@@ -122,7 +122,7 @@ export function clearVideoBrandingInstances(): void {
 }
 
 export function startThumbnailListener(): void {
-    const selector = "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer";
+    const selector = "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media";
     setThumbnailListener((e) => void replaceVideoCardsBranding(e),
         () => {}, () => Config.isReady(), selector); // eslint-disable-line @typescript-eslint/no-empty-function
 }

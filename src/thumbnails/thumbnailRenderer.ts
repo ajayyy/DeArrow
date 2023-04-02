@@ -236,15 +236,16 @@ function createVideo(existingVideo: HTMLVideoElement | null, url: string, timest
 
 export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, timestamp?: number): Promise<boolean> {
     const image = element.querySelector("ytd-thumbnail img") as HTMLImageElement;
+    const box = element.querySelector("ytd-thumbnail") as HTMLDivElement;
 
     if (!showCustomBranding) {
         image.style.setProperty("display", "block", "important");
         return false;
     }
 
-    if (image) {
-        const width = 720;
-        const height = 404;
+    if (image && box) {
+        const width = box.offsetWidth * window.devicePixelRatio;
+        const height = box.offsetHeight * window.devicePixelRatio;
 
         // TODO: Add option not to hide all thumbnails by default
         image.style.display = "none";
