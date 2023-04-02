@@ -120,6 +120,10 @@ export class SubmitButton {
     }
 
     private async submitPressed(title: TitleSubmission, thumbnail: ThumbnailSubmission): Promise<void> {
+        if (title) {
+            title.title = title.title.trim();
+        }
+
         const result = await submitVideoBranding(getVideoID()!, title, thumbnail);
 
         if (result) {
