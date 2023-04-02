@@ -122,7 +122,7 @@ export function clearVideoBrandingInstances(): void {
 }
 
 export function startThumbnailListener(): void {
-    const selector = "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer";
+    const selector = "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer";
     setThumbnailListener((e) => void replaceVideoCardsBranding(e),
         () => {}, () => Config.isReady(), selector); // eslint-disable-line @typescript-eslint/no-empty-function
 }

@@ -192,3 +192,9 @@ ytd-thumbnail img {
 ytd-playlist-panel-video-renderer #video-title {
     width: 100%;
 }
+
+/* Fix mixes in recomendations breaking flex layout */
+ytd-compact-radio-renderer ytd-badge-supported-renderer {
+    position: absolute;
+    right: 0;
+}
