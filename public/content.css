@@ -194,7 +194,7 @@ ytd-playlist-panel-video-renderer #video-title {
 }
 
 /* Fix mixes in recomendations breaking flex layout */
-ytd-compact-radio-renderer ytd-badge-supported-renderer {
+ytd-compact-radio-renderer ytd-badge-supported-renderer, ytd-grid-movie-renderer ytd-badge-supported-renderer {
     position: absolute;
     right: 0;
 }
