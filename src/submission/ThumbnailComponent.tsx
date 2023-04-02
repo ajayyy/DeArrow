@@ -22,6 +22,13 @@ export interface ThumbnailComponentProps {
     lastElem: boolean;
 }
 
+const defaultThumbnailOptions = [
+    "maxresdefault",
+    "mqdefault",
+    "sddefault",
+    "hqdefault"
+]
+
 const canvasWidth = 720;
 const canvasHeight = 404;
 
@@ -33,6 +40,7 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
     const [error, setError] = React.useState(false)
     const lastTime = React.useRef(null) as React.MutableRefObject<number | null>;
     const [drawInterval, setDrawInterval] = React.useState<NodeJS.Timer | null>(null);
+    const [defaultThumbnailOption, setDefaultThumbnailOption] = React.useState(0);
 
     // State is only used for the current time thumbnail, otherwise stay updated to upstream value
     if (props.time && time !== props.time) {
@@ -47,6 +55,8 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                 renderCurrentFrame(props.video, canvasRef.current!);
                 setTime(props.video.currentTime);
             }).catch(() => setError(true));
+
+            setDefaultThumbnailOption(0);
         }, [props.videoID]);
     }
 
@@ -130,7 +140,20 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                 }}>
             {
                 props.type === ThumbnailType.Original ?
-                <img className="cbThumbnailImg" src={`https://i.ytimg.com/vi/${props.videoID}/hq720.jpg`}></img> :
+                <img 
+                    className="cbThumbnailImg" 
+                    src={`https://i.ytimg.com/vi/${props.videoID}/${defaultThumbnailOptions[defaultThumbnailOption]}.jpg`}
+                    onLoad={(e) => {
+                        // If the image is the default thumbnail, try the next one
+                        if ((e.target as HTMLImageElement).width === 120) {
+                            console.log("Error")
+                            if (defaultThumbnailOption < defaultThumbnailOptions.length - 1) {
+                                setDefaultThumbnailOption(defaultThumbnailOption + 1);
+                            } else {
+                                setError(true);
+                            }
+                        }
+                    }}></img> :
                 null
             }
             {
