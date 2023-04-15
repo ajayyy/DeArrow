@@ -7,6 +7,7 @@ import { clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./vide
 import { getVideoBranding } from "./dataFetching";
 import * as documentScript from "../dist/js/document.js";
 import { listenForBadges, listenForTitleChange } from "./utils/titleBar";
+import { getPlaybackFormats } from "./thumbnails/thumbnailData";
 
 
 export const submitButton = new SubmitButton();
@@ -50,6 +51,15 @@ function videoElementChange(newVideo: boolean) {
 function windowListenerHandler(event: MessageEvent) {
 }
 
+function newVideosLoaded(videoIDs: VideoID[]) {
+    console.log("precaching", videoIDs)
+    // Pre-cache the data for these videos
+    for (const videoID of videoIDs) {
+        getVideoBranding(videoID, false).catch(logError);
+        getPlaybackFormats(videoID).catch(logError);
+    }
+}
+
 export function setupCBVideoModule(): void {
     chrome.runtime.onMessage.addListener((request: BackgroundToContentMessage) => {
         if (request.message === "update") {
@@ -63,6 +73,7 @@ export function setupCBVideoModule(): void {
         videoElementChange,
         resetValues,
         windowListenerHandler,
+        newVideosLoaded,
         documentScript
     }, () => Config);
 }

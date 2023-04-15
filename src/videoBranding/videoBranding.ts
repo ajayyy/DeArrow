@@ -57,7 +57,6 @@ export function replaceVideoCardBranding(element: HTMLElement): Promise<[boolean
     const link = element.querySelector("a#thumbnail") as HTMLAnchorElement;
 
     if (link) {
-        // todo: fastest would be to preload via /browser request
         const videoID = link.href?.match(/(?<=\?v=).{11}|(?<=\/shorts\/).{11}/)?.[0] as VideoID;
 
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,

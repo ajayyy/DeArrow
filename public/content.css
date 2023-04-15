@@ -8,7 +8,7 @@ canvas.ytd-img-shadow {
 }
 
 ytd-thumbnail img {
-    display: none !important; /* todo: remove this when it is fast enough to be hidden before it is loaded, or inject dynamically based on config */
+    visibility: hidden !important; /* todo: remove this when it is fast enough to be hidden before it is loaded, or inject dynamically based on config */
 }
 
 .cbThumbnail {
