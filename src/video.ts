@@ -52,7 +52,6 @@ function windowListenerHandler(event: MessageEvent) {
 }
 
 function newVideosLoaded(videoIDs: VideoID[]) {
-    console.log("precaching", videoIDs)
     // Pre-cache the data for these videos
     for (const videoID of videoIDs) {
         getVideoBranding(videoID, false).catch(logError);
