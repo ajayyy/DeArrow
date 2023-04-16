@@ -7,7 +7,7 @@ canvas.ytd-img-shadow {
     border-radius: var(--yt-img-border-radius, none);
 }
 
-ytd-thumbnail img {
+ytd-thumbnail img:not(.cb-visible) {
     visibility: hidden !important; /* todo: remove this when it is fast enough to be hidden before it is loaded, or inject dynamically based on config */
 }
 
