@@ -239,7 +239,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
     const box = element.querySelector("ytd-thumbnail") as HTMLDivElement;
 
     if (!showCustomBranding) {
-        image.style.setProperty("visibility", "visible", "important");
+        image.style.setProperty("visibility", "inherit", "important");
         image.style.removeProperty("display");
         return false;
     }
@@ -254,7 +254,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
         // Trigger a fetch to start, and display the original thumbnail if necessary
         getVideoThumbnailIncludingUnsubmitted(videoID, false).then((thumbnail) => {
             if (!thumbnail || thumbnail.original) {
-                image.style.setProperty("visibility", "visible", "important");
+                image.style.setProperty("visibility", "inherit", "important");
                 image.style.removeProperty("display");
             }
         }).catch(logError);
@@ -266,7 +266,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
         });
 
         if (!thumbnail) {
-            image.style.setProperty("visibility", "visible", "important");
+            image.style.setProperty("visibility", "inherit", "important");
             image.style.removeProperty("display");
             return false;
         }
