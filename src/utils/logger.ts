@@ -1,7 +1,7 @@
 import * as CompileConfig from "../../config.json";
 
 export function logError(error: unknown): void {
-    console.error(`[CB] ${error}`);
+    console.error("[CB]", error);
 }
 
 export function log(...text: unknown[]): void {
