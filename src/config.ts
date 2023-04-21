@@ -30,6 +30,7 @@ interface SBConfig {
     invidiousInstances: string[];
     keepUnsubmitted: boolean;
     titleFormatting: TitleFormatting;
+    fetchTimeout: number;
 }
 
 interface SBStorage {
@@ -55,7 +56,8 @@ const syncDefaults = {
     userID: null,
     invidiousInstances: [],
     keepUnsubmitted: true,
-    titleFormatting: TitleFormatting.CapitalizeWords
+    titleFormatting: TitleFormatting.CapitalizeWords,
+    fetchTimeout: 7000
 };
 
 const localDefaults = {

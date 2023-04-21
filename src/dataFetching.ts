@@ -10,6 +10,7 @@ import { getHash } from "@ajayyy/maze-utils/lib/hash";
 import Config from "./config";
 import { generateUserID } from "@ajayyy/maze-utils/lib/setup";
 import { BrandingUUID } from "./videoBranding/videoBranding";
+import { timeoutPomise } from "@ajayyy/maze-utils";
 
 interface VideoBrandingCacheRecord extends BrandingResult {
     lastUsed: number;
@@ -52,20 +53,19 @@ export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, queryB
 export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): Promise<VideoBrandingCacheRecord | null> {
     const cachedValue = cache[videoID];
 
-    const oneHour = 1000 * 60 * 60;
-    if (cachedValue?.lastUsed > Date.now() - oneHour) {
+    if (cachedValue) {
         return cachedValue;
     }
 
     activeRequests[videoID] ??= (async () => {
-        let result: Record<VideoID, BrandingResult> | null = null;
+        let results: Record<VideoID, BrandingResult> | null = null;
         if (queryByHash) {
             const request = await sendRequestToServer("GET", `/api/branding/${(await getHash(videoID, 1)).slice(0, 4)}`);
 
             if (request.ok || request.status === 404) {
                 try {
                     const json = JSON.parse(request.responseText);
-                    result = json;
+                    results = json;
                 } catch (e) {
                     logError(`Getting video branding for ${videoID} failed: ${e}`);
                 }
@@ -77,7 +77,7 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): 
 
             if (request.ok || request.status === 404) {
                 try {
-                    result = {
+                    results = {
                         [videoID]: JSON.parse(request.responseText)
                     };
                 } catch (e) {
@@ -86,33 +86,39 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): 
             }
         }
 
-        return result;
-    })();
-
-    const results = await activeRequests[videoID];
-    delete activeRequests[videoID];
-
-    if (results) {
-        for (const [key, result] of Object.entries(results)) {
-            cache[key] = {
-                titles: result.titles,
-                thumbnails: result.thumbnails,
-                lastUsed: key === videoID ? Date.now() : 0
-            };
-        }
-
-        const keys = Object.keys(cache);
-        if (keys.length > cacheLimit) {
-            const numberToDelete = keys.length - cacheLimit;
-
-            for (let i = 0; i < numberToDelete; i++) {
-                const oldestKey = keys.reduce((a, b) => cache[a].lastUsed < cache[b].lastUsed ? a : b);
-                delete cache[oldestKey];
+        if (results) {
+            for (const [key, result] of Object.entries(results)) {
+                cache[key] = {
+                    titles: result.titles,
+                    thumbnails: result.thumbnails,
+                    lastUsed: key === videoID ? Date.now() : 0
+                };
+            }
+    
+            const keys = Object.keys(cache);
+            if (keys.length > cacheLimit) {
+                const numberToDelete = keys.length - cacheLimit;
+    
+                for (let i = 0; i < numberToDelete; i++) {
+                    const oldestKey = keys.reduce((a, b) => cache[a].lastUsed < cache[b].lastUsed ? a : b);
+                    delete cache[oldestKey];
+                }
             }
         }
-    }
 
-    return cache[videoID];
+        return results;
+    })();
+    activeRequests[videoID].catch(() => delete activeRequests[videoID]);
+
+    try {
+        await Promise.race([timeoutPomise(Config.config?.fetchTimeout), activeRequests[videoID]]);
+        delete activeRequests[videoID];
+    
+        return cache[videoID];
+    } catch (e) {
+        logError(e);
+        return null;
+    }
 }
 
 export function clearCache(videoID: VideoID) {
