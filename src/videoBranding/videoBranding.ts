@@ -102,7 +102,12 @@ export async function toggleShowCustom(videoID: VideoID): Promise<boolean> {
     if (videoBrandingInstances[videoID]) {
         const newValue = !videoBrandingInstances[videoID].showCustomBranding;
         videoBrandingInstances[videoID].showCustomBranding = newValue;
-        for (const updateBranding of videoBrandingInstances[videoID].updateBrandingCallbacks) {
+
+        const updateBrandingCallbacks = videoBrandingInstances[videoID].updateBrandingCallbacks;
+        // They will be added back to the array
+        videoBrandingInstances[videoID].updateBrandingCallbacks = [];
+
+        for (const updateBranding of updateBrandingCallbacks) {
             await updateBranding();
         }
 
