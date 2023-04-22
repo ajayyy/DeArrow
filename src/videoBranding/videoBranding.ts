@@ -22,7 +22,7 @@ export enum BrandingLocation {
 
 export interface VideoBrandingInstance {
     showCustomBranding: boolean;
-    updateBranding: () => Promise<void>;
+    updateBrandingCallbacks: Array<() => Promise<void>>;
 }
 
 const videoBrandingInstances: Record<VideoID, VideoBrandingInstance> = {}
@@ -89,10 +89,10 @@ function getAndUpdateVideoBrandingInstances(videoID: VideoID, updateBranding: ()
     if (!videoBrandingInstances[videoID]) {
         videoBrandingInstances[videoID] = {
             showCustomBranding: true,
-            updateBranding
+            updateBrandingCallbacks: [updateBranding]
         }
     } else {
-        videoBrandingInstances[videoID].updateBranding = updateBranding;
+        videoBrandingInstances[videoID].updateBrandingCallbacks.push(updateBranding);
     }
 
     return videoBrandingInstances[videoID];
@@ -102,7 +102,9 @@ export async function toggleShowCustom(videoID: VideoID): Promise<boolean> {
     if (videoBrandingInstances[videoID]) {
         const newValue = !videoBrandingInstances[videoID].showCustomBranding;
         videoBrandingInstances[videoID].showCustomBranding = newValue;
-        await videoBrandingInstances[videoID].updateBranding();
+        for (const updateBranding of videoBrandingInstances[videoID].updateBrandingCallbacks) {
+            await updateBranding();
+        }
 
         return newValue;
     }
