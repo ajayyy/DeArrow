@@ -18,6 +18,9 @@ async function videoIDChange(videoID: VideoID | null): Promise<void> {
     replaceCurrentVideoBranding().catch(logError);
     
     try {
+        // To update videoID
+        submitButton.render();
+
         const branding = await getVideoBranding(videoID, true);
         if (branding) {
             submitButton.setSubmissions(branding);
