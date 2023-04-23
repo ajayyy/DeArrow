@@ -28,7 +28,7 @@ export class SubmitButton {
     }
 
     async attachToPage(): Promise<void> {
-        if (!getVideo() || !getVideoID()) {
+        if (!getVideo()) {
             log("Not attaching submit button, no video");
             return;
         }
