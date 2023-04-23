@@ -108,6 +108,8 @@ export class SubmitButton {
             thumbnails: [],
             titles: []
         });
+
+        this.render();
     }
 
     setSubmissions(submissions: BrandingResult): void {
