@@ -7,6 +7,7 @@ import { RenderedThumbnailSubmission, ThumbnailDrawerComponent } from "./Thumbna
 import { RenderedTitleSubmission, TitleDrawerComponent } from "./TitleDrawerComponent";
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import Config from "../config";
+import { addTitleChangeListener } from "../utils/titleBar";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -49,7 +50,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
     // Load existing unsubmitted thumbnails whenever a videoID change happens
     const [extraUnsubmittedThumbnails, setExtraUnsubmittedThumbnails] = React.useState<RenderedThumbnailSubmission[]>([]);
     const [extraUnsubmittedTitles, setExtraUnsubmittedTitles] = React.useState<RenderedTitleSubmission[]>([]);
-    React.useEffect(() => {
+    const videoChangeListener = () => {
         if (props.submissions.titles.some((t) => t.votes >= 0)) {
             selectedTitle.current = props.submissions.titles.sort((a, b) => b.votes - a.votes)
                 .sort((a, b) => +b.locked - +a.locked)[0];
@@ -102,7 +103,10 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             setExtraUnsubmittedThumbnails([]);
             setExtraUnsubmittedTitles([]);
         }
-    }, [props.videoID]);
+    };
+    
+    React.useEffect(videoChangeListener, [props.videoID]);
+    React.useEffect(() => addTitleChangeListener(() => videoChangeListener()), []);
 
     return (
         <div className="submissionMenuInner">
@@ -172,7 +176,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
             <button className="cbNoticeButton cbVoteButton" onClick={() => void props.submitClicked({
                 ...selectedTitle.current,
-                original: selectedTitle.current.title === originalTitle
+                original: selectedTitle.current.title === getCurrentPageTitle()
             }, selectedThumbnail.current)}>
                 {`${chrome.i18n.getMessage("Vote")}!`}
             </button>
