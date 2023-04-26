@@ -28,7 +28,7 @@ export interface VideoBrandingInstance {
 const videoBrandingInstances: Record<VideoID, VideoBrandingInstance> = {}
 
 export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]> {
-    const title = await waitForElement(getYouTubeTitleNodeSelector()) as HTMLElement;
+    const title = await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
     const videoID = getVideoID();
 
