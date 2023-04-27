@@ -5,6 +5,7 @@ export interface TitleComponentProps {
     submission: RenderedTitleSubmission;
     selected: boolean;
     onSelectOrUpdate: (title: string, oldTitle: string) => void;
+    onDeselect: () => void;
 }
 
 export const TitleComponent = (props: TitleComponentProps) => {
@@ -15,7 +16,9 @@ export const TitleComponent = (props: TitleComponentProps) => {
     return (
         <div className={`cbTitle${props.selected ? " cbTitleSelected" : ""}`}
                 onClick={() => {
-                    props.onSelectOrUpdate(titleRef.current!.innerText, titleRef.current!.innerText);
+                    const newTitle = titleRef.current!.innerText;
+                    const oldTitle = props.submission.title;
+                    props.onSelectOrUpdate(newTitle, oldTitle);
 
                     if (document.activeElement !== titleRef.current) {
                         titleRef.current!.focus();
@@ -56,12 +59,19 @@ export const TitleComponent = (props: TitleComponentProps) => {
 
             <button className="resetCustomTitle cbButton" 
                 title={chrome.i18n.getMessage("resetCustomTitle")}
-                onClick={() => {
+                onClick={(e) => {
+                    e.stopPropagation();
+
                     props.onSelectOrUpdate(props.submission.title, titleRef.current!.innerText);
+                    props.onDeselect();
                     titleRef.current!.innerText = props.submission.title;
                     title.current = props.submission.title;
 
                     setTitleChanged(false);
+
+                    if (document.activeElement === titleRef.current) {
+                        titleRef.current!.blur();
+                    }
                 }}>
                 <img style={{ display: props.selected && titleChanged ? "block" : "none" }} 
                     src={chrome.runtime.getURL("icons/reset.svg")} alt={chrome.i18n.getMessage("resetIcon")} className="resetCustomTitle" />

@@ -111,14 +111,11 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             <div>
                 <TitleDrawerComponent existingSubmissions={[...titles, ...extraUnsubmittedTitles]}
                     selectedTitleIndex={selectedTitleIndex}
+                    onDeselect={() => {
+                        setSelectedTitleIndex(-1);
+                        selectedThumbnail.current = null;
+                    }}
                     onSelectOrUpdate={(t, oldTitle, i) => {
-                        if (selectedTitleIndex === i && t.title === originalTitle) {
-                            // Deselect
-                            setSelectedTitleIndex(-1);
-                            selectedThumbnail.current = null;
-                            return;
-                        }
-
                         setSelectedTitleIndex(i);
                         selectedTitle.current = t;
 
