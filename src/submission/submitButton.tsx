@@ -121,7 +121,7 @@ export class SubmitButton {
         this.root?.render(<SubmissionComponent video={getVideo()!} videoID={getVideoID()!} submissions={this.submissions} submitClicked={(title, thumbnail) => this.submitPressed(title, thumbnail)} />);
     }
 
-    private async submitPressed(title: TitleSubmission, thumbnail: ThumbnailSubmission): Promise<void> {
+    private async submitPressed(title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null): Promise<void> {
         if (title) {
             title.title = title.title.trim();
         }
@@ -138,19 +138,23 @@ export class SubmitButton {
                     unsubmitted.titles.forEach((t) => t.selected = false);
                     unsubmitted.thumbnails.forEach((t) => t.selected = false);
 
-                    if (thumbnail.original && !unsubmitted.thumbnails.find((t) => t.original)) {
-                        unsubmitted.thumbnails.push({
-                            original: true,
-                            selected: true
-                        });
+                    if (title) {
+                        const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === title.title);
+                        if (unsubmittedTitle) unsubmittedTitle.selected = true;
                     }
-
-                    const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === title.title);
-                    if (unsubmittedTitle) unsubmittedTitle.selected = true;
                     
-                    const unsubmittedThumbnail = unsubmitted.thumbnails.find((t) => (t.original && thumbnail.original) 
-                        || (!t.original && !thumbnail.original && t.timestamp === thumbnail.timestamp))
-                    if (unsubmittedThumbnail) unsubmittedThumbnail.selected = true;
+                    if (thumbnail) {
+                        if (thumbnail.original && !unsubmitted.thumbnails.find((t) => t.original)) {
+                            unsubmitted.thumbnails.push({
+                                original: true,
+                                selected: true
+                            });
+                        } else {
+                            const unsubmittedThumbnail = unsubmitted.thumbnails.find((t) => (t.original && thumbnail.original) 
+                                || (!t.original && !thumbnail.original && t.timestamp === thumbnail.timestamp))
+                            if (unsubmittedThumbnail) unsubmittedThumbnail.selected = true;
+                        }
+                    }
                 } else {
                     delete Config.local!.unsubmitted[getVideoID()!];
                 }

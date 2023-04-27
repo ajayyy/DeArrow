@@ -16,7 +16,7 @@ async function videoIDChange(videoID: VideoID | null): Promise<void> {
     if (!videoID) return;
 
     replaceCurrentVideoBranding().catch(logError);
-    
+
     try {
         // To update videoID
         submitButton.render();
@@ -25,7 +25,7 @@ async function videoIDChange(videoID: VideoID | null): Promise<void> {
         if (branding) {
             submitButton.setSubmissions(branding);
         }
-    } catch(e) {
+    } catch (e) {
         logError(e);
     }
 }
@@ -47,6 +47,8 @@ function videoElementChange(newVideo: boolean) {
 
         listenForBadges().catch(logError);
         listenForTitleChange().catch(logError);
+
+        submitButton.render();
     }
 }
 

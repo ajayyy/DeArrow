@@ -92,3 +92,10 @@ export async function listenForTitleChange() {
 export function addTitleChangeListener(listener: () => void) {
     titleChangeListeners.push(listener);
 }
+
+export function removeTitleChangeListener(listener: () => void) {
+    const index = titleChangeListeners.indexOf(listener);
+    if (index !== -1) {
+        titleChangeListeners.splice(index, 1);
+    }
+}

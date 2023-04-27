@@ -25,7 +25,7 @@ function getTitles(props: TitleDrawerComponentProps,
     for (let i = 0; i < Math.min(5, props.existingSubmissions.length); i++) {
         titles.push(
             <TitleComponent
-                large={selectedTitle === i}
+                selected={selectedTitle === i}
                 onSelectOrUpdate={(title, oldTitle) => {
                     props.onSelectOrUpdate({
                         ...props.existingSubmissions[i],

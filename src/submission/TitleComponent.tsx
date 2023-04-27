@@ -3,7 +3,7 @@ import { RenderedTitleSubmission } from "./TitleDrawerComponent";
 
 export interface TitleComponentProps {
     submission: RenderedTitleSubmission;
-    large: boolean;
+    selected: boolean;
     onSelectOrUpdate: (title: string, oldTitle: string) => void;
 }
 
@@ -13,8 +13,15 @@ export const TitleComponent = (props: TitleComponentProps) => {
     const [titleChanged, setTitleChanged] = React.useState(false);
 
     return (
-        <div className={`cbTitle${props.large ? " cbTitleLarge" : ""}`}
-                onClick={() => props.onSelectOrUpdate(titleRef.current!.innerText, titleRef.current!.innerText)}>
+        <div className={`cbTitle${props.selected ? " cbTitleSelected" : ""}`}
+                onClick={() => {
+                    props.onSelectOrUpdate(titleRef.current!.innerText, titleRef.current!.innerText);
+
+                    if (document.activeElement !== titleRef.current) {
+                        titleRef.current!.focus();
+                        setSelectionToEnd(titleRef.current!);
+                    }
+                }}>
             <span ref={titleRef}
                 contentEditable={true}
                 onInput={(e) => {
@@ -56,9 +63,21 @@ export const TitleComponent = (props: TitleComponentProps) => {
 
                     setTitleChanged(false);
                 }}>
-                <img style={{ display: props.large && titleChanged ? "block" : "none" }} 
+                <img style={{ display: props.selected && titleChanged ? "block" : "none" }} 
                     src={chrome.runtime.getURL("icons/reset.svg")} alt={chrome.i18n.getMessage("resetIcon")} className="resetCustomTitle" />
             </button>
         </div>
     );
 };
+
+function setSelectionToEnd(element: HTMLElement) {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    range.collapse(false);
+
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+
+    element.focus();
+}

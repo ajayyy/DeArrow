@@ -121,6 +121,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
                     }
 
                     console.error(`Failed to render thumbnail for ${videoID} after ${tries} tries`);
+                    reject("Failed to render thumbnail");
                     return;
                 }
 

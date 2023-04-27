@@ -19,9 +19,6 @@
     "OriginalTitle": {
         "message": "Original Title"
     },
-    "UnknownError": {
-        "message": "Unknown Error"
-    },
     "CurrentTime": {
         "message": "Current Time"
     },
@@ -36,5 +33,24 @@
     },
     "TypeYourOwnTitleHere": {
         "message": "Type your own title here"
+    },
+    "VideoNotReady": {
+        "message": "Video not ready"
+    },
+    "FailedToRender": {
+        "message": "Failed to render",
+        "description": "Thumbnail preview failed to render"
+    },
+    "CanvasMissing": {
+        "message": "Canvas missing",
+        "description": "Canvas is the name of an HTML element used to draw thumbnails onto"
+    },
+    "ExceptionWhileRendering": {
+        "message": "Exception while rendering",
+        "description": "Displayed if there is a general error when trying to render the thumbnail"
+    },
+    "FailedToLoad": {
+        "message": "Failed to load",
+        "description": "Thumbnail failed to load"
     }
 }

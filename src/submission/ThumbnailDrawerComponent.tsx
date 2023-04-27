@@ -1,15 +1,15 @@
 import React = require("react");
-import { ThumbnailComponent } from "./ThumbnailComponent";
 import { ThumbnailType } from "./ThumbnailComponent";
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
+import { ThumbnailSelectionComponent } from "./ThumbnailSelectionComponent";
 
 export interface ThumbnailDrawerComponentProps {
     video: HTMLVideoElement;
     videoId: VideoID;
     existingSubmissions: RenderedThumbnailSubmission[];
     selectedThumbnailIndex: number;
-    onSelect: (submission: ThumbnailSubmission, oldTime: number | undefined, index: number) => void;
+    onSelect: (submission: ThumbnailSubmission, index: number) => void;
 }
 
 interface NoTimeRenderedThumbnailSubmission {
@@ -34,23 +34,25 @@ export const ThumbnailDrawerComponent = (props: ThumbnailDrawerComponentProps) =
 function getThumbnails(props: ThumbnailDrawerComponentProps, 
         selectedThumbnail: number): JSX.Element[] {
     const thumbnails: JSX.Element[] = [];
-    const renderCount = Math.min(5, props.existingSubmissions.length);
+    const renderCount = props.existingSubmissions.length;
     for (let i = 0; i < renderCount; i++) {
+        const time = props.existingSubmissions[i].type === ThumbnailType.SpecifiedTime ? 
+            (props.existingSubmissions[i] as TimeRenderedThumbnailSubmission).timestamp : undefined;
+
         thumbnails.push(
-            <ThumbnailComponent
+            <ThumbnailSelectionComponent
                 video={props.video}
-                large={selectedThumbnail === i}
-                onClick={(submission, oldTime) => {
-                    props.onSelect(submission, oldTime, i);
+                selected={selectedThumbnail === i}
+                onClick={(submission) => {
+                    props.onSelect(submission, i);
                 }}
                 type={props.existingSubmissions[i].type}
                 videoID={props.videoId}
-                time={props.existingSubmissions[i].type === ThumbnailType.SpecifiedTime ? 
-                    (props.existingSubmissions[i] as TimeRenderedThumbnailSubmission).timestamp : undefined}
+                time={time}
                 firstElem={i === 0}
                 lastElem={i === renderCount - 1}
-                key={i}
-            ></ThumbnailComponent>
+                key={time ? `T${time}` : `I${i}`}
+            ></ThumbnailSelectionComponent>
         );
     }
 
