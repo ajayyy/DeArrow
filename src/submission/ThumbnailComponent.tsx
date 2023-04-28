@@ -37,19 +37,20 @@ const canvasHeight = 404;
 export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     const lastTime = React.useRef(null) as React.MutableRefObject<number | null>;
+    const inRenderingLoop = React.useRef(false);
     const [defaultThumbnailOption, setDefaultThumbnailOption] = React.useState(0);
 
     if (props.type === ThumbnailType.CurrentTime) {
         React.useEffect(() => {
-            props.video.addEventListener("playing", () => renderCurrentFrame(props, canvasRef, true));
+            props.video.addEventListener("playing", () => renderCurrentFrame(props, canvasRef, inRenderingLoop, true));
             props.video.addEventListener("seeked", () => {
                 // If playing, it's already waiting for the next frame from the other listener
                 if (props.video.paused) {
-                    renderCurrentFrame(props, canvasRef, false);
+                    renderCurrentFrame(props, canvasRef, inRenderingLoop, false);
                 }
             });
 
-            renderCurrentFrame(props, canvasRef, !props.video.paused);
+            renderCurrentFrame(props, canvasRef, inRenderingLoop, !props.video.paused);
         }, [props.video]);
     }
 
@@ -65,7 +66,7 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                 canvasRef.current?.getContext("2d")?.clearRect(0, 0, canvasRef.current?.width, canvasRef.current?.height);
                 if (props.video.paused && props.time === props.video.currentTime) {
                     // Skip rendering and just use existing video frame
-                    renderCurrentFrame(props, canvasRef, false);
+                    renderCurrentFrame(props, canvasRef, inRenderingLoop, false);
                 } else {
                     renderThumbnail(props.videoID, canvasWidth, canvasHeight, false, props.time!).then((rendered) => {
                         waitFor(() => canvasRef?.current).then(() => {
@@ -143,7 +144,9 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
  * Will keep rendering until paused if waitForNextFrame is true
  */
 async function renderCurrentFrame(props: ThumbnailComponentProps,
-        canvasRef: React.RefObject<HTMLCanvasElement>, waitForNextFrame: boolean): Promise<void> {
+        canvasRef: React.RefObject<HTMLCanvasElement>,
+        inRenderingLoop: React.MutableRefObject<boolean>,
+        waitForNextFrame: boolean): Promise<void> {
     try {
         await waitFor(() => canvasRef?.current && props.video.duration > 0 && props.video.readyState > 2);
 
@@ -151,8 +154,12 @@ async function renderCurrentFrame(props: ThumbnailComponentProps,
         canvasRef.current!.getContext("2d")!.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
         drawCentered(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height, props.video.videoWidth, props.video.videoHeight, props.video);
 
-        if (waitForNextFrame && !props.video.paused) {
-            requestAnimationFrame(() => renderCurrentFrame(props, canvasRef, true));
+        if (waitForNextFrame && !props.video.paused && !inRenderingLoop.current) {
+            inRenderingLoop.current = true;
+            requestAnimationFrame(() => {
+                inRenderingLoop.current = false;
+                renderCurrentFrame(props, canvasRef, inRenderingLoop, true);
+            });
         }
     } catch (e) {
         props.onError(chrome.i18n.getMessage("VideoNotReady"));
