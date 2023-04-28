@@ -142,16 +142,19 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
 /**
  * Will keep rendering until paused if waitForNextFrame is true
  */
-function renderCurrentFrame(props: ThumbnailComponentProps,
-        canvasRef: React.RefObject<HTMLCanvasElement>, waitForNextFrame: boolean): void {
-    waitFor(() => canvasRef?.current && props.video.duration > 0 && props.video.readyState > 2).then(() => {
-        props.onError("");
+async function renderCurrentFrame(props: ThumbnailComponentProps,
+        canvasRef: React.RefObject<HTMLCanvasElement>, waitForNextFrame: boolean): Promise<void> {
+    try {
+        await waitFor(() => canvasRef?.current && props.video.duration > 0 && props.video.readyState > 2);
 
+        props.onError("");
         canvasRef.current!.getContext("2d")!.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
         drawCentered(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height, props.video.videoWidth, props.video.videoHeight, props.video);
-    }).catch(() => props.onError(chrome.i18n.getMessage("VideoNotReady")));
 
-    if (waitForNextFrame && !props.video.paused) {
-        requestAnimationFrame(() => renderCurrentFrame(props, canvasRef, true));
+        if (waitForNextFrame && !props.video.paused) {
+            requestAnimationFrame(() => renderCurrentFrame(props, canvasRef, true));
+        }
+    } catch (e) {
+        props.onError(chrome.i18n.getMessage("VideoNotReady"));
     }
 }
