@@ -156,10 +156,16 @@ async function renderCurrentFrame(props: ThumbnailComponentProps,
 
         if (waitForNextFrame && !props.video.paused && !inRenderingLoop.current) {
             inRenderingLoop.current = true;
-            requestAnimationFrame(() => {
+            const nextLoop = () => {
                 inRenderingLoop.current = false;
                 renderCurrentFrame(props, canvasRef, inRenderingLoop, true);
-            });
+            };
+
+            if (props.video.requestVideoFrameCallback) {
+                props.video.requestVideoFrameCallback(nextLoop);
+            } else {
+                setTimeout(nextLoop, 1000);
+            }
         }
     } catch (e) {
         props.onError(chrome.i18n.getMessage("VideoNotReady"));
