@@ -263,23 +263,31 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
 
         const existingCanvas = image.parentElement?.querySelector(".cbCustomThumbnailCanvas") as HTMLCanvasElement | null;
 
-        const thumbnail = await createThumbnailCanvas(existingCanvas, videoID, width, height, timestamp ?? null, false, (thumbnail) => {
-            thumbnail!.style.removeProperty("display");
-        });
+        try {
+            const thumbnail = await createThumbnailCanvas(existingCanvas, videoID, width, height, timestamp ?? null, false, (thumbnail) => {
+                thumbnail!.style.removeProperty("display");
+            });
+    
+            if (!thumbnail) {
+                image.classList.add("cb-visible");
+                image.style.removeProperty("display");
+                return false;
+            }
 
-        if (!thumbnail) {
+            image.style.display = "none";
+            image.classList.remove("cb-visible");
+            thumbnail.classList.add("style-scope");
+            thumbnail.classList.add("ytd-img-shadow");
+            thumbnail.classList.add("cbCustomThumbnailCanvas");
+            thumbnail.style.height = "100%";
+            image.parentElement?.appendChild(thumbnail);
+        } catch (e) {
+            logError(e);
+
             image.classList.add("cb-visible");
             image.style.removeProperty("display");
             return false;
         }
-
-        image.style.display = "none";
-        image.classList.remove("cb-visible");
-        thumbnail.classList.add("style-scope");
-        thumbnail.classList.add("ytd-img-shadow");
-        thumbnail.classList.add("cbCustomThumbnailCanvas");
-        thumbnail.style.height = "100%";
-        image.parentElement?.appendChild(thumbnail);
     }
 
     return !!image;
