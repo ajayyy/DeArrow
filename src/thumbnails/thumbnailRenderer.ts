@@ -192,27 +192,19 @@ export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | 
     canvas.height = height;
     canvas.style.display = "none";
 
-    renderThumbnail(videoID, 0, 0, saveVideo, timestamp).then((smallerCanvasInfo) => {
-        if (!smallerCanvasInfo || smallerCanvasInfo.width < width || smallerCanvasInfo.height < height) {
+    const result = (canvasInfo: RenderedThumbnailVideo | null) => {
+        if (!canvasInfo) return;
 
-            // Try to generate a larger one too and replace it when ready
-            // todo: use a better metric than a fixed delay, count number of loading items and use a priority system
-            setTimeout(() => {
-                renderThumbnail(videoID, width, height, saveVideo, timestamp).then((largerCanvasInfo) => {
-                    if (!largerCanvasInfo) return;
-
-                    drawCentered(canvas, width, height, largerCanvasInfo.width, largerCanvasInfo.height, largerCanvasInfo.canvas);
-                    if (!smallerCanvasInfo) ready(canvas);
-                }).catch(() => { }); //eslint-disable-line @typescript-eslint/no-empty-function
-            }, 1500);
-
-
-            if (!smallerCanvasInfo) return;
-        }
-
-        drawCentered(canvas, width, height, smallerCanvasInfo.width, smallerCanvasInfo.height, smallerCanvasInfo.canvas);
+        drawCentered(canvas, width, height, canvasInfo.width, canvasInfo.height, canvasInfo.canvas);
         ready(canvas);
-    }).catch(() => { }); //eslint-disable-line @typescript-eslint/no-empty-function
+    }
+
+    renderThumbnail(videoID, width, height, saveVideo, timestamp).then(result).catch(() => {
+        // Try again with lower resolution
+        renderThumbnail(videoID, 0, 0, saveVideo, timestamp).then(result).catch(() => {
+            logError(`Failed to render thumbnail for ${videoID}`);
+        });
+    });
 
     return canvas;
 }
