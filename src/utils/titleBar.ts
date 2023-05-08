@@ -1,15 +1,17 @@
-import { waitFor } from "@ajayyy/maze-utils";
-import { getYouTubeTitleNode } from "@ajayyy/maze-utils/lib/elements";
+import { getYouTubeTitleNodeSelector } from "@ajayyy/maze-utils/lib/elements";
 import { getOriginalTitleElement } from "../titles/titleRenderer";
 import { BrandingLocation } from "../videoBranding/videoBranding";
+import { isVisible, waitForElement } from "@ajayyy/maze-utils/lib/dom";
 
 export async function getOrCreateTitleButtonContainer(): Promise<HTMLElement | null> {
-    const titleNode = await waitFor(() => getYouTubeTitleNode());
+    const titleNode = await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
     const referenceNode = titleNode?.parentElement;
 
     if (referenceNode) {
         let titleButtonContainer = document.querySelector(".cbTitleButtonContainer") as HTMLElement;
-        if (!titleButtonContainer) {
+        if (!titleButtonContainer || !isVisible(titleButtonContainer)) {
+            if (titleButtonContainer) titleButtonContainer.remove();
+
             titleButtonContainer = document.createElement("div");
             titleButtonContainer.classList.add("cbTitleButtonContainer");
             referenceNode.appendChild(titleButtonContainer);
@@ -27,7 +29,7 @@ export async function getOrCreateTitleButtonContainer(): Promise<HTMLElement | n
 
 let badgeListener: MutationObserver | null = null;
 export async function listenForBadges() {
-    const titleNode = await waitFor(() => getYouTubeTitleNode());
+    const titleNode = await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
     const referenceNode = titleNode?.parentElement;
 
     if (referenceNode) {
@@ -64,7 +66,7 @@ function moveBadge(badge: HTMLElement) {
 let titleChangeObserver: MutationObserver | null = null;
 const titleChangeListeners: (() => void)[] = [];
 export async function listenForTitleChange() {
-    const titleNode = await waitFor(() => getYouTubeTitleNode());
+    const titleNode = await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
     if (titleNode) {
         const originalTitleElement = getOriginalTitleElement(titleNode, BrandingLocation.Watch);
         if (originalTitleElement) {

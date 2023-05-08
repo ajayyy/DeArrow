@@ -231,6 +231,12 @@ ytd-thumbnail img:not(.cb-visible) {
     height: 20px;
 }
 
+/* For Watch Page */
+.cbTitleButtonContainer {
+    display: flex;
+    align-content: center;
+}
+
 /* For playlist titles to be properly spaced out with show original button */
 ytd-playlist-panel-video-renderer #video-title {
     width: 100%;
