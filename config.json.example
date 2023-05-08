@@ -1,5 +1,18 @@
 {
     "serverAddress": "https://sponsor.ajay.app",
     "testingServerAddress": "https://sponsor.ajay.app/test",
-    "debug": false
+    "debug": false,
+    "extensionImportList": {
+        "chromium": [
+            "mnjggcdmjocbbbhaepdhchncahnbgone",
+            "mbmgnelfcpoecdepckhlhegpcehmpmji"
+        ],
+        "firefox": [
+            "sponsorBlocker@ajay.app",
+            "sponsorBlockerBETA@ajay.app"
+        ],
+        "safari": [
+            "app.ajay.sponsor.macos.extension"
+        ]
+    }
 }

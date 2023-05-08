@@ -27,6 +27,10 @@ export enum TitleFormatting {
 
 interface SBConfig {
     userID: string | null;
+    allowExpirements: boolean;
+    showDonationLink: boolean;
+    showUpsells: boolean;
+    darkMode: boolean;
     invidiousInstances: string[];
     keepUnsubmitted: boolean;
     titleFormatting: TitleFormatting;
@@ -54,6 +58,10 @@ function migrateOldSyncFormats(config: SBConfig) {
 
 const syncDefaults = {
     userID: null,
+    allowExpirements: true,
+    showDonationLink: true,
+    showUpsells: true,
+    darkMode: true,
     invidiousInstances: [],
     keepUnsubmitted: true,
     titleFormatting: TitleFormatting.CapitalizeWords,
