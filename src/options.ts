@@ -8,7 +8,7 @@ import * as invidiousList from "../ci/invidiouslist.json";
 // Make the config public for debugging purposes
 window["CB"] = Config;
 
-import KeybindComponent from "./options/components/KeybindComponent";
+import KeybindComponent from "./options/KeybindComponent";
 import { showDonationLink } from "./utils/configUtils";
 import { localizeHtmlPage } from "@ajayyy/maze-utils/lib/setup";
 import { StorageChangesObject } from "@ajayyy/maze-utils/lib/config";

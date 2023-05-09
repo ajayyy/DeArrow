@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createRoot, Root } from 'react-dom/client';
-import Config from "../../config";
+import Config from "../config";
 import KeybindDialogComponent from "./KeybindDialogComponent";
 import { formatKey, Keybind, keybindEquals, keybindToString } from "@ajayyy/maze-utils/lib/config";
 
