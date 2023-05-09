@@ -92,6 +92,7 @@ module.exports = env => {
         entry: {
             background: path.join(__dirname, srcDir + 'background.ts'),
             content: path.join(__dirname, srcDir + 'content.ts'),
+            options: path.join(__dirname, srcDir + 'options.ts'),
         },
         output: {
             path: path.join(__dirname, '../dist/js'),

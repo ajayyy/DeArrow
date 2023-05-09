@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<!-- Link to specific tabs by using their ID in the URL like: options.html#keybinds -->
+
+<head>
+  <title>__MSG_Options__ - DeArrow</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+  <link rel="icon" href="../icons/IconSponsorBlocker32px.png" type="image/png">
+  
+  <link href="options.css" rel="stylesheet"/>
+
+  <script src="../js/options.js"></script>
+</head>
+
+<body class="sponsorBlockPageBody">
+
+	<div id="options-container">
+
+		<div id="menubar" class="center">
+
+			<div id="title" class="titleBar">
+				<img src="../icons/logo.svg" class="profilepic" alt="DeArrow logo"/>
+				DeArrow
+				<div id="version"></div>
+			</div>
+
+			<div id="navigation">
+				<div class="tab-heading" data-for="behavior">
+					__MSG_optionsTabBehavior__
+				</div>
+
+				<div class="tab-heading" data-for="interface">
+					__MSG_optionsTabInterface__
+				</div>
+
+				<div class="tab-heading" data-for="import">
+					__MSG_optionsTabBackup__
+				</div>
+
+				<div class="tab-heading" data-for="advanced">
+					__MSG_optionsTabAdvanced__
+				</div>
+		</div>
+
+			<div id="createdBy" class="titleBar">
+				<div>
+					<img src="../icons/newprofilepic.jpg" height="30" class="profilepiccircle" alt="profile picture of creator"/>
+					__MSG_createdBy__ 
+					<a href="https://ajay.app">Ajay Ramachandran</a> 
+				</div>
+				<a href="https://sponsor.ajay.app/donate" target="_blank" rel="noopener" id="sbDonate">(__MSG_Donate__)</a>
+			</div>
+
+		</div>
+
+		<div id="options">
+
+			<div id="behavior" class="option-group hidden">
+
+				<div data-type="selector" data-sync="titleFormatting">
+					<label class="optionLabel" for="titleFormatting">__MSG_titleFormatting__:</label>
+
+					<select id="titleFormatting" class="selector-element optionsSelector" >
+						<option value="-1">__MSG_Disabled__</option>
+						<option value="0">__MSG_CapitalizeWords__</option>
+					</select>
+				</div>
+
+				<div data-type="toggle" data-sync="keepUnsubmitted">
+					<div class="switch-container">
+						<label class="switch">
+							<input id="keepUnsubmitted" type="checkbox" checked>
+							<span class="slider round"></span>
+						</label>
+						<label class="switch-label" for="keepUnsubmitted">
+							__MSG_keepUnsubmitted__
+						</label>
+					</div>
+	
+					<div class="small-description">__MSG_whatKeepUnsubmitted__</div>
+				</div>
+
+				<div data-type="number-change" data-sync="fetchTimeout">
+					<label class="number-container">
+						<span class="optionLabel">__MSG_fetchTimeout__</span>
+						<input type="number" step="1" min="0" style="width: 80px;">
+					</label>
+	
+					<div class="small-description">__MSG_fetchTimeoutDescription__</div>
+				</div>
+
+			</div>
+
+			<div id="interface" class="option-group hidden">
+
+				<div data-type="toggle" data-sync="darkMode">
+					<div class="switch-container">
+						<label class="switch">
+							<input id="darkMode" type="checkbox" checked>
+							<span class="slider round"></span>
+						</label>
+						<label class="switch-label" for="darkMode">
+							__MSG_darkModeOptionsPage__
+						</label>
+					</div>
+				</div>
+
+				<div data-type="toggle" data-toggle-type="reverse" data-sync="showDonationLink" data-no-safari="true">
+					<div class="switch-container">
+						<label class="switch">
+							<input id="showDonationLink" type="checkbox" checked>
+							<span class="slider round"></span>
+						</label>
+						<label class="switch-label" for="showDonationLink">
+							__MSG_hideDonationLink__
+						</label>
+					</div>
+				</div>
+
+			</div>
+
+			<div id="import" class="option-group hidden">
+
+				<div data-type="private-text-change" data-sync="userID" data-confirm-message="userIDChangeWarning">
+					<div class="option-button trigger-button">
+						__MSG_changeUserID__
+					</div>
+	
+					<div class="small-description">__MSG_whatChangeUserID__</div>
+	
+					<div class="option-hidden-section hidden spacing indent">
+						<input class="option-text-box" type="text">
+	
+						<div class="option-button text-change-set inline low-profile">
+							__MSG_setUserID__
+						</div>
+					</div>
+				</div>
+
+				<div data-type="private-text-change" data-sync="*" data-confirm-message="exportOptionsWarning">
+					<h2>__MSG_exportOptions__</h2>
+					
+					<div>
+						<div class="option-button trigger-button inline">
+							__MSG_exportOptionsCopy__
+						</div>
+						<div class="option-button download-button inline">
+							__MSG_exportOptionsDownload__
+						</div>
+						<label for="importOptions" class="option-button inline">
+							__MSG_exportOptionsUpload__
+						</label>
+						<input id="importOptions" type="file" class="upload-button hidden" />
+					</div>
+	
+					<div class="small-description">__MSG_whatExportOptions__</div>
+	
+					<div class="option-hidden-section hidden spacing indent">	
+						<textarea class="option-text-box" rows="10" style="width:80%"></textarea>
+	
+						<div class="option-button text-change-set">
+							__MSG_setOptions__
+						</div>
+					</div>
+				</div>
+
+				<div data-type="button-press" data-sync="resetToDefault" data-confirm-message="confirmResetToDefault">
+					<div class="option-button trigger-button">
+						__MSG_resetToDefault__
+					</div>
+				</div>
+
+			</div>
+
+			<div id="advanced" class="option-group hidden">
+
+				<div data-type="button-press" data-sync="copyDebugInformation" data-confirm-message="copyDebugInformation">
+					<div class="option-button trigger-button">
+						__MSG_copyDebugInformation__
+					</div>
+	
+					<div class="small-description">__MSG_copyDebugInformationOptions__</div>
+				</div>
+
+				<div data-type="text-change" data-sync="serverAddress" data-dependent-on="testingServer" data-dependent-on-inverted="true">
+					<label class="optionLabel inline">
+						<span class="optionLabel">__MSG_dataFetchingServerAddress__:</span>
+	
+						<input class="option-text-box" type="text" style="margin-right:10px">
+					</label>
+
+					<div class="small-description">__MSG_dataFetchingServerAddressDescription__</div>
+	
+					<div class="next-line">
+						<div class="option-button text-change-set inline">
+							__MSG_save__
+						</div>
+		
+						<div class="option-button text-change-reset inline">
+							__MSG_reset__
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</body>

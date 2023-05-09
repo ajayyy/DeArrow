@@ -24,7 +24,8 @@
         "icons/reset.svg",
         "icons/pencil.svg",
         "icons/logo.svg",
-        "js/document.js"
+        "js/document.js",
+        "js/options.js"
     ],
     "permissions": [
         "storage",

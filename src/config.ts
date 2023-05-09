@@ -2,6 +2,7 @@ import { ProtoConfig } from "@ajayyy/maze-utils/lib/config";
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import { ThumbnailSubmission } from "./thumbnails/thumbnailData";
 import { logError } from "./utils/logger";
+import * as CompileConfig from "../config.json";
 
 export interface Permission {
     canSubmit: boolean;
@@ -22,6 +23,7 @@ export interface UnsubmittedSubmission {
 }
 
 export enum TitleFormatting {
+    Disable = -1,
     CapitalizeWords,
 }
 
@@ -30,10 +32,12 @@ interface SBConfig {
     allowExpirements: boolean;
     showDonationLink: boolean;
     showUpsells: boolean;
+    donateClicked: number;
     darkMode: boolean;
     invidiousInstances: string[];
     keepUnsubmitted: boolean;
     titleFormatting: TitleFormatting;
+    serverAddress: string;
     fetchTimeout: number;
 }
 
@@ -61,10 +65,12 @@ const syncDefaults = {
     allowExpirements: true,
     showDonationLink: true,
     showUpsells: true,
+    donateClicked: 0,
     darkMode: true,
     invidiousInstances: [],
     keepUnsubmitted: true,
     titleFormatting: TitleFormatting.CapitalizeWords,
+    serverAddress: CompileConfig.serverAddress,
     fetchTimeout: 7000
 };
 
