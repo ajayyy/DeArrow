@@ -1,9 +1,9 @@
 {
-    "name": "__MSG_fullName__",
+    "name": "__MSG_deArrowFullName__",
     "short_name": "DeArrow",
     "version": "0.1",
     "default_locale": "en",
-    "description": "__MSG_Description__",
+    "description": "__MSG_deArrowDescription__",
     "homepage_url": "https://sponsor.ajay.app",
     "content_scripts": [{
         "run_at": "document_start",
