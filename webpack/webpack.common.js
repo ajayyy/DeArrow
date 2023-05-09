@@ -92,6 +92,7 @@ module.exports = env => {
         entry: {
             background: path.join(__dirname, srcDir + 'background.ts'),
             content: path.join(__dirname, srcDir + 'content.ts'),
+            options: path.join(__dirname, srcDir + 'options.ts'),
         },
         output: {
             path: path.join(__dirname, '../dist/js'),
@@ -128,7 +129,7 @@ module.exports = env => {
                         from: '.',
                         to: '../',
                         globOptions: {
-                        ignore: ['manifest.json'],
+                            ignore: ['manifest.json', '**/.git/**', '**/crowdin.yml'],
                         },
                         context: './public',
                         filter: async (path) => {
