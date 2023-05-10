@@ -146,11 +146,23 @@ export function startThumbnailListener(): void {
         () => {}, () => Config.isReady(), selector); // eslint-disable-line @typescript-eslint/no-empty-function
 }
 
-export function setupExtensionEnabledListener(): void {
+export function setupOptionChangeListener(): void {
     Config.configSyncListeners.push((changes) => {
         if (changes.extensionEnabled && changes.extensionEnabled.newValue !== changes.extensionEnabled.oldValue) {
             for (const videoID in videoBrandingInstances) {
                 setShowCustom(videoID as VideoID, changes.extensionEnabled.newValue).catch(logError);
+            }
+        }
+
+        if (changes.titleFormatting && changes.titleFormatting.newValue !== changes.titleFormatting.oldValue) {
+            for (const videoID in videoBrandingInstances) {
+                const updateBrandingCallbacks = videoBrandingInstances[videoID as VideoID].updateBrandingCallbacks;
+                // They will be added back to the array
+                videoBrandingInstances[videoID].updateBrandingCallbacks = [];
+
+                for (const updateBranding of updateBrandingCallbacks) {
+                    updateBranding().catch(logError);
+                }
             }
         }
     });
