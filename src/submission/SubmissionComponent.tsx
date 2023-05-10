@@ -1,4 +1,4 @@
-import React = require("react");
+import * as React from "react";
 import { CustomThumbnailResult, ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { getCurrentPageTitle, TitleSubmission } from "../titles/titleData";
 import { BrandingResult } from "../videoBranding/videoBranding";

@@ -1,0 +1,331 @@
+:root {
+    --sb-main-font-family: "Source Sans Pro", sans-serif;
+    --sb-main-bg-color: #222;
+    --sb-main-fg-color: #fff;
+    --sb-grey-bg-color: #333;
+    --sb-grey-fg-color: #999;
+    --sb-red-bg-color: #cc1717;
+    --cb-switch-color: #0e79ca;
+}
+
+/*
+ * Generic utilities
+ */
+.grey-text {
+    color: var(--sb-grey-fg-color);
+}
+
+.white-text {
+    color: var(--sb-main-fg-color);
+}
+
+.sbHeader {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: left;
+    margin: 0;
+}
+
+#sponsorBlockPopupBody .u-mZ {
+    margin: 0 !important;
+    position: relative;
+}
+
+#sponsorBlockPopupBody .hidden {
+    display: none !important;
+}
+
+/*
+ * Main containers
+ */
+#sponsorBlockPopupHTML {
+    color-scheme: dark;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+#sponsorBlockPopupBody {
+    margin: 0;
+    width: 374px;
+    max-width: 100%;
+    /* NOTE: Ensures content doesn't exceed restricted popup widths in Firefox */
+    font-size: 14px;
+    font-family: var(--sb-main-font-family);
+    background-color: var(--sb-main-bg-color);
+    color: var(--sb-main-fg-color);
+    color-scheme: dark;
+    text-align: center;
+}
+
+#sponsorBlockPopupBody a,
+#sponsorBlockPopupBody button {
+    cursor: pointer;
+}
+
+/*
+ * Header logo
+ */
+.sbPopupLogo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    user-select: none;
+    padding: 10px 0px 0px;
+    font-size: 32px;
+}
+
+.sbPopupLogo img {
+    margin: 8px;
+}
+
+/*
+ * Main controls menu
+ */
+.sbControlsMenu {
+    margin: 16px;
+    margin-top: 6px;
+    border-radius: 8px;
+    background-color: var(--sb-grey-bg-color);
+    justify-content: space-evenly;
+    overflow: hidden;
+    display: flex;
+}
+
+.sbControlsMenu-item {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    background: transparent;
+    user-select: none;
+    cursor: pointer;
+    border: none;
+    flex: 1;
+    padding: 10px 15px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.sbControlsMenu-item:hover {
+    background-color: #444;
+}
+
+.sbControlsMenu-itemIcon {
+    margin-bottom: 6px;
+}
+
+/*
+ * "Extension is enabled" toggle
+ */
+.toggleSwitchContainer {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.toggleSwitchContainer-switch {
+    display: flex;
+    margin-bottom: 6px;
+}
+
+.switchBg {
+    width: 50px;
+    height: 23px;
+    display: block;
+    border-radius: 18.5px;
+}
+
+.switchBg.shadow {
+    box-shadow: 0.75px 0.75px 10px 0px rgba(50, 50, 50, 0.5);
+    opacity: 1;
+}
+
+.switchBg.white {
+    opacity: 1;
+    position: absolute;
+    background-color: #ccc;
+}
+
+.switchBg.blue {
+    opacity: 0;
+    position: absolute;
+    background-color: var(--cb-switch-color);
+    transition: opacity 0.2s ease-out;
+}
+
+.switchDot {
+    width: 15px;
+    margin: 4px;
+    height: 15px;
+    border-radius: 50%;
+    position: absolute;
+    transition: transform 0.2s ease-out;
+    background-color: var(--sb-main-fg-color);
+    box-shadow: 0.75px 0.75px 3.8px 0px rgba(50, 50, 50, 0.45);
+}
+
+#toggleSwitch:checked~.switchDot {
+    transform: translateX(27px);
+}
+
+#toggleSwitch:checked~.switchBg.blue {
+    opacity: 1;
+}
+
+#toggleSwitch:checked~.switchBg.white {
+    transition: opacity 0.2s step-end;
+    opacity: 0;
+}
+
+/*
+ * Your Work box
+ */
+.sbYourWorkBox {
+    margin: 16px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border: 2px solid var(--sb-grey-bg-color);
+}
+
+.sbYourWorkCols {
+    display: flex;
+    border-top: 2px solid var(--sb-grey-bg-color);
+    border-bottom: 2px solid var(--sb-grey-bg-color);
+}
+
+/*
+ * Increase font size of username input and display
+ */
+#usernameValue,
+#usernameInput {
+    font-size: 16px;
+    flex: 1 0;
+}
+
+#sponsorTimesContributionsDisplay {
+    font-size: 16px;
+}
+
+/*
+ * <button> elements that have icons
+ */
+ #setUsernameButton,
+ #copyUserID,
+ #submitUsername {
+     color: var(--sb-main-fg-color);
+     background: transparent;
+     width: fit-content;
+     padding: 0;
+     border: none;
+ }
+
+/*
+  * Improve alignment of username and submissions
+  */
+#usernameElement>p,
+#sponsorTimesContributionsContainer {
+    text-align: left;
+}
+
+/*
+  * Username
+  */
+#usernameElement {
+    padding: 8px 14px;
+    min-width: 40%;
+    width: 100%;
+}
+
+#setUsernameContainer {
+    display: flex;
+    width: fit-content;
+}
+
+#setUsernameContainer>button {
+    display: flex;
+}
+
+#setUsernameButton {
+    margin-right: 5px;
+    flex: 0 1;
+}
+
+#submitUsername {
+    padding-left: 16px;
+}
+
+#copyUserID {
+    width: 100%;
+    flex: 0 1;
+}
+
+/*
+  * Truncate username display
+  */
+#usernameValue {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 0 8px 0 0;
+    max-width: 105px;
+}
+
+/*
+  * Set username form container with "expanded" state
+  */
+#setUsername.SBExpanded {
+    text-align: left;
+}
+
+.SBExpanded {
+    display: flex;
+}
+
+/*
+  * Set username input
+  */
+#usernameInput {
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    width: calc(100% - 68px);
+    text-overflow: ellipsis;
+    color: var(--sb-main-fg-color);
+    background-color: var(--sb-grey-bg-color);
+}
+
+/*
+  * Submissions
+ */
+#sponsorTimesContributionsContainer {
+    padding: 8px 14px;
+    border-left: 2px solid var(--sb-grey-bg-color);
+}
+
+/*
+ * Footer
+ */
+#sbFooter {
+    padding: 8px 0;
+}
+
+#sbFooter a {
+    transition: background 0.3s ease !important;
+    color: var(--sb-main-fg-color);
+    display: inline-block;
+    text-decoration: none;
+    border-radius: 4px;
+    background-color: #333;
+    padding: 4px 8px;
+    font-weight: 500;
+    margin: 2px 1px;
+}
+
+#sbFooter a:hover {
+    background-color: #444;
+}
+
+#sponsorTimesDonateContainer a {
+    color: var(--sb-main-fg-color);
+    text-decoration: none;
+}

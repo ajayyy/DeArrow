@@ -29,6 +29,7 @@ export enum TitleFormatting {
 
 interface SBConfig {
     userID: string | null;
+    vip: boolean;
     allowExpirements: boolean;
     showDonationLink: boolean;
     showUpsells: boolean;
@@ -39,6 +40,7 @@ interface SBConfig {
     titleFormatting: TitleFormatting;
     serverAddress: string;
     fetchTimeout: number;
+    extensionEnabled: boolean;
 }
 
 interface SBStorage {
@@ -62,6 +64,7 @@ function migrateOldSyncFormats(config: SBConfig) {
 
 const syncDefaults = {
     userID: null,
+    vip: false,
     allowExpirements: true,
     showDonationLink: true,
     showUpsells: true,
@@ -71,7 +74,8 @@ const syncDefaults = {
     keepUnsubmitted: true,
     titleFormatting: TitleFormatting.CapitalizeWords,
     serverAddress: CompileConfig.serverAddress,
-    fetchTimeout: 7000
+    fetchTimeout: 7000,
+    extensionEnabled: true
 };
 
 const localDefaults = {

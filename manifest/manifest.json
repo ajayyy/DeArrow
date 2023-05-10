@@ -25,7 +25,9 @@
         "icons/pencil.svg",
         "icons/logo.svg",
         "js/document.js",
-        "js/options.js"
+        "js/options.js",
+        "js/popup.js",
+        "popup.css"
     ],
     "permissions": [
         "storage",
@@ -36,7 +38,7 @@
         "*://*/*"
     ],
     "browser_action": {
-        "default_title": "SponsorBlock",
+        "default_title": "DeArrow",
         "default_popup": "popup.html",
         "default_icon": {
             "16": "icons/logo-16.png",

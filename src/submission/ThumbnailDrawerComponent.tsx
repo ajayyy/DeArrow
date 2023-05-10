@@ -1,4 +1,4 @@
-import React = require("react");
+import * as React from "react";
 import { ThumbnailType } from "./ThumbnailComponent";
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";

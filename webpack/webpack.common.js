@@ -93,6 +93,7 @@ module.exports = env => {
             background: path.join(__dirname, srcDir + 'background.ts'),
             content: path.join(__dirname, srcDir + 'content.ts'),
             options: path.join(__dirname, srcDir + 'options.ts'),
+            popup: path.join(__dirname, srcDir + 'popup/popup.tsx'),
         },
         output: {
             path: path.join(__dirname, '../dist/js'),

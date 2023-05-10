@@ -9,7 +9,20 @@ import { isFirefoxOrSafari } from "@ajayyy/maze-utils";
 setupTabUpdates(Config);
 setupBackgroundRequestProxy();
 
-chrome.runtime.onInstalled.addListener(function () {
+chrome.runtime.onMessage.addListener((request) =>  {
+    switch(request.message) {
+        case "openConfig":
+            void chrome.tabs.create({url: chrome.runtime.getURL('options/options.html' + (request.hash ? '#' + request.hash : ''))});
+            return false;
+        case "openHelp":
+            void chrome.tabs.create({url: chrome.runtime.getURL('help/index.html')});
+            return false;
+    }
+
+    return false;
+});
+
+chrome.runtime.onInstalled.addListener(() => {
     // This let's the config sync to run fully before checking.
     // This is required on Firefox
     // eslint-disable-next-line @typescript-eslint/no-misused-promises

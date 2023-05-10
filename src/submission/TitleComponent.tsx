@@ -1,4 +1,4 @@
-import React = require("react");
+import * as React from "react";
 import { RenderedTitleSubmission } from "./TitleDrawerComponent";
 
 export interface TitleComponentProps {
