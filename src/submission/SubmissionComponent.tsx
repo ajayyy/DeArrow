@@ -51,6 +51,11 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
     const [extraUnsubmittedThumbnails, setExtraUnsubmittedThumbnails] = React.useState<RenderedThumbnailSubmission[]>([]);
     const [extraUnsubmittedTitles, setExtraUnsubmittedTitles] = React.useState<RenderedTitleSubmission[]>([]);
     const videoChangeListener = () => {
+        selectedTitle.current = null;
+        selectedThumbnail.current = null;
+        setSelectedTitleIndex(-1);
+        setSelectedThumbnailIndex(-1);
+
         const unsubmitted = Config.local!.unsubmitted[props.videoID];
         updateUnsubmitted(unsubmitted, setExtraUnsubmittedThumbnails, setExtraUnsubmittedTitles, thumbnails, titles);
     };
