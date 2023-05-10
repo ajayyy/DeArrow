@@ -13,6 +13,7 @@ export const PopupComponent = () => {
     const [usernameSubmissionStatus, setUsernameSubmissionStatus] = React.useState("");
     const [titleSubmissionCount, setTitleSubmissionCount] = React.useState("");
     const [thumbnailSubmissionCount, setThumbnailSubmissionCount] = React.useState("");
+    const [titleFormatting, setTitleFormatting] = React.useState(String(Config.config!.titleFormatting));
 
     React.useEffect(() => {
         (async () => {
@@ -71,6 +72,21 @@ export const PopupComponent = () => {
                 <img src="/icons/settings.svg" alt="Settings icon" width="23" height="23" className="sbControlsMenu-itemIcon" id="sbPopupIconSettings" />
                     {chrome.i18n.getMessage("Options")}
                 </button>
+            </div>
+            
+            {/* Title Reformatting Option */}
+            <div className="optionContainer">
+                <label className="optionLabel" htmlFor="titleFormatting">{chrome.i18n.getMessage("titleFormatting")}</label>
+                <select id="titleFormatting" 
+                    className="selector-element optionsSelector"
+                    value={titleFormatting}
+                    onChange={(e) => {
+                        setTitleFormatting(e.target.value);
+                        Config.config!.titleFormatting = parseInt(e.target.value, 10);
+                    }}>
+                    <option value="-1">{chrome.i18n.getMessage("Disabled")}</option>
+                    <option value="0">{chrome.i18n.getMessage("CapitalizeWords")}</option>
+                </select>
             </div>
 
             {/* Your Work box */}

@@ -329,3 +329,26 @@
     color: var(--sb-main-fg-color);
     text-decoration: none;
 }
+
+/* Options */
+
+.optionsSelector {
+    background-color: #0e79ca;
+    color: white;
+    
+    border: none;
+    font-size: 14px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.optionLabel {
+    font-size: 16px;
+    padding-bottom: 5px;
+
+    display: block;
+}
+
+.optionContainer {
+    padding-bottom: 2px;
+}
