@@ -114,11 +114,26 @@ function createTitleElement(originalTitleElement: HTMLElement, brandingLocation:
     return titleElement;
 }
 
-export async function hideAndUpdateShowOriginalButton(element: HTMLElement, brandingLocation: BrandingLocation): Promise<void> {
+export async function hideAndUpdateShowOriginalButton(element: HTMLElement, brandingLocation: BrandingLocation,
+        showCustomBranding: boolean): Promise<void> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const buttonElement = await findShowOriginalButton(originalTitleElement, brandingLocation);
     if (buttonElement) {
-        resetShowOriginalButton(buttonElement, brandingLocation);
+        const buttonImage = buttonElement.querySelector(".cbShowOriginalImage") as HTMLElement;
+        if (buttonImage) {
+            if (showCustomBranding) {
+                buttonImage.classList.remove("cbOriginalShown");
+            } else {
+                buttonImage.classList.add("cbOriginalShown");
+            }
+
+            if (showCustomBranding === Config.config!.extensionEnabled && brandingLocation !== BrandingLocation.Watch) {
+                buttonElement.classList.remove("cbDontHide");
+            } else {
+                buttonElement.classList.add("cbDontHide");
+            }
+        }
+
         buttonElement.style.setProperty("display", "none", "important");
     }
 }
@@ -144,6 +159,7 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
         brandingLocation: BrandingLocation): Promise<HTMLElement> {
     const buttonElement = document.createElement("button");
     buttonElement.classList.add("cbShowOriginal");
+
     buttonElement.classList.add("cbButton");
     if (brandingLocation === BrandingLocation.Watch) buttonElement.classList.add("cbDontHide");
 
@@ -152,20 +168,18 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
     buttonImage.className = "cbShowOriginalImage";
     buttonImage.src = chrome.runtime.getURL("icons/logo.svg");
     buttonElement.appendChild(buttonImage);
-    
+
+    if (!Config.config?.extensionEnabled) {
+        buttonImage.classList.add("cbOriginalShown");
+    }
+
     buttonElement.addEventListener("click", (e) => void (async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
         const videoID = buttonElement.getAttribute("videoID");
         if (videoID) {
-            const custom = await toggleShowCustom(videoID as VideoID);
-            if (custom) {
-                resetShowOriginalButtonFromElements(buttonElement, buttonImage, brandingLocation)
-            } else {
-                buttonImage.classList.add("cbOriginalShown");
-                buttonElement.classList.add("cbDontHide");
-            }
+            await toggleShowCustom(videoID as VideoID);
         }
     })(e));
 
@@ -177,17 +191,6 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
     }
 
     return buttonElement;
-}
-
-function resetShowOriginalButton(buttonElement: HTMLElement, brandingLocation: BrandingLocation) {
-    const buttonImage = buttonElement.querySelector(".cbShowOriginalImage") as HTMLElement;
-    resetShowOriginalButtonFromElements(buttonElement, buttonImage, brandingLocation);
-}
-
-function resetShowOriginalButtonFromElements(buttonElement: HTMLElement, buttonImage: HTMLElement,
-        brandingLocation: BrandingLocation) {
-    buttonImage.classList.remove("cbOriginalShown");
-    if (brandingLocation !== BrandingLocation.Watch) buttonElement.classList.remove("cbDontHide");
 }
 
 // https://stackoverflow.com/a/196991

@@ -7,6 +7,7 @@ import { TitleResult } from "../titles/titleData";
 import { findOrCreateShowOriginalButton, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
 import { setThumbnailListener } from "@ajayyy/maze-utils/lib/thumbnailManagement";
 import Config from "../config";
+import { logError } from "../utils/logger";
 
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
 
@@ -36,11 +37,12 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
         if (title) {
             const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
                 async () => void await replaceCurrentVideoBranding());
+            const brandingLocation = BrandingLocation.Watch;
             const showCustomBranding = videoBrandingInstance.showCustomBranding;
     
-            promises[0] = replaceTitle(title, videoID, showCustomBranding, BrandingLocation.Watch, true);
+            promises[0] = replaceTitle(title, videoID, showCustomBranding, brandingLocation, true);
 
-            void handleShowOriginalButton(title, videoID, BrandingLocation.Watch, promises);
+            void handleShowOriginalButton(title, videoID, brandingLocation, showCustomBranding, promises);
         }
 
         //todo: replace thumbnail in background of .ytp-cued-thumbnail-overlay-image
@@ -61,12 +63,13 @@ export function replaceVideoCardBranding(element: HTMLElement): Promise<[boolean
 
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
             async () => void await replaceVideoCardBranding(element));
+        const brandingLocation = BrandingLocation.Related;
         const showCustomBranding = videoBrandingInstance.showCustomBranding;
 
         const promises = [replaceThumbnail(element, videoID, showCustomBranding),
-            replaceTitle(element, videoID, showCustomBranding, BrandingLocation.Related, false)] as [Promise<boolean>, Promise<boolean>];
+            replaceTitle(element, videoID, showCustomBranding, brandingLocation, false)] as [Promise<boolean>, Promise<boolean>];
 
-        void handleShowOriginalButton(element, videoID, BrandingLocation.Related, promises);
+        void handleShowOriginalButton(element, videoID, brandingLocation, showCustomBranding, promises);
 
         return Promise.all(promises) as Promise<[boolean, boolean]>;
     }
@@ -74,8 +77,10 @@ export function replaceVideoCardBranding(element: HTMLElement): Promise<[boolean
     return new Promise((resolve) => resolve([false, false]));
 }
 
-export async function handleShowOriginalButton(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation, promises: [Promise<boolean>, Promise<boolean>]): Promise<HTMLElement | null> {
-    await hideAndUpdateShowOriginalButton(element, brandingLocation);
+export async function handleShowOriginalButton(element: HTMLElement, videoID: VideoID,
+        brandingLocation: BrandingLocation, showCustomBranding: boolean,
+        promises: [Promise<boolean>, Promise<boolean>]): Promise<HTMLElement | null> {
+    await hideAndUpdateShowOriginalButton(element, brandingLocation, showCustomBranding);
 
     const result = await Promise.race(promises);
     if (result || (await Promise.all(promises)).some((r) => r)) {
@@ -88,7 +93,7 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
 function getAndUpdateVideoBrandingInstances(videoID: VideoID, updateBranding: () => Promise<void>): VideoBrandingInstance {
     if (!videoBrandingInstances[videoID]) {
         videoBrandingInstances[videoID] = {
-            showCustomBranding: true,
+            showCustomBranding: Config.config?.extensionEnabled ?? true,
             updateBrandingCallbacks: [updateBranding]
         }
     } else {
@@ -98,10 +103,18 @@ function getAndUpdateVideoBrandingInstances(videoID: VideoID, updateBranding: ()
     return videoBrandingInstances[videoID];
 }
 
-export async function toggleShowCustom(videoID: VideoID): Promise<boolean> {
+export function toggleShowCustom(videoID: VideoID): Promise<boolean> {
     if (videoBrandingInstances[videoID]) {
-        const newValue = !videoBrandingInstances[videoID].showCustomBranding;
-        videoBrandingInstances[videoID].showCustomBranding = newValue;
+        return setShowCustom(videoID, !videoBrandingInstances[videoID].showCustomBranding);
+    }
+
+    // Assume still showing, but something has gone very wrong if it gets here
+    return Promise.resolve(true);
+}
+
+export async function setShowCustom(videoID: VideoID, value: boolean): Promise<boolean> {
+    if (videoBrandingInstances[videoID]) {
+        videoBrandingInstances[videoID].showCustomBranding = value;
 
         const updateBrandingCallbacks = videoBrandingInstances[videoID].updateBrandingCallbacks;
         // They will be added back to the array
@@ -111,7 +124,7 @@ export async function toggleShowCustom(videoID: VideoID): Promise<boolean> {
             await updateBranding();
         }
 
-        return newValue;
+        return value;
     }
 
     // Assume still showing, but something has gone very wrong if it gets here
@@ -131,4 +144,14 @@ export function startThumbnailListener(): void {
     const selector = "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer";
     setThumbnailListener((e) => void replaceVideoCardsBranding(e),
         () => {}, () => Config.isReady(), selector); // eslint-disable-line @typescript-eslint/no-empty-function
+}
+
+export function setupExtensionEnabledListener(): void {
+    Config.configSyncListeners.push((changes) => {
+        if (changes.extensionEnabled && changes.extensionEnabled.newValue !== changes.extensionEnabled.oldValue) {
+            for (const videoID in videoBrandingInstances) {
+                setShowCustom(videoID as VideoID, changes.extensionEnabled.newValue).catch(logError);
+            }
+        }
+    });
 }
