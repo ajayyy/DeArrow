@@ -113,7 +113,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                     selectedTitleIndex={selectedTitleIndex}
                     onDeselect={() => {
                         setSelectedTitleIndex(-1);
-                        selectedThumbnail.current = null;
+                        selectedTitle.current = null;
                     }}
                     onSelectOrUpdate={(t, oldTitle, i) => {
                         setSelectedTitleIndex(i);
