@@ -85,6 +85,8 @@ export const PopupComponent = () => {
                         Config.config!.titleFormatting = parseInt(e.target.value, 10);
                     }}>
                     <option value="-1">{chrome.i18n.getMessage("Disabled")}</option>
+                    <option value="1">{chrome.i18n.getMessage("TitleCase")}</option>
+                    <option value="2">{chrome.i18n.getMessage("SentenceCase")}</option>
                     <option value="0">{chrome.i18n.getMessage("CapitalizeWords")}</option>
                 </select>
             </div>

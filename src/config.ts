@@ -25,6 +25,8 @@ export interface UnsubmittedSubmission {
 export enum TitleFormatting {
     Disable = -1,
     CapitalizeWords,
+    TitleCase,
+    SentenceCase
 }
 
 interface SBConfig {
@@ -72,7 +74,7 @@ const syncDefaults = {
     darkMode: true,
     invidiousInstances: [],
     keepUnsubmitted: true,
-    titleFormatting: TitleFormatting.CapitalizeWords,
+    titleFormatting: TitleFormatting.TitleCase,
     serverAddress: CompileConfig.serverAddress,
     fetchTimeout: 7000,
     extensionEnabled: true

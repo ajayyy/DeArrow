@@ -1,9 +1,10 @@
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
-import Config, { TitleFormatting } from "../config";
+import Config from "../config";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
 import { getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { BrandingLocation, toggleShowCustom } from "../videoBranding/videoBranding";
+import { formatTitle } from "./titleFormatter";
 
 let lastWatchTitle = "";
 let lastWatchVideoID: VideoID | null = null;
@@ -47,14 +48,12 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     try {
         const title = (await getVideoTitleIncludingUnsubmitted(videoID, queryByHash))?.title;
         if (title) {
-            titleElement.innerText = title;
-            titleElement.title = title;
+            titleElement.innerText = formatTitle(title);
+            titleElement.title = formatTitle(title);
         } else if (originalTitleElement?.textContent) {
-            // TODO: Allow customizing this rule
             // innerText is blank when visibility hidden
             const originalText = originalTitleElement.textContent.trim();
-            const modifiedTitle = Config.config!.titleFormatting === TitleFormatting.CapitalizeWords ?
-                toTitleCase(originalText) : originalText;
+            const modifiedTitle = formatTitle(originalText);
             if (originalText === modifiedTitle) {
                 showOriginalTitle(titleElement, originalTitleElement);
                 return false;
@@ -191,15 +190,4 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
     }
 
     return buttonElement;
-}
-
-// https://stackoverflow.com/a/196991
-function toTitleCase(str: string): string {
-    // TODO: ignore some acronyms like AI, allow customizing
-    return str.replace(
-        /\w\S*/g,
-        (txt) => {
-            return txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase();
-        }
-    );
 }
