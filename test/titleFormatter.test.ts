@@ -196,7 +196,7 @@ describe("titleFormatter custom cases", () => {
         ["Mad vs T1 - game 1 | round 1 Lol MSI 2023", "Mad vs T1 - Game 1 | Round 1 Lol MSI 2023", "Mad vs T1 - game 1 | round 1 Lol MSI 2023"], // LoL, MSI and T1
         ["The great awakening - 3D to 5D consciousness - 432 Hz + 963 Hz", "The Great Awakening - 3D to 5D Consciousness - 432 Hz + 963 Hz", "The great awakening - 3D to 5D consciousness - 432 Hz + 963 Hz"], // Hz, 3D, 5D
         ["H3VR early access devlog - update 110e1 - new revolver cartridges", "H3VR Early Access Devlog - Update 110e1 - New Revolver Cartridges", "H3VR early access devlog - update 110e1 - new revolver cartridges"], // H3VR, e1
-        ["Snapshot 23W14A", "Snapshot 23W14A", "Snapshot 23W14A"], // 23W14A
+        ["Snapshot 23w14a", "Snapshot 23w14a", "Snapshot 23w14a"], // 23W14A
         ["Is the F-15EX secretly the best fighter jet ever made?", "Is the F-15EX Secretly the Best Fighter Jet Ever Made?", "Is the F-15EX secretly the best fighter jet ever made?"], // F-15EX
         ["US F-15s nose dive against each other | DCS", "US F-15s Nose Dive Against Each Other | DCS", "US F-15s nose dive against each other | DCS"], // DCS, F-15s
         ["F/A-18C Hornets execute no knock raid | DCS", "F/A-18C Hornets Execute No Knock Raid | DCS", "F/A-18C Hornets execute no knock raid | DCS"], // F/A-18C, DCS
@@ -209,6 +209,7 @@ describe("titleFormatter custom cases", () => {
         ["n0thing vs. nMo @CEVO-P season VIII (de_dust2)","n0thing vs. nMo @CEVO-P Season VIII (de_dust2)","n0thing vs. nMo @CEVO-P season VIII (de_dust2)"], // n0thing, nMo, VIII, de_dust2
         ["POV: zet vs. a-Losers NiP CS 1.6 demo","POV: zet vs. a-Losers NiP CS 1.6 Demo","POV: zet vs. a-Losers NiP CS 1.6 demo"], // zet, a-Losers
         ["POV: f0rest vs. Virtus.pro fnatic CS 1.6 demo part1", "POV: f0rest vs. Virtus.pro fnatic CS 1.6 Demo Part1","POV: f0rest vs. Virtus.pro fnatic CS 1.6 demo part1"], // Virtus.pro, fnatic
+        ["Announcements at Google I/O 2023", "Announcements at Google I/O 2023", "Announcements at Google I/O 2023"], // Google sould be capitalized
     ]
     for (const testCase of customTitles) {
         const [input, title, sentence] = testCase;
