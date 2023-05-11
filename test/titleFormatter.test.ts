@@ -109,6 +109,10 @@ describe("titleFormatter", () => {
         expect(toTitleCase("The car is from the U.S.A")).toBe("The Car Is from the U.S.A");
     });
 
+    it("toTitleCase When I WENT TO The Store", () => {
+        expect(toTitleCase("When I WENT TO The Store")).toBe("When I Went to the Store");
+    });
+
     it("toSentenceCase Go on the table with a cat", () => {
         expect(toSentenceCase("Go on the table with a cat")).toBe("Go on the table with a cat");
     });
@@ -162,6 +166,10 @@ describe("titleFormatter", () => {
     });
 
     it("toSentenceCase When I Went To The Store", () => {
+        expect(toSentenceCase("When I Went To The Store")).toBe("When I went to the store");
+    });
+
+    it("toSentenceCase When I WENT TO The Store", () => {
         expect(toSentenceCase("When I Went To The Store")).toBe("When I went to the store");
     });
 });

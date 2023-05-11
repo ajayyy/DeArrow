@@ -47,24 +47,27 @@ export function toSentenceCase(str: string): string {
     const mostlyAllCaps = isMostlyAllCaps(words);
 
     let result = "";
-    let firstWord = true;
+    let index = 0;
     for (const word of words) {
+        const trustCaps = !mostlyAllCaps && 
+            !(isAllCaps(words[index - 1]) || isAllCaps(words[index + 1]));
+
         if (word.toUpperCase() === "I") {
             result += word.toUpperCase() + " ";
         } else if (isAcronymStrict(word) ||
-            (!inTitleCase && !mostlyAllCaps && isAcronym(word)) ||
+            (!inTitleCase && trustCaps && isAcronym(word)) ||
             (!inTitleCase && isWordCaptialCase(word))) {
             // Trust it with capitalization
             result += word + " ";
         } else {
-            if (firstWord) {
+            if (index === 0) {
                 result += capitalizeFirstLetter(word) + " ";
             } else {
                 result += word.toLowerCase() + " ";
             }
         }
 
-        firstWord = false;
+        index++;
     }
 
     return result.trim();
@@ -75,17 +78,23 @@ export function toTitleCase(str: string): string {
     const mostlyAllCaps = isMostlyAllCaps(words);
 
     let result = "";
+    let index = 0;
     for (const word of words) {
+        const trustCaps = !mostlyAllCaps && 
+            !(isAllCaps(words[index - 1]) || isAllCaps(words[index + 1]));
+
         // Skip lowercase check for the first word
         if (result.length !== 0 && sentenceCaseNotCapitalized.includes(word.toLowerCase())) {
             result += word.toLowerCase() + " ";
         } else if (isFirstLetterCaptial(word) && 
-                ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word))) {
+                ((trustCaps && isAcronym(word)) || isAcronymStrict(word))) {
             // Trust it with capitalization
             result += word + " ";
         } else {
             result += capitalizeFirstLetter(word) + " ";
         }
+
+        index++;
     }
 
     return result.trim();
@@ -129,12 +138,19 @@ export function isMostlyAllCaps(words: string[]): boolean {
     let count = 0;
     for (const word of words) {
         // Has at least one char and is upper case
-        if (word.match(/[a-zA-Z]/) && word.toUpperCase() === word) {
+        if (isAllCaps(word)) {
             count++;
         }
     }
 
     return count > words.length * 0.5;
+}
+
+/**
+ * Has at least one char and is upper case
+ */
+function isAllCaps(word: string): boolean {
+    return !!word && !!word.match(/[a-zA-Z]/) && word.toUpperCase() === word && !isAcronymStrict(word);
 }
 
 export function capitalizeFirstLetter(word: string): string {
