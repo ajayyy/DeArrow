@@ -177,9 +177,9 @@ describe("titleFormatter custom cases", () => {
     // original, title, sentence
     // original should not be capital unless necessary
     const customTitles: [string, string, string][] = [
-        ["NaVi vs. FaZe - map 1 [Inferno] - IEM Cologne 2022 - grand final","NaVi Vs. FaZe - Map 1 [Inferno] - IEM Cologne 2022 - Grand Final","NaVi vs. FaZe - map 1 [Inferno] - IEM Cologne 2022 - grand final"], // multiple mixed capitalizations
+        ["NaVi vs. FaZe - map 1 [Inferno] - IEM Cologne 2022 - grand final","NaVi vs. FaZe - Map 1 [Inferno] - IEM Cologne 2022 - Grand Final","NaVi vs. FaZe - map 1 [Inferno] - IEM Cologne 2022 - grand final"], // multiple mixed capitalizations
         ["[SMii7Y VOD] CS:GO never changed","[SMii7Y VOD] CS:GO Never Changed","[SMii7Y VOD] CS:GO never changed"], // CS:GO
-        ["MNM Gaming vs. W7M // BLAST R6 Copenhagen major | finals | day 1","MNM Gaming Vs. W7M // BLAST R6 Copenhagen Major | Finals | Day 1","MNM Gaming vs. W7M // BLAST R6 Copenhagen major | finals | day 1"], // retain MNM and W7M
+        ["MNM Gaming vs. W7M // BLAST R6 Copenhagen major | finals | day 1","MNM Gaming vs. W7M // BLAST R6 Copenhagen Major | Finals | Day 1","MNM Gaming vs. W7M // BLAST R6 Copenhagen major | finals | day 1"], // retain MNM and W7M
         ["GTA V RP (2023-05-08)", "GTA V RP (2023-05-08)", "GTA V RP (2023-05-08)"], // retain GTA V RP
         ["m0NESY - 2023 highlights (CS:GO)", "m0NESY - 2023 Highlights (CS:GO)", "m0NESY - 2023 highlights (CS:GO)"], // don't capitalize m0NESY but retain CS:GO
         ["s1mple - the best player in the world - HLTV.org's #1 of 2021","s1mple - the Best Player in the World - HLTV.org's #1 of 2021","s1mple - the best player in the world - HLTV.org's #1 of 2021"], // keep s1mple, keep HLTV.org
