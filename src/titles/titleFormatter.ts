@@ -1,6 +1,6 @@
 import Config, { TitleFormatting } from "../config";
 
-const sentenceCaseNotCapitalized = [
+const titleCaseNotCapitalized = [
     "a",
     "an",
     "the",
@@ -100,7 +100,7 @@ export function toTitleCase(str: string, isCustom: boolean): string {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             result += word + " ";
-        } else if (result.length !== 0 && sentenceCaseNotCapitalized.includes(word.toLowerCase())) {
+        } else if (result.length !== 0 && titleCaseNotCapitalized.includes(word.toLowerCase())) {
             // Skip lowercase check for the first word
             result += word.toLowerCase() + " ";
         } else if (isFirstLetterCaptial(word) && 
@@ -146,7 +146,7 @@ export function isInTitleCase(words: string[]): boolean {
         if (isWordCaptialCase(word)) {
             count++;
         } else if (!isWordAllLower(word) ||
-                sentenceCaseNotCapitalized.includes(word.toLowerCase())) {
+                titleCaseNotCapitalized.includes(word.toLowerCase())) {
             ignored++;
         }
     }
