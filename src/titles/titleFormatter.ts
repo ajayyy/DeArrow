@@ -25,7 +25,15 @@ const sentenceCaseNotCapitalized = [
     "at",
     "by",
     "via",
-    "to"
+    "to",
+    "vs",
+    "v.s.",
+    "vs.",
+    "ft",
+    "ft.",
+    "feat",
+    "etc.",
+    "etc"
 ];
 
 export function formatTitle(title: string, isCustom: boolean): string {
