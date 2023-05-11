@@ -4,6 +4,7 @@ import { showDonationLink } from "../utils/configUtils";
 import { sendRequestToServer } from "../dataFetching";
 import { getHash } from "@ajayyy/maze-utils/lib/hash";
 import { getErrorMessage } from "@ajayyy/maze-utils/lib/formating";
+import { toSentenceCase } from "../titles/titleFormatter";
 
 export const PopupComponent = () => {
     const [extensionEnabled, setExtensionEnabled] = React.useState(Config.config!.extensionEnabled);
@@ -86,7 +87,7 @@ export const PopupComponent = () => {
                     }}>
                     <option value="-1">{chrome.i18n.getMessage("Disabled")}</option>
                     <option value="1">{chrome.i18n.getMessage("TitleCase")}</option>
-                    <option value="2">{chrome.i18n.getMessage("SentenceCase")}</option>
+                    <option value="2">{toSentenceCase(chrome.i18n.getMessage("SentenceCase"), false)}</option>
                     <option value="0">{chrome.i18n.getMessage("CapitalizeWords")}</option>
                 </select>
             </div>

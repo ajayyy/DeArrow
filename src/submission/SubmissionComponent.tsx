@@ -8,6 +8,7 @@ import { RenderedTitleSubmission, TitleDrawerComponent } from "./TitleDrawerComp
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import Config, { UnsubmittedSubmission } from "../config";
 import { addTitleChangeListener, removeTitleChangeListener } from "../utils/titleBar";
+import { toSentenceCase } from "../titles/titleFormatter";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -18,7 +19,7 @@ export interface SubmissionComponentProps {
 }
 
 export const SubmissionComponent = (props: SubmissionComponentProps) => {
-    const originalTitle = getCurrentPageTitle() || chrome.i18n.getMessage("OriginalTitle");
+    const originalTitle = toSentenceCase(getCurrentPageTitle() || chrome.i18n.getMessage("OriginalTitle"), false);
     const titles: RenderedTitleSubmission[] = [{
         title: originalTitle
     }, {
