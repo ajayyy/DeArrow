@@ -28,20 +28,20 @@ const sentenceCaseNotCapitalized = [
     "to"
 ];
 
-export function formatTitle(title: string): string {
+export function formatTitle(title: string, isCustom: boolean): string {
     switch (Config.config!.titleFormatting) {
         case TitleFormatting.CapitalizeWords:
-            return toCapitalizeCase(title);
+            return toCapitalizeCase(title, isCustom);
         case TitleFormatting.TitleCase:
-            return toTitleCase(title);
+            return toTitleCase(title, isCustom);
         case TitleFormatting.SentenceCase:
-            return toSentenceCase(title);
+            return toSentenceCase(title, isCustom);
         default:
             return title;
     }
 }
 
-export function toSentenceCase(str: string): string {
+export function toSentenceCase(str: string, isCustom: boolean): string {
     const words = str.split(" ");
     const inTitleCase = isInTitleCase(words);
     const mostlyAllCaps = isMostlyAllCaps(words);
@@ -54,9 +54,10 @@ export function toSentenceCase(str: string): string {
 
         if (word.toUpperCase() === "I") {
             result += word.toUpperCase() + " ";
-        } else if (isAcronymStrict(word) ||
-            (!inTitleCase && trustCaps && isAcronym(word)) ||
-            (!inTitleCase && isWordCaptialCase(word))) {
+        } else if (isAcronymStrict(word) 
+            || (!inTitleCase && trustCaps && isAcronym(word))
+            || (!inTitleCase && isWordCaptialCase(word)) 
+            || (isCustom && isWordCustomCaptialization(word))) {
             // Trust it with capitalization
             result += word + " ";
         } else {
@@ -73,7 +74,7 @@ export function toSentenceCase(str: string): string {
     return result.trim();
 }
 
-export function toTitleCase(str: string): string {
+export function toTitleCase(str: string, isCustom: boolean): string {
     const words = str.split(" ");
     const mostlyAllCaps = isMostlyAllCaps(words);
 
@@ -84,7 +85,10 @@ export function toTitleCase(str: string): string {
             !(isAllCaps(words[index - 1]) || isAllCaps(words[index + 1]));
 
         // Skip lowercase check for the first word
-        if (result.length !== 0 && sentenceCaseNotCapitalized.includes(word.toLowerCase())) {
+        if (isCustom && isWordCustomCaptialization(word)) {
+            // Trust it with capitalization
+            result += word + " ";
+        } else if (result.length !== 0 && sentenceCaseNotCapitalized.includes(word.toLowerCase())) {
             result += word.toLowerCase() + " ";
         } else if (isFirstLetterCaptial(word) && 
                 ((trustCaps && isAcronym(word)) || isAcronymStrict(word))) {
@@ -100,14 +104,15 @@ export function toTitleCase(str: string): string {
     return result.trim();
 }
 
-export function toCapitalizeCase(str: string): string {
+export function toCapitalizeCase(str: string, isCustom: boolean): string {
     const words = str.split(" ");
     const mostlyAllCaps = isMostlyAllCaps(words);
 
     let result = "";
     for (const word of words) {
-        if (isFirstLetterCaptial(word) && 
-                ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word))) {
+        if ((isCustom && isWordCustomCaptialization(word)) 
+                || (isFirstLetterCaptial(word) && 
+                ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word)))) {
             // Trust it with capitalization
             result += word + " ";
         } else {
@@ -172,12 +177,23 @@ function isWordCaptialCase(word: string): boolean {
     return !!word.match(/^[^a-zA-Z]*[A-Z][^A-Z]+$/);
 }
 
+/**
+ * Not just capital at start
+ */
+function isWordCustomCaptialization(word: string): boolean {
+    const capitalMatch = word.match(/[A-Z]/g);
+    if (!capitalMatch) return false;
+
+    const capitalNumber = capitalMatch.length;
+    return capitalNumber > 1 || (capitalNumber === 1 && !isFirstLetterCaptial(word));
+}
+
 function isWordAllLower(word: string): boolean {
     return !!word.match(/^[a-z]+$/);
 }
 
 function isFirstLetterCaptial(word: string): boolean {
-    return !!word.match(/^[A-Z]/);
+    return !!word.match(/^[^a-zA-Z]*[A-Z]/);
 }
 
 export function isAcronym(word: string): boolean {
@@ -188,5 +204,5 @@ export function isAcronym(word: string): boolean {
 
 export function isAcronymStrict(word: string): boolean {
     // U.S.A allowed
-    return !!word.match(/^(\S\.)+(\S)?$/);
+    return !!word.match(/^[^a-zA-Z]*(\S\.)+(\S)?$/);
 }

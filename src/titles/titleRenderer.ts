@@ -46,14 +46,16 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     }
 
     try {
-        const title = (await getVideoTitleIncludingUnsubmitted(videoID, queryByHash))?.title;
+        const titleData = await getVideoTitleIncludingUnsubmitted(videoID, queryByHash)
+        const title = titleData?.title;
         if (title) {
-            titleElement.innerText = formatTitle(title);
-            titleElement.title = formatTitle(title);
+            const formattedTitle = formatTitle(title, !titleData.original)
+            titleElement.innerText = formattedTitle;
+            titleElement.title = formattedTitle;
         } else if (originalTitleElement?.textContent) {
             // innerText is blank when visibility hidden
             const originalText = originalTitleElement.textContent.trim();
-            const modifiedTitle = formatTitle(originalText);
+            const modifiedTitle = formatTitle(originalText, false);
             if (originalText === modifiedTitle) {
                 showOriginalTitle(titleElement, originalTitleElement);
                 return false;
