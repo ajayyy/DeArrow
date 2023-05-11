@@ -49,7 +49,9 @@ export function toSentenceCase(str: string): string {
     let result = "";
     let firstWord = true;
     for (const word of words) {
-        if (isAcronymStrict(word) ||
+        if (word.toUpperCase() === "I") {
+            result += word.toUpperCase() + " ";
+        } else if (isAcronymStrict(word) ||
             (!inTitleCase && !mostlyAllCaps && isAcronym(word)) ||
             (!inTitleCase && isWordCaptialCase(word))) {
             // Trust it with capitalization
@@ -74,7 +76,8 @@ export function toTitleCase(str: string): string {
 
     let result = "";
     for (const word of words) {
-        if (sentenceCaseNotCapitalized.includes(word.toLowerCase())) {
+        // Skip lowercase check for the first word
+        if (result.length !== 0 && sentenceCaseNotCapitalized.includes(word.toLowerCase())) {
             result += word.toLowerCase() + " ";
         } else if (isFirstLetterCaptial(word) && 
                 ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word))) {

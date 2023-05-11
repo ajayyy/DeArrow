@@ -105,6 +105,10 @@ describe("titleFormatter", () => {
         expect(toTitleCase("5 min COUNTDOWN timer from U.S.A (roller coaster) 🎢")).toBe("5 Min Countdown Timer from U.S.A (Roller Coaster) 🎢");
     });
 
+    it("toTitleCase The car is from the U.S.A", () => {
+        expect(toTitleCase("The car is from the U.S.A")).toBe("The Car Is from the U.S.A");
+    });
+
     it("toSentenceCase Go on the table with a cat", () => {
         expect(toSentenceCase("Go on the table with a cat")).toBe("Go on the table with a cat");
     });
@@ -152,4 +156,12 @@ describe("titleFormatter", () => {
     it("toSentenceCase 5 Minute Timer Bomb [COKE AND MENTOS] 💣", () => {
         expect(toSentenceCase("5 Minute Timer Bomb [COKE AND MENTOS] 💣")).toBe("5 minute timer bomb [coke and mentos] 💣");
     })
+
+    it("toSentenceCase The car is from the U.S.A", () => {
+        expect(toSentenceCase("The car is from the U.S.A")).toBe("The car is from the U.S.A");
+    });
+
+    it("toSentenceCase When I Went To The Store", () => {
+        expect(toSentenceCase("When I Went To The Store")).toBe("When I went to the store");
+    });
 });
