@@ -32,7 +32,12 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, qu
         };
     }
 
-    return (await getVideoBranding(videoID, queryByHash))?.thumbnails[0] ?? null;
+    const result = (await getVideoBranding(videoID, queryByHash))?.thumbnails[0];
+    if (!result || (!result.locked && result.votes < 0)) {
+        return null;
+    } else {
+        return result;
+    }
 }
 
 export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, queryByHash: boolean): Promise<TitleResult | null> {
@@ -47,7 +52,12 @@ export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, queryB
         };
     }
 
-    return (await getVideoBranding(videoID, queryByHash))?.titles[0] ?? null;
+    const result = (await getVideoBranding(videoID, queryByHash))?.titles[0];
+    if (!result || (!result.locked && result.votes < 0)) {
+        return null;
+    } else {
+        return result;
+    }
 }
 
 export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): Promise<VideoBrandingCacheRecord | null> {
