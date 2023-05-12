@@ -45,7 +45,7 @@ export function formatTitle(title: string, isCustom: boolean): string {
         case TitleFormatting.SentenceCase:
             return toSentenceCase(title, isCustom);
         default:
-            return title;
+            return cleanResultingTitle(title);
     }
 }
 
