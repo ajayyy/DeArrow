@@ -148,5 +148,5 @@ export async function submitVideoBranding(videoID: VideoID, title: TitleSubmissi
 }
 
 export function sendRequestToServer(type: string, url: string, data = {}): Promise<FetchResponse> {
-    return sendRequestToCustomServer(type, CompileConfig.serverAddress + url, data);
+    return sendRequestToCustomServer(type, Config.config!.serverAddress + url, data);
 }
