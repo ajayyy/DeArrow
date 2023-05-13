@@ -55,11 +55,11 @@ export async function replaceVideoCardsBranding(elements: HTMLElement[]): Promis
     return await Promise.all(elements.map((e) => replaceVideoCardBranding(e)));
 }
 
-export function replaceVideoCardBranding(element: HTMLElement): Promise<[boolean, boolean]> {
+export async function replaceVideoCardBranding(element: HTMLElement, tries = 0): Promise<[boolean, boolean]> {
     const link = element.querySelector("a#thumbnail") as HTMLAnchorElement;
 
     if (link) {
-        const videoID = link.href?.match(/(?<=\?v=).{11}|(?<=\/shorts\/).{11}/)?.[0] as VideoID;
+        const videoID = extractVideoID(link);
 
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
             async () => void await replaceVideoCardBranding(element));
@@ -71,10 +71,21 @@ export function replaceVideoCardBranding(element: HTMLElement): Promise<[boolean
 
         void handleShowOriginalButton(element, videoID, brandingLocation, showCustomBranding, promises);
 
-        return Promise.all(promises) as Promise<[boolean, boolean]>;
+        const result = await Promise.all(promises);
+
+        if (videoID !== extractVideoID(link) && extractVideoID(link) && tries < 2) {
+            // Video ID changed, so try again
+            return replaceVideoCardBranding(element, tries++);
+        }
+
+        return result;
     }
 
-    return new Promise((resolve) => resolve([false, false]));
+    return [false, false];
+}
+
+function extractVideoID(link: HTMLAnchorElement) {
+    return link.href?.match(/(?<=\?v=).{11}|(?<=\/shorts\/).{11}/)?.[0] as VideoID;
 }
 
 export async function handleShowOriginalButton(element: HTMLElement, videoID: VideoID,
