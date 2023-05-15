@@ -96,7 +96,8 @@ export function toTitleCase(str: string, isCustom: boolean): string {
             !(isAllCaps(words[index - 1]) || isAllCaps(words[index + 1]));
 
         if ((isCustom && isWordCustomCaptialization(word))
-            || (!isAllCaps(word) && isWordCustomCaptialization(word))) {
+            || (!isAllCaps(word) && isWordCustomCaptialization(word))
+            || isYear(word)) {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             result += word + " ";
@@ -126,7 +127,8 @@ export function toCapitalizeCase(str: string, isCustom: boolean): string {
         if ((isCustom && isWordCustomCaptialization(word)) 
                 || (!isAllCaps(word) && isWordCustomCaptialization(word))
                 || (isFirstLetterCaptial(word) && 
-                ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word)))) {
+                ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word)))
+                || isYear(word)) {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             // Trust it with capitalization
@@ -202,6 +204,10 @@ function isWordCustomCaptialization(word: string): boolean {
 
     const capitalNumber = capitalMatch.length;
     return capitalNumber > 1 || (capitalNumber === 1 && !isFirstLetterCaptial(word));
+}
+
+function isYear(word: string): boolean {
+    return !!word.match(/^[0-9]{2,4}s$/);
 }
 
 function isWordAllLower(word: string): boolean {

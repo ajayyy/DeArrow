@@ -117,6 +117,10 @@ describe("titleFormatter", () => {
         expect(toTitleCase("When I WENT TO The Store", false)).toBe("When I Went to the Store");
     });
 
+    it("toTitleCase Something happened in the 2000s", () => {
+        expect(toTitleCase("Something happened in the 2000s", false)).toBe("Something Happened in the 2000s");
+    });
+
     it("toTitleCase custom MNM gaming vs. W7M // BLAST R6 Copenhagen major | finals | day 1", () => {
         expect(toTitleCase("MNM gaming vs. W7M // BLAST R6 Copenhagen major | finals | day 1", true)).toBe("MNM Gaming vs. W7M // BLAST R6 Copenhagen Major | Finals | Day 1");
     });
