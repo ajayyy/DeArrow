@@ -1,5 +1,3 @@
-import * as CompileConfig from "../config.json";
-
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import { ThumbnailResult, ThumbnailSubmission } from "./thumbnails/thumbnailData";
 import { TitleResult, TitleSubmission } from "./titles/titleData";
@@ -32,7 +30,12 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, qu
         };
     }
 
-    return (await getVideoBranding(videoID, queryByHash))?.thumbnails[0] ?? null;
+    const result = (await getVideoBranding(videoID, queryByHash))?.thumbnails[0];
+    if (!result || (!result.locked && result.votes < 0)) {
+        return null;
+    } else {
+        return result;
+    }
 }
 
 export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, queryByHash: boolean): Promise<TitleResult | null> {
@@ -47,7 +50,12 @@ export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, queryB
         };
     }
 
-    return (await getVideoBranding(videoID, queryByHash))?.titles[0] ?? null;
+    const result = (await getVideoBranding(videoID, queryByHash))?.titles[0];
+    if (!result || (!result.locked && result.votes < 0)) {
+        return null;
+    } else {
+        return result;
+    }
 }
 
 export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): Promise<VideoBrandingCacheRecord | null> {
@@ -138,5 +146,5 @@ export async function submitVideoBranding(videoID: VideoID, title: TitleSubmissi
 }
 
 export function sendRequestToServer(type: string, url: string, data = {}): Promise<FetchResponse> {
-    return sendRequestToCustomServer(type, CompileConfig.serverAddress + url, data);
+    return sendRequestToCustomServer(type, Config.config!.serverAddress + url, data);
 }

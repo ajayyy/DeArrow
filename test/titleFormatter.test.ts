@@ -111,6 +111,10 @@ describe("titleFormatter", () => {
         expect(toTitleCase("When I WENT TO The Store", false)).toBe("When I Went to the Store");
     });
 
+    it("toTitleCase Something happened in the 2000s", () => {
+        expect(toTitleCase("Something happened in the 2000s", false)).toBe("Something Happened in the 2000s");
+    });
+
     it("toSentenceCase Go on the table with a cat", () => {
         expect(toSentenceCase("Go on the table with a cat", false)).toBe("Go on the table with a cat");
     });
