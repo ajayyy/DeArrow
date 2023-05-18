@@ -45,7 +45,7 @@ export function formatTitle(title: string, isCustom: boolean): string {
         case TitleFormatting.SentenceCase:
             return toSentenceCase(title, isCustom);
         default:
-            return title;
+            return cleanResultingTitle(title);
     }
 }
 
@@ -62,7 +62,8 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
 
         if (word.toUpperCase() === "I") {
             result += word.toUpperCase() + " ";
-        } else if (isAcronymStrict(word) 
+        } else if (forceKeepFormatting(word)
+            || isAcronymStrict(word) 
             || (!inTitleCase && trustCaps && isAcronym(word))
             || (!inTitleCase && isWordCaptialCase(word)) 
             || (isCustom && isWordCustomCaptialization(word))
@@ -82,7 +83,7 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
         index++;
     }
 
-    return result.trim();
+    return cleanResultingTitle(result);
 }
 
 export function toTitleCase(str: string, isCustom: boolean): string {
@@ -95,7 +96,8 @@ export function toTitleCase(str: string, isCustom: boolean): string {
         const trustCaps = !mostlyAllCaps && 
             !(isAllCaps(words[index - 1]) || isAllCaps(words[index + 1]));
 
-        if ((isCustom && isWordCustomCaptialization(word))
+        if (forceKeepFormatting(word)
+            || (isCustom && isWordCustomCaptialization(word))
             || (!isAllCaps(word) && isWordCustomCaptialization(word))
             || isYear(word)) {
             // For custom titles, allow any not just first capital
@@ -115,7 +117,7 @@ export function toTitleCase(str: string, isCustom: boolean): string {
         index++;
     }
 
-    return result.trim();
+    return cleanResultingTitle(result);
 }
 
 export function toCapitalizeCase(str: string, isCustom: boolean): string {
@@ -124,7 +126,8 @@ export function toCapitalizeCase(str: string, isCustom: boolean): string {
 
     let result = "";
     for (const word of words) {
-        if ((isCustom && isWordCustomCaptialization(word)) 
+        if (forceKeepFormatting(word)
+                || (isCustom && isWordCustomCaptialization(word)) 
                 || (!isAllCaps(word) && isWordCustomCaptialization(word))
                 || (isFirstLetterCaptial(word) && 
                 ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word)))
@@ -138,7 +141,7 @@ export function toCapitalizeCase(str: string, isCustom: boolean): string {
         }
     }
 
-    return result.trim();
+    return cleanResultingTitle(result);
 }
 
 export function isInTitleCase(words: string[]): boolean {
@@ -218,6 +221,10 @@ function isFirstLetterCaptial(word: string): boolean {
     return !!word.match(/^[^a-zA-Z]*[A-Z]/);
 }
 
+function forceKeepFormatting(word: string): boolean {
+    return !!word.match(/^>/);
+}
+
 export function isAcronym(word: string): boolean {
     // 2 or less chars, or has dots after each letter except last word
     // U.S.A allowed
@@ -227,4 +234,8 @@ export function isAcronym(word: string): boolean {
 export function isAcronymStrict(word: string): boolean {
     // U.S.A allowed
     return !!word.match(/^[^a-zA-Z]*(\S\.)+(\S)?$/);
+}
+
+function cleanResultingTitle(title: string): string {
+    return title.replace(/>/g, "").trim();
 }
