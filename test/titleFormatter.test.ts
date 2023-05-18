@@ -1,6 +1,5 @@
 import { capitalizeFirstLetter, isAcronym, isAcronymStrict, isInTitleCase, isMostlyAllCaps, toCapitalizeCase, toSentenceCase, toTitleCase } from "../src/titles/titleFormatter";
 
-// Acronym Tests
 describe("Acronym Tests", () => {
     const acronymCases: [string, boolean][] = [
         ["USA", true],
@@ -8,30 +7,28 @@ describe("Acronym Tests", () => {
         ["U.S.A.G", true],
         ["U.S.A.G.", true],
         ["SOMETHING", false],
-    ]
+    ];
     for (const testCase of acronymCases) {
         const [input, result] = testCase;
-        it(`toTitleCase ${input}`, () => {
+        it(input, () => {
             expect(isAcronym(input)).toBe(result);
         });
     }
-})
+});
 
-// Strict Acronym Tests
 describe("Strict Acronym Tests", () => {
     const strictAcronymCases: [string, boolean][] = [
         ["U.S.", true],
         ["US", false],
-    ]
+    ];
     for (const testCase of strictAcronymCases) {
         const [input, result] = testCase;
-        it(`toTitleCase ${input}`, () => {
+        it(input, () => {
             expect(isAcronymStrict(input)).toBe(result);
         });
     }
-})
+});
 
-// Capitalize First Letter Tests
 describe("Capitalize First Letter Tests", () => {
     const capitalizeFirstCases: [string, string][] = [
         ["word", "Word"],
@@ -41,139 +38,99 @@ describe("Capitalize First Letter Tests", () => {
         ["[[-w", "[[-W"],
         ["[[-W", "[[-W"],
         ["2020", "2020"],
-    ]
+    ];
     for (const testCase of capitalizeFirstCases) {
         const [input, expected] = testCase;
-        it(`toTitleCase ${input}`, () => {
+        it(input, () => {
             expect(capitalizeFirstLetter(input)).toBe(expected);
         });
     }
-})
+});
 
-describe("titleFormatter", () => {
-    it("isMostlyAllCaps SOME WORDS are ALL CAPS", () => {
-        expect(isMostlyAllCaps(["SOME", "WORDS", "are", "ALL", "CAPS"])).toBe(true);
-    });
+describe("isMostlyAllCaps", () => {
+    const mostlyAllCapsCases: [string[], boolean][] = [
+        [["SOME", "WORDS", "are", "ALL", "CAPS"], true],
+        [["SOME", "Words", "are", "All", "CAPS."], false],
+    ];
+    for (const testCase of mostlyAllCapsCases) {
+        const [input, expected] = testCase;
+        it(input.join(", "), () => {
+            expect(isMostlyAllCaps(input)).toBe(expected);
+        });
+    }
+});
 
-    it("isMostlyAllCaps SOME Words are All CAPS.", () => {
-        expect(isMostlyAllCaps(["SOME", "Words", "are", "All", "CAPS."])).toBe(false);
-    });
+describe("isInTitleCase", () => {
+    const inTitleCaseCases: [string[], boolean][] = [
+        [["Go", "on", "the", "Table", "with", "a", "Cat"], true],
+        [["Go", "on", "the", "table", "with", "a", "cat"], false],
+    ];
+    for (const testCase of inTitleCaseCases) {
+        const [input, expected] = testCase;
+        it(input.join(", "), () => {
+            expect(isInTitleCase(input)).toBe(expected);
+        });
+    }
+});
 
-    it("isInTitleCase Go on the Table with a Cat", () => {
-        expect(isInTitleCase(["Go", "on", "the", "Table", "with", "a", "Cat"])).toBe(true);
-    });
+describe("toCapitalizeCase", () => {
+    const capitalizeCases: [string, string][] = [
+        ["Go on the table with a cat", "Go On The Table With A Cat"],
+        ["Go on the Table with a Cat", "Go On The Table With A Cat"],
+    ];
+    for (const testCase of capitalizeCases) {
+        const [input, expected] = testCase;
+        it(input, () => {
+            expect(toCapitalizeCase(input, false)).toBe(expected);
+        });
+    }
+});
 
-    it("isInTitleCase Go on the table with a cat", () => {
-        expect(isInTitleCase(["Go", "on", "the", "table", "with", "a", "cat"])).toBe(false);
-    });
+describe("toTitleCase", () => {
+    const titleCases: [string, string][] = [
+        ["Go on the table with a cat", "Go on the Table with a Cat"],
+        ["Go On The Table With A Cat", "Go on the Table with a Cat"],
+        ["5 Minute Timer [MOUSE MAZE] 🐭", "5 Minute Timer [Mouse Maze] 🐭"],
+        ["AWESOME ART TRICKS and EASY DRAWING HACKS", "Awesome Art Tricks and Easy Drawing Hacks"],
+        ["5 min countdown timer (roller coaster) 🎢", "5 Min Countdown Timer (Roller Coaster) 🎢"],
+        ["5 min COUNTDOWN timer from U.S.A (roller coaster) 🎢", "5 Min Countdown Timer from U.S.A (Roller Coaster) 🎢"],
+        ["Going somewhere [U.S.A is the place]", "Going Somewhere [U.S.A Is the Place]"],
+        ["The car is from the U.S.A", "The Car Is from the U.S.A"],
+        ["When I WENT TO The Store", "When I Went to the Store"],
+        ["Something happened in the 2000s", "Something Happened in the 2000s"],
+    ];
+    for (const testCase of titleCases) {
+        const [input, expected] = testCase;
+        it(input, () => {
+            expect(toTitleCase(input, false)).toBe(expected);
+        });
+    }
+});
 
-    it("toCapitalizeCase Go on the table with a cat", () => {
-        expect(toCapitalizeCase("Go on the table with a cat", false)).toBe("Go On The Table With A Cat");
-    });
-
-    it("toCapitalizeCase Go on the Table with a Cat", () => {
-        expect(toCapitalizeCase("Go on the Table with a Cat", false)).toBe("Go On The Table With A Cat");
-    });
-
-    it("toTitleCase Go on the table with a cat", () => {
-        expect(toTitleCase("Go on the table with a cat", false)).toBe("Go on the Table with a Cat");
-    });
-
-    it("toTitleCase Go On The Table With A Cat", () => {
-        expect(toTitleCase("Go On The Table With A Cat", false)).toBe("Go on the Table with a Cat");
-    });
-
-    it("toTitleCase 5 Minute Timer [MOUSE MAZE] 🐭", () => {
-        expect(toTitleCase("5 Minute Timer [MOUSE MAZE] 🐭", false)).toBe("5 Minute Timer [Mouse Maze] 🐭");
-    });
-
-    it("toTitleCase AWESOME ART TRICKS and EASY DRAWING HACKS", () => {
-        expect(toTitleCase("AWESOME ART TRICKS and EASY DRAWING HACKS", false)).toBe("Awesome Art Tricks and Easy Drawing Hacks");
-    });
-    
-    it("toTitleCase 5 min countdown timer (roller coaster) 🎢", () => {
-        expect(toTitleCase("5 min countdown timer (roller coaster) 🎢", false)).toBe("5 Min Countdown Timer (Roller Coaster) 🎢");
-    });
-
-    it("toTitleCase 5 min COUNTDOWN timer from U.S.A (roller coaster) 🎢", () => {
-        expect(toTitleCase("5 min COUNTDOWN timer from U.S.A (roller coaster) 🎢", false)).toBe("5 Min Countdown Timer from U.S.A (Roller Coaster) 🎢");
-    });
-
-    it("toTitleCase Going somewhere [U.S.A is the place]", () => {
-        expect(toTitleCase("Going somewhere [U.S.A is the Great Place]", false)).toBe("Going Somewhere [U.S.A Is the Great Place]");
-    });
-
-    it("toTitleCase The car is from the U.S.A", () => {
-        expect(toTitleCase("The car is from the U.S.A", false)).toBe("The Car Is from the U.S.A");
-    });
-
-    it("toTitleCase When I WENT TO The Store", () => {
-        expect(toTitleCase("When I WENT TO The Store", false)).toBe("When I Went to the Store");
-    });
-
-    it("toTitleCase Something happened in the 2000s", () => {
-        expect(toTitleCase("Something happened in the 2000s", false)).toBe("Something Happened in the 2000s");
-    });
-
-    it("toSentenceCase Go on the table with a cat", () => {
-        expect(toSentenceCase("Go on the table with a cat", false)).toBe("Go on the table with a cat");
-    });
-
-    it("toSentenceCase Go On The Table With A Cat", () => {
-        expect(toSentenceCase("Go On The Table With A Cat", false)).toBe("Go on the table with a cat");
-    });
-
-    it("toSentenceCase Go On The Table With A Cat From The U.S", () => {
-        expect(toSentenceCase("Go On The Table With A Cat From The U.S", false)).toBe("Go on the table with a cat from the U.S");
-    });
-
-    it("toSentenceCase Go on the Table with a Cat", () => {
-        expect(toSentenceCase("Go on the Table with a Cat", false)).toBe("Go on the table with a cat");
-    });
-
-    it("toSentenceCase Go on the table with a cat named Pat", () => {
-        expect(toSentenceCase("Go on the table with a cat named Pat", false)).toBe("Go on the table with a cat named Pat");
-    });
-
-    it("toSentenceCase Go on the table with a cat named Pat from the U.S", () => {
-        expect(toSentenceCase("Go on the table with a cat named Pat from the U.S", false)).toBe("Go on the table with a cat named Pat from the U.S");
-    });
-
-    it("toSentenceCase 5 Minute Spring Timer (2021)", () => {
-        expect(toSentenceCase("5 Minute Spring Timer (2021)", false)).toBe("5 minute spring timer (2021)");
-    });
-
-    it("toSentenceCase AWESOME ART TRICKS and EASY DRAWING HACKS", () => {
-        expect(toSentenceCase("AWESOME ART TRICKS and EASY DRAWING HACKS", false)).toBe("Awesome art tricks and easy drawing hacks");
-    });
-
-    it("toSentenceCase 5 Min Countdown Timer (Roller Coaster) 🎢", () => {
-        expect(toSentenceCase("5 Min Countdown Timer (Roller Coaster) 🎢", false)).toBe("5 min countdown timer (roller coaster) 🎢");
-    });
-
-    it("toSentenceCase 5 min countdown timer by Jim (roller coaster) 🎢", () => {
-        expect(toSentenceCase("5 min countdown timer by Jim (roller coaster) 🎢", false)).toBe("5 min countdown timer by Jim (roller coaster) 🎢");
-    });
-
-    it("toSentenceCase 5 min COUNTDOWN timer by Jim (roller coaster) 🎢", () => {
-        expect(toSentenceCase("5 min COUNTDOWN timer by Jim (roller coaster) 🎢", false)).toBe("5 min countdown timer by Jim (roller coaster) 🎢");
-    });
-
-    it("toSentenceCase 5 Minute Timer Bomb [COKE AND MENTOS] 💣", () => {
-        expect(toSentenceCase("5 Minute Timer Bomb [COKE AND MENTOS] 💣", false)).toBe("5 minute timer bomb [coke and mentos] 💣");
-    })
-
-    it("toSentenceCase The car is from the U.S.A", () => {
-        expect(toSentenceCase("The car is from the U.S.A", false)).toBe("The car is from the U.S.A");
-    });
-
-    it("toSentenceCase When I Went To The Store", () => {
-        expect(toSentenceCase("When I Went To The Store", false)).toBe("When I went to the store");
-    });
-
-    it("toSentenceCase When I WENT TO The Store", () => {
-        expect(toSentenceCase("When I Went To The Store", false)).toBe("When I went to the store");
-    });
+describe("toSentenceCase", () => {
+    const sentenceCases: [string, string][] = [
+        ["Go on the table with a cat", "Go on the table with a cat"],
+        ["Go On The Table With A Cat", "Go on the table with a cat"],
+        ["Go On The Table With A Cat From The U.S", "Go on the table with a cat from the U.S"],
+        ["Go on the Table with a Cat", "Go on the table with a cat"],
+        ["Go on the table with a cat named Pat", "Go on the table with a cat named Pat"],
+        ["Go on the table with a cat named Pat from the U.S", "Go on the table with a cat named Pat from the U.S"],
+        ["5 Minute Spring Timer (2021)", "5 minute spring timer (2021)"],
+        ["AWESOME ART TRICKS and EASY DRAWING HACKS", "Awesome art tricks and easy drawing hacks"],
+        ["5 Min Countdown Timer (Roller Coaster) 🎢", "5 min countdown timer (roller coaster) 🎢"],
+        ["5 min countdown timer by Jim (roller coaster) 🎢", "5 min countdown timer by Jim (roller coaster) 🎢"],
+        ["5 min COUNTDOWN timer by Jim (roller coaster) 🎢", "5 min countdown timer by Jim (roller coaster) 🎢"],
+        ["5 Minute Timer Bomb [COKE AND MENTOS] 💣", "5 minute timer bomb [coke and mentos] 💣"],
+        ["The car is from the U.S.A", "The car is from the U.S.A"],
+        ["When I Went To The Store", "When I went to the store"],
+        ["When I WENT TO The Store", "When I went to the store"],
+    ];
+    for (const testCase of sentenceCases) {
+        const [input, expected] = testCase;
+        it(input, () => {
+            expect(toSentenceCase(input, false)).toBe(expected);
+        });
+    }
 });
 
 // Custom cases that should be retained as-is
@@ -215,7 +172,7 @@ describe("titleFormatter custom cases", () => {
         ["POV: >f0rest vs. Virtus.pro >fnatic CS 1.6 demo part1", "POV: f0rest vs. Virtus.pro fnatic CS 1.6 Demo Part1","POV: f0rest vs. Virtus.pro fnatic CS 1.6 demo part1"], // Virtus.pro, fnatic
         ["Announcements at >Google I/O 2023", "Announcements at Google I/O 2023", "Announcements at Google I/O 2023"], // Google sould be capitalized
         ["WWDC 2022 - iOS 16 announcement", "WWDC 2022 - iOS 16 Announcement", "WWDC 2022 - iOS 16 announcement"], // iOS should NOT be capitalized
-    ]
+    ];
     for (const testCase of customTitles) {
         const [input, title, sentence] = testCase;
         it(`toTitleCase "${input}"`, () => {
@@ -225,4 +182,4 @@ describe("titleFormatter custom cases", () => {
             expect(toSentenceCase(input, true)).toBe(sentence);
         });
     }
-})
+});
