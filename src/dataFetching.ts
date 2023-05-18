@@ -1,5 +1,3 @@
-import * as CompileConfig from "../config.json";
-
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import { ThumbnailResult, ThumbnailSubmission } from "./thumbnails/thumbnailData";
 import { TitleResult, TitleSubmission } from "./titles/titleData";
