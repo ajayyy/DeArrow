@@ -1,5 +1,5 @@
 {
-  "name": "clickbait",
+  "name": "dearrow",
   "version": "1.0.0",
   "description": "",
   "main": "background.js",
@@ -61,7 +61,7 @@
     "dev:firefox": "npm run build:dev:firefox && concurrently \"npm run web-run:firefox\" \"npm run build:watch:firefox\"",
     "dev:firefox-android": "npm run build:dev:firefox && concurrently \"npm run web-run:firefox-android\" \"npm run build:watch:firefox\"",
     "clean": "rimraf dist",
-    "test": "npm run build:chrome && npx jest --passWithNoTests",
+    "test": "npm run build:chrome && npm run test:no-build",
     "test-without-building": "npm run test:no-build",
     "test:no-build":  "npx jest --passWithNoTests",
     "lint": "eslint src",
@@ -90,7 +90,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ajayyy/SponsorBlock.git"
+    "url": "git+https://github.com/ajayyy/DeArrow.git"
   },
   "author": "Ajay Ramachandran",
   "license": "LGPL-3.0-or-later",
