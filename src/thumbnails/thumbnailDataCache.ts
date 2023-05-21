@@ -10,13 +10,14 @@ interface ThumbnailVideoBase {
     video: HTMLVideoElement | null;
     width: number;
     height: number;
-    onReady: Array<(video: RenderedThumbnailVideo) => void>;
+    onReady: Array<(video: RenderedThumbnailVideo | null) => void>;
     timestamp: number;
 }
 
 export type RenderedThumbnailVideo = ThumbnailVideoBase & {
     canvas: HTMLCanvasElement;
     rendered: true;
+    fromThumbnailCache: boolean;
 }
 
 export type ThumbnailVideo = RenderedThumbnailVideo | ThumbnailVideoBase & {

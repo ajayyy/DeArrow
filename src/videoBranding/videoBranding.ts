@@ -127,19 +127,25 @@ export async function setShowCustom(videoID: VideoID, value: boolean): Promise<b
     if (videoBrandingInstances[videoID]) {
         videoBrandingInstances[videoID].showCustomBranding = value;
 
-        const updateBrandingCallbacks = videoBrandingInstances[videoID].updateBrandingCallbacks;
-        // They will be added back to the array
-        videoBrandingInstances[videoID].updateBrandingCallbacks = [];
-
-        for (const updateBranding of updateBrandingCallbacks) {
-            await updateBranding();
-        }
+        await updateBrandingForVideo(videoID);
 
         return value;
     }
 
     // Assume still showing, but something has gone very wrong if it gets here
     return true;
+}
+
+export async function updateBrandingForVideo(videoID: VideoID): Promise<void> {
+    if (videoBrandingInstances[videoID]) {
+        const updateBrandingCallbacks = videoBrandingInstances[videoID].updateBrandingCallbacks;
+        // They will be added back to the array
+        videoBrandingInstances[videoID].updateBrandingCallbacks = [];
+    
+        for (const updateBranding of updateBrandingCallbacks) {
+            await updateBranding();
+        }
+    }
 }
 
 export function clearVideoBrandingInstances(): void {

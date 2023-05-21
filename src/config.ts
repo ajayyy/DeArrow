@@ -41,6 +41,7 @@ interface SBConfig {
     keepUnsubmitted: boolean;
     titleFormatting: TitleFormatting;
     serverAddress: string;
+    thumbnailServerAddress: string;
     fetchTimeout: number;
     extensionEnabled: boolean;
 }
@@ -76,6 +77,7 @@ const syncDefaults = {
     keepUnsubmitted: true,
     titleFormatting: TitleFormatting.TitleCase,
     serverAddress: CompileConfig.serverAddress,
+    thumbnailServerAddress: CompileConfig.thumbnailServerAddress,
     fetchTimeout: 7000,
     extensionEnabled: true
 };
