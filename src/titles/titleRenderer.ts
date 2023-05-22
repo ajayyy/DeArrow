@@ -64,7 +64,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
             titleElement.innerText = modifiedTitle;
             titleElement.title = modifiedTitle;
         } else {
-            originalTitleElement.style.removeProperty("display");
+            originalTitleElement.style.setProperty("display", "inherit", "important");
         }
 
         if (originalTitleElement.parentElement?.title) {
@@ -80,7 +80,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         return true;
     } catch (e) {
         logError(e);
-        originalTitleElement.style.removeProperty("display");
+        originalTitleElement.style.setProperty("display", "inherit", "important");
 
         return false;
     }
@@ -88,7 +88,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
 
 function showOriginalTitle(titleElement: HTMLElement, originalTitleElement: HTMLElement) {
     titleElement.style.display = "none";
-    originalTitleElement.style.removeProperty("display");
+    originalTitleElement.style.setProperty("display", "inherit", "important");
 }
 
 export function getOriginalTitleElement(element: HTMLElement, brandingLocation: BrandingLocation) {

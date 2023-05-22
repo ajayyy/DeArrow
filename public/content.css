@@ -16,6 +16,10 @@ ytd-thumbnail img:not(.cb-visible) {
     visibility: hidden !important; /* todo: remove this when it is fast enough to be hidden before it is loaded, or inject dynamically based on config */
 }
 
+#video-title:not(.cbCustomTitle) {
+    display: none !important; /* todo: remove this when it is fast enough to be hidden before it is loaded, or inject dynamically based on config */
+}
+
 .cbThumbnail {
     position: relative;
     flex: 0 0 20%;
