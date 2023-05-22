@@ -60,8 +60,8 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
         const trustCaps = !mostlyAllCaps && 
             !(isAllCaps(words[index - 1]) || isAllCaps(words[index + 1]));
 
-        if (word.toUpperCase() === "I") {
-            result += word.toUpperCase() + " ";
+        if (word.match(/^[Ii]$|^[Ii]['’][a-zA-Z]{1,3}$/)) {
+            result += capitalizeFirstLetter(word) + " ";
         } else if (forceKeepFormatting(word)
             || isAcronymStrict(word) 
             || ((!inTitleCase || !isWordCaptialCase(word)) && trustCaps && isAcronym(word))

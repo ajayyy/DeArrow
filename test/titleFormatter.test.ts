@@ -135,6 +135,8 @@ describe("toSentenceCase", () => {
         ["A first title ; The subtitle", "A first title ; The subtitle"],
         ["Why Does OTT Sound so Good?", "Why does OTT sound so good?"],
         ["You Don't Understand EQ - PART 1", "You don't understand EQ - Part 1"],
+        ["Tomorrow I'll Go To The US", "Tomorrow I'll go to the US"],
+        ["Tomorrow I'llllllll Go To The US", "Tomorrow i'llllllll go to the US"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
