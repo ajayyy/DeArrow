@@ -2,7 +2,9 @@ import { replaceCurrentVideoBranding, setupOptionChangeListener, startThumbnailL
 import { setupCBVideoModule } from "./video";
 import { addTitleChangeListener, listenForBadges, listenForTitleChange } from "./utils/titleBar";
 import { logError } from "./utils/logger";
+import { addCssToPage } from "./utils/cssInjector";
 
+addCssToPage();
 setupCBVideoModule();
 
 startThumbnailListener();
