@@ -1,4 +1,4 @@
-import { capitalizeFirstLetter, isAcronym, isAcronymStrict, isInTitleCase, isMostlyAllCaps, toCapitalizeCase, toSentenceCase, toTitleCase } from "../src/titles/titleFormatter";
+import { capitalizeFirstLetter, cleanPunctuation, isAcronym, isAcronymStrict, isInTitleCase, isMostlyAllCaps, toCapitalizeCase, toSentenceCase, toTitleCase } from "../src/titles/titleFormatter";
 
 describe("Acronym Tests", () => {
     const acronymCases: [string, boolean][] = [
@@ -193,6 +193,25 @@ describe("titleFormatter custom cases", () => {
         });
         it(`toSentenceCase "${input}"`, () => {
             expect(toSentenceCase(input, true)).toBe(sentence);
+        });
+    }
+});
+
+describe("cleanPunctuation", () => {
+    const cases: [string, string][] = [
+        ["Some interesting title!", "Some interesting title"],
+        ["Some interesting title?", "Some interesting title?"],
+        ["Some interesting title!?", "Some interesting title?"],
+        ["Some interesting title!?!?", "Some interesting title?"],
+        ["Some interesting title!?!?!", "Some interesting title?"],
+        ["Some interesting title????", "Some interesting title?"],
+        ["Some interesting title!????", "Some interesting title?"],
+        ["Some interesting title.", "Some interesting title"],
+    ];
+    for (const testCase of cases) {
+        const [input, expected] = testCase;
+        it(input, () => {
+            expect(cleanPunctuation(input)).toBe(expected);
         });
     }
 });

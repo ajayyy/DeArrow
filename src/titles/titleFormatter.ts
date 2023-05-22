@@ -249,5 +249,26 @@ function isDelimeter(char: string): boolean {
 }
 
 function cleanResultingTitle(title: string): string {
-    return title.replace(/>/g, "").trim();
+    return cleanPunctuation(title.replace(/>/g, "").trim());
+}
+
+export function cleanPunctuation(title: string): string {
+    let toTrim = 0;
+    let questionMarkCount = 0;
+    for (let i = title.length - 1; i >= 0; i--) {
+        toTrim = i;
+
+        if (title[i] === "?") {
+            questionMarkCount++;
+        } else if (title[i] !== "!" && title[i] !== ".") {
+            break;
+        }
+    }
+
+    let cleanTitle = toTrim === title.length ? title : title.substring(0, toTrim + 1);
+    if (questionMarkCount > 0) {
+        cleanTitle += "?";
+    }
+
+    return cleanTitle.trim();
 }
