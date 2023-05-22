@@ -260,7 +260,7 @@ export function cleanPunctuation(title: string): string {
 
         if (title[i] === "?") {
             questionMarkCount++;
-        } else if (title[i] !== "!" && title[i] !== ".") {
+        } else if (title[i] !== "!" && title[i] !== "." && title[i] !== " ") {
             break;
         }
     }
@@ -270,5 +270,5 @@ export function cleanPunctuation(title: string): string {
         cleanTitle += "?";
     }
 
-    return cleanTitle.trim();
+    return cleanTitle;
 }

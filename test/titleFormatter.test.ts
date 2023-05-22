@@ -200,12 +200,13 @@ describe("titleFormatter custom cases", () => {
 describe("cleanPunctuation", () => {
     const cases: [string, string][] = [
         ["Some interesting title!", "Some interesting title"],
-        ["Some interesting title?", "Some interesting title?"],
+        ["Some interesting title ?", "Some interesting title?"],
         ["Some interesting title!?", "Some interesting title?"],
         ["Some interesting title!?!?", "Some interesting title?"],
         ["Some interesting title!?!?!", "Some interesting title?"],
         ["Some interesting title????", "Some interesting title?"],
-        ["Some interesting title!????", "Some interesting title?"],
+        ["Some interesting title !????", "Some interesting title?"],
+        ["Some interesting title!?! ???", "Some interesting title?"],
         ["Some interesting title.", "Some interesting title"],
     ];
     for (const testCase of cases) {
