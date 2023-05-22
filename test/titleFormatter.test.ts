@@ -98,6 +98,7 @@ describe("toTitleCase", () => {
         ["The car is from the U.S.A", "The Car Is from the U.S.A"],
         ["When I WENT TO The Store", "When I Went to the Store"],
         ["Something happened in the 2000s", "Something Happened in the 2000s"],
+        ["USB-C AirPods Pro Kit - Assembly Guide", "USB-C AirPods Pro Kit - Assembly Guide"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;

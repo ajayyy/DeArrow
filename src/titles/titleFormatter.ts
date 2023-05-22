@@ -176,7 +176,10 @@ export function isMostlyAllCaps(words: string[]): boolean {
  * Has at least one char and is upper case
  */
 function isAllCaps(word: string): boolean {
-    return !!word && !!word.match(/[a-zA-Z]/) && word.toUpperCase() === word && !isAcronymStrict(word);
+    return !!word && !!word.match(/[a-zA-Z]/) 
+        && word.toUpperCase() === word 
+        && !isAcronymStrict(word)
+        && !word.match(/^[a-zA-Z]+[-~—]/); // USB-C not all caps
 }
 
 export function capitalizeFirstLetter(word: string): string {
