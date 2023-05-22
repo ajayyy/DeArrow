@@ -64,7 +64,7 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
             result += word.toUpperCase() + " ";
         } else if (forceKeepFormatting(word)
             || isAcronymStrict(word) 
-            || (!inTitleCase && trustCaps && isAcronym(word))
+            || ((!inTitleCase || !isWordCaptialCase(word)) && trustCaps && isAcronym(word))
             || (!inTitleCase && isWordCaptialCase(word)) 
             || (isCustom && isWordCustomCaptialization(word))
             || (!isAllCaps(word) && isWordCustomCaptialization(word))) {
@@ -229,9 +229,10 @@ function forceKeepFormatting(word: string): boolean {
 }
 
 export function isAcronym(word: string): boolean {
-    // 2 or less chars, or has dots after each letter except last word
+    // 2 - 3 chars, or has dots after each letter except last word
     // U.S.A allowed
-    return (word.length <= 3 && isAllCaps(word)) || isAcronymStrict(word);
+    // US allowed
+    return (word.length <= 3 && word.length > 1 && isAllCaps(word)) || isAcronymStrict(word);
 }
 
 export function isAcronymStrict(word: string): boolean {

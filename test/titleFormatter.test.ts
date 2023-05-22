@@ -99,6 +99,8 @@ describe("toTitleCase", () => {
         ["When I WENT TO The Store", "When I Went to the Store"],
         ["Something happened in the 2000s", "Something Happened in the 2000s"],
         ["USB-C AirPods Pro Kit - Assembly Guide", "USB-C AirPods Pro Kit - Assembly Guide"],
+        ["Why Does OTT Sound So Good?", "Why Does OTT Sound so Good?"],
+        ["You Don't Understand EQ - PART 1", "You Don't Understand EQ - Part 1"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -131,6 +133,8 @@ describe("toSentenceCase", () => {
         ["A first title — The subtitle", "A first title — The subtitle"],
         ["A first title : The subtitle", "A first title : The subtitle"],
         ["A first title ; The subtitle", "A first title ; The subtitle"],
+        ["Why Does OTT Sound so Good?", "Why does OTT sound so good?"],
+        ["You Don't Understand EQ - PART 1", "You don't understand EQ - Part 1"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
