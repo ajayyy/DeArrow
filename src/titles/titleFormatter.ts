@@ -73,7 +73,7 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
             // Trust it with capitalization
             result += word + " ";
         } else {
-            if (index === 0) {
+            if (startOfSentence(index, words)) {
                 result += capitalizeFirstLetter(word) + " ";
             } else {
                 result += word.toLowerCase() + " ";
@@ -103,7 +103,7 @@ export function toTitleCase(str: string, isCustom: boolean): string {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             result += word + " ";
-        } else if (result.length !== 0 && titleCaseNotCapitalized.includes(word.toLowerCase())) {
+        } else if (!startOfSentence(index, words) && titleCaseNotCapitalized.includes(word.toLowerCase())) {
             // Skip lowercase check for the first word
             result += word.toLowerCase() + " ";
         } else if (isFirstLetterCaptial(word) && 
@@ -231,12 +231,20 @@ function forceKeepFormatting(word: string): boolean {
 export function isAcronym(word: string): boolean {
     // 2 or less chars, or has dots after each letter except last word
     // U.S.A allowed
-    return word.length <= 3 || isAcronymStrict(word);
+    return (word.length <= 3 && isAllCaps(word)) || isAcronymStrict(word);
 }
 
 export function isAcronymStrict(word: string): boolean {
     // U.S.A allowed
     return !!word.match(/^[^a-zA-Z]*(\S\.)+(\S)?$/);
+}
+
+function startOfSentence(index: number, words: string[]): boolean {
+    return index === 0 || isDelimeter(words[index - 1]);
+}
+
+function isDelimeter(char: string): boolean {
+    return char.match(/^[-~—|]$/) !== null;
 }
 
 function cleanResultingTitle(title: string): string {

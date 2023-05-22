@@ -125,6 +125,10 @@ describe("toSentenceCase", () => {
         ["The car is from the U.S.A", "The car is from the U.S.A"],
         ["When I Went To The Store", "When I went to the store"],
         ["When I WENT TO The Store", "When I went to the store"],
+        ["A first title - Some subtitle", "A first title - Some subtitle"],
+        ["A first title | the subtitle", "A first title | The subtitle"],
+        ["A first title ~ The subtitle", "A first title ~ The subtitle"],
+        ["A first title — The subtitle", "A first title — The subtitle"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
@@ -139,13 +143,13 @@ describe("titleFormatter custom cases", () => {
     // original, title, sentence
     // original should not be capital unless necessary
     const customTitles: [string, string, string][] = [
-        ["NaVi vs. FaZe - map 1 [Inferno] - IEM Cologne 2022 - grand final","NaVi vs. FaZe - Map 1 [Inferno] - IEM Cologne 2022 - Grand Final","NaVi vs. FaZe - map 1 [Inferno] - IEM Cologne 2022 - grand final"], // multiple mixed capitalizations
+        ["NaVi vs. FaZe - map 1 [Inferno] - IEM Cologne 2022 - grand final","NaVi vs. FaZe - Map 1 [Inferno] - IEM Cologne 2022 - Grand Final","NaVi vs. FaZe - Map 1 [Inferno] - IEM Cologne 2022 - Grand final"], // multiple mixed capitalizations
         ["[SMii7Y VOD] CS:GO never changed","[SMii7Y VOD] CS:GO Never Changed","[SMii7Y VOD] CS:GO never changed"], // CS:GO
-        ["MNM Gaming vs. W7M // BLAST R6 Copenhagen major | finals | day 1","MNM Gaming vs. W7M // BLAST R6 Copenhagen Major | Finals | Day 1","MNM Gaming vs. W7M // BLAST R6 Copenhagen major | finals | day 1"], // retain MNM and W7M
+        ["MNM Gaming vs. W7M // BLAST R6 Copenhagen major | finals | day 1","MNM Gaming vs. W7M // BLAST R6 Copenhagen Major | Finals | Day 1","MNM Gaming vs. W7M // BLAST R6 Copenhagen major | Finals | Day 1"], // retain MNM and W7M
         ["GTA >V RP (2023-05-08)", "GTA V RP (2023-05-08)", "GTA V RP (2023-05-08)"], // retain GTA V RP
         ["m0NESY - 2023 highlights (CS:GO)", "m0NESY - 2023 Highlights (CS:GO)", "m0NESY - 2023 highlights (CS:GO)"], // don't capitalize m0NESY but retain CS:GO
-        [">s1mple - the best player in the world - HLTV.org's #1 of 2021","s1mple - the Best Player in the World - HLTV.org's #1 of 2021","s1mple - the best player in the world - HLTV.org's #1 of 2021"], // keep s1mple, keep HLTV.org
-        ["CS 1.6 vs CS:S vs CS:GO vs CS2 - weapons comparison", "CS 1.6 vs CS:S vs CS:GO vs CS2 - Weapons Comparison", "CS 1.6 vs CS:S vs CS:GO vs CS2 - weapons comparison"], // lots of abbreviations
+        [">s1mple - the best player in the world - HLTV.org's #1 of 2021","s1mple - The Best Player in the World - HLTV.org's #1 of 2021","s1mple - The best player in the world - HLTV.org's #1 of 2021"], // keep s1mple, keep HLTV.org
+        ["CS 1.6 vs CS:S vs CS:GO vs CS2 - weapons comparison", "CS 1.6 vs CS:S vs CS:GO vs CS2 - Weapons Comparison", "CS 1.6 vs CS:S vs CS:GO vs CS2 - Weapons comparison"], // lots of abbreviations
         ["Oh sh*t, y'all can hear that?! | C9 valorant voice comms #3 ft. Annie >alexis Jazzyk1ns meL >katsumi", "Oh Sh*t, Y'all Can Hear That?! | C9 Valorant Voice Comms #3 ft. Annie alexis Jazzyk1ns meL katsumi", "Oh sh*t, y'all can hear that?! | C9 valorant voice comms #3 ft. Annie alexis Jazzyk1ns meL katsumi"], // lots of names with purposeful capitalization
         ["Tarik reacts to team Shroud vs team meL II RE//LOAD - CROWN >x riot games VALORANT tour", "Tarik Reacts to Team Shroud vs Team meL II RE//LOAD - CROWN x Riot Games VALORANT Tour", "Tarik reacts to team Shroud vs team meL II RE//LOAD - CROWN x riot games VALORANT tour"], // meL, mix of RE//LOAD and CROWN
         [">2b2t's first war - >4chan vs. Facepunch (2011-2012)", "2b2t's First War - 4chan vs. Facepunch (2011-2012)", "2b2t's first war - 4chan vs. Facepunch (2011-2012)"], // preserve lower and upper cases
@@ -154,15 +158,15 @@ describe("titleFormatter custom cases", () => {
         ["[MV] SEVENTEEN(세븐틴), >Ailee(에일리) _ Q&A", "[MV] SEVENTEEN(세븐틴), Ailee(에일리) _ Q&A", "[MV] SEVENTEEN(세븐틴), Ailee(에일리) _ Q&A"], // keep all caps in title for SEVENTEEN and [MV]
         ["AH-dventures in LA - >4K", "AH-dventures in LA - 4K", "AH-dventures in LA - 4K"], // capitalization for pun, 4K
         ["Welcome to the cunderground - GTA V: cunning stunts", "Welcome to the Cunderground - GTA V: Cunning Stunts", "Welcome to the cunderground - GTA V: cunning stunts"], // GTA V:
-        ["Achievement City, plan G(mod) - Gmod: TTT | let's play", "Achievement City, Plan G(mod) - Gmod: TTT | Let's Play", "Achievement City, plan G(mod) - Gmod: TTT | let's play"], // Proper place, G(mod)
-        ["Mad vs T1 - game 1 | round 1 Lol MSI 2023", "Mad vs T1 - Game 1 | Round 1 Lol MSI 2023", "Mad vs T1 - game 1 | round 1 Lol MSI 2023"], // LoL, MSI and T1
+        ["Achievement City, plan G(mod) - Gmod: TTT | let's play", "Achievement City, Plan G(mod) - Gmod: TTT | Let's Play", "Achievement City, plan G(mod) - Gmod: TTT | Let's play"], // Proper place, G(mod)
+        ["Mad vs T1 - game 1 | round 1 Lol MSI 2023", "Mad vs T1 - Game 1 | Round 1 Lol MSI 2023", "Mad vs T1 - Game 1 | Round 1 Lol MSI 2023"], // LoL, MSI and T1
         ["The great awakening - 3D to 5D consciousness - 432 Hz + 963 Hz", "The Great Awakening - 3D to 5D Consciousness - 432 Hz + 963 Hz", "The great awakening - 3D to 5D consciousness - 432 Hz + 963 Hz"], // Hz, 3D, 5D
-        ["H3VR early access devlog - update >110e1 - new revolver cartridges", "H3VR Early Access Devlog - Update 110e1 - New Revolver Cartridges", "H3VR early access devlog - update 110e1 - new revolver cartridges"], // H3VR, e1
+        ["H3VR early access devlog - update >110e1 - new revolver cartridges", "H3VR Early Access Devlog - Update 110e1 - New Revolver Cartridges", "H3VR early access devlog - Update 110e1 - New revolver cartridges"], // H3VR, e1
         ["Snapshot >23w14a", "Snapshot 23w14a", "Snapshot 23w14a"], // 23W14A
         ["Is the F-15EX secretly the best fighter jet ever made?", "Is the F-15EX Secretly the Best Fighter Jet Ever Made?", "Is the F-15EX secretly the best fighter jet ever made?"], // F-15EX
         ["US F-15s nose dive against each other | DCS", "US F-15s Nose Dive Against Each Other | DCS", "US F-15s nose dive against each other | DCS"], // DCS, F-15s
         ["F/A-18C Hornets execute no knock raid | DCS", "F/A-18C Hornets Execute No Knock Raid | DCS", "F/A-18C Hornets execute no knock raid | DCS"], // F/A-18C, DCS
-        ["CS 1.6 - zombie plague / >zm_cubeworld_mini [küplere biniyoruz]", "CS 1.6 - Zombie Plague / zm_cubeworld_mini [Küplere Biniyoruz]", "CS 1.6 - zombie plague / zm_cubeworld_mini [küplere biniyoruz]"], // preserve zm_cubeworld_mini
+        ["CS 1.6 - zombie plague / >zm_cubeworld_mini [küplere biniyoruz]", "CS 1.6 - Zombie Plague / zm_cubeworld_mini [Küplere Biniyoruz]", "CS 1.6 - Zombie plague / zm_cubeworld_mini [küplere biniyoruz]"], // preserve zm_cubeworld_mini
         [">f0rest vs. >x6tence @IEM IV european championship", "f0rest vs. x6tence @IEM IV European Championship", "f0rest vs. x6tence @IEM IV european championship"], // two lowercase names
         [">markeloff vs SK.swe (ESWC 2010 final)", "markeloff vs SK.swe (ESWC 2010 Final)", "markeloff vs SK.swe (ESWC 2010 final)"], // keep markeloff, keep SK.swe
         ["POV: >solo vs. Lunatic'hai @WCG >project_kr CS 1.6 demo", "POV: solo vs. Lunatic'hai @WCG project_kr CS 1.6 Demo", "POV: solo vs. Lunatic'hai @WCG project_kr CS 1.6 demo"], // solo, 'hai, project_kr
