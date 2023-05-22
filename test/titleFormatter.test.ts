@@ -129,6 +129,8 @@ describe("toSentenceCase", () => {
         ["A first title | the subtitle", "A first title | The subtitle"],
         ["A first title ~ The subtitle", "A first title ~ The subtitle"],
         ["A first title — The subtitle", "A first title — The subtitle"],
+        ["A first title : The subtitle", "A first title : The subtitle"],
+        ["A first title ; The subtitle", "A first title ; The subtitle"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
