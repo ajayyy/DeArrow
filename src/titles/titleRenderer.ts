@@ -159,6 +159,7 @@ export async function findOrCreateShowOriginalButton(element: HTMLElement, brand
 async function createShowOriginalButton(originalTitleElement: HTMLElement,
         brandingLocation: BrandingLocation): Promise<HTMLElement> {
     const buttonElement = document.createElement("button");
+    buttonElement.title = chrome.i18n.getMessage("ShowOriginal");
     buttonElement.classList.add("cbShowOriginal");
 
     buttonElement.classList.add("cbButton");
