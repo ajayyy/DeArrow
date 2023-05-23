@@ -47,7 +47,7 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, qu
 }
 
 export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, queryByHash: boolean): Promise<TitleResult | null> {
-    const unsubmitted = Config.local!.unsubmitted[videoID]?.titles?.find(t => t.selected);
+    const unsubmitted = Config.local?.unsubmitted?.[videoID]?.titles?.find(t => t.selected);
     if (unsubmitted) {
         return {
             ...unsubmitted,
