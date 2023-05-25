@@ -1,0 +1,143 @@
+import { waitForElement } from "@ajayyy/maze-utils/lib/dom";
+import { logError } from "../utils/logger";
+import { BrandingLocation, getLinkElement, replaceVideoCardBranding } from "./videoBranding";
+
+enum CheckType {
+    Target,
+    AddedNodes
+}
+
+let autoplayObserver: MutationObserver | null = null;
+let autoplayObserverElement: HTMLElement | null = null;
+
+let endRecommendationsObserver: MutationObserver | null = null;
+let endRecommendationsObserverElement: HTMLElement | null = null;
+
+let waiting = false;
+let mutationObserver: MutationObserver | null = null;
+let observerElement: HTMLElement | null = null;
+export async function replaceVideoPlayerSuggestionsBranding(): Promise<void> {
+    if (waiting) return;
+    waiting = true;
+
+    const refNode = await waitForElement("#movie_player", true);
+
+    if (!mutationObserver || observerElement !== refNode) {
+        if (mutationObserver) mutationObserver.disconnect();
+
+        observerElement = refNode as HTMLElement;
+        mutationObserver = new MutationObserver((mutations) => {
+            // Endcards
+            observe(mutations,
+                ".ytp-ce-element", BrandingLocation.Endcards, CheckType.AddedNodes);
+
+            // Auto play and end recommendations require deeper observers
+            // To make it more effecient, they are recreated when needed without
+            // using subtree for all of #movie_player
+            for (const mutation of mutations) {
+                if (mutation.type === "childList") {
+                    for (const node of mutation.addedNodes) {
+                        if (node instanceof HTMLElement) {
+                            if (node.matches(".ytp-autonav-endscreen-countdown-overlay")) {
+                                setupAutoplayObserver(node);
+                            } else if (node.matches(".html5-endscreen")) {
+                                setupRecommendationsObserver(node);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        mutationObserver.observe(refNode, {
+            childList: true
+        });
+    }
+
+    waiting = false;
+}
+
+export function setupAutoplayObserver(element: HTMLElement): void {
+    const refNode = element.querySelector(".ytp-autonav-endscreen-video-info") as HTMLElement;
+    if (!autoplayObserver || autoplayObserverElement !== element && refNode) {
+        if (autoplayObserver) autoplayObserver.disconnect();
+
+        autoplayObserverElement = element as HTMLElement;
+        autoplayObserver = new MutationObserver((mutations) => observe(mutations,
+            ".ytp-autonav-endscreen-upnext-title:not(.cbCustomTitle)", BrandingLocation.Autoplay,
+            CheckType.Target, ".ytp-autonav-endscreen-countdown-overlay"));
+
+        // Sometimes it is one level deep due to the div added to make the show original button work
+        autoplayObserver.observe(refNode, {
+            childList: true,
+            subtree: true 
+        });
+    }
+}
+
+export function setupRecommendationsObserver(element: HTMLElement): void {
+    const refNode = element.querySelector(".ytp-endscreen-content") as HTMLElement;
+
+    if (!endRecommendationsObserver || endRecommendationsObserverElement !== element && refNode) {
+        if (endRecommendationsObserver) endRecommendationsObserver.disconnect();
+
+        endRecommendationsObserverElement = element as HTMLElement;
+        endRecommendationsObserver = new MutationObserver((mutations) => observe(mutations,
+            ".ytp-videowall-still", BrandingLocation.EndRecommendations, CheckType.AddedNodes));
+
+        endRecommendationsObserver.observe(refNode, {
+            childList: true
+        });
+    }
+}
+
+function observe(mutations: MutationRecord[], selector: string, brandingLocation: BrandingLocation, 
+        checkType: CheckType, nodeSelectorToUse?: string): void {
+
+    for (const mutation of mutations) {
+        if (mutation.type === "childList") {
+            if (checkType === CheckType.Target) {
+                const target = mutation.target as HTMLElement;
+                if (target?.matches(selector)) {
+                    setupVideoBrandReplacement(nodeSelectorToUse 
+                        ? target.closest(nodeSelectorToUse) as HTMLElement : target, brandingLocation);
+                }
+            } else if (checkType === CheckType.AddedNodes) {
+                for (const node of mutation.addedNodes) {
+                    if (node instanceof HTMLElement) {
+                        if (node.matches(selector)) {
+                            setupVideoBrandReplacement(nodeSelectorToUse 
+                                ? node.closest(nodeSelectorToUse) as HTMLElement : node, brandingLocation);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+const handledElements = new Set<HTMLElement>();
+function setupVideoBrandReplacement(element: HTMLElement, brandingLocation: BrandingLocation): void {
+    replaceVideoCardBranding(element, brandingLocation).catch(logError);
+
+    if (brandingLocation === BrandingLocation.EndRecommendations) {
+        if (element && !handledElements.has(element)) {
+            handledElements.add(element);
+            const observer = new MutationObserver((mutations) => {
+                for (const mutation of mutations) {
+                    if (mutation.type === "attributes" && mutation.attributeName === "href") {
+                        replaceVideoCardBranding(element, brandingLocation).catch(logError);
+                        break;
+                    }
+                }
+            });
+
+            const link = getLinkElement(element, brandingLocation);
+            if (link) {
+                observer.observe(link, {
+                    attributes: true
+                });
+            }
+        }
+    }
+}

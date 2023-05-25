@@ -182,54 +182,57 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
     activeThumbnailCacheRequests[videoID] ??= {
         shouldRerequest: false
     };
-    const request = await sendRequestToThumbnailCache(videoID, time, title, generateNow);
+    try {
+        const request = await sendRequestToThumbnailCache(videoID, time, title, generateNow);
 
-    if (request.status === 200) {
-        try {
-            const timestamp = parseFloat(request.headers.get("x-timestamp") as string);
-            const title = request.headers.get("x-title");
-            if (isNaN(timestamp)) {
-                logError(`Getting video branding from cache server for ${videoID} failed: Timestamp is NaN`);
-                return null;
-            }
-
-            if (activeThumbnailCacheRequests[videoID].shouldRerequest 
-                    && activeThumbnailCacheRequests[videoID].time !== timestamp
-                    && !reRequesting) {
-                // Stop and refetch with the proper timestamp
-                return handleThumbnailCacheRefetch(videoID, time);
-            }
-
-            await setupPreRenderedThumbnail(videoID, timestamp, await request.blob());
-
-            delete activeThumbnailCacheRequests[videoID];
-            return {
-                [videoID]: {
-                    titles: title ? [{
-                        votes: 0,
-                        locked: false,
-                        UUID: generateUserID() as BrandingUUID,
-                        original: false,
-                        title: title
-                    }] : [],
-                    thumbnails: [{
-                        votes: 0,
-                        locked: false,
-                        UUID: generateUserID() as BrandingUUID,
-                        original: false,
-                        timestamp
-                    }]
+        if (request.status === 200) {
+            try {
+                const timestamp = parseFloat(request.headers.get("x-timestamp") as string);
+                const title = request.headers.get("x-title");
+                if (isNaN(timestamp)) {
+                    logError(`Getting video branding from cache server for ${videoID} failed: Timestamp is NaN`);
+                    return null;
                 }
-            };
-        } catch (e) {
-            logError(`Getting video branding for ${videoID} failed: ${e}`);
-        }
-    } else if (activeThumbnailCacheRequests[videoID].shouldRerequest && !reRequesting) {
-        return handleThumbnailCacheRefetch(videoID, time);
-    } else {
-        delete activeThumbnailCacheRequests[videoID];
-    }
 
+                if (activeThumbnailCacheRequests[videoID].shouldRerequest 
+                        && activeThumbnailCacheRequests[videoID].time !== timestamp
+                        && !reRequesting) {
+                    // Stop and refetch with the proper timestamp
+                    return handleThumbnailCacheRefetch(videoID, time);
+                }
+
+                await setupPreRenderedThumbnail(videoID, timestamp, await request.blob());
+
+                delete activeThumbnailCacheRequests[videoID];
+                return {
+                    [videoID]: {
+                        titles: title ? [{
+                            votes: 0,
+                            locked: false,
+                            UUID: generateUserID() as BrandingUUID,
+                            original: false,
+                            title: title
+                        }] : [],
+                        thumbnails: [{
+                            votes: 0,
+                            locked: false,
+                            UUID: generateUserID() as BrandingUUID,
+                            original: false,
+                            timestamp
+                        }]
+                    }
+                };
+            } catch (e) {
+                logError(`Getting video branding for ${videoID} failed: ${e}`);
+            }
+        } else if (activeThumbnailCacheRequests[videoID].shouldRerequest && !reRequesting) {
+            return handleThumbnailCacheRefetch(videoID, time);
+        }
+    } catch (e) {
+        logError(`Error getting thumbnail cache data for ${e}`);
+    }
+    
+    delete activeThumbnailCacheRequests[videoID];
     return null;
 }
 
@@ -246,6 +249,10 @@ function handleThumbnailCacheRefetch(videoID: VideoID, time?: number): Promise<R
 
 export function queueThumbnailCacheRequest(videoID: VideoID, time?: number, title?: string, generateNow?: boolean): void {
     if (activeThumbnailCacheRequests[videoID]) {
+        if (activeThumbnailCacheRequests[videoID].time !== time 
+            || activeThumbnailCacheRequests[videoID].generateNow !== generateNow) {
+                activeThumbnailCacheRequests[videoID].shouldRerequest = true;
+        }
         activeThumbnailCacheRequests[videoID].time = time;
         activeThumbnailCacheRequests[videoID].generateNow ||= generateNow ?? false;
         return;
@@ -280,7 +287,7 @@ export function sendRequestToThumbnailCache(videoID: string, time?: number, titl
         generateNow
     };
 
-    if (time) {
+    if (time != null) {
         data["time"] = time;
     }
 

@@ -32,9 +32,21 @@ export function addCssToPage() {
 }
 
 function buildHideThumbnailCss(): string {
-    const result: string[] = [];
+    const result: string[] = [
+        ".ytp-ce-covering-image:not(.cb-visible)", // Endcards
+        "div.ytp-autonav-endscreen-upnext-thumbnail:not(.cb-visible)", // Autoplay
+        "div.ytp-videowall-still-image:not(.cb-visible)" // End recommendations
+    ];
+
     for (const start of brandingBoxSelector.split(", ")) {
-        result.push(`${start} ytd-thumbnail img:not(.cb-visible)`);
+        const thumbnailTypes = [
+            "ytd-thumbnail",
+            "ytd-playlist-video-thumbnail-renderer"
+        ];
+
+        for (const thumbnailType of thumbnailTypes) {
+            result.push(`${start} ${thumbnailType} img:not(.cb-visible)`);
+        }
     }
 
     return `${result.join(", ")} { visibility: hidden !important; }\n`;

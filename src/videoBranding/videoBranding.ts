@@ -4,7 +4,7 @@ import { isVisible, waitForElement } from "@ajayyy/maze-utils/lib/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
-import { findOrCreateShowOriginalButton, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
+import { findOrCreateShowOriginalButton, getOrCreateTitleElement, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
 import { setThumbnailListener } from "@ajayyy/maze-utils/lib/thumbnailManagement";
 import Config from "../config";
 import { logError } from "../utils/logger";
@@ -18,7 +18,10 @@ export interface BrandingResult {
 
 export enum BrandingLocation {
     Related,
-    Watch
+    Watch,
+    Endcards,
+    Autoplay,
+    EndRecommendations
 }
 
 export interface VideoBrandingInstance {
@@ -26,7 +29,7 @@ export interface VideoBrandingInstance {
     updateBrandingCallbacks: Array<() => Promise<void>>;
 }
 
-export const brandingBoxSelector = "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer";
+export const brandingBoxSelector = "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer, ytd-compact-playlist-renderer";
 
 const videoBrandingInstances: Record<VideoID, VideoBrandingInstance> = {}
 
@@ -54,22 +57,37 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
 }
 
 export async function replaceVideoCardsBranding(elements: HTMLElement[]): Promise<[boolean, boolean][]> {
-    return await Promise.all(elements.map((e) => replaceVideoCardBranding(e)));
+    return await Promise.all(elements.map((e) => replaceVideoCardBranding(e, BrandingLocation.Related)));
 }
 
-export async function replaceVideoCardBranding(element: HTMLElement, tries = 0): Promise<[boolean, boolean]> {
-    const link = element.querySelector("a#thumbnail") as HTMLAnchorElement;
+export async function replaceVideoCardBranding(element: HTMLElement, brandingLocation: BrandingLocation,
+        verifyVideoID?: VideoID, tries = 0): Promise<[boolean, boolean]> {
+    const link = getLinkElement(element, brandingLocation);
 
     if (link) {
         const videoID = extractVideoID(link);
+        const isPlaylistVideo = isPlaylist(link);
+
+        if (verifyVideoID && videoID !== verifyVideoID) {
+            // Don't need this branding update anymore, it was trying to update for a different video
+            return [false, false];
+        }
 
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
-            async () => void await replaceVideoCardBranding(element));
-        const brandingLocation = BrandingLocation.Related;
+            async () => void await replaceVideoCardBranding(element, brandingLocation, videoID));
         const showCustomBranding = videoBrandingInstance.showCustomBranding;
 
-        const promises = [replaceThumbnail(element, videoID, showCustomBranding),
-            replaceTitle(element, videoID, showCustomBranding, brandingLocation, false)] as [Promise<boolean>, Promise<boolean>];
+        const videoPromise = replaceThumbnail(element, videoID, brandingLocation, showCustomBranding);
+        const titlePromise = !isPlaylistVideo 
+            ? replaceTitle(element, videoID, showCustomBranding, brandingLocation, false) 
+            : Promise.resolve(false);
+
+        if (isPlaylistVideo) {
+            // Still create title element to make sure show original button will be in the right place
+            getOrCreateTitleElement(element, brandingLocation);
+        }
+
+        const promises = [videoPromise, titlePromise] as [Promise<boolean>, Promise<boolean>];
 
         void handleShowOriginalButton(element, videoID, brandingLocation, showCustomBranding, promises);
 
@@ -77,7 +95,7 @@ export async function replaceVideoCardBranding(element: HTMLElement, tries = 0):
 
         if (videoID !== extractVideoID(link) && extractVideoID(link) && tries < 2) {
             // Video ID changed, so try again
-            return replaceVideoCardBranding(element, tries++);
+            return replaceVideoCardBranding(element, brandingLocation, verifyVideoID, tries++);
         }
 
         return result;
@@ -86,8 +104,27 @@ export async function replaceVideoCardBranding(element: HTMLElement, tries = 0):
     return [false, false];
 }
 
+export function getLinkElement(element: HTMLElement, brandingLocation: BrandingLocation): HTMLAnchorElement {
+    switch (brandingLocation) {
+        case BrandingLocation.Related:
+            return element.querySelector("a#thumbnail") as HTMLAnchorElement;
+        case BrandingLocation.Endcards:
+            return element.querySelector("a.ytp-ce-covering-overlay") as HTMLAnchorElement;
+        case BrandingLocation.Autoplay:
+            return element.querySelector("a.ytp-autonav-endscreen-link-container") as HTMLAnchorElement;
+        case BrandingLocation.EndRecommendations:
+            return element as HTMLAnchorElement;
+        default:
+            throw new Error("Invalid branding location");
+    }
+}
+
 function extractVideoID(link: HTMLAnchorElement) {
-    return link.href?.match(/(?<=\?v=).{11}|(?<=\/shorts\/).{11}/)?.[0] as VideoID;
+    return link.href?.match(/(?<=(?:\?|&)v=).{11}|(?<=\/shorts\/).{11}/)?.[0] as VideoID;
+}
+
+function isPlaylist(link: HTMLAnchorElement) {
+    return link.href?.match(/list=/)?.[0] !== undefined;
 }
 
 export async function handleShowOriginalButton(element: HTMLElement, videoID: VideoID,
@@ -144,9 +181,7 @@ export async function updateBrandingForVideo(videoID: VideoID): Promise<void> {
         // They will be added back to the array
         videoBrandingInstances[videoID].updateBrandingCallbacks = [];
     
-        for (const updateBranding of updateBrandingCallbacks) {
-            await updateBranding();
-        }
+        await Promise.all(updateBrandingCallbacks.map((updateBranding) => updateBranding()));
     }
 }
 

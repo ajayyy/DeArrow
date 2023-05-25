@@ -3,6 +3,8 @@ import { getFromCache, RenderedThumbnailVideo, setupCache, ThumbnailVideo } from
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import { getVideoThumbnailIncludingUnsubmitted, queueThumbnailCacheRequest } from "../dataFetching";
 import { log, logError } from "../utils/logger";
+import { BrandingLocation } from "../videoBranding/videoBranding";
+import { waitFor } from "@ajayyy/maze-utils";
 
 const thumbnailRendererControls: Record<VideoID, Array<(error?: string) => void>> = {};
 
@@ -273,19 +275,70 @@ function createVideo(existingVideo: HTMLVideoElement | null, url: string, timest
     return video;
 }
 
-export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, timestamp?: number): Promise<boolean> {
-    const image = element.querySelector("ytd-thumbnail img") as HTMLImageElement;
-    const box = element.querySelector("ytd-thumbnail") as HTMLDivElement;
+function getThumbnailSelector(brandingLocation: BrandingLocation): string {
+    switch (brandingLocation) {
+        case BrandingLocation.Related:
+            return "ytd-thumbnail img, ytd-playlist-video-thumbnail-renderer img";
+        case BrandingLocation.Endcards:
+            return ".ytp-ce-covering-image";
+        case BrandingLocation.Autoplay:
+            return "div.ytp-autonav-endscreen-upnext-thumbnail";
+        case BrandingLocation.EndRecommendations:
+            return "div.ytp-videowall-still-image";
+        default:
+            throw new Error("Invalid branding location");
+    }
+}
+
+function getThumbnailBox(image: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
+    switch (brandingLocation) {
+        case BrandingLocation.Related:
+            return image.closest("ytd-thumbnail, ytd-playlist-video-thumbnail-renderer") as HTMLElement;
+        case BrandingLocation.Autoplay:
+            return image;
+        default:
+            return image.parentElement!;
+    }
+}
+
+export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation,
+        showCustomBranding: boolean, timestamp?: number): Promise<boolean> {
+    const image = element.querySelector(getThumbnailSelector(brandingLocation)) as HTMLImageElement;
+    const box = getThumbnailBox(image, brandingLocation);
 
     if (!showCustomBranding) {
         image.classList.add("cb-visible");
         image.style.removeProperty("display");
-        return false;
+
+        if (brandingLocation === BrandingLocation.Autoplay) {
+            hideCanvas(image)
+        }
+        
+        // Still check if the thumbnail is supposed to be changed or not
+        const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, false);
+        return !!thumbnail && !thumbnail.original;
     }
 
     if (image && box) {
-        const width = box.offsetWidth * window.devicePixelRatio;
-        const height = box.offsetHeight * window.devicePixelRatio;
+        let objectWidth = box.offsetWidth;
+        let objectHeight = box.offsetHeight;
+        if (objectWidth === 0) {
+            const style = window.getComputedStyle(box);
+            objectWidth = parseInt(style.getPropertyValue("width").replace("px", ""), 10);
+            objectHeight = parseInt(style.getPropertyValue("height").replace("px", ""), 10);
+
+            if (objectWidth === 0) {
+                try {
+                    await waitFor(() => box.offsetWidth > 0);
+                } catch (e) {
+                    // No need to render this thumbnail since it is hidden
+                    return false;
+                }
+            }
+        }
+
+        const width = objectWidth * window.devicePixelRatio;
+        const height = objectHeight * window.devicePixelRatio;
 
         // TODO: Add option not to hide all thumbnails by default
         image.style.display = "none";
@@ -296,6 +349,10 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
             if (!thumbnail || thumbnail.original) {
                 image.classList.add("cb-visible");
                 image.style.removeProperty("display");
+
+                if (brandingLocation === BrandingLocation.Autoplay) {
+                    hideCanvas(image)
+                }
             }
         }).catch(logError);
 
@@ -309,6 +366,10 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
             if (!thumbnail) {
                 image.classList.add("cb-visible");
                 image.style.removeProperty("display");
+
+                if (brandingLocation === BrandingLocation.Autoplay) {
+                    hideCanvas(image)
+                }
                 return false;
             }
 
@@ -317,8 +378,24 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
             thumbnail.classList.add("style-scope");
             thumbnail.classList.add("ytd-img-shadow");
             thumbnail.classList.add("cbCustomThumbnailCanvas");
+            thumbnail.style.removeProperty("display");
+
+            if (brandingLocation === BrandingLocation.EndRecommendations) {
+                thumbnail.classList.add("ytp-videowall-still-image");
+            } else if (brandingLocation === BrandingLocation.Autoplay) {
+                thumbnail.classList.add("ytp-autonav-endscreen-upnext-thumbnail");
+            }
+
             thumbnail.style.height = "100%";
-            image.parentElement?.appendChild(thumbnail);
+            if (brandingLocation === BrandingLocation.Autoplay) {
+                // For autoplay, the thumbnail is placed inside the image div, which has the image as the background image
+                // This is because hiding the entire div would hide the video duration
+                image.prepend(thumbnail);
+                image.style.removeProperty("display");
+                image.classList.add("cb-visible");
+            } else {
+                image.parentElement?.appendChild?.(thumbnail);
+            }
         } catch (e) {
             logError(e);
 
@@ -331,8 +408,14 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, s
     return !!image;
 }
 
+function hideCanvas(image: HTMLElement) {
+    const canvas = image.parentElement?.querySelector(".cbCustomThumbnailCanvas") as HTMLCanvasElement | null;
+    if (canvas) {
+        canvas.style.display = "none";
+    }
+}
+
 export async function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, blob: Blob) {
-    
     const imageBitmap = await createImageBitmap(blob);
     const canvas = document.createElement("canvas");
     canvas.width = imageBitmap.width;

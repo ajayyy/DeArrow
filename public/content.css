@@ -3,7 +3,7 @@
     --cb-thumbnail-padding: 0.3em;
 }
 
-canvas.ytd-img-shadow {
+canvas.ytd-img-shadow:not(.ytp-autonav-endscreen-upnext-thumbnail, .ytp-videowall-still-image) {
     display: block;
     margin-left: var(--yt-img-margin-left, auto);
     margin-right: var(--yt-img-margin-right, auto);
@@ -33,6 +33,24 @@ canvas.ytd-img-shadow {
 
 .cbThumbnail.cbThumbnailSelected {
     border-color: white;
+}
+
+/* Playlist titles should not be hidden */
+ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.cbCustomTitle) {
+    display: inherit !important;
+}
+
+/* For end recommendations */
+.cbCustomThumbnailCanvas.ytp-videowall-still-image {
+    z-index: -1;
+}
+
+/* For autoplay */
+.ytp-autonav-endscreen-upnext-thumbnail .cbCustomThumbnailCanvas,
+.ytp-ce-element .cbCustomThumbnailCanvas {
+    width: 100% !important;
+    border: none;
+    background-color: black;
 }
 
 .cbAddThumbnailOverlay {
@@ -203,6 +221,11 @@ canvas.ytd-img-shadow {
     z-index: 100000;
 }
 
+/* Endcards need a little margin instead of 0 */
+.ytp-ce-covering-overlay .cbShowOriginal {
+    margin-right: 10px;
+}
+
 .cbShowOriginal img {
     transition: filter 0.3s;
 }
@@ -219,12 +242,19 @@ canvas.ytd-img-shadow {
     display: inline !important;
 }
 
-*:hover > * > * > .cbShowOriginal {
+/* General case, endcards */
+*:hover > *:not(.ytp-ce-element) > * > .cbShowOriginal, .ytp-ce-element:hover > * > .cbShowOriginal {
     display: inline !important;
 }
 
 .cbShowOriginal img.cbShowOriginalImage, .cbSubmitButton .cbSubmitButtonImage {
     height: 20px;
+}
+
+/* For autoplay */
+.ytp-autonav-endscreen-video-info .cbShowOriginal img.cbShowOriginalImage,
+.ytp-autonav-endscreen-video-info .cbSubmitButton .cbSubmitButtonImage {
+    height: 18px;
 }
 
 /* For Watch Page */
