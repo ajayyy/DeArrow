@@ -43,6 +43,7 @@ interface SBConfig {
     serverAddress: string;
     thumbnailServerAddress: string;
     fetchTimeout: number;
+    renderTimeout: number;
     extensionEnabled: boolean;
 }
 
@@ -79,6 +80,7 @@ const syncDefaults = {
     serverAddress: CompileConfig.serverAddress,
     thumbnailServerAddress: CompileConfig.thumbnailServerAddress,
     fetchTimeout: 7000,
+    renderTimeout: 25000,
     extensionEnabled: true
 };
 

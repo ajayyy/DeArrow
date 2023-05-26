@@ -24,9 +24,16 @@ export type ThumbnailVideo = RenderedThumbnailVideo | ThumbnailVideoBase & {
     rendered: false;
 };
 
+export interface FailInfo {
+    timestamp: number;
+    onReady: Array<(video: RenderedThumbnailVideo | null) => void>;
+}
+
 export interface ThumbnailData {
     video: ThumbnailVideo[];
     playbackUrls: PlaybackUrl[];
+    failures: FailInfo[];
+    thumbnailCachesFailed: Set<number>;
 }
 
 interface ThumbnailDataCacheRecord extends ThumbnailData {
@@ -46,7 +53,9 @@ export function setupCache(videoID: VideoID): ThumbnailData {
         cache[videoID] = {
             video: [],
             playbackUrls: [],
-            lastUsed: Date.now()
+            lastUsed: Date.now(),
+            failures: [],
+            thumbnailCachesFailed: new Set()
         };
 
         if (Object.keys(cache).length > cacheLimit) {

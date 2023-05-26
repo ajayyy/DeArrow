@@ -23,7 +23,7 @@ export type OriginalThumbnailResult = PartialThumbnailResult & OriginalThumbnail
 export type ThumbnailResult = CustomThumbnailResult | OriginalThumbnailResult;
 export type ThumbnailSubmission = CustomThumbnailSubmission | OriginalThumbnailSubmission;
 
-interface Format {
+export interface Format {
     url: string;
     width: number;
     height: number;

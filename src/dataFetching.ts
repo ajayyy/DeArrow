@@ -10,6 +10,7 @@ import { generateUserID } from "@ajayyy/maze-utils/lib/setup";
 import { BrandingUUID } from "./videoBranding/videoBranding";
 import { timeoutPomise } from "@ajayyy/maze-utils";
 import { isCachedThumbnailLoaded, setupPreRenderedThumbnail } from "./thumbnails/thumbnailRenderer";
+import { setupCache } from "./thumbnails/thumbnailDataCache";
 
 interface VideoBrandingCacheRecord extends BrandingResult {
     lastUsed: number;
@@ -178,8 +179,8 @@ async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Re
     return results;
 }
 
-async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, title?: string, generateNow?: boolean, reRequesting = false): Promise<Record<VideoID, BrandingResult> | null> {
-    activeThumbnailCacheRequests[videoID] ??= {
+async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, title?: string, generateNow?: boolean, tries = 0): Promise<Record<VideoID, BrandingResult> | null> {
+    activeThumbnailCacheRequests[videoID] = {
         shouldRerequest: false
     };
     try {
@@ -196,9 +197,9 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
 
                 if (activeThumbnailCacheRequests[videoID].shouldRerequest 
                         && activeThumbnailCacheRequests[videoID].time !== timestamp
-                        && !reRequesting) {
+                        && tries < 2) {
                     // Stop and refetch with the proper timestamp
-                    return handleThumbnailCacheRefetch(videoID, time);
+                    return handleThumbnailCacheRefetch(videoID, time, generateNow, tries + 1);
                 }
 
                 await setupPreRenderedThumbnail(videoID, timestamp, await request.blob());
@@ -225,23 +226,44 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
             } catch (e) {
                 logError(`Getting video branding for ${videoID} failed: ${e}`);
             }
-        } else if (activeThumbnailCacheRequests[videoID].shouldRerequest && !reRequesting) {
-            return handleThumbnailCacheRefetch(videoID, time);
+        } else if (activeThumbnailCacheRequests[videoID].shouldRerequest && tries < 2) {
+            const nextTry = await handleThumbnailCacheRefetch(videoID, time, generateNow, tries + 1);
+            if (nextTry) {
+                return nextTry;
+            }
         }
     } catch (e) {
         logError(`Error getting thumbnail cache data for ${e}`);
+    }
+
+    if (time !== undefined && generateNow === true) {
+        const videoCache = setupCache(videoID);
+        videoCache.thumbnailCachesFailed.add(time);
+
+        // If the thumbs already failured rendering, send nulls
+        // Would be blank otherwise
+        for (const failure of videoCache.failures) {
+            if (failure.timestamp === time) {
+                for (const callback of failure.onReady) {
+                    callback(null);
+                }
+            }
+        }
+
+        videoCache.failures = videoCache.failures.filter((failure) => failure.timestamp !== time);
     }
     
     delete activeThumbnailCacheRequests[videoID];
     return null;
 }
 
-function handleThumbnailCacheRefetch(videoID: VideoID, time?: number): Promise<Record<VideoID, BrandingResult> | null> {
+function handleThumbnailCacheRefetch(videoID: VideoID, time: number | undefined,
+        generateNow: boolean | undefined, tries: number): Promise<Record<VideoID, BrandingResult> | null> {
     const data = activeThumbnailCacheRequests[videoID];
     delete activeThumbnailCacheRequests[videoID];
 
-    if (data.time !== time) {
-        return fetchBrandingFromThumbnailCache(videoID, data.time, cache[videoID]?.titles?.[0]?.title, data.shouldRerequest, true);
+    if (data.time !== time || data.generateNow !== generateNow) {
+        return fetchBrandingFromThumbnailCache(videoID, data.time, cache[videoID]?.titles?.[0]?.title, data.generateNow, tries);
     }
 
     return Promise.resolve(null);
