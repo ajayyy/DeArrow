@@ -61,7 +61,7 @@ export const PopupComponent = () => {
                     <span className="switchBg blue"></span>
                     <span className="switchDot"></span>
                 </span>
-                <span id="disableSkipping" className={extensionEnabled ? " hidden" : ""}>{chrome.i18n.getMessage("Disable")}</span>
+                <span id="disableSkipping" className={extensionEnabled ? " hidden" : ""}>{chrome.i18n.getMessage("disable")}</span>
                 <span id="enableSkipping" className={!extensionEnabled ? " hidden" : ""}>{chrome.i18n.getMessage("Enable")}</span>
                 </label>
                 <button id="optionsButton" 
