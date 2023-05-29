@@ -117,7 +117,8 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): 
                 // Fetch for a cached thumbnail if it is either not loaded yet, or has an out of date title
                 if (thumbnail && !thumbnail.original 
                         && (!isCachedThumbnailLoaded(videoID, thumbnail.timestamp) || (title?.title && oldResults?.titles?.length <= 0))) {
-                    queueThumbnailCacheRequest(videoID, thumbnail.timestamp, title?.title, true);
+                    // Only an official time for default server address
+                    queueThumbnailCacheRequest(videoID, thumbnail.timestamp, title?.title, Config.config?.serverAddress === Config.syncDefaults.serverAddress);
                 }
             }
         }).catch(logError);
