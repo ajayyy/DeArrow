@@ -19,6 +19,7 @@ interface VideoBrandingCacheRecord extends BrandingResult {
 interface ActiveThumbnailCacheRequestInfo {
     shouldRerequest: boolean;
     time?: number;
+    officialImage?: boolean;
     generateNow?: boolean;
 }
 
@@ -116,7 +117,7 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): 
                 // Fetch for a cached thumbnail if it is either not loaded yet, or has an out of date title
                 if (thumbnail && !thumbnail.original 
                         && (!isCachedThumbnailLoaded(videoID, thumbnail.timestamp) || (title?.title && oldResults?.titles?.length <= 0))) {
-                    queueThumbnailCacheRequest(videoID, thumbnail.timestamp, title?.title);
+                    queueThumbnailCacheRequest(videoID, thumbnail.timestamp, title?.title, true);
                 }
             }
         }).catch(logError);
@@ -149,7 +150,7 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): 
 
 async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Record<VideoID, BrandingResult> | null> {
     let results: Record<VideoID, BrandingResult> | null = null;
-    
+
     if (queryByHash) {
         const request = await sendRequestToServer("GET", `/api/branding/${(await getHash(videoID, 1)).slice(0, 4)}`);
 
@@ -179,12 +180,12 @@ async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Re
     return results;
 }
 
-async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, title?: string, generateNow?: boolean, tries = 0): Promise<Record<VideoID, BrandingResult> | null> {
+async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, title?: string, officialImage?: boolean, generateNow?: boolean, tries = 0): Promise<Record<VideoID, BrandingResult> | null> {
     activeThumbnailCacheRequests[videoID] = {
         shouldRerequest: false
     };
     try {
-        const request = await sendRequestToThumbnailCache(videoID, time, title, generateNow);
+        const request = await sendRequestToThumbnailCache(videoID, time, title, officialImage, generateNow);
 
         if (request.status === 200) {
             try {
@@ -263,24 +264,31 @@ function handleThumbnailCacheRefetch(videoID: VideoID, time: number | undefined,
     delete activeThumbnailCacheRequests[videoID];
 
     if (data.time !== time || data.generateNow !== generateNow) {
-        return fetchBrandingFromThumbnailCache(videoID, data.time, cache[videoID]?.titles?.[0]?.title, data.generateNow, tries);
+        return fetchBrandingFromThumbnailCache(videoID, data.time, cache[videoID]?.titles?.[0]?.title, data.officialImage, data.generateNow, tries);
     }
 
     return Promise.resolve(null);
 }
 
-export function queueThumbnailCacheRequest(videoID: VideoID, time?: number, title?: string, generateNow?: boolean): void {
+export function queueThumbnailCacheRequest(videoID: VideoID, time?: number, title?: string,
+        officialTime?: boolean, generateNow?: boolean): void {
     if (activeThumbnailCacheRequests[videoID]) {
         if (activeThumbnailCacheRequests[videoID].time !== time 
             || activeThumbnailCacheRequests[videoID].generateNow !== generateNow) {
                 activeThumbnailCacheRequests[videoID].shouldRerequest = true;
         }
+        if (activeThumbnailCacheRequests[videoID].time === time) {
+            // If official time, and time is the same, still keep that it is the official time
+            officialTime ||= activeThumbnailCacheRequests[videoID].officialImage
+        }
+
         activeThumbnailCacheRequests[videoID].time = time;
         activeThumbnailCacheRequests[videoID].generateNow ||= generateNow ?? false;
+        activeThumbnailCacheRequests[videoID].officialImage = officialTime ?? false;
         return;
     }
 
-    fetchBrandingFromThumbnailCache(videoID, time, title, generateNow).catch(logError);
+    fetchBrandingFromThumbnailCache(videoID, time, title, officialTime, generateNow).catch(logError);
 }
 
 export function clearCache(videoID: VideoID) {
@@ -303,9 +311,11 @@ export function sendRequestToServer(type: string, url: string, data = {}): Promi
     return sendRequestToCustomServer(type, Config.config!.serverAddress + url, data);
 }
 
-export function sendRequestToThumbnailCache(videoID: string, time?: number, title?: string, generateNow = false): Promise<Response> {
+export function sendRequestToThumbnailCache(videoID: string, time?: number, title?: string,
+        officialTime = false, generateNow = false): Promise<Response> {
     const data = {
         videoID,
+        officialTime,
         generateNow
     };
 
