@@ -9,9 +9,9 @@ import { formatTitle } from "./titleFormatter";
 let lastWatchTitle = "";
 let lastWatchVideoID: VideoID | null = null;
 
-export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, brandingLocation: BrandingLocation, queryByHash: boolean): Promise<boolean> {
+export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, brandingLocation: BrandingLocation): Promise<boolean> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
-    const titleElement = element.querySelector(".cbCustomTitle") as HTMLElement ?? createTitleElement(originalTitleElement, brandingLocation);
+    const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
 
     if (brandingLocation === BrandingLocation.Watch) {
         if (lastWatchVideoID && originalTitleElement?.textContent 
@@ -28,25 +28,8 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     titleElement.style.display = "none";
     originalTitleElement.style.display = "none";
 
-    if (brandingLocation !== BrandingLocation.Watch) {
-        const smallBrandingBox = !!titleElement.closest("ytd-grid-video-renderer");
-
-        // To be able to show the show original button in the right place
-        titleElement.parentElement!.style.display = "flex";
-        titleElement.parentElement!.style.alignItems = "center";
-        if (smallBrandingBox) titleElement.parentElement!.style.alignItems = "flex-start";
-        titleElement.parentElement!.style.justifyContent = "space-between";
-        titleElement.parentElement!.style.width = "100%";
-
-        // For channel pages to make sure the show original button can be on the right
-        const metaElement = element.querySelector("#meta") as HTMLElement;
-        if (metaElement && !smallBrandingBox) {
-            metaElement.style.width = "100%";
-        }
-    }
-
     try {
-        const titleData = await getVideoTitleIncludingUnsubmitted(videoID, queryByHash)
+        const titleData = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation)
         const title = titleData?.title;
         if (title) {
             const formattedTitle = formatTitle(title, !titleData.original)
@@ -64,7 +47,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
             titleElement.innerText = modifiedTitle;
             titleElement.title = modifiedTitle;
         } else {
-            originalTitleElement.style.removeProperty("display");
+            originalTitleElement.style.setProperty("display", "inherit", "important");
         }
 
         if (originalTitleElement.parentElement?.title) {
@@ -80,7 +63,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         return true;
     } catch (e) {
         logError(e);
-        originalTitleElement.style.removeProperty("display");
+        originalTitleElement.style.setProperty("display", "inherit", "important");
 
         return false;
     }
@@ -88,7 +71,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
 
 function showOriginalTitle(titleElement: HTMLElement, originalTitleElement: HTMLElement) {
     titleElement.style.display = "none";
-    originalTitleElement.style.removeProperty("display");
+    originalTitleElement.style.setProperty("display", "inherit", "important");
 }
 
 export function getOriginalTitleElement(element: HTMLElement, brandingLocation: BrandingLocation) {
@@ -101,17 +84,74 @@ function getTitleSelector(brandingLocation: BrandingLocation): string {
             return "yt-formatted-string";
         case BrandingLocation.Related:
             return "#video-title";
+        case BrandingLocation.Endcards:
+            return ".ytp-ce-video-title, .ytp-ce-playlist-title";
+        case BrandingLocation.Autoplay:
+            return ".ytp-autonav-endscreen-upnext-title";
+        case BrandingLocation.EndRecommendations:
+            return ".ytp-videowall-still-info-title";
         default:
             throw new Error("Invalid branding location");
     }
 }
 
-function createTitleElement(originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
-    const titleElement = brandingLocation === BrandingLocation.Related ? originalTitleElement.cloneNode() as HTMLElement 
+export function getOrCreateTitleElement(element: HTMLElement, brandingLocation: BrandingLocation, originalTitleElement?: HTMLElement): HTMLElement {
+    return element.querySelector(".cbCustomTitle") as HTMLElement ?? 
+        createTitleElement(element, originalTitleElement ?? getOriginalTitleElement(element, brandingLocation), brandingLocation);
+}
+
+function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
+    const titleElement = brandingLocation !== BrandingLocation.Watch ? originalTitleElement.cloneNode() as HTMLElement 
         : document.createElement("div");
     titleElement.classList.add("cbCustomTitle");
 
-    originalTitleElement.parentElement?.appendChild(titleElement);
+    if (brandingLocation === BrandingLocation.EndRecommendations
+            || brandingLocation === BrandingLocation.Autoplay) {
+        const container = document.createElement("div");
+        container.appendChild(titleElement);
+        originalTitleElement.parentElement?.prepend(container);
+
+        // Move original title element over to this element
+        container.prepend(originalTitleElement);
+    } else {
+        originalTitleElement.parentElement?.appendChild(titleElement);
+    }
+
+    if (brandingLocation !== BrandingLocation.Watch) {
+        const smallBrandingBox = !!titleElement.closest("ytd-grid-video-renderer");
+
+        // To be able to show the show original button in the right place
+        titleElement.parentElement!.style.display = "flex";
+        titleElement.parentElement!.style.alignItems = "center";
+        if (smallBrandingBox) titleElement.parentElement!.style.alignItems = "flex-start";
+        titleElement.parentElement!.style.justifyContent = "space-between";
+        titleElement.parentElement!.style.width = "100%";
+
+        if (brandingLocation === BrandingLocation.Related) {
+            // Move badges out of centered div
+            const badges = titleElement.parentElement!.querySelectorAll("ytd-badge-supported-renderer");
+            for (const badge of badges) {
+                badge.parentElement!.parentElement!.prepend(badge);
+            }
+        }
+
+        if (brandingLocation === BrandingLocation.Endcards) {
+            titleElement.parentElement!.style.height = "auto";
+
+            // Move duration out of centered div
+            const durationElement = titleElement.parentElement!.querySelector(".ytp-ce-video-duration");
+            if (durationElement) {
+                titleElement.parentElement!.parentElement!.appendChild(durationElement);
+            }
+        }
+
+        // For channel pages to make sure the show original button can be on the right
+        const metaElement = element.querySelector("#meta") as HTMLElement;
+        if (metaElement && !smallBrandingBox) {
+            metaElement.style.width = "100%";
+        }
+    }
+
     return titleElement;
 }
 
@@ -159,6 +199,7 @@ export async function findOrCreateShowOriginalButton(element: HTMLElement, brand
 async function createShowOriginalButton(originalTitleElement: HTMLElement,
         brandingLocation: BrandingLocation): Promise<HTMLElement> {
     const buttonElement = document.createElement("button");
+    buttonElement.title = chrome.i18n.getMessage("ShowOriginal");
     buttonElement.classList.add("cbShowOriginal");
 
     buttonElement.classList.add("cbButton");

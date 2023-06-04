@@ -32,6 +32,7 @@
     "permissions": [
         "storage",
         "https://sponsor.ajay.app/*",
+        "https://dearrow-thumb.ajay.app/*",
         "unlimitedStorage"
     ],
     "optional_permissions": [

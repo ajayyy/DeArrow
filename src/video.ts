@@ -3,11 +3,12 @@ import { logError } from "./utils/logger";
 import { ChannelIDInfo, checkIfNewVideoID, setupVideoModule, VideoID } from "@ajayyy/maze-utils/lib/video"
 import Config from "./config";
 import { SubmitButton } from "./submission/submitButton";
-import { clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
+import { BrandingLocation, clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
 import { getVideoBranding } from "./dataFetching";
 import * as documentScript from "../dist/js/document.js";
 import { listenForBadges, listenForTitleChange } from "./utils/titleBar";
 import { getPlaybackFormats } from "./thumbnails/thumbnailData";
+import { replaceVideoPlayerSuggestionsBranding } from "./videoBranding/watchPageBrandingHandler";
 
 
 export const submitButton = new SubmitButton();
@@ -16,12 +17,13 @@ async function videoIDChange(videoID: VideoID | null): Promise<void> {
     if (!videoID) return;
 
     replaceCurrentVideoBranding().catch(logError);
+    replaceVideoPlayerSuggestionsBranding().catch(logError);
 
     try {
         // To update videoID
         submitButton.render();
 
-        const branding = await getVideoBranding(videoID, true);
+        const branding = await getVideoBranding(videoID, true, BrandingLocation.Watch);
         if (branding) {
             submitButton.setSubmissions(branding);
         }

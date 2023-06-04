@@ -1,5 +1,6 @@
 {
     "serverAddress": "https://sponsor.ajay.app",
+    "thumbnailServerAddress": "https://dearrow-thumb.ajay.app",
     "testingServerAddress": "https://sponsor.ajay.app/test",
     "debug": false,
     "extensionImportList": {

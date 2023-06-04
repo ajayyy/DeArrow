@@ -68,7 +68,7 @@ const titleChangeListeners: (() => void)[] = [];
 export async function listenForTitleChange() {
     const titleNode = await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
     if (titleNode) {
-        const originalTitleElement = getOriginalTitleElement(titleNode, BrandingLocation.Watch);
+        const originalTitleElement = await getOriginalTitleElement(titleNode, BrandingLocation.Watch);
         if (originalTitleElement) {
             titleChangeObserver?.disconnect();
 

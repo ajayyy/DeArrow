@@ -60,11 +60,11 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
         const trustCaps = !mostlyAllCaps && 
             !(isAllCaps(words[index - 1]) || isAllCaps(words[index + 1]));
 
-        if (word.toUpperCase() === "I") {
-            result += word.toUpperCase() + " ";
+        if (word.match(/^[Ii]$|^[Ii]['’][a-zA-Z]{1,3}$/)) {
+            result += capitalizeFirstLetter(word) + " ";
         } else if (forceKeepFormatting(word)
             || isAcronymStrict(word) 
-            || (!inTitleCase && trustCaps && isAcronym(word))
+            || ((!inTitleCase || !isWordCaptialCase(word)) && trustCaps && isAcronym(word))
             || (!inTitleCase && isWordCaptialCase(word)) 
             || (isCustom && isWordCustomCaptialization(word))
             || (!isAllCaps(word) && isWordCustomCaptialization(word))) {
@@ -73,7 +73,7 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
             // Trust it with capitalization
             result += word + " ";
         } else {
-            if (index === 0) {
+            if (startOfSentence(index, words)) {
                 result += capitalizeFirstLetter(word) + " ";
             } else {
                 result += word.toLowerCase() + " ";
@@ -103,7 +103,7 @@ export function toTitleCase(str: string, isCustom: boolean): string {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             result += word + " ";
-        } else if (result.length !== 0 && titleCaseNotCapitalized.includes(word.toLowerCase())) {
+        } else if (!startOfSentence(index, words) && titleCaseNotCapitalized.includes(word.toLowerCase())) {
             // Skip lowercase check for the first word
             result += word.toLowerCase() + " ";
         } else if (isFirstLetterCaptial(word) && 
@@ -176,7 +176,10 @@ export function isMostlyAllCaps(words: string[]): boolean {
  * Has at least one char and is upper case
  */
 function isAllCaps(word: string): boolean {
-    return !!word && !!word.match(/[a-zA-Z]/) && word.toUpperCase() === word && !isAcronymStrict(word);
+    return !!word && !!word.match(/[a-zA-Z]/) 
+        && word.toUpperCase() === word 
+        && !isAcronymStrict(word)
+        && !word.match(/^[a-zA-Z]+[-~—]/); // USB-C not all caps
 }
 
 export function capitalizeFirstLetter(word: string): string {
@@ -226,9 +229,10 @@ function forceKeepFormatting(word: string): boolean {
 }
 
 export function isAcronym(word: string): boolean {
-    // 2 or less chars, or has dots after each letter except last word
+    // 2 - 3 chars, or has dots after each letter except last word
     // U.S.A allowed
-    return word.length <= 3 || isAcronymStrict(word);
+    // US allowed
+    return (word.length <= 3 && word.length > 1 && isAllCaps(word)) || isAcronymStrict(word);
 }
 
 export function isAcronymStrict(word: string): boolean {
@@ -236,6 +240,35 @@ export function isAcronymStrict(word: string): boolean {
     return !!word.match(/^[^a-zA-Z]*(\S\.)+(\S)?$/);
 }
 
+function startOfSentence(index: number, words: string[]): boolean {
+    return index === 0 || isDelimeter(words[index - 1]);
+}
+
+function isDelimeter(char: string): boolean {
+    return char.match(/^[-:;~—|]$/) !== null;
+}
+
 function cleanResultingTitle(title: string): string {
-    return title.replace(/>/g, "").trim();
+    return cleanPunctuation(title.replace(/>/g, "").trim());
+}
+
+export function cleanPunctuation(title: string): string {
+    let toTrim = 0;
+    let questionMarkCount = 0;
+    for (let i = title.length - 1; i >= 0; i--) {
+        toTrim = i;
+
+        if (title[i] === "?") {
+            questionMarkCount++;
+        } else if (title[i] !== "!" && title[i] !== "." && title[i] !== " ") {
+            break;
+        }
+    }
+
+    let cleanTitle = toTrim === title.length ? title : title.substring(0, toTrim + 1);
+    if (questionMarkCount > 0) {
+        cleanTitle += "?";
+    }
+
+    return cleanTitle;
 }

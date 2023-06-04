@@ -52,7 +52,6 @@ export const PopupComponent = () => {
                         id="toggleSwitch" 
                         checked={extensionEnabled}
                         onChange={(e) => {
-                            console.log(e.target.checked)
                             Config.config!.extensionEnabled = e.target.checked;
                             setExtensionEnabled(e.target.checked)
                         }}/>
@@ -61,12 +60,12 @@ export const PopupComponent = () => {
                     <span className="switchBg blue"></span>
                     <span className="switchDot"></span>
                 </span>
-                <span id="disableSkipping" className={extensionEnabled ? " hidden" : ""}>{chrome.i18n.getMessage("Disable")}</span>
+                <span id="disableSkipping" className={extensionEnabled ? " hidden" : ""}>{chrome.i18n.getMessage("disable")}</span>
                 <span id="enableSkipping" className={!extensionEnabled ? " hidden" : ""}>{chrome.i18n.getMessage("Enable")}</span>
                 </label>
                 <button id="optionsButton" 
                     className="sbControlsMenu-item" 
-                    title={chrome.i18n.getMessage("optionsInfo")}
+                    title={chrome.i18n.getMessage("Options")}
                     onClick={() => {
                         chrome.runtime.sendMessage({ "message": "openConfig" });
                     }}>

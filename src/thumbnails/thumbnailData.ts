@@ -23,10 +23,17 @@ export type OriginalThumbnailResult = PartialThumbnailResult & OriginalThumbnail
 export type ThumbnailResult = CustomThumbnailResult | OriginalThumbnailResult;
 export type ThumbnailSubmission = CustomThumbnailSubmission | OriginalThumbnailSubmission;
 
-interface Format {
+export interface Format {
     url: string;
     width: number;
     height: number;
+}
+
+interface InnerTubeFormat {
+    url: string;
+    width: number;
+    height: number;
+    mimeType: string;
 }
 
 const activeRequests: Record<VideoID, Promise<PlaybackUrl[]>> = {};
@@ -38,6 +45,107 @@ async function fetchFormats(videoID: VideoID, ignoreCache: boolean): Promise<For
 
     const start = Date.now();
 
+    try {
+        const result = activeRequests[videoID] ?? (async () => {
+            let formats = Math.random() > 0.5 ? await fetchVideoDataAndroidClient(videoID) : await fetchVideoDataDesktopClient(videoID);
+            if (!formats || formats.length === 0) formats = await fetchVideoDataDesktopClient(videoID);
+    
+            if (formats) {
+                const containsVp9 = formats.some((format) => format.mimeType.includes("vp9"));
+                // Should already be reverse sorted, but reverse sort just incase (not slow if it is correct already)
+                const sorted = formats
+                    .reverse()
+                    .filter((format) => format.width && format.height && (!containsVp9 || format.mimeType.includes("vp9")))
+                    .sort((a, b) => a?.width - b?.width);
+
+                log(videoID, (Date.now() - start) / 1000, "innerTube");
+                const videoCache = setupCache(videoID);
+                videoCache.playbackUrls = sorted.map((format) => ({
+                    url: format.url,
+                    width: format.width,
+                    height: format.height
+                }));
+
+                // Remove this from active requests after it's been dealt with in other places
+                setTimeout(() => delete activeRequests[videoID], 500);
+
+                return videoCache.playbackUrls;
+            }
+
+            return [];
+        })();
+
+        activeRequests[videoID] = result;
+        return await result;
+    } catch (e) { } //eslint-disable-line no-empty
+
+    return [];
+}
+
+export async function fetchVideoDataAndroidClient(videoID: VideoID): Promise<InnerTubeFormat[]> {
+    const innertubeDetails = {
+        apiKey: "AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w",
+        clientVersion: "17.31.35",
+        clientName: "3",
+        androidVersion: "12"
+    }
+    
+    const context = {
+        client: {
+            clientName: "ANDROID",
+            clientVersion: innertubeDetails.clientVersion,
+            androidSdkVersion: 31,
+            osName: "Android",
+            osVersion: innertubeDetails.androidVersion,
+            hl: "en",
+            gl: "US"
+        }
+    }
+
+    const url = `https://www.youtube.com/youtubei/v1/player?key=${innertubeDetails.apiKey}`;
+    const data = {
+        context: context,
+        videoId: videoID,
+        params: "8AEB",
+        playbackContext: {
+            contentPlaybackContext: {
+                html5Preference: "HTML5_PREF_WANTS"
+            }
+        },
+        contentCheckOk: true,
+        racyCheckOk: true
+    }
+
+    try {
+        const result = await fetch(url, {
+            body: JSON.stringify(data),
+            headers: {
+                "X-Youtube-Client-Name": innertubeDetails.clientName,
+                "X-Youtube-Client-Version": innertubeDetails.clientVersion,
+                "User-Agent": `com.google.android.youtube/${innertubeDetails.clientVersion} (Linux; U; Android ${innertubeDetails.androidVersion}) gzip`,
+                "Content-Type": "application/json",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "en-us,en;q=0.5",
+                "Sec-Fetch-Mode": "navigate",
+                "Connection": "close"
+            },
+            method: "POST"
+        });
+
+        if (result.ok) {
+            const response = await result.json();
+            const formats = response?.streamingData?.adaptiveFormats as InnerTubeFormat[];
+            if (formats) {
+                return formats;
+            }
+        }
+
+    } catch (e) { } //eslint-disable-line no-empty
+
+    return [];
+}
+
+export async function fetchVideoDataDesktopClient(videoID: VideoID): Promise<InnerTubeFormat[]> {
     const url = "https://www.youtube.com/youtubei/v1/player";
     const data = {
         context: {
@@ -50,53 +158,22 @@ async function fetchFormats(videoID: VideoID, ignoreCache: boolean): Promise<For
     };
 
     try {
-        const result = activeRequests[videoID] ?? (async () => {
-            const result = await fetch(url, {
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                method: "POST"
-            });
-    
-            if (result.ok) {
-                type Format = {
-                    url: string;
-                    width: number;
-                    height: number;
-                    mimeType: string;
-                }
-    
-                const response = await result.json();
-                const formats = response?.streamingData?.adaptiveFormats as Format[];
-                if (formats) {
-                    const containsVp9 = formats.some((format) => format.mimeType.includes("vp9"));
-                    // Should already be reverse sorted, but reverse sort just incase (not slow if it is correct already)
-                    const sorted = formats
-                        .reverse()
-                        .filter((format) => format.width && format.height && (!containsVp9 || format.mimeType.includes("vp9")))
-                        .sort((a, b) => a?.width - b?.width);
-    
-                    log(videoID, (Date.now() - start) / 1000, "innerTube");
-                    const videoCache = setupCache(videoID);
-                    videoCache.playbackUrls = sorted.map((format) => ({
-                        url: format.url,
-                        width: format.width,
-                        height: format.height
-                    }));
+        const result = await fetch(url, {
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: "POST"
+        });
 
-                    // Remove this from active requests after it's been dealt with in other places
-                    setTimeout(() => delete activeRequests[videoID], 500);
-
-                    return videoCache.playbackUrls;
-                }
+        if (result.ok) {
+            const response = await result.json();
+            const formats = response?.streamingData?.adaptiveFormats as InnerTubeFormat[];
+            if (formats) {
+                return formats;
             }
+        }
 
-            return [];
-        })();
-
-        activeRequests[videoID] = result;
-        return await result;
     } catch (e) { } //eslint-disable-line no-empty
 
     return [];
