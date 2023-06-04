@@ -1,12 +1,20 @@
 import { isFirefoxOrSafari, waitFor } from "@ajayyy/maze-utils";
 import Config from "../config";
-import { brandingBoxSelector } from "../videoBranding/videoBranding";
+import { brandingBoxSelector, watchPageThumbnailSelector } from "../videoBranding/videoBranding";
 
 const cssFiles = [
     "content.css"
 ];
 
 export function addCssToPage() {
+    const head = document.getElementsByTagName("head")[0] || document.documentElement;
+
+    // Add css related to hiding branding boxes by default
+    const style = document.createElement("style");
+    style.innerHTML = buildHideThumbnailCss() + buildHideTitleCss();
+
+    head.appendChild(style);
+
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     window.addEventListener("DOMContentLoaded", async () => {
         await waitFor(() => Config.isReady());
@@ -22,12 +30,6 @@ export function addCssToPage() {
                 head.appendChild(fileref);
             }
         }
-
-        // Add css related to hiding branding boxes by default
-        const style = document.createElement("style");
-        style.innerHTML = buildHideThumbnailCss() + buildHideTitleCss();
-
-        head.appendChild(style);
     });
 }
 
@@ -48,6 +50,8 @@ function buildHideThumbnailCss(): string {
             result.push(`${start} ${thumbnailType} img:not(.cb-visible)`);
         }
     }
+
+    result.push(`${watchPageThumbnailSelector} div:not(.cb-visible)`);
 
     return `${result.join(", ")} { visibility: hidden !important; }\n`;
 }

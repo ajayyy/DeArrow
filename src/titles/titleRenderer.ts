@@ -9,7 +9,7 @@ import { formatTitle } from "./titleFormatter";
 let lastWatchTitle = "";
 let lastWatchVideoID: VideoID | null = null;
 
-export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, brandingLocation: BrandingLocation, queryByHash: boolean): Promise<boolean> {
+export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, brandingLocation: BrandingLocation): Promise<boolean> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
 
@@ -29,7 +29,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     originalTitleElement.style.display = "none";
 
     try {
-        const titleData = await getVideoTitleIncludingUnsubmitted(videoID, queryByHash)
+        const titleData = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation)
         const title = titleData?.title;
         if (title) {
             const formattedTitle = formatTitle(title, !titleData.original)

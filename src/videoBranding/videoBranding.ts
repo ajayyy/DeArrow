@@ -6,7 +6,7 @@ import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
 import { findOrCreateShowOriginalButton, getOrCreateTitleElement, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
 import { setThumbnailListener } from "@ajayyy/maze-utils/lib/thumbnailManagement";
-import Config from "../config";
+import Config, { ThumbnailCacheOption } from "../config";
 import { logError } from "../utils/logger";
 
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
@@ -30,6 +30,7 @@ export interface VideoBrandingInstance {
 }
 
 export const brandingBoxSelector = "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer, ytd-compact-playlist-renderer";
+export const watchPageThumbnailSelector = ".ytp-cued-thumbnail-overlay";
 
 const videoBrandingInstances: Record<VideoID, VideoBrandingInstance> = {}
 
@@ -45,12 +46,21 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
             const brandingLocation = BrandingLocation.Watch;
             const showCustomBranding = videoBrandingInstance.showCustomBranding;
     
-            promises[0] = replaceTitle(title, videoID, showCustomBranding, brandingLocation, true);
+            promises[0] = replaceTitle(title, videoID, showCustomBranding, brandingLocation);
+
+            const thumbnailElement = document.querySelector(watchPageThumbnailSelector) as HTMLElement;
+            if (thumbnailElement) {
+                const childElement = thumbnailElement.querySelector("div");
+                if (Config.config!.thumbnailCacheUse > ThumbnailCacheOption.OnAllPagesExceptWatch) {
+                    if (childElement) childElement.style.removeProperty("visibility");
+                    promises[1] = replaceThumbnail(thumbnailElement, videoID, brandingLocation, showCustomBranding);
+                } else {
+                    if (childElement) childElement.style.setProperty("visibility", "visible", "important");
+                }
+            }
 
             void handleShowOriginalButton(title, videoID, brandingLocation, showCustomBranding, promises);
         }
-
-        //todo: replace thumbnail in background of .ytp-cued-thumbnail-overlay-image
     }
 
     return Promise.all(promises);
@@ -79,7 +89,7 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
 
         const videoPromise = replaceThumbnail(element, videoID, brandingLocation, showCustomBranding);
         const titlePromise = !isPlaylistVideo 
-            ? replaceTitle(element, videoID, showCustomBranding, brandingLocation, false) 
+            ? replaceTitle(element, videoID, showCustomBranding, brandingLocation) 
             : Promise.resolve(false);
 
         if (isPlaylistVideo) {

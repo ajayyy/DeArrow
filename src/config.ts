@@ -29,6 +29,12 @@ export enum TitleFormatting {
     SentenceCase
 }
 
+export enum ThumbnailCacheOption {
+    Disable,
+    OnAllPagesExceptWatch,
+    OnAllPages
+}
+
 interface SBConfig {
     userID: string | null;
     vip: boolean;
@@ -44,6 +50,7 @@ interface SBConfig {
     thumbnailServerAddress: string;
     fetchTimeout: number;
     renderTimeout: number;
+    thumbnailCacheUse: ThumbnailCacheOption;
     extensionEnabled: boolean;
 }
 
@@ -81,6 +88,7 @@ const syncDefaults = {
     thumbnailServerAddress: CompileConfig.thumbnailServerAddress,
     fetchTimeout: 7000,
     renderTimeout: 25000,
+    thumbnailCacheUse: ThumbnailCacheOption.OnAllPages,
     extensionEnabled: true
 };
 

@@ -185,6 +185,30 @@
 
 			<div id="advanced" class="option-group hidden">
 
+				<div data-type="selector" data-sync="thumbnailCacheUse">
+					<label class="optionLabel" for="thumbnailCacheUse">__MSG_useThumbnailGenerationService__:</label>
+
+					<select id="thumbnailCacheUse" class="selector-element optionsSelector" >
+						<option value="2">__MSG_onAllPages__</option>
+						<option value="1">__MSG_onAllPagesExceptVideo__</option>
+						<option value="0">__MSG_Never__</option>
+					</select>
+
+					<div class="small-description">__MSG_thumbnailGeneratorDescription1__</div>
+
+					<div class="small-description">__MSG_thumbnailGeneratorDescription2__</div>
+
+					<div class="small-description">__MSG_thumbnailGeneratorDescription3__</div>
+
+					<div class="small-description">
+						<a href="https://github.com/ajayyy/DeArrowThumbnailCache" target="_blank" rel="noopener">__MSG_thumbnailGeneratorSourceCode__</a>
+					</div>
+
+					<div class="small-description">
+						<a href="https://github.com/ajayyy/SponsorBlock/wiki/K-Anonymity" target="_blank" rel="noopener">__MSG_moreAboutKAnonymity__</a>
+					</div>
+				</div>
+
 				<div data-type="button-press" data-sync="copyDebugInformation" data-confirm-message="copyDebugInformation">
 					<div class="option-button trigger-button">
 						__MSG_copyDebugInformation__

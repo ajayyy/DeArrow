@@ -3,7 +3,7 @@ import { logError } from "./utils/logger";
 import { ChannelIDInfo, checkIfNewVideoID, setupVideoModule, VideoID } from "@ajayyy/maze-utils/lib/video"
 import Config from "./config";
 import { SubmitButton } from "./submission/submitButton";
-import { clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
+import { BrandingLocation, clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
 import { getVideoBranding } from "./dataFetching";
 import * as documentScript from "../dist/js/document.js";
 import { listenForBadges, listenForTitleChange } from "./utils/titleBar";
@@ -23,7 +23,7 @@ async function videoIDChange(videoID: VideoID | null): Promise<void> {
         // To update videoID
         submitButton.render();
 
-        const branding = await getVideoBranding(videoID, true);
+        const branding = await getVideoBranding(videoID, true, BrandingLocation.Watch);
         if (branding) {
             submitButton.setSubmissions(branding);
         }

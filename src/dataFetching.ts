@@ -2,15 +2,16 @@ import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import { ThumbnailResult, ThumbnailSubmission } from "./thumbnails/thumbnailData";
 import { TitleResult, TitleSubmission } from "./titles/titleData";
 import { FetchResponse, sendRealRequestToCustomServer, sendRequestToCustomServer } from "@ajayyy/maze-utils/lib/background-request-proxy";
-import { BrandingResult, updateBrandingForVideo } from "./videoBranding/videoBranding";
+import { BrandingLocation, BrandingResult, updateBrandingForVideo } from "./videoBranding/videoBranding";
 import { logError } from "./utils/logger";
 import { getHash } from "@ajayyy/maze-utils/lib/hash";
-import Config from "./config";
+import Config, { ThumbnailCacheOption } from "./config";
 import { generateUserID } from "@ajayyy/maze-utils/lib/setup";
 import { BrandingUUID } from "./videoBranding/videoBranding";
 import { timeoutPomise } from "@ajayyy/maze-utils";
 import { isCachedThumbnailLoaded, setupPreRenderedThumbnail } from "./thumbnails/thumbnailRenderer";
 import { setupCache } from "./thumbnails/thumbnailDataCache";
+import * as CompileConfig from "../config.json";
 
 interface VideoBrandingCacheRecord extends BrandingResult {
     lastUsed: number;
@@ -29,7 +30,7 @@ const cacheLimit = 1000;
 const activeRequests: Record<VideoID, Promise<Record<VideoID, BrandingResult> | null>> = {};
 const activeThumbnailCacheRequests: Record<VideoID, ActiveThumbnailCacheRequestInfo> = {};
 
-export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, queryByHash: boolean): Promise<ThumbnailResult | null> {
+export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, brandingLocation?: BrandingLocation): Promise<ThumbnailResult | null> {
     const unsubmitted = Config.local!.unsubmitted[videoID]?.thumbnails?.find(t => t.selected);
     if (unsubmitted) {
         return {
@@ -40,7 +41,7 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, qu
         };
     }
 
-    const result = (await getVideoBranding(videoID, queryByHash))?.thumbnails[0];
+    const result = (await getVideoBranding(videoID, brandingLocation === BrandingLocation.Watch, brandingLocation))?.thumbnails[0];
     if (!result || (!result.locked && result.votes < 0)) {
         return null;
     } else {
@@ -48,7 +49,7 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, qu
     }
 }
 
-export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, queryByHash: boolean): Promise<TitleResult | null> {
+export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, brandingLocation?: BrandingLocation): Promise<TitleResult | null> {
     const unsubmitted = Config.local?.unsubmitted?.[videoID]?.titles?.find(t => t.selected);
     if (unsubmitted) {
         return {
@@ -60,7 +61,7 @@ export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, queryB
         };
     }
 
-    const result = (await getVideoBranding(videoID, queryByHash))?.titles[0];
+    const result = (await getVideoBranding(videoID, brandingLocation === BrandingLocation.Watch, brandingLocation))?.titles[0];
     if (!result || (!result.locked && result.votes < 0)) {
         return null;
     } else {
@@ -68,16 +69,26 @@ export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, queryB
     }
 }
 
-export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): Promise<VideoBrandingCacheRecord | null> {
+export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, brandingLocation?: BrandingLocation): Promise<VideoBrandingCacheRecord | null> {
     const cachedValue = cache[videoID];
 
     if (cachedValue) {
         return cachedValue;
     }
 
+    if (Config.config!.thumbnailCacheUse === ThumbnailCacheOption.Disable) {
+        // Always query by hash when not using thumbnail cache
+        queryByHash = true;
+    }
+
     activeRequests[videoID] ??= (() => {
+        const shouldGenerateBranding = brandingLocation !== BrandingLocation.Watch || Config.config!.thumbnailCacheUse > ThumbnailCacheOption.OnAllPagesExceptWatch;
+        const shouldGenerateNow = brandingLocation === BrandingLocation.Watch;
+    
         const results = fetchBranding(queryByHash, videoID);
-        const thumbnailCacheResults = fetchBrandingFromThumbnailCache(videoID);
+        const thumbnailCacheResults = shouldGenerateBranding ? 
+            fetchBrandingFromThumbnailCache(videoID, undefined, undefined, undefined, shouldGenerateNow) 
+            : Promise.resolve(null);
 
         const handleResults = (results: Record<VideoID, BrandingResult>) => {
             for (const [key, result] of Object.entries(results)) {
@@ -118,7 +129,8 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean): 
                 if (thumbnail && !thumbnail.original 
                         && (!isCachedThumbnailLoaded(videoID, thumbnail.timestamp) || (title?.title && oldResults?.titles?.length <= 0))) {
                     // Only an official time for default server address
-                    queueThumbnailCacheRequest(videoID, thumbnail.timestamp, title?.title, Config.config?.serverAddress === Config.syncDefaults.serverAddress);
+                    queueThumbnailCacheRequest(videoID, thumbnail.timestamp, title?.title, Config.config?.serverAddress === Config.syncDefaults.serverAddress && !CompileConfig.debug,
+                        shouldGenerateNow);
                 }
             }
         }).catch(logError);
@@ -182,6 +194,8 @@ async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Re
 }
 
 async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, title?: string, officialImage?: boolean, generateNow?: boolean, tries = 0): Promise<Record<VideoID, BrandingResult> | null> {
+    if (Config.config!.thumbnailCacheUse === ThumbnailCacheOption.Disable) return null;
+    
     activeThumbnailCacheRequests[videoID] = {
         shouldRerequest: false
     };

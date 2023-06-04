@@ -66,7 +66,7 @@ export const PopupComponent = () => {
                 </label>
                 <button id="optionsButton" 
                     className="sbControlsMenu-item" 
-                    title={chrome.i18n.getMessage("optionsInfo")}
+                    title={chrome.i18n.getMessage("Options")}
                     onClick={() => {
                         chrome.runtime.sendMessage({ "message": "openConfig" });
                     }}>

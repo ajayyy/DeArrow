@@ -256,7 +256,7 @@ export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | 
     let timestamp = forcedTimestamp as number;
     if (timestamp === null) {
         try {
-            const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, false);
+            const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation);
             if (thumbnail && !thumbnail.original) {
                 timestamp = thumbnail.timestamp;
             } else {
@@ -323,6 +323,8 @@ function getThumbnailSelector(brandingLocation: BrandingLocation): string {
             return "div.ytp-autonav-endscreen-upnext-thumbnail";
         case BrandingLocation.EndRecommendations:
             return "div.ytp-videowall-still-image";
+        case BrandingLocation.Watch:
+            return ".ytp-cued-thumbnail-overlay-image";
         default:
             throw new Error("Invalid branding location");
     }
@@ -348,7 +350,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
         resetToShowOriginalThumbnail(image, brandingLocation);
         
         // Still check if the thumbnail is supposed to be changed or not
-        const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, false);
+        const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation);
         return !!thumbnail && !thumbnail.original;
     }
 
@@ -378,7 +380,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
         image.classList.remove("cb-visible");
 
         // Trigger a fetch to start, and display the original thumbnail if necessary
-        getVideoThumbnailIncludingUnsubmitted(videoID, false).then((thumbnail) => {
+        getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation).then((thumbnail) => {
             if (!thumbnail || thumbnail.original) {
                 resetToShowOriginalThumbnail(image, brandingLocation);
             }
