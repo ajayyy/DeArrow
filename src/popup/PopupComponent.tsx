@@ -52,7 +52,6 @@ export const PopupComponent = () => {
                         id="toggleSwitch" 
                         checked={extensionEnabled}
                         onChange={(e) => {
-                            console.log(e.target.checked)
                             Config.config!.extensionEnabled = e.target.checked;
                             setExtensionEnabled(e.target.checked)
                         }}/>
