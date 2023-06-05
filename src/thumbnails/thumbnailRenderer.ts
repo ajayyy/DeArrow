@@ -296,7 +296,31 @@ export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | 
 export function drawCentered(canvas: HTMLCanvasElement, width: number, height: number,
     originalWidth: number, originalHeight: number, originalSurface: HTMLVideoElement | HTMLCanvasElement): void {
     const calculateWidth = height * originalWidth / originalHeight;
-    canvas.getContext("2d")?.drawImage(originalSurface, (width - calculateWidth) / 2, 0, calculateWidth, height);
+    const context = canvas.getContext("2d")!;
+    
+    if (Config.config!.antiAliasThumbnails 
+            && (originalSurface.width !== width || originalSurface.height !== height)) {
+        originalSurface = runAntiAliasShrink(originalSurface, width, height);
+        context.imageSmoothingEnabled = true;
+    }
+
+    context.drawImage(originalSurface, (width - calculateWidth) / 2, 0, calculateWidth, height);
+}
+
+function runAntiAliasShrink(originalSurface: HTMLVideoElement | HTMLCanvasElement,
+        width: number, height: number): HTMLVideoElement | HTMLCanvasElement {
+    while (originalSurface.width > width * 2 && originalSurface.height > height * 2) {
+        const newCanvas = document.createElement("canvas");
+        newCanvas.width = originalSurface.width / 1.5;
+        newCanvas.height = originalSurface.height / 1.5;
+        const newContext = newCanvas.getContext("2d")!;
+        newContext.imageSmoothingEnabled = true;
+        newContext.drawImage(originalSurface, 0, 0, newCanvas.width, newCanvas.height);
+
+        originalSurface = newCanvas;
+    }
+
+    return originalSurface;
 }
 
 function createVideo(existingVideo: HTMLVideoElement | null, url: string, timestamp: number): HTMLVideoElement {

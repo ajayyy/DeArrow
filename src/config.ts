@@ -51,6 +51,7 @@ interface SBConfig {
     fetchTimeout: number;
     renderTimeout: number;
     thumbnailCacheUse: ThumbnailCacheOption;
+    antiAliasThumbnails: boolean;
     extensionEnabled: boolean;
 }
 
@@ -89,6 +90,7 @@ const syncDefaults = {
     fetchTimeout: 7000,
     renderTimeout: 25000,
     thumbnailCacheUse: ThumbnailCacheOption.OnAllPages,
+    antiAliasThumbnails: true,
     extensionEnabled: true
 };
 
