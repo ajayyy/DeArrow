@@ -25,11 +25,36 @@ export async function replaceVideoPlayerSuggestionsBranding(): Promise<void> {
     if (!mutationObserver || observerElement !== refNode) {
         if (mutationObserver) mutationObserver.disconnect();
 
+        const endcardSelector = ".ytp-ce-element";
+        const autoplaySelector = ".ytp-autonav-endscreen-countdown-overlay";
+        const endRecommendationsSelector = ".html5-endscreen";
+
+        // Setup initial listeners
+        {
+            const initialEndcardElements = refNode.querySelectorAll(endcardSelector);
+            if (initialEndcardElements.length > 0) {
+                for (const initialEndcardElement of initialEndcardElements) {
+                    setupVideoBrandReplacement(initialEndcardElement as HTMLElement, BrandingLocation.Endcards);
+                }
+            }
+
+            const initialAutoplayElement = refNode.querySelector(autoplaySelector) as HTMLElement;
+            if (initialAutoplayElement) {
+                setupAutoplayObserver(initialAutoplayElement);
+            }
+
+            const initialEndRecommendationsElement = refNode.querySelector(endRecommendationsSelector) as HTMLElement;
+            if (initialEndRecommendationsElement) {
+                setupRecommendationsObserver(initialEndRecommendationsElement);
+            }
+        }
+
+
         observerElement = refNode as HTMLElement;
         mutationObserver = new MutationObserver((mutations) => {
             // Endcards
             observe(mutations,
-                ".ytp-ce-element", BrandingLocation.Endcards, CheckType.AddedNodes);
+                endcardSelector, BrandingLocation.Endcards, CheckType.AddedNodes);
 
             // Auto play and end recommendations require deeper observers
             // To make it more effecient, they are recreated when needed without
@@ -38,9 +63,9 @@ export async function replaceVideoPlayerSuggestionsBranding(): Promise<void> {
                 if (mutation.type === "childList") {
                     for (const node of mutation.addedNodes) {
                         if (node instanceof HTMLElement) {
-                            if (node.matches(".ytp-autonav-endscreen-countdown-overlay")) {
+                            if (node.matches(autoplaySelector)) {
                                 setupAutoplayObserver(node);
-                            } else if (node.matches(".html5-endscreen")) {
+                            } else if (node.matches(endRecommendationsSelector)) {
                                 setupRecommendationsObserver(node);
                             }
                         }
