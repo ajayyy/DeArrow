@@ -123,14 +123,16 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
                     updateBrandingForVideo(videoID).catch(logError);
                 }
 
-                const thumbnail = results[videoID].thumbnails[0];
-                const title = results[videoID].titles[0];
-                // Fetch for a cached thumbnail if it is either not loaded yet, or has an out of date title
-                if (thumbnail && !thumbnail.original 
-                        && (!isCachedThumbnailLoaded(videoID, thumbnail.timestamp) || (title?.title && oldResults?.titles?.length <= 0))) {
-                    // Only an official time for default server address
-                    queueThumbnailCacheRequest(videoID, thumbnail.timestamp, title?.title, Config.config?.serverAddress === Config.syncDefaults.serverAddress && !CompileConfig.debug,
-                        shouldGenerateNow);
+                if (results[videoID]) {
+                    const thumbnail = results[videoID].thumbnails[0];
+                    const title = results[videoID].titles[0];
+                    // Fetch for a cached thumbnail if it is either not loaded yet, or has an out of date title
+                    if (thumbnail && !thumbnail.original 
+                            && (!isCachedThumbnailLoaded(videoID, thumbnail.timestamp) || (title?.title && oldResults?.titles?.length <= 0))) {
+                        // Only an official time for default server address
+                        queueThumbnailCacheRequest(videoID, thumbnail.timestamp, title?.title, Config.config?.serverAddress === Config.syncDefaults.serverAddress && !CompileConfig.debug,
+                            shouldGenerateNow);
+                    }
                 }
             }
         }).catch(logError);
