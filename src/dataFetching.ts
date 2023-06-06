@@ -172,6 +172,14 @@ async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Re
         if (request.ok || request.status === 404) {
             try {
                 const json = JSON.parse(request.responseText);
+                if (!json[videoID]) {
+                    // Add empty object
+                    json[videoID] = {
+                        thumbnails: [],
+                        titles: []
+                    };
+                }
+
                 results = json;
             } catch (e) {
                 logError(`Getting video branding for ${videoID} failed: ${e}`);
