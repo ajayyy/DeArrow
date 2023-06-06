@@ -6,10 +6,10 @@ import { SubmitButton } from "./submission/submitButton";
 import { BrandingLocation, clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
 import { getVideoBranding } from "./dataFetching";
 import * as documentScript from "../dist/js/document.js";
-import { listenForBadges, listenForTitleChange } from "./utils/titleBar";
+import { listenForBadges, listenForMiniPlayerTitleChange, listenForTitleChange } from "./utils/titleBar";
 import { getPlaybackFormats } from "./thumbnails/thumbnailData";
 import { replaceVideoPlayerSuggestionsBranding } from "./videoBranding/watchPageBrandingHandler";
-
+import { onTitleUpdate, setPageTitle } from "./titles/pageTitleHandler";
 
 export const submitButton = new SubmitButton();
 
@@ -33,6 +33,8 @@ async function videoIDChange(videoID: VideoID | null): Promise<void> {
 }
 
 function resetValues() {
+    setPageTitle("", true);
+
     submitButton.clearSubmissions();
     submitButton.close();
 
@@ -49,6 +51,7 @@ function videoElementChange(newVideo: boolean) {
 
         listenForBadges().catch(logError);
         listenForTitleChange().catch(logError);
+        listenForMiniPlayerTitleChange().catch(console.error);
 
         submitButton.render();
     }
@@ -56,6 +59,12 @@ function videoElementChange(newVideo: boolean) {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
 function windowListenerHandler(event: MessageEvent) {
+    const data = event.data;
+    if (!data) return;
+
+    if (data.type === "titleChange") {
+        onTitleUpdate(data);
+    }
 }
 
 function newVideosLoaded(videoIDs: VideoID[]) {

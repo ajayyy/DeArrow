@@ -35,32 +35,47 @@ export const watchPageThumbnailSelector = ".ytp-cued-thumbnail-overlay";
 const videoBrandingInstances: Record<VideoID, VideoBrandingInstance> = {}
 
 export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]> {
-    const title = await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
+    const onWatchPage = document.URL.includes("/watch");
+    const possibleSelectors = onWatchPage ? [
+        getYouTubeTitleNodeSelector(),
+        ".ytp-title-text"
+    ] : [
+        ".miniplayer #info-bar"
+    ];
+
+    // Find first invisible one, or wait for the first one to be visible
+    const mainTitle = possibleSelectors.map((selector) => document.querySelector(selector) as HTMLElement).filter((element) => isVisible(element))[0] || 
+        await waitForElement(possibleSelectors[0], true) as HTMLElement;
+    const titles = (possibleSelectors.map((selector) => document.querySelector(selector))) as HTMLElement[];
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
     const videoID = getVideoID();
 
-    if (videoID !== null && isVisible(title)) {
-        if (title) {
-            const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
-                async () => void await replaceCurrentVideoBranding());
-            const brandingLocation = BrandingLocation.Watch;
-            const showCustomBranding = videoBrandingInstance.showCustomBranding;
-    
-            promises[0] = replaceTitle(title, videoID, showCustomBranding, brandingLocation);
+    console.log("Rendering new thing", mainTitle, titles, videoID)
 
-            const thumbnailElement = document.querySelector(watchPageThumbnailSelector) as HTMLElement;
-            if (thumbnailElement) {
-                const childElement = thumbnailElement.querySelector("div");
-                if (Config.config!.thumbnailCacheUse > ThumbnailCacheOption.OnAllPagesExceptWatch) {
-                    if (childElement) childElement.style.removeProperty("visibility");
-                    promises[1] = replaceThumbnail(thumbnailElement, videoID, brandingLocation, showCustomBranding);
-                } else {
-                    if (childElement) childElement.style.setProperty("visibility", "visible", "important");
-                }
+    if (videoID !== null && isVisible(mainTitle)) {
+        const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
+            async () => void await replaceCurrentVideoBranding());
+        const brandingLocation = BrandingLocation.Watch;
+        const showCustomBranding = videoBrandingInstance.showCustomBranding;
+
+        // Replace each title and return true only if all true
+        promises[0] = Promise.all(titles.map((title) => 
+            replaceTitle(title, videoID, showCustomBranding, brandingLocation)))
+        .then((results) => results.every((result) => result));
+
+        const thumbnailElement = document.querySelector(watchPageThumbnailSelector) as HTMLElement;
+        if (thumbnailElement) {
+            const childElement = thumbnailElement.querySelector("div");
+            if (Config.config!.thumbnailCacheUse > ThumbnailCacheOption.OnAllPagesExceptWatch) {
+                if (childElement) childElement.style.removeProperty("visibility");
+                promises[1] = replaceThumbnail(thumbnailElement, videoID, brandingLocation, showCustomBranding);
+            } else {
+                if (childElement) childElement.style.setProperty("visibility", "visible", "important");
             }
-
-            void handleShowOriginalButton(title, videoID, brandingLocation, showCustomBranding, promises);
         }
+
+        // Only the first title needs a button, it will affect all titles
+        if (onWatchPage) void handleShowOriginalButton(titles[0], videoID, brandingLocation, showCustomBranding, promises);
     }
 
     return Promise.all(promises);
@@ -158,6 +173,8 @@ function getAndUpdateVideoBrandingInstances(videoID: VideoID, updateBranding: ()
         }
     } else {
         videoBrandingInstances[videoID].updateBrandingCallbacks.push(updateBranding);
+
+        console.log(videoBrandingInstances[videoID].updateBrandingCallbacks, videoID);
     }
 
     return videoBrandingInstances[videoID];
@@ -190,6 +207,8 @@ export async function updateBrandingForVideo(videoID: VideoID): Promise<void> {
         const updateBrandingCallbacks = videoBrandingInstances[videoID].updateBrandingCallbacks;
         // They will be added back to the array
         videoBrandingInstances[videoID].updateBrandingCallbacks = [];
+
+        console.log(updateBrandingCallbacks, videoID)
     
         await Promise.all(updateBrandingCallbacks.map((updateBranding) => updateBranding()));
     }

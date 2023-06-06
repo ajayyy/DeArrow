@@ -5,49 +5,59 @@ import { logError } from "../utils/logger";
 import { getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { BrandingLocation, toggleShowCustom } from "../videoBranding/videoBranding";
 import { formatTitle } from "./titleFormatter";
+import { setPageTitle } from "./pageTitleHandler";
+
+enum WatchPageType {
+    Video,
+    Miniplayer
+}
 
 let lastWatchTitle = "";
 let lastWatchVideoID: VideoID | null = null;
+let lastUrlWatchPageType: WatchPageType | null = null;
 
 export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, brandingLocation: BrandingLocation): Promise<boolean> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
-    const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
-
+    
     if (brandingLocation === BrandingLocation.Watch) {
+        const currentWatchPageType = document.URL.includes("watch") ? WatchPageType.Video : WatchPageType.Miniplayer;
+
         if (lastWatchVideoID && originalTitleElement?.textContent 
-                && videoID !== lastWatchVideoID && originalTitleElement.textContent === lastWatchTitle) {
+                && videoID !== lastWatchVideoID && originalTitleElement.textContent === lastWatchTitle
+                && lastUrlWatchPageType === currentWatchPageType) {
+            console.log("title not changed", lastWatchTitle, originalTitleElement.textContent, lastUrlWatchPageType, videoID, lastWatchVideoID);
             // Don't reset it if it hasn't changed videos yet, will be handled by title change listener
             return false;
         }
 
         lastWatchTitle = originalTitleElement?.textContent ?? "";
         lastWatchVideoID = videoID;
+        lastUrlWatchPageType = currentWatchPageType;
+        console.log("changing stuff", originalTitleElement)
     }
 
     //todo: add an option to not hide title
-    titleElement.style.display = "none";
-    originalTitleElement.style.display = "none";
+    hideCustomTitle(element, brandingLocation);
+    hideOriginalTitle(element, brandingLocation);
 
     try {
         const titleData = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation)
         const title = titleData?.title;
         if (title) {
             const formattedTitle = formatTitle(title, !titleData.original)
-            titleElement.innerText = formattedTitle;
-            titleElement.title = formattedTitle;
+            setCustomTitle(formattedTitle, element, brandingLocation);
         } else if (originalTitleElement?.textContent) {
             // innerText is blank when visibility hidden
             const originalText = originalTitleElement.textContent.trim();
             const modifiedTitle = formatTitle(originalText, false);
             if (originalText === modifiedTitle) {
-                showOriginalTitle(titleElement, originalTitleElement);
+                showOriginalTitle(element, brandingLocation);
                 return false;
             }
 
-            titleElement.innerText = modifiedTitle;
-            titleElement.title = modifiedTitle;
+            setCustomTitle(modifiedTitle, element, brandingLocation);
         } else {
-            originalTitleElement.style.setProperty("display", "inherit", "important");
+            showOriginalTitle(element, brandingLocation);
         }
 
         if (originalTitleElement.parentElement?.title) {
@@ -55,41 +65,102 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
             originalTitleElement.parentElement.title = "";
         }
 
-        titleElement.style.removeProperty("display");
+        showCustomTitle(element, brandingLocation);
 
         if (!showCustomBranding) {
-            showOriginalTitle(titleElement, originalTitleElement);
+            showOriginalTitle(element, brandingLocation);
         }
         return true;
     } catch (e) {
         logError(e);
-        originalTitleElement.style.setProperty("display", "inherit", "important");
+        showOriginalTitle(element, brandingLocation);
 
         return false;
     }
 }
 
-function showOriginalTitle(titleElement: HTMLElement, originalTitleElement: HTMLElement) {
+function hideOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocation) {
+    const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
+    originalTitleElement.style.display = "none";
+
+    switch(brandingLocation) {
+        case BrandingLocation.Watch: {
+            setPageTitle("");
+            break;
+        }
+    }
+}
+
+function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocation) {
+    const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
+    const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
+    
     titleElement.style.display = "none";
     originalTitleElement.style.setProperty("display", "inherit", "important");
+
+    switch(brandingLocation) {
+        case BrandingLocation.Watch: {
+            if (originalTitleElement.classList.contains("ytd-miniplayer")) {
+                originalTitleElement.style.setProperty("display", "inline-block", "important");
+            }
+
+            setPageTitle(null);
+            break;
+        }
+    }
+}
+
+function hideCustomTitle(element: HTMLElement, brandingLocation: BrandingLocation) {
+    const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
+    const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
+
+    titleElement.style.display = "none";
+}
+
+function showCustomTitle(element: HTMLElement, brandingLocation: BrandingLocation) {
+    const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
+    const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
+    titleElement.style.removeProperty("display");
+
+    switch(brandingLocation) {
+        case BrandingLocation.Watch: {
+            setPageTitle(titleElement.textContent ?? "");
+            break;
+        }
+    }
+}
+
+function setCustomTitle(title: string, element: HTMLElement, brandingLocation: BrandingLocation) {
+    const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
+    const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
+    titleElement.innerText = title;
+    titleElement.title = title;
+
+    switch(brandingLocation) {
+        case BrandingLocation.Watch: {
+            setPageTitle(title);
+            break;
+        }
+    }
 }
 
 export function getOriginalTitleElement(element: HTMLElement, brandingLocation: BrandingLocation) {
-    return element.querySelector(`${getTitleSelector(brandingLocation)}:not(.cbCustomTitle)`) as HTMLElement;
+    return element.querySelector(getTitleSelector(brandingLocation)
+        .map((s) => `${s}:not(.cbCustomTitle)`).join(", ")) as HTMLElement;
 }
 
-function getTitleSelector(brandingLocation: BrandingLocation): string {
+function getTitleSelector(brandingLocation: BrandingLocation): string[] {
     switch (brandingLocation) {
         case BrandingLocation.Watch:
-            return "yt-formatted-string";
+            return ["yt-formatted-string", ".ytp-title-link.yt-uix-sessionlink"];
         case BrandingLocation.Related:
-            return "#video-title";
+            return ["#video-title"];
         case BrandingLocation.Endcards:
-            return ".ytp-ce-video-title, .ytp-ce-playlist-title";
+            return [".ytp-ce-video-title", ".ytp-ce-playlist-title"];
         case BrandingLocation.Autoplay:
-            return ".ytp-autonav-endscreen-upnext-title";
+            return [".ytp-autonav-endscreen-upnext-title"];
         case BrandingLocation.EndRecommendations:
-            return ".ytp-videowall-still-info-title";
+            return [".ytp-videowall-still-info-title"];
         default:
             throw new Error("Invalid branding location");
     }

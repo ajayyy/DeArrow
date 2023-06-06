@@ -35,6 +35,13 @@ canvas.ytd-img-shadow:not(.ytp-autonav-endscreen-upnext-thumbnail, .ytp-videowal
     border-color: white;
 }
 
+/* For miniplayer */
+.ytd-miniplayer .cbCustomTitle {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 /* Playlist titles should not be hidden */
 ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.cbCustomTitle) {
     display: inherit !important;

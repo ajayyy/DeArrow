@@ -67,13 +67,26 @@ let titleChangeObserver: MutationObserver | null = null;
 const titleChangeListeners: (() => void)[] = [];
 export async function listenForTitleChange() {
     const titleNode = await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
-    if (titleNode) {
-        const originalTitleElement = await getOriginalTitleElement(titleNode, BrandingLocation.Watch);
+    titleChangeObserver = setupTextChangeListener(titleChangeObserver, titleNode, true);
+}
+
+let miniplayerTitleChangeObserver: MutationObserver | null = null;
+export async function listenForMiniPlayerTitleChange() {
+    const titleNode = await waitForElement(".miniplayer yt-formatted-string") as HTMLElement;
+    miniplayerTitleChangeObserver = setupTextChangeListener(miniplayerTitleChangeObserver, titleNode, false);
+}
+
+function setupTextChangeListener(mutationObserver: MutationObserver | null, element: HTMLElement,
+        lookForOriginalTitleElement: boolean) {
+    if (element) {
+        const originalTitleElement = lookForOriginalTitleElement ? 
+            getOriginalTitleElement(element, BrandingLocation.Watch)
+            : element;
         if (originalTitleElement) {
-            titleChangeObserver?.disconnect();
+            mutationObserver?.disconnect();
 
             let oldText = originalTitleElement.textContent;
-            titleChangeObserver = new MutationObserver(() => {
+            mutationObserver = new MutationObserver(() => {
                 if (oldText !== originalTitleElement.textContent) {
                     oldText = originalTitleElement.textContent;
                     for (const listener of titleChangeListeners) {
@@ -82,15 +95,17 @@ export async function listenForTitleChange() {
                 }
             });
 
-            titleChangeObserver.observe(originalTitleElement, {
+            mutationObserver.observe(originalTitleElement, {
                 characterData: true,
                 subtree: true,
                 childList: true
             });
         }
     }
-}
 
+    return mutationObserver;
+}
+    
 export function addTitleChangeListener(listener: () => void) {
     titleChangeListeners.push(listener);
 }
