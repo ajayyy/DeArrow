@@ -25,7 +25,6 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         if (lastWatchVideoID && originalTitleElement?.textContent 
                 && videoID !== lastWatchVideoID && originalTitleElement.textContent === lastWatchTitle
                 && lastUrlWatchPageType === currentWatchPageType) {
-            console.log("title not changed", lastWatchTitle, originalTitleElement.textContent, lastUrlWatchPageType, videoID, lastWatchVideoID);
             // Don't reset it if it hasn't changed videos yet, will be handled by title change listener
             return false;
         }
@@ -33,7 +32,6 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         lastWatchTitle = originalTitleElement?.textContent ?? "";
         lastWatchVideoID = videoID;
         lastUrlWatchPageType = currentWatchPageType;
-        console.log("changing stuff", originalTitleElement)
     }
 
     //todo: add an option to not hide title
@@ -104,7 +102,7 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
                 originalTitleElement.style.setProperty("display", "inline-block", "important");
             }
 
-            setPageTitle(null);
+            setPageTitle(originalTitleElement.textContent ?? "");
             break;
         }
     }

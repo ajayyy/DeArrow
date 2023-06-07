@@ -9,7 +9,6 @@ import * as documentScript from "../dist/js/document.js";
 import { listenForBadges, listenForMiniPlayerTitleChange, listenForTitleChange } from "./utils/titleBar";
 import { getPlaybackFormats } from "./thumbnails/thumbnailData";
 import { replaceVideoPlayerSuggestionsBranding } from "./videoBranding/watchPageBrandingHandler";
-import { onTitleUpdate, setPageTitle } from "./titles/pageTitleHandler";
 
 export const submitButton = new SubmitButton();
 
@@ -33,8 +32,6 @@ async function videoIDChange(videoID: VideoID | null): Promise<void> {
 }
 
 function resetValues() {
-    setPageTitle("", true);
-
     submitButton.clearSubmissions();
     submitButton.close();
 
@@ -61,10 +58,6 @@ function videoElementChange(newVideo: boolean) {
 function windowListenerHandler(event: MessageEvent) {
     const data = event.data;
     if (!data) return;
-
-    if (data.type === "titleChange") {
-        onTitleUpdate(data);
-    }
 }
 
 function newVideosLoaded(videoIDs: VideoID[]) {
