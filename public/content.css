@@ -234,30 +234,40 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     cursor: default !important;
 }
 
+.cbNoticeButton:disabled {
+    cursor: default;
+    background-color: #0e78ca63 !important;
+}
+
 .cbNoticeButton {
 	background: none;
-	font-size: 2em;
+	font-size: 1.3em;
     padding: 10px 20px;
     border-radius: 30px;
     background-color: #0e79cac2;
     color: white;
     border: none;
+    text-decoration: none;
 
     cursor: pointer;
+	transition: background-color 0.2s;
 }
 
 .cbNoticeButton:hover {
 	background-color: rgba(235, 235, 235, 0.2);
     background-color: #0e78ca;
 
-	transition: background-color 0.2s;
 }
 
-.cbVoteButtonContainer {
+.cbVoteButtonContainer, .cbHelpButtonContainer {
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
     margin-top: 15px;
     margin-bottom: 15px;
+}
+
+.cbVoteButton {
+    font-size: 2em;
 }
 
 .cbSubmitInstructions {
@@ -270,6 +280,9 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 .cbLine {
     border: 0;
     border-top: 1px solid var(--yt-spec-text-primary);
+
+    width: 80%;
+    margin: auto;
 }
 
 .cbShowOriginal {

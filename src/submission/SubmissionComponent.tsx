@@ -10,6 +10,10 @@ import Config, { UnsubmittedSubmission } from "../config";
 import { addTitleChangeListener, removeTitleChangeListener } from "../utils/titleBar";
 import { toSentenceCase } from "../titles/titleFormatter";
 import { BrandingPreviewComponent } from "./BrandingPreviewComponent";
+import { getHash } from "@ajayyy/maze-utils/lib/hash";
+import { sendRequestToServer } from "../dataFetching";
+import { objectToURI } from "@ajayyy/maze-utils";
+import { logError } from "../utils/logger";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -19,7 +23,40 @@ export interface SubmissionComponentProps {
     submitClicked: (title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null) => void;
 }
 
+interface ChatDisplayName {
+    publicUserID: string;
+    username: string | null;
+}
+
 export const SubmissionComponent = (props: SubmissionComponentProps) => {
+    const [chatDisplayName, setChatDisplayName] = React.useState<ChatDisplayName | null>(null);
+    React.useEffect(() => {
+        getHash(Config.config!.userID!).then(async (publicUserID) => {
+            let username: string | null = null;
+
+            setChatDisplayName({
+                publicUserID,
+                username
+            });
+
+            const values = ["userName"];
+                const result = await sendRequestToServer("GET", "/api/userInfo", {
+                    publicUserID: publicUserID,
+                    values
+                });
+
+            if (result.ok) {
+                const userInfo = JSON.parse(result.responseText);
+                username = userInfo.userName;
+            }
+
+            setChatDisplayName({
+                publicUserID,
+                username
+            });
+        }).catch(logError);
+    }, []);
+
     const originalTitle = toSentenceCase(getCurrentPageTitle() || chrome.i18n.getMessage("OriginalTitle"), false);
     const titles: RenderedTitleSubmission[] = [{
         title: originalTitle
@@ -172,6 +209,35 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                 </button>
             </div>
 
+            {
+                Config.config!.showGuidelineHelp ? 
+                <>
+                    <hr className="cbLine"/>
+
+                    <div className="cbHelpButtonContainer">
+                        <a className="cbNoticeButton"
+                            href="https://wiki.sponsor.ajay.app/w/DeArrow/Guidelines"
+                            target="_blank"
+                            rel="noreferrer">
+                            {`${chrome.i18n.getMessage("Guidelines")}`}
+                        </a>
+
+                        <a className="cbNoticeButton"
+                            href={`https://chat.sponsor.ajay.app/#${objectToURI("", {
+                                displayName: getChatDisplayName(chatDisplayName),
+                                customDescription: `${chrome.i18n.getMessage("chatboxDescription")}\n\nhttps://discord.gg/SponsorBlock\nhttps://matrix.to/#/#sponsor:ajay.app?via=matrix.org`,
+                                bigDescription: true
+                            }, false)}`}
+                            target="_blank"
+                            rel="noreferrer">
+                            {`${chrome.i18n.getMessage("askAQuestion")}`}
+                        </a>
+                    </div>
+                </>
+                : null
+            }
+
+            
         </div>
     );
 };
@@ -202,5 +268,17 @@ function updateUnsubmitted(unsubmitted: UnsubmittedSubmission,
     } else {
         setExtraUnsubmittedThumbnails([]);
         setExtraUnsubmittedTitles([]);
+    }
+}
+
+function getChatDisplayName(chatDisplayName: ChatDisplayName | null): string {
+    if (chatDisplayName) {
+        if (chatDisplayName.username && chatDisplayName.username !== chatDisplayName.publicUserID) {
+            return `${chatDisplayName.username} - ${chatDisplayName.publicUserID}`;
+        } else {
+            return chatDisplayName.publicUserID;
+        }
+    } else {
+        return "DeArrow User";
     }
 }
