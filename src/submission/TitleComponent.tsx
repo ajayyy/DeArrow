@@ -1,5 +1,6 @@
 import * as React from "react";
 import { RenderedTitleSubmission } from "./TitleDrawerComponent";
+import ResetIcon from "../svgIcons/resetIcon";
 
 export interface TitleComponentProps {
     submission: RenderedTitleSubmission;
@@ -12,7 +13,16 @@ export const TitleComponent = (props: TitleComponentProps) => {
     const titleRef = React.useRef<HTMLDivElement>(null);
     const title = React.useRef(props.submission.title);
     const [titleChanged, setTitleChanged] = React.useState(false);
+    const [focused, setFocused] = React.useState(false);
 
+    React.useEffect(() => {
+        if (focused && title.current === "") {
+            // Now it has padding added, time to set selection
+            setSelectionToEnd(titleRef.current!);
+        }
+    }, [focused]);
+
+    const showTitleHint = !focused && title.current === "";
     return (
         <div className={`cbTitle${props.selected ? " cbTitleSelected" : ""}`}
                 onClick={() => {
@@ -21,12 +31,25 @@ export const TitleComponent = (props: TitleComponentProps) => {
                     props.onSelectOrUpdate(newTitle, oldTitle);
 
                     if (document.activeElement !== titleRef.current) {
-                        titleRef.current!.focus();
+                        setFocused(true);
                         setSelectionToEnd(titleRef.current!);
                     }
+                }}
+                onBlur={() => {
+                    setFocused(false);
                 }}>
+
+            <span className={`cbTitleTextHint ${!showTitleHint ? "cbHiddenTextBox" : ""}`}>
+                {chrome.i18n.getMessage("TypeYourOwnTitleHere")}
+            </span>
+
             <span ref={titleRef}
                 contentEditable={true}
+                className={`cbTitleTextBox ${showTitleHint ? "cbHiddenTextBox" : ""}`}
+                style={{
+                    paddingRight: title.current === "" ? "0.5em" : "0"
+                }}
+                
                 onInput={(e) => {
                     e.stopPropagation();
 
@@ -38,6 +61,7 @@ export const TitleComponent = (props: TitleComponentProps) => {
                         title.current = newTitle;
     
                         setTitleChanged(newTitle !== props.submission.title);
+                        setFocused(true);
                     }
                 }}
                 onKeyDown={(e) => {
@@ -73,8 +97,10 @@ export const TitleComponent = (props: TitleComponentProps) => {
                         titleRef.current!.blur();
                     }
                 }}>
-                <img style={{ display: props.selected && titleChanged ? "block" : "none" }} 
-                    src={chrome.runtime.getURL("icons/reset.svg")} alt={chrome.i18n.getMessage("resetIcon")} className="resetCustomTitle" />
+                <ResetIcon
+                    style={{ display: props.selected && titleChanged ? "block" : "none" }} 
+                    className="resetCustomTitle"
+                />
             </button>
         </div>
     );

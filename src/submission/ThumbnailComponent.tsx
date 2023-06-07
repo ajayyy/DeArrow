@@ -87,16 +87,8 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
         }, [props.time]);
     }
 
-    const style: React.CSSProperties = {};
-    if (props.firstElem) {
-        style.marginLeft = "0px";
-    } else if (props.lastElem) {
-        style.marginRight = "0px";
-    }
-
     return (
         <div className={`cbThumbnail${props.selected ? " cbThumbnailSelected" : ""}`}
-                style={style}
                 onClick={() => {
                     if (props.type === ThumbnailType.CurrentTime && props.video.paused) {
                         // Ensure video is showing correct frame (destructive, will affect visible video)

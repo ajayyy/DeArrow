@@ -10,9 +10,13 @@ import { submitVideoBranding } from "../dataFetching";
 import Config from "../config";
 import { addTitleChangeListener, getOrCreateTitleButtonContainer } from "../utils/titleBar";
 
+const submitButtonIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M14.1 7.1l2.9 2.9L6.1 20.7l-3.6.7.7-3.6L14.1 7.1zm0-2.8L1.4 16.9 0 24l7.1-1.4L19.8 9.9l-5.7-5.7zm7.1 4.3L24 5.7 18.3 0l-2.8 2.8 5.7 5.7z"/>
+</svg>`;
+
 export class SubmitButton {
     button: HTMLButtonElement;
-    buttonImage: HTMLImageElement;
     container: HTMLElement;
     root: Root | null;
 
@@ -39,54 +43,55 @@ export class SubmitButton {
                 if (!this.button) {
                     this.button = document.createElement('button');
                     this.button.className = "cbSubmitButton cbButton";
-
-                    this.buttonImage = document.createElement("img");
+                    this.button.innerHTML = submitButtonIcon;
                     this.button.draggable = false;
-                    this.buttonImage.className = "cbSubmitButtonImage";
-                    this.buttonImage.src = chrome.runtime.getURL("icons/pencil.svg");
 
-                    // Append image to button
-                    this.button.appendChild(this.buttonImage);
                     this.button.addEventListener('click', () => {
                         if (this.container.style.display === "none") {
                             this.open();
                         } else {
                             this.close();
                         }
+
+                        this.attachToPage().catch(logError);
                     });
                 }
 
                 referenceNode.appendChild(this.button);
             }
 
+            let popupNode = document.querySelector("#secondary-inner");
 
-            if (!referenceNode.contains(this.container)) {
+            if (!popupNode || popupNode.childElementCount < 2) {
+                popupNode = referenceNode.parentElement;
+            }
+
+            if (popupNode && !popupNode.contains(this.container)) {
                 if (!this.container) {
                     this.container = document.createElement('span');
                     this.container.id = "cbSubmitMenu";
                     this.container.style.display = "none";
     
                     this.root = createRoot(this.container);
-                    //todo: setup params, call this class and then test
                     //todo: don't render right away if not visible
                     this.render();
-
-                    if (isOnMobileYouTube()) {
-                        if (this.mutationObserver) {
-                            this.mutationObserver.disconnect();
-                        }
-                        
-                        this.mutationObserver = new MutationObserver(() => 
-                            void this.attachToPage());
-        
-                        this.mutationObserver.observe(referenceNode, { 
-                            childList: true,
-                            subtree: true
-                        });
-                    }
                 }
     
-                referenceNode.parentElement?.appendChild(this.container);
+                popupNode.insertBefore(this.container, popupNode.firstChild);
+            }
+
+            if (isOnMobileYouTube()) {
+                if (this.mutationObserver) {
+                    this.mutationObserver.disconnect();
+                }
+                
+                this.mutationObserver = new MutationObserver(() => 
+                    void this.attachToPage());
+
+                this.mutationObserver.observe(referenceNode, { 
+                    childList: true,
+                    subtree: true
+                });
             }
         }
 
@@ -124,6 +129,10 @@ export class SubmitButton {
     private async submitPressed(title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null): Promise<void> {
         if (title) {
             title.title = title.title.trim();
+
+            if (title.title.length === 0) {
+                title = null;
+            }
         }
 
         const result = await submitVideoBranding(getVideoID()!, title, thumbnail);
@@ -139,7 +148,7 @@ export class SubmitButton {
                     unsubmitted.thumbnails.forEach((t) => t.selected = false);
 
                     if (title) {
-                        const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === title.title);
+                        const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === title!.title);
                         if (unsubmittedTitle) unsubmittedTitle.selected = true;
                     }
                     

@@ -23,7 +23,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
     const titles: RenderedTitleSubmission[] = [{
         title: originalTitle
     }, {
-        title: chrome.i18n.getMessage("TypeYourOwnTitleHere")
+        title: ""
     }, ...props.submissions.titles
     .filter((s) => s.title !== originalTitle)
     .map((s) => ({
@@ -74,7 +74,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
     return (
         <div className="submissionMenuInner">
-            <div style={{ display: "flex", overflowX: "auto" }}>
+            <div className="cbThumbnailDrawer">
                 <ThumbnailDrawerComponent 
                     video={props.video} 
                     videoId={props.videoID} 
@@ -147,20 +147,16 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                     }}></TitleDrawerComponent>
             </div>
 
-            <hr className="cbLine">
-            </hr>
-
-            <div className="cbSubmitInstructions">
-                {chrome.i18n.getMessage("chooseDescriptive")}
+            <div className="cbVoteButtonContainer">
+                <button className="cbNoticeButton cbVoteButton" disabled={!selectedThumbnail.current && !selectedTitle.current}
+                    onClick={() => void props.submitClicked(selectedTitle.current ? {
+                    ...selectedTitle.current,
+                    original: selectedTitle.current.title === getCurrentPageTitle()
+                } : null, selectedThumbnail.current)}>
+                    {`${chrome.i18n.getMessage("Vote")}`}
+                </button>
             </div>
 
-            <button className="cbNoticeButton cbVoteButton" disabled={!selectedThumbnail.current && !selectedTitle.current}
-                onClick={() => void props.submitClicked(selectedTitle.current ? {
-                ...selectedTitle.current,
-                original: selectedTitle.current.title === getCurrentPageTitle()
-            } : null, selectedThumbnail.current)}>
-                {`${chrome.i18n.getMessage("Vote")}!`}
-            </button>
         </div>
     );
 };
