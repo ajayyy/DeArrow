@@ -60,7 +60,7 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
         if (props.time !== lastTime.current) {
             lastTime.current = props.time ?? null;
 
-            if (props.type !== ThumbnailType.Original) {
+            if (props.type === ThumbnailType.SpecifiedTime) {
                 canvasRef.current?.getContext("2d")?.clearRect(0, 0, canvasRef.current?.width, canvasRef.current?.height);
                 if (props.video.paused && props.time === props.video.currentTime) {
                     // Skip rendering and just use existing video frame
