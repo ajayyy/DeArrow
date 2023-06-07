@@ -46,11 +46,9 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
     // Find first invisible one, or wait for the first one to be visible
     const mainTitle = possibleSelectors.map((selector) => document.querySelector(selector) as HTMLElement).filter((element) => isVisible(element))[0] || 
         await waitForElement(possibleSelectors[0], true) as HTMLElement;
-    const titles = (possibleSelectors.map((selector) => document.querySelector(selector))) as HTMLElement[];
+    const titles = (possibleSelectors.map((selector) => document.querySelector(selector)).filter((e) => !!e)) as HTMLElement[];
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
     const videoID = getVideoID();
-
-    console.log("Rendering new thing", mainTitle, titles, videoID)
 
     if (videoID !== null && isVisible(mainTitle)) {
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
@@ -173,8 +171,6 @@ function getAndUpdateVideoBrandingInstances(videoID: VideoID, updateBranding: ()
         }
     } else {
         videoBrandingInstances[videoID].updateBrandingCallbacks.push(updateBranding);
-
-        console.log(videoBrandingInstances[videoID].updateBrandingCallbacks, videoID);
     }
 
     return videoBrandingInstances[videoID];
@@ -208,8 +204,6 @@ export async function updateBrandingForVideo(videoID: VideoID): Promise<void> {
         // They will be added back to the array
         videoBrandingInstances[videoID].updateBrandingCallbacks = [];
 
-        console.log(updateBrandingCallbacks, videoID)
-    
         await Promise.all(updateBrandingCallbacks.map((updateBranding) => updateBranding()));
     }
 }
