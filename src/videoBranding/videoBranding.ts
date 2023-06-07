@@ -4,7 +4,7 @@ import { isVisible, waitForElement } from "@ajayyy/maze-utils/lib/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
-import { findOrCreateShowOriginalButton, getOrCreateTitleElement, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
+import { findOrCreateShowOriginalButton, getOrCreateTitleElement, getOriginalTitleElement, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
 import { setThumbnailListener } from "@ajayyy/maze-utils/lib/thumbnailManagement";
 import Config, { ThumbnailCacheOption } from "../config";
 import { logError } from "../utils/logger";
@@ -89,7 +89,7 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
 
     if (link) {
         const videoID = extractVideoID(link);
-        const isPlaylistVideo = isPlaylist(link);
+        const isPlaylistTitleStatus = isPlaylistTitle(link);
 
         if (verifyVideoID && videoID !== verifyVideoID) {
             // Don't need this branding update anymore, it was trying to update for a different video
@@ -101,13 +101,18 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
         const showCustomBranding = videoBrandingInstance.showCustomBranding;
 
         const videoPromise = replaceThumbnail(element, videoID, brandingLocation, showCustomBranding);
-        const titlePromise = !isPlaylistVideo 
+        const titlePromise = !isPlaylistTitleStatus 
             ? replaceTitle(element, videoID, showCustomBranding, brandingLocation) 
             : Promise.resolve(false);
 
-        if (isPlaylistVideo) {
+        if (isPlaylistTitleStatus) {
             // Still create title element to make sure show original button will be in the right place
-            getOrCreateTitleElement(element, brandingLocation);
+            const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
+            const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
+
+            // Force original thumbnail to be visible
+            originalTitleElement.style.setProperty("display", "block", "important");
+            titleElement.style.setProperty("display", "none", "important");
         }
 
         const promises = [videoPromise, titlePromise] as [Promise<boolean>, Promise<boolean>];
@@ -146,8 +151,8 @@ function extractVideoID(link: HTMLAnchorElement) {
     return link.href?.match(/(?<=(?:\?|&)v=).{11}|(?<=\/shorts\/).{11}/)?.[0] as VideoID;
 }
 
-function isPlaylist(link: HTMLAnchorElement) {
-    return link.href?.match(/list=/)?.[0] !== undefined;
+function isPlaylistTitle(link: HTMLAnchorElement) {
+    return link.href?.match(/list=/)?.[0] !== undefined && link.href?.match(/index=/)?.[0] === undefined;
 }
 
 export async function handleShowOriginalButton(element: HTMLElement, videoID: VideoID,
