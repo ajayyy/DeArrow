@@ -7,13 +7,12 @@ import AddIcon from "../svgIcons/addIcon";
 
 export interface ThumbnailSelectionComponentProps {
     video: HTMLVideoElement;
-    selected: boolean;
-    onClick: (thumbnail: ThumbnailSubmission) => void;
+    selected?: boolean;
+    onClick?: (thumbnail: ThumbnailSubmission) => void;
     type: ThumbnailType;
     videoID: VideoID;
+    hideTime?: boolean;
     time?: number;
-    firstElem: boolean;
-    lastElem: boolean;
 }
 
 /**
@@ -29,8 +28,6 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
                 type={props.type}
                 videoID={props.videoID}
                 time={props.time}
-                firstElem={props.firstElem}
-                lastElem={props.lastElem}
                 onError={(e) => setError(e)}
                 onClick={props.onClick}>
 
@@ -43,10 +40,15 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
                         />
                     </div> : null
             }
-            <div style={{ fontWeight: "bold", textAlign: "center", marginTop: "4px" }}>
-                {error ? <div>{error}</div> : null}
-                {getText(props.time, props.type)}
-            </div>
+            {
+                !props.hideTime ?
+                    <div style={{ fontWeight: "bold", textAlign: "center", marginTop: "4px" }}>
+                        {error ? <div>{error}</div> : null}
+                        {getText(props.time, props.type)}
+                    </div>
+                : null
+            }
+            
         </ThumbnailComponent>
     );
 };

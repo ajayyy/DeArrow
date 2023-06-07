@@ -9,6 +9,7 @@ import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import Config, { UnsubmittedSubmission } from "../config";
 import { addTitleChangeListener, removeTitleChangeListener } from "../utils/titleBar";
 import { toSentenceCase } from "../titles/titleFormatter";
+import { BrandingPreviewComponent } from "./BrandingPreviewComponent";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -43,7 +44,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
     }));
     const thumbnails = defaultThumbnails.concat(downloadedThumbnails);
 
-    const selectedTitle = React.useRef<RenderedTitleSubmission | null>(null);
+    const [selectedTitle, setSelectedTitle] = React.useState<RenderedTitleSubmission | null>(null);
     const selectedThumbnail = React.useRef<ThumbnailSubmission | null>(null);
     const [selectedTitleIndex, setSelectedTitleIndex] = React.useState(-1);
     const [selectedThumbnailIndex, setSelectedThumbnailIndex] = React.useState(-1);
@@ -52,7 +53,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
     const [extraUnsubmittedThumbnails, setExtraUnsubmittedThumbnails] = React.useState<RenderedThumbnailSubmission[]>([]);
     const [extraUnsubmittedTitles, setExtraUnsubmittedTitles] = React.useState<RenderedTitleSubmission[]>([]);
     const videoChangeListener = () => {
-        selectedTitle.current = null;
+        setSelectedTitle(null);
         selectedThumbnail.current = null;
         setSelectedTitleIndex(-1);
         setSelectedThumbnailIndex(-1);
@@ -72,13 +73,27 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
         videoChangeListener();
     }, [props.videoID]);
 
+    const thumbnailSubmissions = [...defaultThumbnails, ...extraUnsubmittedThumbnails, ...downloadedThumbnails];
     return (
         <div className="submissionMenuInner">
+            <BrandingPreviewComponent
+                submissions={props.submissions}
+                titles={titles}
+                thumbnails={thumbnails}
+                selectedTitle={selectedTitle}
+                selectedThumbnail={selectedThumbnailIndex >= 0 ? thumbnailSubmissions[selectedThumbnailIndex] : null}
+
+                video={props.video}
+                videoID={props.videoID}
+            />
+
+            <hr className="cbLine"/>
+
             <div className="cbThumbnailDrawer">
                 <ThumbnailDrawerComponent 
                     video={props.video} 
                     videoId={props.videoID} 
-                    existingSubmissions={[...defaultThumbnails, ...extraUnsubmittedThumbnails, ...downloadedThumbnails]}
+                    existingSubmissions={thumbnailSubmissions}
                     selectedThumbnailIndex={selectedThumbnailIndex}
                     onSelect={(t, i) => {
                         let selectedIndex = i;
@@ -119,11 +134,11 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                     selectedTitleIndex={selectedTitleIndex}
                     onDeselect={() => {
                         setSelectedTitleIndex(-1);
-                        selectedTitle.current = null;
+                        setSelectedTitle(null);
                     }}
                     onSelectOrUpdate={(t, oldTitle, i) => {
                         setSelectedTitleIndex(i);
-                        selectedTitle.current = t;
+                        setSelectedTitle(t);
 
                         if (t.title !== originalTitle) {
                             const unsubmitted = Config.local!.unsubmitted[props.videoID] ??= {
@@ -148,10 +163,10 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             </div>
 
             <div className="cbVoteButtonContainer">
-                <button className="cbNoticeButton cbVoteButton" disabled={!selectedThumbnail.current && !selectedTitle.current}
-                    onClick={() => void props.submitClicked(selectedTitle.current ? {
-                    ...selectedTitle.current,
-                    original: selectedTitle.current.title === getCurrentPageTitle()
+                <button className="cbNoticeButton cbVoteButton" disabled={!selectedThumbnail.current && !selectedTitle}
+                    onClick={() => void props.submitClicked(selectedTitle ? {
+                    ...selectedTitle,
+                    original: selectedTitle.title === getCurrentPageTitle()
                 } : null, selectedThumbnail.current)}>
                     {`${chrome.i18n.getMessage("Vote")}`}
                 </button>

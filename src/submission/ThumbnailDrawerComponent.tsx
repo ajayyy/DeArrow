@@ -49,8 +49,6 @@ function getThumbnails(props: ThumbnailDrawerComponentProps,
                 type={props.existingSubmissions[i].type}
                 videoID={props.videoId}
                 time={time}
-                firstElem={i === 0}
-                lastElem={i === renderCount - 1}
                 key={time ? `T${time}` : `I${i}`}
             ></ThumbnailSelectionComponent>
         );

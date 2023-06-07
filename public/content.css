@@ -35,6 +35,11 @@ canvas.ytd-img-shadow:not(.ytp-autonav-endscreen-upnext-thumbnail, .ytp-videowal
     border-color: var(--yt-spec-text-primary);
 }
 
+.cbBrandingPreview .cbThumbnail {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
 /* For miniplayer */
 .ytd-miniplayer .cbCustomTitle {
     text-overflow: ellipsis;
@@ -78,6 +83,8 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 .cbThumbnailDrawer {
     display: flex;
     overflow-x: auto;
+
+    margin-top: 16px;
 }
 
 .cbThumbnailDrawer > div:first-child {
@@ -110,12 +117,14 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     cursor: pointer;
 }
 
+.cbBrandingPreview .cbThumbnailImg {
+    cursor: default;
+}
+
 .cbTitle {
     font-size: 1.3em;
     display: flex;
     align-items: center;
-    /* margin-top: 5px;
-    margin-bottom: 5px; */
 
     padding: var(--cb-thumbnail-padding);
     box-sizing: border-box;
@@ -134,6 +143,17 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 
 .cbTitleTextHint {
     opacity: 0.5;
+}
+
+.cbTitlePreview {
+    display: flex;
+    justify-content: center;
+
+    padding-top: 0;
+    margin-top: 0;
+    font-weight: 600;
+    font-family: "YouTube Sans", "Roboto", sans-serif;
+    font-size: 2rem;
 }
 
 .cbHiddenTextBox {
@@ -208,6 +228,10 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 
 .cbTitleSelected svg.resetCustomTitle {
     height: 0.7em;
+}
+
+.cbBrandingPreview .cbTitle {
+    cursor: default !important;
 }
 
 .cbNoticeButton {

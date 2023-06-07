@@ -12,14 +12,12 @@ export enum ThumbnailType {
 
 export interface ThumbnailComponentProps {
     video: HTMLVideoElement;
-    selected: boolean;
-    onClick: (thumbnail: ThumbnailSubmission) => void;
+    selected?: boolean;
+    onClick?: (thumbnail: ThumbnailSubmission) => void;
     onError: (error: string) => void;
     type: ThumbnailType;
     videoID: VideoID;
     time?: number;
-    firstElem: boolean;
-    lastElem: boolean;
     children?: React.ReactNode;
 }
 
@@ -40,8 +38,8 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
     const inRenderingLoop = React.useRef(false);
     const [defaultThumbnailOption, setDefaultThumbnailOption] = React.useState(0);
 
-    if (props.type === ThumbnailType.CurrentTime) {
-        React.useEffect(() => {
+    React.useEffect(() => {
+        if (props.type === ThumbnailType.CurrentTime) {
             props.video.addEventListener("playing", () => renderCurrentFrame(props, canvasRef, inRenderingLoop, true));
             props.video.addEventListener("seeked", () => {
                 // If playing, it's already waiting for the next frame from the other listener
@@ -51,18 +49,18 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
             });
 
             renderCurrentFrame(props, canvasRef, inRenderingLoop, !props.video.paused);
-        }, [props.video]);
-    }
+        }
+    }, [props.video]);
 
     React.useEffect(() => {
         setDefaultThumbnailOption(0);
     }, [props.videoID]);
 
-    if (props.time != null && props.type === ThumbnailType.SpecifiedTime) {
-        React.useEffect(() => {
-            if (props.type !== ThumbnailType.Original && props.time !== lastTime.current) {
-                lastTime.current = props.time ?? null;
+    React.useEffect(() => {
+        if (props.time !== lastTime.current) {
+            lastTime.current = props.time ?? null;
 
+            if (props.type !== ThumbnailType.Original) {
                 canvasRef.current?.getContext("2d")?.clearRect(0, 0, canvasRef.current?.width, canvasRef.current?.height);
                 if (props.video.paused && props.time === props.video.currentTime) {
                     // Skip rendering and just use existing video frame
@@ -84,8 +82,8 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                     });
                 }
             }
-        }, [props.time]);
-    }
+        }
+    }, [props.time]);
 
     return (
         <div className={`cbThumbnail${props.selected ? " cbThumbnailSelected" : ""}`}
@@ -95,7 +93,7 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                         props.video.currentTime = props.video.currentTime;
                     }
 
-                    props.onClick(props.type === ThumbnailType.Original ? {
+                    props.onClick?.(props.type === ThumbnailType.Original ? {
                         original: true
                     } : {
                         original: false,
