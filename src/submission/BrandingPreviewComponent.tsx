@@ -24,7 +24,7 @@ export const  BrandingPreviewComponent = (props: BrandingPreviewComponentCompone
     const [displayedThumbnail, setDisplayedThumbnail] = React.useState(getDefaultThumbnail(props.submissions, props.thumbnails));
 
     React.useEffect(() => {
-        if (props.selectedTitle) {
+        if (props.selectedTitle?.title) {
             setDisplayedTitle(props.selectedTitle);
         } else {
             setDisplayedTitle(getDefaultTitle(props.submissions, props.titles));
