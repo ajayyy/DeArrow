@@ -47,6 +47,7 @@ export const  BrandingPreviewComponent = (props: BrandingPreviewComponentCompone
                 videoID={props.videoID}
                 time={displayedThumbnail.type === ThumbnailType.SpecifiedTime ? displayedThumbnail.timestamp : undefined}
                 hideTime={true}
+                larger={true}
             ></ThumbnailSelectionComponent>
 
             <div className="cbTitle cbTitlePreview">

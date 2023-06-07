@@ -13,6 +13,7 @@ export interface ThumbnailSelectionComponentProps {
     videoID: VideoID;
     hideTime?: boolean;
     time?: number;
+    larger?: boolean;
 }
 
 /**
@@ -28,6 +29,7 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
                 type={props.type}
                 videoID={props.videoID}
                 time={props.time}
+                larger={props.larger}
                 onError={(e) => setError(e)}
                 onClick={props.onClick}>
 

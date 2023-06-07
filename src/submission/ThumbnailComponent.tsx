@@ -19,6 +19,7 @@ export interface ThumbnailComponentProps {
     videoID: VideoID;
     time?: number;
     children?: React.ReactNode;
+    larger?: boolean;
 }
 
 const defaultThumbnailOptions = [
@@ -28,15 +29,17 @@ const defaultThumbnailOptions = [
     "hqdefault"
 ]
 
-// todo: remove this
-const canvasWidth = 720;
-const canvasHeight = 404;
+const aspectRatio = 16 / 9;
+
 
 export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     const lastTime = React.useRef(null) as React.MutableRefObject<number | null>;
     const inRenderingLoop = React.useRef(false);
     const [defaultThumbnailOption, setDefaultThumbnailOption] = React.useState(0);
+
+    const canvasWidth = Math.ceil(calculateCanvasWidth(props.larger ?? false));
+    const canvasHeight = Math.ceil(canvasWidth / aspectRatio);
 
     React.useEffect(() => {
         if (props.type === ThumbnailType.CurrentTime) {
@@ -159,5 +162,22 @@ async function renderCurrentFrame(props: ThumbnailComponentProps,
         }
     } catch (e) {
         props.onError(chrome.i18n.getMessage("VideoNotReady"));
+    }
+}
+
+function calculateCanvasWidth(larger: boolean): number {
+    const fallback = larger ? 720 : 100;
+
+    const watchFlexy = document.querySelector("ytd-watch-flexy");
+    if (!watchFlexy) return fallback;
+
+    const containerWidth = parseFloat(getComputedStyle(watchFlexy)
+        .getPropertyValue("--ytd-watch-flexy-sidebar-width")?.replace("px", ""));
+
+    const factor = larger ? 1 : 0.2;
+    if (containerWidth && !isNaN(containerWidth)) {
+        return containerWidth * window.devicePixelRatio * factor;
+    } else {
+        return fallback;
     }
 }
