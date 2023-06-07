@@ -1,8 +1,8 @@
-## DeArrow
-
 <p align="center">
   <a href="https://dearrow.ajay.app"><img src="public/icons/logo-128.png" alt="Logo"></img></a>
 </p>
+
+<h1 align="center">DeArrow</h1>
 
 > EXPERIMENTAL PROTOTYPE PLEASE WAIT FOR STABLE. If you do like testing alpha software, please join #de-arrow channel on Discord/Matrix and follow the instructions.
 
