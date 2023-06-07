@@ -236,21 +236,19 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 
 .cbNoticeButton {
 	background: none;
-	color: rgb(235, 235, 235);
-	border: none;
-	display: inline-block;
-	font-size: 13.3333px;
+	font-size: 2em;
+    padding: 10px 20px;
+    border-radius: 30px;
+    background-color: #0e79cac2;
+    color: white;
+    border: none;
 
-	cursor: pointer;
-
-	margin-right: 10px;
-
-    padding: 2px 5px;
+    cursor: pointer;
 }
 
 .cbNoticeButton:hover {
 	background-color: rgba(235, 235, 235, 0.2);
-	border-radius: 4px;
+    background-color: #0e78ca;
 
 	transition: background-color 0.2s;
 }
@@ -260,15 +258,6 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     justify-content: center;
     margin-top: 15px;
     margin-bottom: 15px;
-}
-
-.cbVoteButton {
-    font-size: 2em;
-    padding: 10px 20px;
-    border-radius: 30px;
-    background-color: #0e79cac2;
-    color: white;
-    border: none;
 }
 
 .cbSubmitInstructions {
