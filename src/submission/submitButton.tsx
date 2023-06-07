@@ -17,7 +17,7 @@ const submitButtonIcon = `
 
 export class SubmitButton {
     button: HTMLButtonElement;
-    container: HTMLElement;
+    container: HTMLElement | null;
     root: Root | null;
 
     mutationObserver?: MutationObserver;
@@ -47,51 +47,11 @@ export class SubmitButton {
                     this.button.draggable = false;
 
                     this.button.addEventListener('click', () => {
-                        if (this.container.style.display === "none") {
-                            this.open();
-                        } else {
-                            this.close();
-                        }
-
-                        this.attachToPage().catch(logError);
+                        this.openOrClose().catch(logError);
                     });
                 }
 
                 referenceNode.appendChild(this.button);
-            }
-
-            let popupNode = document.querySelector("#secondary-inner");
-
-            if (!popupNode || popupNode.childElementCount < 2) {
-                popupNode = referenceNode.parentElement;
-            }
-
-            if (popupNode && !popupNode.contains(this.container)) {
-                if (!this.container) {
-                    this.container = document.createElement('span');
-                    this.container.id = "cbSubmitMenu";
-                    this.container.style.display = "none";
-    
-                    this.root = createRoot(this.container);
-                    //todo: don't render right away if not visible
-                    this.render();
-                }
-    
-                popupNode.insertBefore(this.container, popupNode.firstChild);
-            }
-
-            if (isOnMobileYouTube()) {
-                if (this.mutationObserver) {
-                    this.mutationObserver.disconnect();
-                }
-                
-                this.mutationObserver = new MutationObserver(() => 
-                    void this.attachToPage());
-
-                this.mutationObserver.observe(referenceNode, { 
-                    childList: true,
-                    subtree: true
-                });
             }
         }
 
@@ -101,11 +61,48 @@ export class SubmitButton {
     }
 
     close(): void {
-        if (this.container) this.container.style.display = "none";
+        if (this.container) {
+            this.container.remove();
+            this.container = null;
+        }
     }
 
-    open(): void {
-        this.container.style.removeProperty("display");
+    async openOrClose(): Promise<void> {
+        const referenceNode = await getOrCreateTitleButtonContainer();
+        if (!referenceNode) return;
+
+        let popupNode = document.querySelector("#secondary-inner");
+        if (!popupNode || popupNode.childElementCount < 2) {
+            popupNode = referenceNode.parentElement;
+        }
+
+        if (popupNode && !popupNode.contains(this.container)) {
+            if (!this.container) {
+                this.container = document.createElement('span');
+                this.container.id = "cbSubmitMenu";
+
+                this.root = createRoot(this.container);
+                this.render();
+            }
+
+            popupNode.insertBefore(this.container, popupNode.firstChild);
+
+            if (isOnMobileYouTube()) {
+                if (this.mutationObserver) {
+                    this.mutationObserver.disconnect();
+                }
+                
+                this.mutationObserver = new MutationObserver(() => 
+                    void this.attachToPage());
+    
+                this.mutationObserver.observe(referenceNode, { 
+                    childList: true,
+                    subtree: true
+                });
+            }
+        } else {
+            this.close();
+        }
     }
 
     clearSubmissions(): void {
@@ -123,7 +120,9 @@ export class SubmitButton {
     }
 
     render(): void {
-        this.root?.render(<SubmissionComponent video={getVideo()!} videoID={getVideoID()!} submissions={this.submissions} submitClicked={(title, thumbnail) => this.submitPressed(title, thumbnail)} />);
+        if (this.root) {
+            this.root?.render(<SubmissionComponent video={getVideo()!} videoID={getVideoID()!} submissions={this.submissions} submitClicked={(title, thumbnail) => this.submitPressed(title, thumbnail)} />);
+        }
     }
 
     private async submitPressed(title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null): Promise<void> {
