@@ -8,7 +8,7 @@
 
 DeArrow is a browser extension for crowdsourcing better titles and thumbnails on YouTube.
 
-# Related Repositories
+### Related Repositories
 
 | Name | URL |
 | --- | --- |
