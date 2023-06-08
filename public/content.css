@@ -111,6 +111,12 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     border-radius: 20px;
 }
 
+.submissionMenuInner .sbYourWorkBox {
+    --sb-main-fg-color: var(--yt-spec-text-primary);
+    --sb-grey-fg-color: var(--yt-spec-text-primary);
+    --sb-grey-bg-color: #64646470;
+}
+
 .cbThumbnailImg {
     width: 100%;
 

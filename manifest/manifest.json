@@ -16,17 +16,18 @@
             "./js/content.js"
         ],
         "css": [
-            "content.css"
+            "content.css",
+            "shared.css"
         ]
     }],
     "web_accessible_resources": [
         "icons/refresh.svg",
-        "icons/pencil.svg",
         "icons/logo.svg",
         "js/document.js",
         "js/options.js",
         "js/popup.js",
-        "popup.css"
+        "popup.css",
+        "shared.css"
     ],
     "permissions": [
         "storage",

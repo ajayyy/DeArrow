@@ -14,6 +14,7 @@ import { getHash } from "@ajayyy/maze-utils/lib/hash";
 import { sendRequestToServer } from "../dataFetching";
 import { objectToURI } from "@ajayyy/maze-utils";
 import { logError } from "../utils/logger";
+import { YourWorkComponent } from "../popup/YourWorkComponent";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -213,6 +214,8 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                 Config.config!.showGuidelineHelp ? 
                 <>
                     <hr className="cbLine"/>
+
+                    <YourWorkComponent/>
 
                     <div className="cbHelpButtonContainer">
                         <a className="cbNoticeButton"

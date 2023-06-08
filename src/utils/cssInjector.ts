@@ -3,7 +3,8 @@ import Config from "../config";
 import { brandingBoxSelector, watchPageThumbnailSelector } from "../videoBranding/videoBranding";
 
 const cssFiles = [
-    "content.css"
+    "content.css",
+    "shared.css"
 ];
 
 export function addCssToPage() {
