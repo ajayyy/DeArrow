@@ -3,10 +3,12 @@ import Config from "../config";
 import { showDonationLink } from "../utils/configUtils";
 import { toSentenceCase } from "../titles/titleFormatter";
 import { YourWorkComponent } from "./YourWorkComponent";
+import { SelectOptionComponent } from "./SelectOptionComponent";
 
 export const PopupComponent = () => {
     const [extensionEnabled, setExtensionEnabled] = React.useState(Config.config!.extensionEnabled);
     const [titleFormatting, setTitleFormatting] = React.useState(String(Config.config!.titleFormatting));
+    const [thumbnailFallback, setThumbnailFallback] = React.useState(String(Config.config!.thumbnailFallback));
 
     return (
         <>
@@ -48,21 +50,40 @@ export const PopupComponent = () => {
             </div>
             
             {/* Title Reformatting Option */}
-            <div className="optionContainer">
-                <label className="optionLabel" htmlFor="titleFormatting">{chrome.i18n.getMessage("titleFormatting")}</label>
-                <select id="titleFormatting" 
-                    className="selector-element optionsSelector"
-                    value={titleFormatting}
-                    onChange={(e) => {
-                        setTitleFormatting(e.target.value);
-                        Config.config!.titleFormatting = parseInt(e.target.value, 10);
-                    }}>
-                    <option value="-1">{chrome.i18n.getMessage("Disabled")}</option>
-                    <option value="1">{chrome.i18n.getMessage("TitleCase")}</option>
-                    <option value="2">{toSentenceCase(chrome.i18n.getMessage("SentenceCase"), false)}</option>
-                    <option value="0">{chrome.i18n.getMessage("CapitalizeWords")}</option>
-                </select>
-            </div>
+            <SelectOptionComponent
+                id="titleFormatting"
+                onChange={(value) => {
+                    setTitleFormatting(value);
+                    Config.config!.titleFormatting = parseInt(value, 10);
+                }}
+                value={titleFormatting}
+                label={chrome.i18n.getMessage("titleFormatting")}
+                options={[
+                    { value: "-1", label: chrome.i18n.getMessage("Disabled") },
+                    { value: "1", label: chrome.i18n.getMessage("TitleCase") },
+                    { value: "2", label: toSentenceCase(chrome.i18n.getMessage("SentenceCase"), false) },
+                    { value: "0", label: chrome.i18n.getMessage("CapitalizeWords") },
+                ]}
+            />
+
+            {/* Thumbnail Fallback Option */}
+            <SelectOptionComponent
+                id="thumbnailFallback"
+                style={{
+                    paddingTop: "15px"
+                }}
+                onChange={(value) => {
+                    setThumbnailFallback(value);
+                    Config.config!.thumbnailFallback = parseInt(value, 10);
+                }}
+                value={thumbnailFallback}
+                label={chrome.i18n.getMessage("thumbnailFallbackOption")}
+                options={[
+                    { value: "0", label: chrome.i18n.getMessage("RandomTime") },
+                    { value: "1", label: chrome.i18n.getMessage("showABlankBox") },
+                    { value: "2", label: chrome.i18n.getMessage("TheOriginalThumbnail") },
+                ]}
+            />
 
             {/* Your Work box */}
             <YourWorkComponent/>

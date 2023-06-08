@@ -27,7 +27,9 @@ export class SubmitButton {
     constructor() {
         this.submissions = {
             thumbnails: [],
-            titles: []
+            titles: [],
+            randomTime: null,
+            videoDuration: null
         }
     }
 
@@ -108,7 +110,9 @@ export class SubmitButton {
     clearSubmissions(): void {
         this.setSubmissions({
             thumbnails: [],
-            titles: []
+            titles: [],
+            randomTime: null,
+            videoDuration: null
         });
 
         this.render();

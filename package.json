@@ -6,7 +6,8 @@
   "dependencies": {
     "@ajayyy/maze-utils": "1.1.33",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "seedrandom": "^3.0.5"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.197",
@@ -14,6 +15,7 @@
     "@types/jest": "^29.1.2",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",
+    "@types/seedrandom": "^3.0.5",
     "@types/selenium-webdriver": "^4.1.5",
     "@types/wicg-mediasession": "^1.1.4",
     "@typescript-eslint/eslint-plugin": "^5.39.0",
@@ -63,7 +65,7 @@
     "clean": "rimraf dist",
     "test": "npm run build:chrome && npm run test:no-build",
     "test-without-building": "npm run test:no-build",
-    "test:no-build":  "npx jest --passWithNoTests",
+    "test:no-build": "npx jest --passWithNoTests",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix"
   },

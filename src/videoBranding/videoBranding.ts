@@ -14,6 +14,8 @@ export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
 export interface BrandingResult {
     titles: TitleResult[];
     thumbnails: ThumbnailResult[];
+    randomTime: number | null;
+    videoDuration: number | null;
 }
 
 export enum BrandingLocation {
@@ -235,7 +237,8 @@ export function setupOptionChangeListener(): void {
             }
         }
 
-        if (changes.titleFormatting && changes.titleFormatting.newValue !== changes.titleFormatting.oldValue) {
+        if ((changes.titleFormatting && changes.titleFormatting.newValue !== changes.titleFormatting.oldValue)
+                || (changes.thumbnailFallback && changes.thumbnailFallback.newValue !== changes.thumbnailFallback.oldValue)) {
             for (const videoID in videoBrandingInstances) {
                 const updateBrandingCallbacks = videoBrandingInstances[videoID as VideoID].updateBrandingCallbacks;
                 // They will be added back to the array

@@ -29,9 +29,14 @@ export interface FailInfo {
     onReady: Array<(video: RenderedThumbnailVideo | null) => void>;
 }
 
+interface VideoMetadata {
+    duration: number | null;
+    playbackUrls: PlaybackUrl[];
+}
+
 export interface ThumbnailData {
     video: ThumbnailVideo[];
-    playbackUrls: PlaybackUrl[];
+    metadata: VideoMetadata;
     failures: FailInfo[];
     thumbnailCachesFailed: Set<number>;
 }
@@ -52,7 +57,10 @@ export function setupCache(videoID: VideoID): ThumbnailData {
     if (!cache[videoID]) {
         cache[videoID] = {
             video: [],
-            playbackUrls: [],
+            metadata: {
+                duration: null,
+                playbackUrls: []
+            },
             lastUsed: Date.now(),
             failures: [],
             thumbnailCachesFailed: new Set()

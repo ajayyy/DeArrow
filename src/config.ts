@@ -35,6 +35,12 @@ export enum ThumbnailCacheOption {
     OnAllPages
 }
 
+export enum ThumbnailFallbackOption {
+    RandomTime,
+    Blank,
+    Original
+}
+
 interface SBConfig {
     userID: string | null;
     vip: boolean;
@@ -53,6 +59,7 @@ interface SBConfig {
     thumbnailCacheUse: ThumbnailCacheOption;
     antiAliasThumbnails: boolean;
     showGuidelineHelp: boolean;
+    thumbnailFallback: ThumbnailFallbackOption;
     extensionEnabled: boolean;
 }
 
@@ -93,6 +100,7 @@ const syncDefaults = {
     thumbnailCacheUse: ThumbnailCacheOption.OnAllPages,
     antiAliasThumbnails: true,
     showGuidelineHelp: true,
+    thumbnailFallback: ThumbnailFallbackOption.RandomTime,
     extensionEnabled: true
 };
 

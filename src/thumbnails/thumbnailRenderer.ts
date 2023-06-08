@@ -5,7 +5,7 @@ import { getVideoThumbnailIncludingUnsubmitted, queueThumbnailCacheRequest } fro
 import { log, logError } from "../utils/logger";
 import { BrandingLocation } from "../videoBranding/videoBranding";
 import { isFirefoxOrSafari, waitFor } from "@ajayyy/maze-utils";
-import Config from "../config";
+import Config, { ThumbnailFallbackOption } from "../config";
 
 const thumbnailRendererControls: Record<VideoID, Array<(error?: string) => void>> = {};
 
@@ -406,7 +406,11 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
         // Trigger a fetch to start, and display the original thumbnail if necessary
         getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation).then((thumbnail) => {
             if (!thumbnail || thumbnail.original) {
-                resetToShowOriginalThumbnail(image, brandingLocation);
+                if (!thumbnail && Config.config!.thumbnailFallback === ThumbnailFallbackOption.Blank) {
+                    resetToBlankThumbnail(image);
+                } else {
+                    resetToShowOriginalThumbnail(image, brandingLocation);
+                }
             }
         }).catch(logError);
 
@@ -418,7 +422,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
             }, () => resetToShowOriginalThumbnail(image, brandingLocation));
     
             if (!thumbnail) {
-                resetToShowOriginalThumbnail(image, brandingLocation);
+                // Hiding handled by already above then check
                 return false;
             }
 
@@ -463,6 +467,13 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
     if (brandingLocation === BrandingLocation.Autoplay) {
         hideCanvas(image);
     }
+}
+
+function resetToBlankThumbnail(image: HTMLImageElement) {
+    image.classList.remove("cb-visible");
+    image.style.setProperty("display", "none", "important");
+
+    hideCanvas(image);
 }
 
 function hideCanvas(image: HTMLElement) {
