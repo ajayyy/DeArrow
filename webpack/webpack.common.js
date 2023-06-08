@@ -151,7 +151,7 @@ module.exports = env => {
                         transform(content, path) {
                             if (path.match(/(\/|\\)_locales(\/|\\).+/)) {
                                 const parsed = JSON.parse(content.toString());
-                                if (env.browser.toLowerCase() === "safari") {
+                                if (env.browser.toLowerCase() === "safari" || env.browser.toLowerCase() === "firefox") {
                                     parsed.fullName.message = parsed.fullName.message.match(/^.+(?= -)/)?.[0] || parsed.fullName.message;
                                     if (parsed.fullName.message.length > 50) {
                                         parsed.fullName.message = parsed.fullName.message.slice(0, 47) + "...";
