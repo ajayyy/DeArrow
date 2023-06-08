@@ -41,7 +41,10 @@ function buildHideThumbnailCss(): string {
         "div.ytp-videowall-still-image:not(.cb-visible)" // End recommendations
     ];
 
-    for (const start of brandingBoxSelector.split(", ")) {
+    const boxesToHide = brandingBoxSelector.split(", ").concat([
+        "ytd-video-preview"
+    ]);
+    for (const start of boxesToHide) {
         const thumbnailTypes = [
             "ytd-thumbnail",
             "ytd-playlist-video-thumbnail-renderer"
