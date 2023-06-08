@@ -276,6 +276,34 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     font-size: 2em;
 }
 
+.cbHelpContainer {
+    margin: auto;
+    width: 80%;
+
+    padding-top: 6px;
+}
+
+.cbTip {
+    display: flex;
+    align-items: center;
+
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.cbTipIcon {
+    width: 30px;
+    flex-shrink: 0;
+}
+
+.cbTipText {
+    font-size: 14px;
+    padding-left: 5px;
+
+    text-align: center;
+    width: 100%;
+}
+
 .cbSubmitInstructions {
     margin-top: 4px;
     margin-bottom: 4px;

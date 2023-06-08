@@ -15,6 +15,10 @@ import { sendRequestToServer } from "../dataFetching";
 import { objectToURI } from "@ajayyy/maze-utils";
 import { logError } from "../utils/logger";
 import { YourWorkComponent } from "../popup/YourWorkComponent";
+import PersonIcon from "../svgIcons/personIcon";
+import QuestionIcon from "../svgIcons/questionIcon";
+import ExclamationIcon from "../svgIcons/exclamationIcon";
+import CursorIcon from "../svgIcons/cursorIcon";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -215,6 +219,10 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                 <>
                     <hr className="cbLine"/>
 
+                    <div className="cbHelpContainer">
+                        {getTips()}
+                    </div>
+
                     <YourWorkComponent/>
 
                     <div className="cbHelpButtonContainer">
@@ -284,4 +292,27 @@ function getChatDisplayName(chatDisplayName: ChatDisplayName | null): string {
     } else {
         return "DeArrow User";
     }
+}
+
+function getTips(): React.ReactElement[] {
+    const tipInfo = [{
+        icon: PersonIcon,
+        text: chrome.i18n.getMessage("tip1")
+    }, {
+        icon: QuestionIcon,
+        text: chrome.i18n.getMessage("tip2")
+    }, {
+        icon: ExclamationIcon,
+        text: chrome.i18n.getMessage("tip3")
+    }, {
+        icon: CursorIcon,
+        text: chrome.i18n.getMessage("tip4")
+    }];
+
+    return tipInfo.map((tip, i) => (
+        <div className="cbTip" key={i}>
+            <tip.icon className="cbTipIcon"/>
+            <span className="cbTipText">{tip.text}</span>
+        </div>
+    ));
 }
