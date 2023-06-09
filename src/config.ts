@@ -61,6 +61,7 @@ interface SBConfig {
     showGuidelineHelp: boolean;
     thumbnailFallback: ThumbnailFallbackOption;
     extensionEnabled: boolean;
+    importedConfig: boolean;
 }
 
 interface SBStorage {
@@ -101,7 +102,8 @@ const syncDefaults = {
     antiAliasThumbnails: true,
     showGuidelineHelp: true,
     thumbnailFallback: ThumbnailFallbackOption.RandomTime,
-    extensionEnabled: true
+    extensionEnabled: true,
+    importedConfig: false
 };
 
 const localDefaults = {

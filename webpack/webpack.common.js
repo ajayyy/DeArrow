@@ -94,6 +94,7 @@ module.exports = env => {
             content: path.join(__dirname, srcDir + 'content.ts'),
             options: path.join(__dirname, srcDir + 'options.ts'),
             popup: path.join(__dirname, srcDir + 'popup/popup.tsx'),
+            help: path.join(__dirname, srcDir + 'help/help.tsx'),
         },
         output: {
             path: path.join(__dirname, '../dist/js'),
@@ -135,8 +136,8 @@ module.exports = env => {
                         context: './public',
                         filter: async (path) => {
                             if (path.match(/(\/|\\)_locales(\/|\\).+/)) {
-                                if (env.browser.toLowerCase() === "edge" 
-                                        && !edgeLanguages.includes(path.match(/(?<=\/_locales\/)[^/]+(?=\/[^/]+$)/)[0])) {
+                                if (env.browser.toLowerCase() === "edge"
+                                    && !edgeLanguages.includes(path.match(/(?<=\/_locales\/)[^/]+(?=\/[^/]+$)/)[0])) {
                                     return false;
                                 }
 
@@ -162,7 +163,7 @@ module.exports = env => {
                                         parsed.Description.message = parsed.Description.message.slice(0, 77) + "...";
                                     }
                                 }
-                
+
                                 return Buffer.from(JSON.stringify(parsed));
                             }
 

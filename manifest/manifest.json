@@ -27,7 +27,14 @@
         "js/options.js",
         "js/popup.js",
         "popup.css",
-        "shared.css"
+        "shared.css",
+        "help.html",
+        "help.css",
+        "icons/logo-16.png",
+        "icons/logo-32.png",
+        "icons/logo-64.png",
+        "icons/logo-128.png",
+        "icons/logo-256.png"
     ],
     "permissions": [
         "storage",

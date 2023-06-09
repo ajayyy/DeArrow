@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener((request) =>  {
             void chrome.tabs.create({url: chrome.runtime.getURL('options/options.html' + (request.hash ? '#' + request.hash : ''))});
             return false;
         case "openHelp":
-            void chrome.tabs.create({url: chrome.runtime.getURL('help/index.html')});
+            void chrome.tabs.create({url: chrome.runtime.getURL('help.html')});
             return false;
     }
 
@@ -53,13 +53,14 @@ chrome.runtime.onInstalled.addListener(() => {
                 Config.config!.showDonationLink = sponsorBlockConfig["showDonationLink"];
                 Config.config!.showUpsells = sponsorBlockConfig["showUpsells"];
                 Config.config!.darkMode = sponsorBlockConfig["darkMode"];
+                Config.config!.importedConfig = true;
             } else {
                 const newUserID = generateUserID();
                 Config.config!.userID = newUserID;
             }
 
             // Open up the install page
-            setTimeout(() => void chrome.tabs.create({url: chrome.extension.getURL("/help/index.html")}), 100);
+            setTimeout(() => void chrome.tabs.create({url: chrome.extension.getURL("/help.html")}), 100);
         }
     }, 1500);
 });
