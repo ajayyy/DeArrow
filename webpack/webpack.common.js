@@ -152,6 +152,10 @@ module.exports = env => {
                         transform(content, path) {
                             if (path.match(/(\/|\\)_locales(\/|\\).+/)) {
                                 const parsed = JSON.parse(content.toString());
+                                if (env.browser.toLowerCase() === "chrome" && path.includes("/en/")) {
+                                    parsed.deArrowFullName.message = parsed.deArrowFullName.message.replace(" on YouTube", "");
+                                }
+
                                 if (env.browser.toLowerCase() === "safari" || env.browser.toLowerCase() === "firefox") {
                                     if (parsed.deArrowFullName) {
                                         parsed.deArrowFullName.message = parsed.deArrowFullName.message.match(/^.+(?= -)/)?.[0] || parsed.deArrowFullName.message;
@@ -174,8 +178,6 @@ module.exports = env => {
                                     const english = fs.readFileSync("public/_locales/en/messages.json").toString();
                                     const englishJson = JSON.parse(english);
                                     parsed.deArrowFullName = englishJson.deArrowFullName;
-
-                                    console.log(path)
                                 }
 
                                 if (!parsed.deArrowDescription) {
