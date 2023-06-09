@@ -1,5 +1,5 @@
 @ajayyy/maze-utils
-1.1.18 <https://github.com/ajayyy/SponsorBlock>
+1.1.33 <https://github.com/ajayyy/maze-utils>
                    GNU LESSER GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
@@ -300,3 +300,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+******************************
+
+seedrandom
+3.0.5 <https://github.com/davidbau/seedrandom>
+license: MIT
+authors: David Bau
