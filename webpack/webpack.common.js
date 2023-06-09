@@ -159,6 +159,7 @@ module.exports = env => {
                                             parsed.deArrowFullName.message = parsed.deArrowFullName.message.slice(0, 47) + "...";
                                         }
                                     }
+                                }
 
                                 if (env.browser.toLowerCase() === "safari") {
                                     if (parsed.deArrowDescription) {
