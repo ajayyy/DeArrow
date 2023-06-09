@@ -170,6 +170,20 @@ module.exports = env => {
                                     }
                                 }
 
+                                if (!parsed.deArrowFullName) {
+                                    const english = fs.readFileSync("public/_locales/en/messages.json").toString();
+                                    const englishJson = JSON.parse(english);
+                                    parsed.deArrowFullName = englishJson.deArrowFullName;
+
+                                    console.log(path)
+                                }
+
+                                if (!parsed.deArrowDescription) {
+                                    const english = fs.readFileSync("public/_locales/en/messages.json").toString();
+                                    const englishJson = JSON.parse(english);
+                                    parsed.deArrowDescription = englishJson.deArrowDescription;
+                                }
+
                                 return Buffer.from(JSON.stringify(parsed));
                             }
 
