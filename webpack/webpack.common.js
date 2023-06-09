@@ -156,11 +156,11 @@ module.exports = env => {
                                     if (parsed.deArrowFullName) {
                                         parsed.deArrowFullName.message = parsed.deArrowFullName.message.match(/^.+(?= -)/)?.[0] || parsed.deArrowFullName.message;
                                         if (parsed.deArrowFullName.message.length > 50) {
-                                            console.log(path)
                                             parsed.deArrowFullName.message = parsed.deArrowFullName.message.slice(0, 47) + "...";
                                         }
                                     }
 
+                                if (env.browser.toLowerCase() === "safari") {
                                     if (parsed.deArrowDescription) {
                                         parsed.deArrowDescription.message = parsed.deArrowDescription.message.match(/^.+(?=\. )/)?.[0] || parsed.deArrowDescription.message;
                                         if (parsed.deArrowDescription.message.length > 80) {
