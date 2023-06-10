@@ -1,7 +1,7 @@
 {
     "name": "__MSG_deArrowFullName__",
     "short_name": "DeArrow",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "default_locale": "en",
     "description": "__MSG_deArrowDescription__",
     "homepage_url": "https://sponsor.ajay.app",
@@ -20,83 +20,10 @@
             "shared.css"
         ]
     }],
-    "web_accessible_resources": [
-        "icons/refresh.svg",
-        "icons/logo.svg",
-        "js/document.js",
-        "js/options.js",
-        "js/popup.js",
-        "popup.css",
-        "shared.css",
-        "help.html",
-        "help.css",
-        "icons/logo-16.png",
-        "icons/logo-32.png",
-        "icons/logo-64.png",
-        "icons/logo-128.png",
-        "icons/logo-256.png"
-    ],
     "permissions": [
         "storage",
-        "https://sponsor.ajay.app/*",
-        "https://dearrow-thumb.ajay.app/*",
         "unlimitedStorage"
     ],
-    "optional_permissions": [
-        "*://*/*"
-    ],
-    "browser_action": {
-        "default_title": "DeArrow",
-        "default_popup": "popup.html",
-        "default_icon": {
-            "16": "icons/logo-16.png",
-            "32": "icons/logo-32.png",
-            "64": "icons/logo-64.png",
-            "128": "icons/logo-128.png"
-        },
-        "theme_icons": [
-            {
-                "light": "icons/logo-16.png",
-                "dark": "icons/logo-16.png",
-                "size": 16
-            },
-            {
-                "light": "icons/logo-32.png",
-                "dark": "icons/logo-32.png",
-                "size": 32
-            },
-            {
-                "light": "icons/logo-64.png",
-                "dark": "icons/logo-64.png",
-                "size": 64
-            },
-            {
-                "light": "icons/logo-128.png",
-                "dark": "icons/logo-128.png",
-                "size": 128
-            },
-            {
-                "light": "icons/logo-256.png",
-                "dark": "icons/logo-256.png",
-                "size": 256
-            },
-            {
-                "light": "icons/logo-512.png",
-                "dark": "icons/logo-512.png",
-                "size": 512
-            },
-            {
-                "light": "icons/logo-1024.png",
-                "dark": "icons/logo-1024.png",
-                "size": 1024
-            }
-        ]
-    }, 
-    "background": {
-        "scripts":[
-        "./js/background.js"
-        ]
-    },
     "icons": {
         "16": "icons/logo-16.png",
         "32": "icons/logo-32.png",
@@ -109,6 +36,5 @@
     "options_ui": {
         "page": "options/options.html",
         "open_in_tab": true
-    },
-    "manifest_version": 2
+    }
 }  

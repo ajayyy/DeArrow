@@ -60,7 +60,7 @@ chrome.runtime.onInstalled.addListener(() => {
             }
 
             // Open up the install page
-            setTimeout(() => void chrome.tabs.create({url: chrome.extension.getURL("/help.html")}), 100);
+            setTimeout(() => void chrome.tabs.create({url: chrome.runtime.getURL("/help.html")}), 100);
         }
     }, 1500);
 });

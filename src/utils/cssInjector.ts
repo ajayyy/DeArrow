@@ -26,7 +26,7 @@ export function addCssToPage() {
                 const fileref = document.createElement("link");
                 fileref.rel = "stylesheet";
                 fileref.type = "text/css";
-                fileref.href = chrome.extension.getURL(file);
+                fileref.href = chrome.runtime.getURL(file);
 
                 head.appendChild(fileref);
             }

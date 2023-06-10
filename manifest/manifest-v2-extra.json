@@ -1,50 +1,28 @@
 {
-    "optional_permissions": [
-        "declarativeContent"
+    "web_accessible_resources": [
+        "icons/refresh.svg",
+        "icons/logo.svg",
+        "js/document.js",
+        "js/options.js",
+        "js/popup.js",
+        "popup.css",
+        "shared.css",
+        "help.html",
+        "help.css",
+        "icons/logo-16.png",
+        "icons/logo-32.png",
+        "icons/logo-64.png",
+        "icons/logo-128.png",
+        "icons/logo-256.png"
     ],
-    "content_scripts": [
-        {
-            "world": "MAIN",
-            "js": [
-                "./js/document.js"
-            ],
-            "matches": [
-                "https://*.youtube.com/*",
-                "https://www.youtube-nocookie.com/embed/*"
-            ],
-            "all_frames": true,
-            "run_at": "document_start"
-        }
-    ],
-    "web_accessible_resources": [{
-        "resources": [
-            "icons/refresh.svg",
-            "icons/logo.svg",
-            "js/document.js",
-            "js/options.js",
-            "js/popup.js",
-            "popup.css",
-            "shared.css",
-            "help.html",
-            "help.css",
-            "icons/logo-16.png",
-            "icons/logo-32.png",
-            "icons/logo-64.png",
-            "icons/logo-128.png",
-            "icons/logo-256.png"
-        ],
-        "matches": ["<all_urls>"]
-    }],
     "permissions": [
-        "scripting"
-    ],
-    "host_permissions": [
         "https://sponsor.ajay.app/*",
-        "https://dearrow-thumb.ajay.app/*",
-        "https://*.youtube.com/*",
-        "https://www.youtube-nocookie.com/embed/*"
+        "https://dearrow-thumb.ajay.app/*"
     ],
-    "action": {
+    "optional_permissions": [
+        "*://*/*"
+    ],
+    "browser_action": {
         "default_title": "DeArrow",
         "default_popup": "popup.html",
         "default_icon": {
@@ -92,7 +70,9 @@
         ]
     },
     "background": {
-        "service_worker": "./js/background.js"
+        "scripts":[
+            "./js/background.js"
+        ]
     },
-    "manifest_version": 3
+    "manifest_version": 2
 }

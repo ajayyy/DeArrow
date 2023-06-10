@@ -82,6 +82,6 @@ export function setupCBVideoModule(): void {
         resetValues,
         windowListenerHandler,
         newVideosLoaded,
-        documentScript
+        documentScript: chrome.runtime.getManifest().manifest_version === 2 ? documentScript : undefined
     }, () => Config);
 }
