@@ -35,9 +35,6 @@
         ],
         "matches": ["<all_urls>"]
     }],
-    "permissions": [
-        "scripting"
-    ],
     "host_permissions": [
         "https://sponsor.ajay.app/*",
         "https://dearrow-thumb.ajay.app/*",
