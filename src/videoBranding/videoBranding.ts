@@ -237,8 +237,8 @@ export function setupOptionChangeListener(): void {
             }
         }
 
-        if ((changes.titleFormatting && changes.titleFormatting.newValue !== changes.titleFormatting.oldValue)
-                || (changes.thumbnailFallback && changes.thumbnailFallback.newValue !== changes.thumbnailFallback.oldValue)) {
+        const settingsToReload = ["replaceTitles", "replaceThumbnails", "titleFormatting", "thumbnailFallback"];
+        if (settingsToReload.some((name) => (changes[name] && changes[name].newValue !== changes[name].oldValue))) {
             for (const videoID in videoBrandingInstances) {
                 const updateBrandingCallbacks = videoBrandingInstances[videoID as VideoID].updateBrandingCallbacks;
                 // They will be added back to the array

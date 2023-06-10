@@ -18,6 +18,11 @@ let lastUrlWatchPageType: WatchPageType | null = null;
 
 export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, brandingLocation: BrandingLocation): Promise<boolean> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
+
+    if (!Config.config!.replaceTitles) {
+        showOriginalTitle(element, brandingLocation);
+        return false;
+    }
     
     if (brandingLocation === BrandingLocation.Watch) {
         const currentWatchPageType = document.URL.includes("watch") ? WatchPageType.Video : WatchPageType.Miniplayer;

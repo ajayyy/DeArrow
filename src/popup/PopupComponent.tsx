@@ -4,9 +4,12 @@ import { showDonationLink } from "../utils/configUtils";
 import { toSentenceCase } from "../titles/titleFormatter";
 import { YourWorkComponent } from "./YourWorkComponent";
 import { SelectOptionComponent } from "./SelectOptionComponent";
+import { ToggleOptionComponent } from "./ToggleOptionComponent";
 
 export const PopupComponent = () => {
     const [extensionEnabled, setExtensionEnabled] = React.useState(Config.config!.extensionEnabled);
+    const [replaceTitles, setReplaceTitles] = React.useState(Config.config!.replaceTitles);
+    const [replaceThumbnails, setReplaceThumbnails] = React.useState(Config.config!.replaceThumbnails);
     const [titleFormatting, setTitleFormatting] = React.useState(String(Config.config!.titleFormatting));
     const [thumbnailFallback, setThumbnailFallback] = React.useState(String(Config.config!.thumbnailFallback));
 
@@ -48,10 +51,38 @@ export const PopupComponent = () => {
                     {chrome.i18n.getMessage("Options")}
                 </button>
             </div>
+
+            {/* Replace titles/thumbnails */}
+            <ToggleOptionComponent
+                id="replaceTitles"
+                onChange={(value) => {
+                    setReplaceTitles(value);
+                    Config.config!.replaceTitles = value;
+                }}
+                value={replaceTitles}
+                label={chrome.i18n.getMessage("replaceTitles")}
+            />
+
+            <ToggleOptionComponent
+                id="replaceThumbnails"
+                style={{
+                    paddingTop: "15px"
+                }}
+                onChange={(value) => {
+                    setReplaceThumbnails(value);
+                    Config.config!.replaceThumbnails = value;
+                }}
+                value={replaceThumbnails}
+                label={chrome.i18n.getMessage("replaceThumbnails")}
+            />
+
             
             {/* Title Reformatting Option */}
             <SelectOptionComponent
                 id="titleFormatting"
+                style={{
+                    paddingTop: "15px"
+                }}
                 onChange={(value) => {
                     setTitleFormatting(value);
                     Config.config!.titleFormatting = parseInt(value, 10);

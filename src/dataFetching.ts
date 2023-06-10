@@ -251,7 +251,8 @@ async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Re
 }
 
 async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, title?: string, officialImage?: boolean, generateNow?: boolean, tries = 0): Promise<Record<VideoID, BrandingResult> | null> {
-    if (Config.config!.thumbnailCacheUse === ThumbnailCacheOption.Disable) return null;
+    if (Config.config!.thumbnailCacheUse === ThumbnailCacheOption.Disable 
+        || !Config.config!.replaceThumbnails) return null;
     
     activeThumbnailCacheRequests[videoID] = {
         shouldRerequest: false

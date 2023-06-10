@@ -370,12 +370,16 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
     const image = element.querySelector(getThumbnailSelector(brandingLocation)) as HTMLImageElement;
     const box = getThumbnailBox(image, brandingLocation);
 
-    if (!showCustomBranding) {
+    if (!showCustomBranding || !Config.config!.replaceThumbnails) {
         resetToShowOriginalThumbnail(image, brandingLocation);
-        
-        // Still check if the thumbnail is supposed to be changed or not
-        const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation);
-        return !!thumbnail && !thumbnail.original;
+
+        if (Config.config!.replaceThumbnails) {
+            // Still check if the thumbnail is supposed to be changed or not
+            const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation);
+            return !!thumbnail && !thumbnail.original;
+        } else {
+            return false;
+        }
     }
 
     if (image && box) {
