@@ -6,6 +6,19 @@
 
 DeArrow is a browser extension for crowdsourcing better titles and thumbnails on YouTube.
 
+The goal of DeArrow is to make titles accurate and reduce sensationalism.
+
+Titles can be any arbitrary text. Thumbnails are screenshots from specific timestamps in the video. These are user submitted and voted on.
+
+By default, if there are no submissions, it will format the original title to the user-specified format, and set a random timestamp as a title. This can be configured in the options to disable formatting, or show the original thumbnail by default.
+
+If the original thumbnail is actually good, you can still vote for it in the submission menu, and then it will act like a submission.
+
+The extension is currently in beta, and there are some issues to work out, but it should be fully usable.
+
+![](https://cdn.fosstodon.org/media_attachments/files/110/520/916/244/905/970/original/9908f444b4e78a31.png)
+![](https://cdn.fosstodon.org/media_attachments/files/110/520/917/557/536/945/original/b65eadd7ea18e073.png)
+
 ### Download
 
 [Firefox](https://addons.mozilla.org/en-US/firefox/addon/dearrow/)
