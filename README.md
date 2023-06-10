@@ -4,9 +4,13 @@
 
 <h1 align="center">DeArrow</h1>
 
-> EXPERIMENTAL PROTOTYPE PLEASE WAIT FOR STABLE. If you do like testing alpha software, please join #de-arrow channel on Discord/Matrix and follow the instructions.
-
 DeArrow is a browser extension for crowdsourcing better titles and thumbnails on YouTube.
+
+### Download
+
+[Firefox](https://addons.mozilla.org/en-US/firefox/addon/dearrow/)
+[Chromium](https://chrome.google.com/webstore/detail/dearrow-better-titles-and/enamippconapkdmgfgjchkhakpfinmaj)
+
 
 ### Related Repositories
 
