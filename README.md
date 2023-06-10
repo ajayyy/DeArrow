@@ -19,6 +19,16 @@ The extension is currently in beta, and there are some issues to work out, but i
 ![](https://cdn.fosstodon.org/media_attachments/files/110/520/916/244/905/970/original/9908f444b4e78a31.png)
 ![](https://cdn.fosstodon.org/media_attachments/files/110/520/917/557/536/945/original/b65eadd7ea18e073.png)
 
+### How it works
+
+The browser extension first fetches data from the [backend](https://github.com/ajayyy/SponsorBlockServer) about submitted titles and thumbnails. If one is found, it replaces the branding locally.
+
+All thumbnails are just timestamps in a video, so they need to be generated. There are two options to generate them. One is to use the [thumbnail generation service](https://github.com/ajayyy/DeArrowThumbnailCache), and another is to generate it locally. It tries both and uses the fastest one. The thumbnail generation service will cache thumbnails for future requests, making it return instantly for the next user. Local thumbnail generation is done by taking a screenshot of an HTML video element using and drawing that to a canvas.
+
+If no thumbnails or titles are submitted, it switches to the configurable fallback options. Titles will be formatted according to user preference (title or sentence cases). Thumbnails, by default, are generated at a random timestamp that is not in a [SponsorBlock](https://github.com/ajayyy/SponsorBlock) segment.
+
+Lastly, it adds a "show original" button if anything was changed, allowing you to peek at the original title and thumbnail when you want.
+
 ### Download
 
 [Firefox](https://addons.mozilla.org/en-US/firefox/addon/dearrow/)
@@ -32,7 +42,7 @@ The extension is currently in beta, and there are some issues to work out, but i
 | Extension | https://github.com/ajayyy/DeArrow |
 | Shared Library With SponsorBlock | https://github.com/ajayyy/maze-utils |
 | Translations | https://github.com/ajayyy/ExtensionTranslations |
-| Backend | https://github.com/ajayyy/SponsorBlockServer |
+| Backend | https://github.com/ajayyy/SponsorBlockServer|
 | Backend Kubernetes Manifests | https://github.com/ajayyy/SponsorBlockKubernetes |
 | Thumbnail Cache Backend | https://github.com/ajayyy/DeArrowThumbnailCache |
 | Thumbnail Cache Kubernetes Manifests | https://github.com/ajayyy/k8s-thumbnail-cache |
