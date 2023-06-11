@@ -1,5 +1,13 @@
 import Config, { TitleFormatting } from "../config";
 
+/**
+ * Useful regex expressions:
+ * 
+ * Characters: \p{L}
+ * Upper: \p{Lu}
+ * Lower: \p{Ll}
+ */
+
 const titleCaseNotCapitalized = [
     "a",
     "an",
@@ -61,7 +69,7 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
         const trustCaps = !mostlyAllCaps && 
             !(isAllCaps(words[index - 1]) || isAllCaps(words[index + 1]));
 
-        if (word.match(/^[Ii]$|^[Ii]['’][a-zA-Z]{1,3}$/)) {
+        if (word.match(/^[Ii]$|^[Ii]['’][\p{L}]{1,3}$/u)) {
             result += capitalizeFirstLetter(word) + " ";
         } else if (forceKeepFormatting(word)
             || isAcronymStrict(word) 
@@ -177,17 +185,17 @@ export function isMostlyAllCaps(words: string[]): boolean {
  * Has at least one char and is upper case
  */
 function isAllCaps(word: string): boolean {
-    return !!word && !!word.match(/[a-zA-Z]/) 
+    return !!word && !!word.match(/[\p{L}]/u) 
         && word.toUpperCase() === word 
         && !isAcronymStrict(word)
-        && !word.match(/^[a-zA-Z]+[-~—]/); // USB-C not all caps
+        && !word.match(/^[\p{L}]+[-~—]/u); // USB-C not all caps
 }
 
 export function capitalizeFirstLetter(word: string): string {
     let result = "";
 
     for (const char of word) {
-        if (char.match(/[a-zA-Z]/)) {
+        if (char.match(/[\p{L}]/u)) {
             result += char.toUpperCase() + word.substring(result.length + 1).toLowerCase();
             break;
         } else {
@@ -199,14 +207,14 @@ export function capitalizeFirstLetter(word: string): string {
 }
 
 function isWordCaptialCase(word: string): boolean {
-    return !!word.match(/^[^a-zA-Z]*[A-Z][^A-Z]+$/);
+    return !!word.match(/^[^\p{L}]*[\p{Lu}][^\p{Lu}]+$/u);
 }
 
 /**
  * Not just capital at start
  */
 function isWordCustomCaptialization(word: string): boolean {
-    const capitalMatch = word.match(/[A-Z]/g);
+    const capitalMatch = word.match(/[\p{Lu}]/gu);
     if (!capitalMatch) return false;
 
     const capitalNumber = capitalMatch.length;
@@ -218,11 +226,11 @@ function isYear(word: string): boolean {
 }
 
 function isWordAllLower(word: string): boolean {
-    return !!word.match(/^[a-z]+$/);
+    return !!word.match(/^[\p{Ll}]+$/u);
 }
 
 function isFirstLetterCaptial(word: string): boolean {
-    return !!word.match(/^[^a-zA-Z]*[A-Z]/);
+    return !!word.match(/^[^\p{L}]*[\p{Lu}]/u);
 }
 
 function forceKeepFormatting(word: string): boolean {
@@ -238,7 +246,7 @@ export function isAcronym(word: string): boolean {
 
 export function isAcronymStrict(word: string): boolean {
     // U.S.A allowed
-    return !!word.match(/^[^a-zA-Z]*(\S\.)+(\S)?$/);
+    return !!word.match(/^[^\p{L}]*(\S\.)+(\S)?$/u);
 }
 
 function startOfSentence(index: number, words: string[]): boolean {

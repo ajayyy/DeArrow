@@ -102,6 +102,7 @@ describe("toTitleCase", () => {
         ["Why Does OTT Sound So Good?", "Why Does OTT Sound so Good?"],
         ["You Don't Understand EQ - PART 1", "You Don't Understand EQ - Part 1"],
         ["First title: The Second title", "First Title: The Second Title"],
+        ['Ski Aggu über Crazy Frog, "Party Sahne", Southstar & Domiziana – Interview mit Aria Nejati', 'Ski Aggu Über Crazy Frog, "Party Sahne", Southstar & Domiziana – Interview Mit Aria Nejati'],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -138,7 +139,7 @@ describe("toSentenceCase", () => {
         ["You Don't Understand EQ - PART 1", "You don't understand EQ - Part 1"],
         ["Tomorrow I'll Go To The US", "Tomorrow I'll go to the US"],
         ["Tomorrow I'llllllll Go To The US", "Tomorrow i'llllllll go to the US"],
-        ["First title: The second title", "First title: The second title"],
+        ["First title: The second title", "First title: The second title"]
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
