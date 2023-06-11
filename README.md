@@ -10,7 +10,7 @@ The goal of DeArrow is to make titles accurate and reduce sensationalism.
 
 Titles can be any arbitrary text. Thumbnails are screenshots from specific timestamps in the video. These are user submitted and voted on.
 
-By default, if there are no submissions, it will format the original title to the user-specified format, and set a random timestamp as a title. This can be configured in the options to disable formatting, or show the original thumbnail by default.
+By default, if there are no submissions, it will format the original title to the user-specified format, and set a screenshot from a random timestamp as the thumbnail. This can be configured in the options to disable formatting, or show the original thumbnail by default.
 
 If the original thumbnail is actually good, you can still vote for it in the submission menu, and then it will act like a submission.
 
