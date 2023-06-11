@@ -41,6 +41,8 @@ export enum ThumbnailFallbackOption {
     Original
 }
 
+const isEnglish = typeof chrome !== "object" || chrome.i18n.getUILanguage().startsWith("en");
+
 interface SBConfig {
     userID: string | null;
     vip: boolean;
@@ -95,7 +97,7 @@ const syncDefaults = {
     darkMode: true,
     invidiousInstances: [],
     keepUnsubmitted: true,
-    titleFormatting: chrome.i18n.getUILanguage().startsWith("en") ? TitleFormatting.TitleCase : TitleFormatting.Disable,
+    titleFormatting: isEnglish ? TitleFormatting.TitleCase : TitleFormatting.Disable,
     serverAddress: CompileConfig.serverAddress,
     thumbnailServerAddress: CompileConfig.thumbnailServerAddress,
     fetchTimeout: 7000,
