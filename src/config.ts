@@ -95,7 +95,7 @@ const syncDefaults = {
     darkMode: true,
     invidiousInstances: [],
     keepUnsubmitted: true,
-    titleFormatting: TitleFormatting.TitleCase,
+    titleFormatting: chrome.i18n.getUILanguage().startsWith("en") ? TitleFormatting.TitleCase : TitleFormatting.Disable,
     serverAddress: CompileConfig.serverAddress,
     thumbnailServerAddress: CompileConfig.thumbnailServerAddress,
     fetchTimeout: 7000,
