@@ -101,6 +101,7 @@ describe("toTitleCase", () => {
         ["USB-C AirPods Pro Kit - Assembly Guide", "USB-C AirPods Pro Kit - Assembly Guide"],
         ["Why Does OTT Sound So Good?", "Why Does OTT Sound so Good?"],
         ["You Don't Understand EQ - PART 1", "You Don't Understand EQ - Part 1"],
+        ["First title: The Second title", "First Title: The Second Title"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -137,6 +138,7 @@ describe("toSentenceCase", () => {
         ["You Don't Understand EQ - PART 1", "You don't understand EQ - Part 1"],
         ["Tomorrow I'll Go To The US", "Tomorrow I'll go to the US"],
         ["Tomorrow I'llllllll Go To The US", "Tomorrow i'llllllll go to the US"],
+        ["First title: The second title", "First title: The second title"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
@@ -165,7 +167,7 @@ describe("titleFormatter custom cases", () => {
         ["NA/TURALS: FINAL/LAP ft. Cloud9 meL & Jazzyk1ns | VCT NA game changers", "NA/TURALS: FINAL/LAP ft. Cloud9 meL & Jazzyk1ns | VCT NA Game Changers", "NA/TURALS: FINAL/LAP ft. Cloud9 meL & Jazzyk1ns | VCT NA game changers"], // keep titles, prefixes, lowercase usernames
         ["[MV] SEVENTEEN(세븐틴), >Ailee(에일리) _ Q&A", "[MV] SEVENTEEN(세븐틴), Ailee(에일리) _ Q&A", "[MV] SEVENTEEN(세븐틴), Ailee(에일리) _ Q&A"], // keep all caps in title for SEVENTEEN and [MV]
         ["AH-dventures in LA - >4K", "AH-dventures in LA - 4K", "AH-dventures in LA - 4K"], // capitalization for pun, 4K
-        ["Welcome to the cunderground - GTA V: cunning stunts", "Welcome to the Cunderground - GTA V: Cunning Stunts", "Welcome to the cunderground - GTA V: cunning stunts"], // GTA V:
+        ["Welcome to the cunderground - GTA V: cunning stunts", "Welcome to the Cunderground - GTA V: Cunning Stunts", "Welcome to the cunderground - GTA V: Cunning stunts"], // GTA V:
         ["Achievement City, plan G(mod) - Gmod: TTT | let's play", "Achievement City, Plan G(mod) - Gmod: TTT | Let's Play", "Achievement City, plan G(mod) - Gmod: TTT | Let's play"], // Proper place, G(mod)
         ["Mad vs T1 - game 1 | round 1 Lol MSI 2023", "Mad vs T1 - Game 1 | Round 1 Lol MSI 2023", "Mad vs T1 - Game 1 | Round 1 Lol MSI 2023"], // LoL, MSI and T1
         ["The great awakening - 3D to 5D consciousness - 432 Hz + 963 Hz", "The Great Awakening - 3D to 5D Consciousness - 432 Hz + 963 Hz", "The great awakening - 3D to 5D consciousness - 432 Hz + 963 Hz"], // Hz, 3D, 5D

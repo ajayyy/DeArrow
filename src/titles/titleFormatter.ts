@@ -245,8 +245,8 @@ function startOfSentence(index: number, words: string[]): boolean {
     return index === 0 || isDelimeter(words[index - 1]);
 }
 
-function isDelimeter(char: string): boolean {
-    return char.match(/^[-:;~—|]$/) !== null;
+function isDelimeter(word: string): boolean {
+    return word.match(/^[-:;~—|]$/) !== null || word.endsWith(":");
 }
 
 function cleanResultingTitle(title: string): string {
