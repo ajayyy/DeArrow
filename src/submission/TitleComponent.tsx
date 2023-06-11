@@ -75,7 +75,7 @@ export const TitleComponent = (props: TitleComponentProps) => {
                 onPaste={(e) => {
                     e.preventDefault();
 
-                    const text = e.clipboardData?.getData("text/plain");
+                    const text = e.clipboardData?.getData?.("text/plain")?.replace(/\n/g, " ") ?? "";
                     document.execCommand("insertText", false, text);
                 }}
                 dangerouslySetInnerHTML={{ __html: props.submission.title }}>
