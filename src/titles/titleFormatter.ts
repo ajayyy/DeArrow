@@ -21,6 +21,7 @@ const titleCaseNotCapitalized = [
     "like",
     "over",
     "with",
+    "w/",
     "upon",
     "at",
     "by",
