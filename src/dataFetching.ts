@@ -178,7 +178,7 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
             thumbnailCacheFetchDone = true;
 
             if (results) {
-                if (!mainFetchDone) {
+                if (!mainFetchDone && Config.config!.thumbnailFallback === ThumbnailFallbackOption.RandomTime) {
                     handleResults(results);
                 }
             }
