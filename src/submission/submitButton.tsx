@@ -167,6 +167,8 @@ export class SubmitButton {
                             if (unsubmittedThumbnail) unsubmittedThumbnail.selected = true;
                         }
                     }
+
+                    Config.forceLocalUpdate("unsubmitted");
                 } else {
                     delete Config.local!.unsubmitted[getVideoID()!];
                 }
