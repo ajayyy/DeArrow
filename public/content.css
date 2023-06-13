@@ -85,6 +85,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     overflow-x: auto;
 
     margin-top: 16px;
+    margin-bottom: 10px;
 }
 
 .cbThumbnailDrawer > div:first-child {
