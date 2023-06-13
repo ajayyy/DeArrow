@@ -47,7 +47,7 @@ function buildHideThumbnailCss(): string {
     for (const start of boxesToHide) {
         const thumbnailTypes = [
             "ytd-thumbnail",
-            "ytd-playlist-video-thumbnail-renderer"
+            "ytd-playlist-thumbnail"
         ];
 
         for (const thumbnailType of thumbnailTypes) {

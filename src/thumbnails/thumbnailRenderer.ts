@@ -352,7 +352,7 @@ function createVideo(existingVideo: HTMLVideoElement | null, url: string, timest
 function getThumbnailSelector(brandingLocation: BrandingLocation): string {
     switch (brandingLocation) {
         case BrandingLocation.Related:
-            return "ytd-thumbnail img, ytd-playlist-video-thumbnail-renderer img";
+            return "ytd-thumbnail:not([hidden]) img, ytd-playlist-thumbnail img";
         case BrandingLocation.Endcards:
             return ".ytp-ce-covering-image";
         case BrandingLocation.Autoplay:
@@ -369,7 +369,7 @@ function getThumbnailSelector(brandingLocation: BrandingLocation): string {
 function getThumbnailBox(image: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
     switch (brandingLocation) {
         case BrandingLocation.Related:
-            return image.closest("ytd-thumbnail, ytd-playlist-video-thumbnail-renderer") as HTMLElement;
+            return image.closest("ytd-thumbnail:not([hidden]), ytd-playlist-thumbnail") as HTMLElement;
         case BrandingLocation.Autoplay:
             return image;
         default:
