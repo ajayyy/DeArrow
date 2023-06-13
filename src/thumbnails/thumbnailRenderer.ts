@@ -397,14 +397,14 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
     if (image && box) {
         let objectWidth = box.offsetWidth;
         let objectHeight = box.offsetHeight;
-        if (objectWidth === 0) {
+        if (objectWidth === 0 || objectHeight === 0) {
             const style = window.getComputedStyle(box);
             objectWidth = parseInt(style.getPropertyValue("width").replace("px", ""), 10);
             objectHeight = parseInt(style.getPropertyValue("height").replace("px", ""), 10);
 
             if (objectWidth === 0) {
                 try {
-                    await waitFor(() => box.offsetWidth > 0);
+                    await waitFor(() => box.offsetWidth > 0 && box.offsetHeight > 0);
                 } catch (e) {
                     // No need to render this thumbnail since it is hidden
                     return false;
