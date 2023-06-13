@@ -54,7 +54,7 @@ export function formatTitle(title: string, isCustom: boolean): string {
         case TitleFormatting.SentenceCase:
             return toSentenceCase(title, isCustom);
         default:
-            return cleanResultingTitle(title);
+            return cleanUnformattedTitle(title);
     }
 }
 
@@ -258,7 +258,11 @@ function isDelimeter(word: string): boolean {
 }
 
 function cleanResultingTitle(title: string): string {
-    return cleanPunctuation(title.replace(/>/g, "").trim());
+    return cleanPunctuation(cleanUnformattedTitle(title));
+}
+
+function cleanUnformattedTitle(title: string): string {
+    return title.replace(/>/g, "").trim();
 }
 
 export function cleanPunctuation(title: string): string {
