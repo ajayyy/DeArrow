@@ -421,6 +421,10 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
 
         // Trigger a fetch to start, and display the original thumbnail if necessary
         getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation).then((thumbnail) => {
+            if (brandingLocation === BrandingLocation.Related) {
+                box.setAttribute("loaded", "");
+            }
+
             if (!thumbnail || thumbnail.original) {
                 if (!thumbnail && Config.config!.thumbnailFallback === ThumbnailFallbackOption.Blank) {
                     resetToBlankThumbnail(image);
