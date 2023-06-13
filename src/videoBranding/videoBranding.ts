@@ -237,7 +237,14 @@ export function setupOptionChangeListener(): void {
             }
         }
 
-        const settingsToReload = ["replaceTitles", "replaceThumbnails", "titleFormatting", "thumbnailFallback"];
+        const settingsToReload = [
+            "replaceTitles",
+            "replaceThumbnails",
+            "titleFormatting",
+            "thumbnailFallback",
+            "alwaysShowShowOriginalButton"
+        ];
+
         if (settingsToReload.some((name) => (changes[name] && changes[name].newValue !== changes[name].oldValue))) {
             for (const videoID in videoBrandingInstances) {
                 const updateBrandingCallbacks = videoBrandingInstances[videoID as VideoID].updateBrandingCallbacks;

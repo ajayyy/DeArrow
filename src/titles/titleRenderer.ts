@@ -242,7 +242,9 @@ export async function hideAndUpdateShowOriginalButton(element: HTMLElement, bran
                 buttonImage.classList.add("cbOriginalShown");
             }
 
-            if (showCustomBranding === Config.config!.extensionEnabled && brandingLocation !== BrandingLocation.Watch) {
+            if (showCustomBranding === Config.config!.extensionEnabled 
+                    && brandingLocation !== BrandingLocation.Watch
+                    && !Config.config!.alwaysShowShowOriginalButton) {
                 buttonElement.classList.remove("cbDontHide");
             } else {
                 buttonElement.classList.add("cbDontHide");
@@ -277,7 +279,10 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
     buttonElement.classList.add("cbShowOriginal");
 
     buttonElement.classList.add("cbButton");
-    if (brandingLocation === BrandingLocation.Watch) buttonElement.classList.add("cbDontHide");
+    if (brandingLocation === BrandingLocation.Watch 
+            || Config.config!.alwaysShowShowOriginalButton) {
+        buttonElement.classList.add("cbDontHide");
+    }
 
     const buttonImage = document.createElement("img");
     buttonElement.draggable = false;
