@@ -3,8 +3,8 @@ import { getOriginalTitleElement } from "../titles/titleRenderer";
 import { BrandingLocation } from "../videoBranding/videoBranding";
 import { isVisible, waitForElement } from "@ajayyy/maze-utils/lib/dom";
 
-export async function getOrCreateTitleButtonContainer(): Promise<HTMLElement | null> {
-    const titleNode = await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
+export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLElement): Promise<HTMLElement | null> {
+    const titleNode = forceTitleNode ?? await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
     const referenceNode = titleNode?.parentElement;
 
     if (referenceNode) {
