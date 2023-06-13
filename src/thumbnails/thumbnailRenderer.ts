@@ -435,15 +435,15 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
         try {
             const thumbnail = await createThumbnailCanvas(existingCanvas, videoID, width, height, brandingLocation, timestamp ?? null, false, (thumbnail) => {
                 thumbnail!.style.removeProperty("display");
+
+                if (brandingLocation === BrandingLocation.Related) {
+                    box.setAttribute("loaded", "");
+                }
             }, () => resetToShowOriginalThumbnail(image, brandingLocation));
     
             if (!thumbnail) {
                 // Hiding handled by already above then check
                 return false;
-            }
-
-            if (brandingLocation === BrandingLocation.Related) {
-                box.setAttribute("loaded", "");
             }
 
             image.style.display = "none";
