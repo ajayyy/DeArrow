@@ -1,10 +1,10 @@
 import { Format, getPlaybackFormats } from "./thumbnailData";
 import { getFromCache, RenderedThumbnailVideo, setupCache, ThumbnailVideo } from "./thumbnailDataCache";
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
-import { getVideoThumbnailIncludingUnsubmitted, queueThumbnailCacheRequest } from "../dataFetching";
+import { getVideoThumbnailIncludingUnsubmitted, isFetchingFromThumbnailCache, queueThumbnailCacheRequest, waitForThumbnailCache } from "../dataFetching";
 import { log, logError } from "../utils/logger";
 import { BrandingLocation } from "../videoBranding/videoBranding";
-import { isFirefoxOrSafari, waitFor } from "@ajayyy/maze-utils";
+import { isFirefoxOrSafari, timeoutPomise, waitFor } from "@ajayyy/maze-utils";
 import Config, { ThumbnailFallbackOption } from "../config";
 
 const thumbnailRendererControls: Record<VideoID, Array<(error?: string) => void>> = {};
@@ -32,9 +32,9 @@ export function renderThumbnail(videoID: VideoID, width: number,
     if (existingCache && existingCache?.video?.length > 0) {
         const bestVideos = ((width && height) ? existingCache.video.filter(v => (v.rendered && v.fromThumbnailCache)
                 || (v.width >= width && v.height >= height))
-            : existingCache.video).sort((a, b) => b.width - a.width);
+            : existingCache.video).sort((a, b) => b.width - a.width).sort((a, b) => +b.rendered - +a.rendered);
 
-        const sameTimestamp = bestVideos.sort((a, b) => b.width - a.width).find(v => v.timestamp === timestamp);
+        const sameTimestamp = bestVideos.find(v => v.timestamp === timestamp);
 
         if (sameTimestamp?.rendered) {
             return Promise.resolve(sameTimestamp);
@@ -265,6 +265,18 @@ export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | 
             }
         } catch (e) {
             return null;
+        }
+    }
+
+    if (isFetchingFromThumbnailCache(videoID, timestamp)) {
+        // Wait for the thumbnail to be fetched from the cache before trying local generation
+        try {
+            await Promise.race([
+                waitForThumbnailCache(videoID),
+                timeoutPomise(Config.config!.startLocalRenderTimeout)
+            ]);
+        } catch (e) {
+            // Go on and do a local render
         }
     }
 

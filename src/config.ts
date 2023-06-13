@@ -57,6 +57,7 @@ interface SBConfig {
     serverAddress: string;
     thumbnailServerAddress: string;
     fetchTimeout: number;
+    startLocalRenderTimeout: number;
     renderTimeout: number;
     thumbnailCacheUse: ThumbnailCacheOption;
     antiAliasThumbnails: boolean;
@@ -101,6 +102,7 @@ const syncDefaults = {
     serverAddress: CompileConfig.serverAddress,
     thumbnailServerAddress: CompileConfig.thumbnailServerAddress,
     fetchTimeout: 7000,
+    startLocalRenderTimeout: 2000,
     renderTimeout: 25000,
     thumbnailCacheUse: ThumbnailCacheOption.OnAllPages,
     antiAliasThumbnails: true,
