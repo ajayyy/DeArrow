@@ -26,9 +26,8 @@ export const TitleComponent = (props: TitleComponentProps) => {
     return (
         <div className={`cbTitle${props.selected ? " cbTitleSelected" : ""}`}
                 onClick={() => {
-                    const newTitle = titleRef.current!.innerText;
-                    const oldTitle = props.submission.title;
-                    props.onSelectOrUpdate(newTitle, oldTitle);
+                    const title = titleRef.current!.innerText;
+                    props.onSelectOrUpdate(title, title);
 
                     if (document.activeElement !== titleRef.current) {
                         setFocused(true);
@@ -49,7 +48,6 @@ export const TitleComponent = (props: TitleComponentProps) => {
                 style={{
                     paddingRight: title.current === "" ? "0.5em" : "0"
                 }}
-                
                 onInput={(e) => {
                     e.stopPropagation();
 

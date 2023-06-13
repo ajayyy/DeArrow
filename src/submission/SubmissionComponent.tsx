@@ -191,7 +191,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                         setSelectedTitleIndex(i);
                         setSelectedTitle(t);
 
-                        if (t.title !== originalTitle) {
+                        if (t.title !== originalTitle && t.title !== oldTitle) {
                             const unsubmitted = Config.local!.unsubmitted[props.videoID] ??= {
                                 thumbnails: [],
                                 titles: []
