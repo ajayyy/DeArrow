@@ -340,6 +340,10 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     filter: grayscale(1);
 }
 
+.cbShowOriginal img.cbAutoFormat:not(.cbOriginalShown) {
+    filter: saturate(0.5);
+}
+
 .cbShowOriginal:hover {
     opacity: 0.7;
 }

@@ -44,7 +44,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     hideOriginalTitle(element, brandingLocation);
 
     try {
-        const titleData = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation)
+        const titleData = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
         const title = titleData?.title;
         if (title) {
             const formattedTitle = formatTitle(title, !titleData.original)

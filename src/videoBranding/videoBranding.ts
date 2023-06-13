@@ -8,6 +8,7 @@ import { findOrCreateShowOriginalButton, getOrCreateTitleElement, getOriginalTit
 import { setThumbnailListener } from "@ajayyy/maze-utils/lib/thumbnailManagement";
 import Config, { ThumbnailCacheOption } from "../config";
 import { logError } from "../utils/logger";
+import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
 
@@ -33,6 +34,9 @@ export interface VideoBrandingInstance {
 
 export const brandingBoxSelector = "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer, ytd-compact-playlist-renderer, ytd-playlist-renderer";
 export const watchPageThumbnailSelector = ".ytp-cued-thumbnail-overlay";
+
+const twoRingLogo = chrome.runtime.getURL("icons/logo-2r.svg");
+const threeRingLogo = chrome.runtime.getURL("icons/logo.svg");
 
 const videoBrandingInstances: Record<VideoID, VideoBrandingInstance> = {}
 
@@ -164,7 +168,23 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
 
     const result = await Promise.race(promises);
     if (result || (await Promise.all(promises)).some((r) => r)) {
-        return await findOrCreateShowOriginalButton(element, brandingLocation, videoID);
+        const button = await findOrCreateShowOriginalButton(element, brandingLocation, videoID);
+        
+        const title = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
+        
+        const customTitle = title && !title.original;
+        const image = button.querySelector("img") as HTMLImageElement;
+        if (image) {
+            if (!customTitle) {
+                image.src = twoRingLogo;
+                image.classList.add("cbAutoFormat");
+            } else {
+                image.src = threeRingLogo;
+                image.classList.remove("cbAutoFormat");
+            }
+        }
+
+        return button;
     }
 
     return null;
