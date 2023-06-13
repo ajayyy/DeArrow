@@ -325,7 +325,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     opacity: 1;
     transition: opacity 0.2s;
     margin-right: 0;
-    z-index: 100000;
+    z-index: 1;
 }
 
 /* Endcards need a little margin instead of 0 */
