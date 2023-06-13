@@ -158,12 +158,21 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
                                 // Next one up
                                 selectedIndex = defaultThumbnails.length;
-                            } else {
-                                selectedIndex = defaultThumbnails.length + existingSubmission;
                             }
 
-                            updateUnsubmitted(unsubmitted, setExtraUnsubmittedThumbnails, setExtraUnsubmittedTitles, thumbnails, titles);
+                            const { extraThumbnails } = updateUnsubmitted(unsubmitted, setExtraUnsubmittedThumbnails,
+                                setExtraUnsubmittedTitles, thumbnails, titles);
                             Config.forceLocalUpdate("unsubmitted");
+
+
+                            if (existingSubmission !== -1) {
+                                const extraUnsubmitted = extraThumbnails.findIndex((s) => s.type === ThumbnailType.SpecifiedTime
+                                    && s.timestamp === t.timestamp);
+
+                                if (extraUnsubmitted !== -1) {
+                                    selectedIndex = defaultThumbnails.length + extraUnsubmitted;
+                                }
+                            }
                         }
 
                         setSelectedThumbnailIndex(selectedIndex);
@@ -256,29 +265,49 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 function updateUnsubmitted(unsubmitted: UnsubmittedSubmission,
         setExtraUnsubmittedThumbnails: React.Dispatch<React.SetStateAction<RenderedThumbnailSubmission[]>>,
         setExtraUnsubmittedTitles: React.Dispatch<React.SetStateAction<RenderedTitleSubmission[]>>,
-        thumbnails: RenderedThumbnailSubmission[], titles: RenderedTitleSubmission[]) {
+        thumbnails: RenderedThumbnailSubmission[], titles: RenderedTitleSubmission[]): {
+            extraTitles: RenderedTitleSubmission[];
+            extraThumbnails: RenderedThumbnailSubmission[];
+        } {
     if (unsubmitted) {
+        let titlesResult: RenderedTitleSubmission[] = [];
+        let thumbnailsResult: RenderedThumbnailSubmission[] = [];
+
         const unsubmittedThumbnails = unsubmitted.thumbnails;
         if (unsubmittedThumbnails) {
-            setExtraUnsubmittedThumbnails(unsubmittedThumbnails
+            thumbnailsResult = unsubmittedThumbnails
                 .filter((t) => thumbnails.every((s) => !t.original && (s.type !== ThumbnailType.SpecifiedTime
                     || s.timestamp !== t.timestamp)))
                 .map((t) => ({
                 type: ThumbnailType.SpecifiedTime,
                 timestamp: (t as CustomThumbnailResult).timestamp
-            })));
+            }));
+
+            setExtraUnsubmittedThumbnails(thumbnailsResult);
         }
 
         const unsubmittedTitles = unsubmitted.titles;
         if (unsubmittedTitles) {
-            setExtraUnsubmittedTitles(unsubmittedTitles
-                .filter((t) => titles.every((s) => s.title !== t.title)));
+            titlesResult = unsubmittedTitles
+                .filter((t) => titles.every((s) => s.title !== t.title))
+
+            setExtraUnsubmittedTitles(titlesResult);
         }
 
         Config.forceLocalUpdate("unsubmitted");
+
+        return {
+            extraTitles: titlesResult,
+            extraThumbnails: thumbnailsResult
+        };
     } else {
         setExtraUnsubmittedThumbnails([]);
         setExtraUnsubmittedTitles([]);
+
+        return {
+            extraTitles: [],
+            extraThumbnails: []
+        };
     }
 }
 
