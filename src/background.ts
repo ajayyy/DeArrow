@@ -74,3 +74,11 @@ function getExtensionIdsToImportFrom(): string[] {
         return CompileConfig.extensionImportList.chromium;
     }
 }
+
+chrome.runtime.onMessageExternal.addListener((request, sender, callback) => {
+    if (sender.id && getExtensionIdsToImportFrom().includes(sender.id)) {
+        if (request.message === "isInstalled") {
+            callback(true);
+        }
+    }
+});
