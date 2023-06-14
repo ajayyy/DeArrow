@@ -5,7 +5,7 @@ import { FetchResponse, sendRealRequestToCustomServer, sendRequestToCustomServer
 import { BrandingLocation, BrandingResult, updateBrandingForVideo } from "./videoBranding/videoBranding";
 import { logError } from "./utils/logger";
 import { getHash } from "@ajayyy/maze-utils/lib/hash";
-import Config, { ThumbnailCacheOption, ThumbnailFallbackOption } from "./config";
+import Config, { ThumbnailCacheOption, ThumbnailFallbackOption } from "./config/config";
 import { generateUserID } from "@ajayyy/maze-utils/lib/setup";
 import { BrandingUUID } from "./videoBranding/videoBranding";
 import { timeoutPomise } from "@ajayyy/maze-utils";
@@ -13,6 +13,7 @@ import { isCachedThumbnailLoaded, setupPreRenderedThumbnail } from "./thumbnails
 import { setupCache } from "./thumbnails/thumbnailDataCache";
 import * as CompileConfig from "../config.json";
 import { alea } from "seedrandom";
+import { getThumbnailFallbackOption, getThumbnailFallbackOptionFastCheck, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "./config/channelOverrides";
 
 interface VideoBrandingCacheRecord extends BrandingResult {
     lastUsed: number;
@@ -46,8 +47,9 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
     const brandingData = await getVideoBranding(videoID, brandingLocation === BrandingLocation.Watch, brandingLocation);
     const result = brandingData?.thumbnails[0];
     if (!result || (!result.locked && result.votes < 0)) {
+        const fastThumbnailOptionCheck = getThumbnailFallbackOptionFastCheck();
         if (brandingData 
-                && Config.config!.thumbnailFallback === ThumbnailFallbackOption.RandomTime) {
+                && (fastThumbnailOptionCheck === null || fastThumbnailOptionCheck === ThumbnailFallbackOption.RandomTime)) {
             let videoDuration = brandingData.videoDuration;
             if (!videoDuration) {
                 const metadata = await fetchVideoMetadata(videoID, false);
@@ -65,6 +67,11 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
                     // Only an official time for default server address
                     queueThumbnailCacheRequest(videoID, timestamp, undefined, isOfficialTime(),
                         checkShouldGenerateNow(brandingLocation));
+                }
+
+                // Wait here for actual thumbnail cache fallback option
+                if (await getThumbnailFallbackOption(videoID) !== ThumbnailFallbackOption.RandomTime) {
+                    return null;
                 }
 
                 return {
@@ -175,11 +182,11 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
             }
         }).catch(logError);
 
-        thumbnailCacheResults.then((results) => {
+        thumbnailCacheResults.then(async (results) => {
             thumbnailCacheFetchDone = true;
 
             if (results) {
-                if (!mainFetchDone && Config.config!.thumbnailFallback === ThumbnailFallbackOption.RandomTime) {
+                if (!mainFetchDone && await getThumbnailFallbackOption(videoID) === ThumbnailFallbackOption.RandomTime) {
                     handleResults(results);
                 }
             }
@@ -252,8 +259,8 @@ async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Re
 }
 
 async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, title?: string, officialImage?: boolean, generateNow?: boolean, tries = 0): Promise<Record<VideoID, BrandingResult> | null> {
-    if (Config.config!.thumbnailCacheUse === ThumbnailCacheOption.Disable 
-        || !Config.config!.replaceThumbnails) return null;
+    if (Config.config!.thumbnailCacheUse === ThumbnailCacheOption.Disable
+        || shouldReplaceThumbnailsFastCheck() === false) return null;
 
     const result = (async () => {
         try {
@@ -273,6 +280,11 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
                         
                     if (isNaN(timestamp)) {
                         logError(`Getting video branding from cache server for ${videoID} failed: Timestamp is NaN`);
+                        return null;
+                    }
+
+                    if (!await shouldReplaceThumbnails(videoID)) {
+                        // This check is done so late to make sure it doesn't slow down the original fetch
                         return null;
                     }
     

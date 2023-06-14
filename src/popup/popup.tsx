@@ -2,7 +2,7 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { PopupComponent } from "./PopupComponent";
 import { waitFor } from "@ajayyy/maze-utils";
-import Config from "../config";
+import Config from "../config/config";
 
 
 document.addEventListener("DOMContentLoaded", async () => {

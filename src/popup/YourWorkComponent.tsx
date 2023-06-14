@@ -1,5 +1,5 @@
 import * as React from "react";
-import Config from "../config";
+import Config from "../config/config";
 import { sendRequestToServer } from "../dataFetching";
 import { getHash } from "@ajayyy/maze-utils/lib/hash";
 import { getErrorMessage } from "@ajayyy/maze-utils/lib/formating";

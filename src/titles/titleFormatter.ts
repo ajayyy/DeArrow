@@ -1,4 +1,6 @@
-import Config, { TitleFormatting } from "../config";
+import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import Config, { TitleFormatting } from "../config/config";
+import { getTitleFormatting } from "../config/channelOverrides";
 
 /**
  * Useful regex expressions:
@@ -45,8 +47,16 @@ const titleCaseNotCapitalized = [
     "etc"
 ];
 
-export function formatTitle(title: string, isCustom: boolean): string {
-    switch (Config.config!.titleFormatting) {
+export async function formatTitle(title: string, isCustom: boolean, videoID: VideoID | null): Promise<string> {
+    return formatTitleInternal(title, isCustom, await getTitleFormatting(videoID));
+}
+
+export function formatTitleDefaultSettings(title: string, isCustom: boolean): string {
+    return formatTitleInternal(title, isCustom, Config.config!.titleFormatting);
+}
+
+function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: TitleFormatting): string {
+    switch (titleFormatting) {
         case TitleFormatting.CapitalizeWords:
             return toCapitalizeCase(title, isCustom);
         case TitleFormatting.TitleCase:

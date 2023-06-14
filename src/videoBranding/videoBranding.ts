@@ -6,7 +6,7 @@ import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
 import { findOrCreateShowOriginalButton, getOrCreateTitleElement, getOriginalTitleElement, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
 import { setThumbnailListener } from "@ajayyy/maze-utils/lib/thumbnailManagement";
-import Config, { ThumbnailCacheOption } from "../config";
+import Config, { ThumbnailCacheOption } from "../config/config";
 import { logError } from "../utils/logger";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 
@@ -262,7 +262,9 @@ export function setupOptionChangeListener(): void {
             "replaceThumbnails",
             "titleFormatting",
             "thumbnailFallback",
-            "alwaysShowShowOriginalButton"
+            "alwaysShowShowOriginalButton",
+            "customConfigurations",
+            "channelOverrides"
         ];
 
         if (settingsToReload.some((name) => (changes[name] && changes[name].newValue !== changes[name].oldValue))) {

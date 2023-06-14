@@ -6,7 +6,7 @@ import { ThumbnailType } from "./ThumbnailComponent";
 import { RenderedThumbnailSubmission, ThumbnailDrawerComponent } from "./ThumbnailDrawerComponent";
 import { RenderedTitleSubmission, TitleDrawerComponent } from "./TitleDrawerComponent";
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
-import Config, { UnsubmittedSubmission } from "../config";
+import Config, { UnsubmittedSubmission } from "../config/config";
 import { addTitleChangeListener, removeTitleChangeListener } from "../utils/titleBar";
 import { toSentenceCase } from "../titles/titleFormatter";
 import { BrandingPreviewComponent } from "./BrandingPreviewComponent";

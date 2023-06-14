@@ -5,7 +5,8 @@ import { getVideoThumbnailIncludingUnsubmitted, isFetchingFromThumbnailCache, qu
 import { log, logError } from "../utils/logger";
 import { BrandingLocation } from "../videoBranding/videoBranding";
 import { isFirefoxOrSafari, timeoutPomise, waitFor } from "@ajayyy/maze-utils";
-import Config, { ThumbnailFallbackOption } from "../config";
+import Config, { ThumbnailFallbackOption } from "../config/config";
+import { getThumbnailFallbackOption, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "../config/channelOverrides";
 
 const thumbnailRendererControls: Record<VideoID, Array<(error?: string) => void>> = {};
 
@@ -382,10 +383,10 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
     const image = element.querySelector(getThumbnailSelector(brandingLocation)) as HTMLImageElement;
     const box = getThumbnailBox(image, brandingLocation);
 
-    if (!showCustomBranding || !Config.config!.replaceThumbnails) {
+    if (!showCustomBranding || shouldReplaceThumbnailsFastCheck() === false) {
         resetToShowOriginalThumbnail(image, brandingLocation);
 
-        if (Config.config!.replaceThumbnails) {
+        if (await shouldReplaceThumbnails(videoID)) {
             // Still check if the thumbnail is supposed to be changed or not
             const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation);
             return !!thumbnail && !thumbnail.original;
@@ -420,9 +421,9 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
         image.classList.remove("cb-visible");
 
         // Trigger a fetch to start, and display the original thumbnail if necessary
-        getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation).then((thumbnail) => {
+        getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation).then(async (thumbnail) => {
             if (!thumbnail || thumbnail.original) {
-                if (!thumbnail && Config.config!.thumbnailFallback === ThumbnailFallbackOption.Blank) {
+                if (!thumbnail && await getThumbnailFallbackOption(videoID) === ThumbnailFallbackOption.Blank) {
                     resetToBlankThumbnail(image);
                 } else {
                     resetToShowOriginalThumbnail(image, brandingLocation);
@@ -443,6 +444,13 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
     
             if (!thumbnail) {
                 // Hiding handled by already above then check
+                return false;
+            }
+
+            // Waiting until now so that innertube has time to fetch data
+            if (!await shouldReplaceThumbnails(videoID)) {
+                resetToShowOriginalThumbnail(image, brandingLocation);
+
                 return false;
             }
 

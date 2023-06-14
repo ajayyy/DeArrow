@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRoot } from 'react-dom/client';
 
-import Config from "./config";
+import Config from "./config/config";
 import * as CompileConfig from "../config.json";
 import * as invidiousList from "../ci/invidiouslist.json";
 
@@ -16,6 +16,7 @@ import { getHash } from "@ajayyy/maze-utils/lib/hash";
 import { isFirefoxOrSafari, waitFor } from "@ajayyy/maze-utils";
 import { sendRequestToServer } from "./dataFetching";
 import { logError } from "./utils/logger";
+import ChannelOverrides from "./options/ChannelOverrides";
 let embed = false;
 
 window.addEventListener('DOMContentLoaded', () => void init());
@@ -281,6 +282,9 @@ async function init() {
                 });
                 break;
             }
+            case "react-ChannelOverridesComponent":
+                new ChannelOverrides(optionsElements[i]);
+                break;
         }
     }
 

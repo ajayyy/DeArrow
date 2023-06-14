@@ -1,11 +1,12 @@
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
-import Config from "../config";
+import Config from "../config/config";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
 import { getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { BrandingLocation, toggleShowCustom } from "../videoBranding/videoBranding";
 import { formatTitle } from "./titleFormatter";
 import { setPageTitle } from "./pageTitleHandler";
+import { shouldReplaceTitles, shouldReplaceTitlesFastCheck } from "../config/channelOverrides";
 
 enum WatchPageType {
     Video,
@@ -19,7 +20,7 @@ let lastUrlWatchPageType: WatchPageType | null = null;
 export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, brandingLocation: BrandingLocation): Promise<boolean> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
 
-    if (!Config.config!.replaceTitles) {
+    if (shouldReplaceTitlesFastCheck() === false) {
         showOriginalTitle(element, brandingLocation);
         return false;
     }
@@ -47,12 +48,12 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         const titleData = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
         const title = titleData?.title;
         if (title) {
-            const formattedTitle = formatTitle(title, !titleData.original)
+            const formattedTitle = await formatTitle(title, !titleData.original, videoID);
             setCustomTitle(formattedTitle, element, brandingLocation);
         } else if (originalTitleElement?.textContent) {
             // innerText is blank when visibility hidden
             const originalText = originalTitleElement.textContent.trim();
-            const modifiedTitle = formatTitle(originalText, false);
+            const modifiedTitle = await formatTitle(originalText, false, videoID);
             if (originalText === modifiedTitle) {
                 showOriginalTitle(element, brandingLocation);
                 return false;
@@ -72,6 +73,11 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
 
         if (!showCustomBranding) {
             showOriginalTitle(element, brandingLocation);
+        }
+
+        if (!await shouldReplaceTitles(videoID)) {
+            showOriginalTitle(element, brandingLocation);
+            return false;
         }
         return true;
     } catch (e) {

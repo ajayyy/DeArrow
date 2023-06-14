@@ -1,4 +1,5 @@
 import * as React from "react";
+import ResetIcon from "../svgIcons/resetIcon";
 
 export interface SelectOption {
     value: string;
@@ -9,15 +10,21 @@ export interface SelectOptionComponentProps {
     id: string;
     onChange: (value: string) => void;
     value: string;
-    label: string;
+    label?: string;
     options: SelectOption[];
     style?: React.CSSProperties;
+    className?: string;
+    showResetButton?: boolean;
+    onReset?: () => void;
 }
 
 export const SelectOptionComponent = (props: SelectOptionComponentProps) => {
     return (
-        <div className="optionContainer" style={props.style}>
-            <label className="optionLabel" htmlFor={props.id}>{props.label}</label>
+        <div className={`optionContainer ${props.className ?? ""}`} style={props.style}>
+            {
+                props.label &&
+                    <label className="optionLabel" htmlFor={props.id}>{props.label}</label>
+            }
             <select id={props.id}
                 className="selector-element optionsSelector"
                 value={props.value}
@@ -26,6 +33,15 @@ export const SelectOptionComponent = (props: SelectOptionComponentProps) => {
                 }}>
                 {getOptions(props.options)}
             </select>
+
+            {
+                props.showResetButton &&
+                <div className="reset-button" onClick={() => {
+                    props.onReset?.();
+                }}>
+                    <ResetIcon/>
+                </div>
+            }
         </div>
     );
 };

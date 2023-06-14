@@ -1,7 +1,7 @@
 import { setupTabUpdates } from "@ajayyy/maze-utils/lib/tab-updates";
 import { setupBackgroundRequestProxy } from "@ajayyy/maze-utils/lib/background-request-proxy";
 import { generateUserID } from "@ajayyy/maze-utils/lib/setup";
-import Config from "./config";
+import Config from "./config/config";
 import { isSafari } from "@ajayyy/maze-utils/lib/config";
 import * as CompileConfig from "../config.json";
 import { isFirefoxOrSafari } from "@ajayyy/maze-utils";

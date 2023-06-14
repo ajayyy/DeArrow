@@ -1,11 +1,11 @@
+import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import * as React from "react";
-import { RenderedTitleSubmission } from "./TitleDrawerComponent";
-import { RenderedThumbnailSubmission } from "./ThumbnailDrawerComponent";
+import { formatTitleDefaultSettings } from "../titles/titleFormatter";
 import { BrandingResult } from "../videoBranding/videoBranding";
 import { ThumbnailType } from "./ThumbnailComponent";
+import { RenderedThumbnailSubmission } from "./ThumbnailDrawerComponent";
 import { ThumbnailSelectionComponent } from "./ThumbnailSelectionComponent";
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
-import { formatTitle } from "../titles/titleFormatter";
+import { RenderedTitleSubmission } from "./TitleDrawerComponent";
 
 export interface BrandingPreviewComponentComponentProps {
     submissions: BrandingResult;
@@ -51,7 +51,7 @@ export const  BrandingPreviewComponent = (props: BrandingPreviewComponentCompone
             ></ThumbnailSelectionComponent>
 
             <div className="cbTitle cbTitlePreview">
-                {formatTitle(displayedTitle.title, true)}
+                {formatTitleDefaultSettings(displayedTitle.title, true)}
             </div>
         </div>
     );

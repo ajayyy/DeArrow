@@ -702,3 +702,58 @@ svg {
     border: none !important;
     padding: 20px 0px 0px 0px !important;
 }
+
+/* Allow list */
+
+#channel-allowlist {
+    width: 600px;
+}
+
+.channelOverridesTopRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.channelOverrides > * {
+    margin-top: 20px;
+}
+
+.channelOverrides > *:first-child {
+    margin-top: 0;
+}
+
+
+.channelOverrides .option-text-box {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.channelOverrides .optionLabel {
+    padding-right: 10px;
+}
+
+.partiallyHidden {
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+.partiallyHidden:hover {
+    opacity: 1;
+}
+
+.channelOverrides .reset-button svg {
+    width: 10px;
+    fill: var(--white);
+
+    cursor: pointer;
+}
+
+.optionContainer .reset-button {
+    padding-left: 10px;
+    display: inline;
+}
+
+.no-configurations {
+    text-align: center;
+}

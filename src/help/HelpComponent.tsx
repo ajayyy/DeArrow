@@ -1,5 +1,5 @@
 import * as React from "react";
-import Config from "../config";
+import Config from "../config/config";
 import { showDonationLink } from "../utils/configUtils";
 
 export const HelpComponent = () => {

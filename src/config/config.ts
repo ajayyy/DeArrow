@@ -1,8 +1,8 @@
 import { ProtoConfig } from "@ajayyy/maze-utils/lib/config";
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
-import { ThumbnailSubmission } from "./thumbnails/thumbnailData";
-import { logError } from "./utils/logger";
-import * as CompileConfig from "../config.json";
+import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
+import { logError } from "../utils/logger";
+import * as CompileConfig from "../../config.json";
 
 export interface Permission {
     canSubmit: boolean;
@@ -41,6 +41,16 @@ export enum ThumbnailFallbackOption {
     Original
 }
 
+export type ConfigurationID = string & { __configurationID: never };
+
+export interface CustomConfiguration {
+    name: string;
+    replaceTitles: boolean | null;
+    replaceThumbnails: boolean | null;
+    titleFormatting: TitleFormatting | null;
+    thumbnailFallback: ThumbnailFallbackOption | null;
+}
+
 const isEnglish = typeof chrome !== "object" || chrome.i18n.getUILanguage().startsWith("en");
 
 interface SBConfig {
@@ -68,6 +78,8 @@ interface SBConfig {
     importedConfig: boolean;
     replaceTitles: boolean;
     replaceThumbnails: boolean;
+    channelOverrides: Record<string, ConfigurationID>;
+    customConfigurations: Record<ConfigurationID, CustomConfiguration>;
 }
 
 interface SBStorage {
@@ -113,7 +125,9 @@ const syncDefaults = {
     alwaysShowShowOriginalButton: false,
     importedConfig: false,
     replaceTitles: true,
-    replaceThumbnails: true
+    replaceThumbnails: true,
+    channelOverrides: {},
+    customConfigurations: {}
 };
 
 const localDefaults = {

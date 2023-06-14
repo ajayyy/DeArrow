@@ -7,7 +7,7 @@ import { log, logError } from "../utils/logger";
 import { TitleSubmission } from "../titles/titleData";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { submitVideoBranding } from "../dataFetching";
-import Config from "../config";
+import Config from "../config/config";
 import { addTitleChangeListener, getOrCreateTitleButtonContainer } from "../utils/titleBar";
 
 const submitButtonIcon = `

@@ -1,7 +1,7 @@
 import * as React from "react";
 
 export interface AddIconProps {
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
   className?: string;
   onClick?: () => void;
 }

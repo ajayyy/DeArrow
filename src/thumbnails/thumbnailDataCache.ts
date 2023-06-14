@@ -30,8 +30,10 @@ export interface FailInfo {
 }
 
 interface VideoMetadata {
-    duration: number | null;
     playbackUrls: PlaybackUrl[];
+    duration: number | null;
+    channelID: string | null;
+    author: string | null;
 }
 
 export interface ThumbnailData {
@@ -58,8 +60,10 @@ export function setupCache(videoID: VideoID): ThumbnailData {
         cache[videoID] = {
             video: [],
             metadata: {
+                playbackUrls: [],
                 duration: null,
-                playbackUrls: []
+                channelID: null,
+                author: null
             },
             lastUsed: Date.now(),
             failures: [],

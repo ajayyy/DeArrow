@@ -1,7 +1,7 @@
 import { BackgroundToContentMessage } from "./types/messaging";
 import { logError } from "./utils/logger";
 import { ChannelIDInfo, checkIfNewVideoID, setupVideoModule, VideoID } from "@ajayyy/maze-utils/lib/video"
-import Config from "./config";
+import Config from "./config/config";
 import { SubmitButton } from "./submission/submitButton";
 import { BrandingLocation, clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
 import { getVideoBranding } from "./dataFetching";

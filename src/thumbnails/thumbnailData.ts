@@ -36,13 +36,17 @@ interface InnerTubeFormat {
     mimeType: string;
 }
 
-interface InnerTubeMetadata {
+interface InnerTubeMetadataBase {
     duration: number | null;
+    channelID: string | null;
+    author: string | null;
+}
+
+interface InnerTubeMetadata extends InnerTubeMetadataBase {
     formats: InnerTubeFormat[];
 }
 
-interface VideoMetadata {
-    duration: number | null;
+interface VideoMetadata extends InnerTubeMetadataBase {
     playbackUrls: PlaybackUrl[];
 }
 
@@ -78,6 +82,8 @@ export async function fetchVideoMetadata(videoID: VideoID, ignoreCache: boolean)
                     height: format.height
                 }));
                 videoCache.metadata.duration = metadata.duration;
+                videoCache.metadata.channelID = metadata.channelID;
+                videoCache.metadata.author = metadata.author;
 
                 // Remove this from active requests after it's been dealt with in other places
                 setTimeout(() => delete activeRequests[videoID], 500);
@@ -94,6 +100,8 @@ export async function fetchVideoMetadata(videoID: VideoID, ignoreCache: boolean)
 
     return {
         duration: null,
+        channelID: null,
+        author: null,
         playbackUrls: []
     };
 }
@@ -152,10 +160,14 @@ export async function fetchVideoDataAndroidClient(videoID: VideoID): Promise<Inn
             const response = await result.json();
             const formats = response?.streamingData?.adaptiveFormats as InnerTubeFormat[];
             const duration = response?.videoDetails?.lengthSeconds ? parseInt(response.videoDetails.lengthSeconds) : null;
+            const channelId = response?.videoDetails?.channelId ?? null;
+            const author = response?.videoDetails?.author ?? null;
             if (formats) {
                 return {
                     formats,
-                    duration
+                    duration,
+                    channelID: channelId,
+                    author
                 };
             }
         }
@@ -164,7 +176,9 @@ export async function fetchVideoDataAndroidClient(videoID: VideoID): Promise<Inn
 
     return {
         formats: [],
-        duration: null
+        duration: null,
+        channelID: null,
+        author: null
     };
 }
 
@@ -193,10 +207,14 @@ export async function fetchVideoDataDesktopClient(videoID: VideoID): Promise<Inn
             const response = await result.json();
             const formats = response?.streamingData?.adaptiveFormats as InnerTubeFormat[];
             const duration = response?.videoDetails?.lengthSeconds ? parseInt(response.videoDetails.lengthSeconds) : null;
+            const channelId = response?.videoDetails?.channelId ?? null;
+            const author = response?.videoDetails?.author ?? null;
             if (formats) {
                 return {
                     formats,
-                    duration
+                    duration,
+                    channelID: channelId,
+                    author
                 };
             }
         }
@@ -205,7 +223,9 @@ export async function fetchVideoDataDesktopClient(videoID: VideoID): Promise<Inn
 
     return {
         formats: [],
-        duration: null
+        duration: null,
+        channelID: null,
+        author: null
     };
 }
 
@@ -226,4 +246,23 @@ export async function getPlaybackFormats(videoID: VideoID,
     }
 
     return null;
+}
+
+export async function getChannelID(videoID: VideoID): Promise<{
+    channelID: string | null;
+    author: string | null;
+}> {
+    const metadata = await fetchVideoMetadata(videoID, false);
+
+    if (metadata) {
+        return {
+            channelID: metadata.channelID,
+            author: metadata.author
+        };
+    }
+
+    return {
+        channelID: null,
+        author: null
+    };
 }
