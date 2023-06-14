@@ -353,7 +353,7 @@ function createVideo(existingVideo: HTMLVideoElement | null, url: string, timest
 function getThumbnailSelector(brandingLocation: BrandingLocation): string {
     switch (brandingLocation) {
         case BrandingLocation.Related:
-            return "ytd-thumbnail:not([hidden]) img, ytd-playlist-thumbnail img";
+            return "ytd-thumbnail:not([hidden]) img, ytd-playlist-thumbnail yt-image:not(.blurred-image) img";
         case BrandingLocation.Endcards:
             return ".ytp-ce-covering-image";
         case BrandingLocation.Autoplay:
