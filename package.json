@@ -4,7 +4,7 @@
   "description": "",
   "main": "background.js",
   "dependencies": {
-    "@ajayyy/maze-utils": "1.1.35",
+    "@ajayyy/maze-utils": "1.1.36",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "seedrandom": "^3.0.5"
