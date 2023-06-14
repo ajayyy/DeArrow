@@ -94,7 +94,7 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
     const link = getLinkElement(element, brandingLocation);
 
     if (link) {
-        const videoID = extractVideoID(link);
+        const videoID = await extractVideoID(link);
         const isPlaylistTitleStatus = isPlaylistTitle(link);
 
         if (verifyVideoID && videoID !== verifyVideoID) {
@@ -127,7 +127,7 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
 
         const result = await Promise.all(promises);
 
-        if (videoID !== extractVideoID(link) && extractVideoID(link) && tries < 2) {
+        if (videoID !== await extractVideoID(link) && await extractVideoID(link) && tries < 2) {
             // Video ID changed, so try again
             return replaceVideoCardBranding(element, brandingLocation, verifyVideoID, tries++);
         }
@@ -153,8 +153,26 @@ export function getLinkElement(element: HTMLElement, brandingLocation: BrandingL
     }
 }
 
-function extractVideoID(link: HTMLAnchorElement) {
-    return link.href?.match(/(?<=(?:\?|&)v=).{11}|(?<=\/shorts\/).{11}/)?.[0] as VideoID;
+async function extractVideoID(link: HTMLAnchorElement) {
+    let videoID = link.href?.match(/(?<=(?:\?|&)v=).{11}|(?<=\/shorts\/).{11}/)?.[0] as VideoID;
+
+    if (!videoID) {
+        const image = link.querySelector("yt-image img") as HTMLImageElement;
+        if (image) {
+            let href = image.getAttribute("src");
+            if (!href) {
+                // wait source to be setup
+                await waitForImageSrc(image);
+                href = image.getAttribute("src");
+            }
+
+            if (href) {
+                videoID = href.match(/(?<=\/vi\/).{11}/)?.[0] as VideoID;
+            }
+        }
+    }
+
+    return videoID;
 }
 
 function isPlaylistTitle(link: HTMLAnchorElement) {
@@ -279,4 +297,33 @@ export function setupOptionChangeListener(): void {
             }
         }
     });
+}
+
+const imagesWaitingFor = new Map<HTMLImageElement, Promise<void>>();
+function waitForImageSrc(image: HTMLImageElement): Promise<void> {
+    const existingPromise = imagesWaitingFor.get(image);
+    if (!existingPromise) {
+        const result = new Promise<void>((resolve) => {
+            const observer = new MutationObserver((mutations) => {
+                for (const mutation of mutations) {
+                    if (mutation.attributeName === "src"
+                            && image.src !== "") {
+                        observer.disconnect();
+                        resolve();
+
+                        imagesWaitingFor.delete(image);
+                        break;
+                    }
+                }
+            });
+
+            observer.observe(image, { attributes: true });
+        });
+
+        imagesWaitingFor.set(image, result);
+
+        return result;
+    }
+
+    return existingPromise;
 }
