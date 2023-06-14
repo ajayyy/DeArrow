@@ -41,7 +41,7 @@ export const YourWorkComponent = () => {
             </h1>
             <div className="sbYourWorkCols">
                 {/* Username */}
-                <div id="usernameElement">
+                <div id="cbUsernameElement">
                     <p className="u-mZ cb-grey-text">{chrome.i18n.getMessage("Username")}:
                         {/* loading/errors */}
                         <span id="setUsernameStatus" 

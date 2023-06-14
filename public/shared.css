@@ -75,7 +75,7 @@
 /*
   * Improve alignment of username and submissions
   */
-#usernameElement>p,
+#cbUsernameElement>p,
 #sponsorTimesContributionsContainer {
     text-align: left;
 }
@@ -83,7 +83,7 @@
 /*
   * Username
   */
-#usernameElement {
+#cbUsernameElement {
     padding: 8px 14px;
     min-width: 40%;
     width: 100%;
