@@ -492,7 +492,8 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
     image.classList.add("cb-visible");
     image.style.removeProperty("display");
 
-    if (brandingLocation === BrandingLocation.Autoplay) {
+    if (brandingLocation === BrandingLocation.Autoplay
+            || !!image.closest("ytd-grid-playlist-renderer")) {
         hideCanvas(image);
     }
 }
