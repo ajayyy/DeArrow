@@ -47,7 +47,7 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
     const brandingData = await getVideoBranding(videoID, brandingLocation === BrandingLocation.Watch, brandingLocation);
     const result = brandingData?.thumbnails[0];
     if (!result || (!result.locked && result.votes < 0)) {
-        const fastThumbnailOptionCheck = getThumbnailFallbackOptionFastCheck();
+        const fastThumbnailOptionCheck = getThumbnailFallbackOptionFastCheck(videoID);
         if (brandingData 
                 && (fastThumbnailOptionCheck === null || fastThumbnailOptionCheck === ThumbnailFallbackOption.RandomTime)) {
             let videoDuration = brandingData.videoDuration;
@@ -260,7 +260,7 @@ async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Re
 
 async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, title?: string, officialImage?: boolean, generateNow?: boolean, tries = 0): Promise<Record<VideoID, BrandingResult> | null> {
     if (Config.config!.thumbnailCacheUse === ThumbnailCacheOption.Disable
-        || shouldReplaceThumbnailsFastCheck() === false) return null;
+        || shouldReplaceThumbnailsFastCheck(videoID) === false) return null;
 
     const result = (async () => {
         try {

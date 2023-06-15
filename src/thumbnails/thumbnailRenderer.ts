@@ -383,7 +383,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
     const image = element.querySelector(getThumbnailSelector(brandingLocation)) as HTMLImageElement;
     const box = getThumbnailBox(image, brandingLocation);
 
-    if (!showCustomBranding || shouldReplaceThumbnailsFastCheck() === false) {
+    if (!showCustomBranding || shouldReplaceThumbnailsFastCheck(videoID) === false) {
         resetToShowOriginalThumbnail(image, brandingLocation);
 
         if (await shouldReplaceThumbnails(videoID)) {

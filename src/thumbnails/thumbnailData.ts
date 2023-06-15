@@ -50,6 +50,11 @@ interface VideoMetadata extends InnerTubeMetadataBase {
     playbackUrls: PlaybackUrl[];
 }
 
+export interface ChannelInfo {
+    channelID: string | null;
+    author: string | null;
+}
+
 const activeRequests: Record<VideoID, Promise<VideoMetadata>> = {};
 export async function fetchVideoMetadata(videoID: VideoID, ignoreCache: boolean): Promise<VideoMetadata> {
     const cachedData = getFromCache(videoID);
@@ -248,10 +253,7 @@ export async function getPlaybackFormats(videoID: VideoID,
     return null;
 }
 
-export async function getChannelID(videoID: VideoID): Promise<{
-    channelID: string | null;
-    author: string | null;
-}> {
+export async function getChannelID(videoID: VideoID): Promise<ChannelInfo> {
     const metadata = await fetchVideoMetadata(videoID, false);
 
     if (metadata) {
@@ -265,4 +267,17 @@ export async function getChannelID(videoID: VideoID): Promise<{
         channelID: null,
         author: null
     };
+}
+
+export function getChannelIDSync(videoID: VideoID): ChannelInfo | null {
+    const cachedData = getFromCache(videoID);
+
+    if (cachedData?.metadata) {
+        return {
+            channelID: cachedData.metadata.channelID,
+            author: cachedData.metadata.author
+        };
+    }
+
+    return null;
 }

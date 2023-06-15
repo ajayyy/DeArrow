@@ -20,7 +20,7 @@ let lastUrlWatchPageType: WatchPageType | null = null;
 export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, brandingLocation: BrandingLocation): Promise<boolean> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
 
-    if (shouldReplaceTitlesFastCheck() === false) {
+    if (shouldReplaceTitlesFastCheck(videoID) === false) {
         showOriginalTitle(element, brandingLocation);
         return false;
     }
