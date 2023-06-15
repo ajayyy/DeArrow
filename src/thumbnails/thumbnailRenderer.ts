@@ -275,7 +275,7 @@ export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | 
         try {
             await Promise.race([
                 waitForThumbnailCache(videoID),
-                timeoutPomise(Config.config!.startLocalRenderTimeout)
+                timeoutPomise(Config.config!.startLocalRenderTimeout).catch(() => ({}))
             ]);
         } catch (e) {
             // Go on and do a local render

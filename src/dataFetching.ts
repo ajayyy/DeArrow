@@ -198,7 +198,7 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
     activeRequests[videoID].catch(() => delete activeRequests[videoID]);
 
     try {
-        await Promise.race([timeoutPomise(Config.config?.fetchTimeout), activeRequests[videoID]]);
+        await Promise.race([timeoutPomise(Config.config?.fetchTimeout).catch(() => ({})), activeRequests[videoID]]);
         delete activeRequests[videoID];
     
         return cache[videoID];
