@@ -177,7 +177,7 @@ async function extractVideoID(link: HTMLAnchorElement) {
 
 export async function extractVideoIDFromElement(element: HTMLElement, brandingLocation: BrandingLocation): Promise<VideoID | null> {
     const link = getLinkElement(element, brandingLocation);
-    if (link){ 
+    if (link) { 
         return await extractVideoID(link);
     } else {
         return null;

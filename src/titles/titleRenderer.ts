@@ -1,9 +1,9 @@
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { VideoID, getVideoID } from "@ajayyy/maze-utils/lib/video";
 import Config from "../config/config";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
 import { getOrCreateTitleButtonContainer } from "../utils/titleBar";
-import { BrandingLocation, toggleShowCustom } from "../videoBranding/videoBranding";
+import { BrandingLocation, extractVideoIDFromElement, toggleShowCustom } from "../videoBranding/videoBranding";
 import { formatTitle } from "./titleFormatter";
 import { setPageTitle } from "./pageTitleHandler";
 import { shouldReplaceTitles, shouldReplaceTitlesFastCheck } from "../config/channelOverrides";
@@ -46,14 +46,20 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
 
     try {
         const titleData = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
+        if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
+
         const title = titleData?.title;
         if (title) {
             const formattedTitle = await formatTitle(title, !titleData.original, videoID);
+            if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
+
             setCustomTitle(formattedTitle, element, brandingLocation);
         } else if (originalTitleElement?.textContent) {
             // innerText is blank when visibility hidden
             const originalText = originalTitleElement.textContent.trim();
             const modifiedTitle = await formatTitle(originalText, false, videoID);
+            if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
+
             if (originalText === modifiedTitle) {
                 showOriginalTitle(element, brandingLocation);
                 return false;
@@ -79,6 +85,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
             showOriginalTitle(element, brandingLocation);
             return false;
         }
+
         return true;
     } catch (e) {
         logError(e);
@@ -86,6 +93,11 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
 
         return false;
     }
+}
+
+async function isOnCorrectVideo(element: HTMLElement, brandingLocation: BrandingLocation, videoID: VideoID): Promise<boolean> {
+    return brandingLocation === BrandingLocation.Watch ? getVideoID() === videoID 
+        : await extractVideoIDFromElement(element, brandingLocation) === videoID;
 }
 
 function hideOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocation) {
