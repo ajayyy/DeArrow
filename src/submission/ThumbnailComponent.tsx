@@ -42,17 +42,29 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
     const canvasHeight = Math.ceil(canvasWidth / aspectRatio);
 
     React.useEffect(() => {
+        const video = props.video;
+
         if (props.type === ThumbnailType.CurrentTime) {
-            props.video.addEventListener("playing", () => renderCurrentFrame(props, canvasRef, inRenderingLoop, true));
-            props.video.addEventListener("seeked", () => {
+            const playListener = () => renderCurrentFrame(props, canvasRef, inRenderingLoop, true);
+            const seekedListener = () => () => {
                 // If playing, it's already waiting for the next frame from the other listener
-                if (props.video.paused) {
+                if (video.paused) {
                     renderCurrentFrame(props, canvasRef, inRenderingLoop, false);
                 }
-            });
+            };
 
-            renderCurrentFrame(props, canvasRef, inRenderingLoop, !props.video.paused);
+            video.addEventListener("playing", playListener);
+            video.addEventListener("seeked", seekedListener);
+
+            renderCurrentFrame(props, canvasRef, inRenderingLoop, !video.paused);
+
+            return () => {
+                video.removeEventListener("playing", playListener);
+                video.removeEventListener("seeked", seekedListener);
+            };
         }
+
+        return () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
     }, [props.video]);
 
     React.useEffect(() => {
