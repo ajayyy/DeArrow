@@ -1,9 +1,9 @@
 import { Format, getPlaybackFormats } from "./thumbnailData";
 import { getFromCache, RenderedThumbnailVideo, setupCache, ThumbnailVideo } from "./thumbnailDataCache";
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { VideoID, getVideoID } from "@ajayyy/maze-utils/lib/video";
 import { getVideoThumbnailIncludingUnsubmitted, isFetchingFromThumbnailCache, queueThumbnailCacheRequest, waitForThumbnailCache } from "../dataFetching";
 import { log, logError } from "../utils/logger";
-import { BrandingLocation } from "../videoBranding/videoBranding";
+import { BrandingLocation, extractVideoIDFromElement } from "../videoBranding/videoBranding";
 import { isFirefoxOrSafari, timeoutPomise, waitFor } from "@ajayyy/maze-utils";
 import Config, { ThumbnailFallbackOption } from "../config/config";
 import { getThumbnailFallbackOption, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "../config/channelOverrides";
@@ -252,7 +252,8 @@ function handleThumbnailRenderFailure(videoID: VideoID, width: number, height: n
  */
 export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | null, videoID: VideoID, width: number,
     height: number, brandingLocation: BrandingLocation, forcedTimestamp: number | null,
-    saveVideo: boolean, ready: (canvas: HTMLCanvasElement) => unknown, failure: () => unknown): Promise<HTMLCanvasElement | null> {
+    saveVideo: boolean, stillValid: () => Promise<boolean>, ready: (canvas: HTMLCanvasElement) => unknown,
+    failure: () => unknown): Promise<HTMLCanvasElement | null> {
 
     let timestamp = forcedTimestamp as number;
     if (timestamp === null) {
@@ -281,12 +282,20 @@ export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | 
         }
     }
 
+    if (!await stillValid()) {
+        return null;
+    }
+
     const canvas = existingCanvas ?? document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
     canvas.style.display = "none";
 
-    const result = (canvasInfo: RenderedThumbnailVideo | null) => {
+    const result = async (canvasInfo: RenderedThumbnailVideo | null) => {
+        if (!await stillValid()) {
+            return;
+        }
+
         if (!canvasInfo) {
             failure();
             return;
@@ -434,7 +443,10 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
         const existingCanvas = image.parentElement?.querySelector(".cbCustomThumbnailCanvas") as HTMLCanvasElement | null;
 
         try {
-            const thumbnail = await createThumbnailCanvas(existingCanvas, videoID, width, height, brandingLocation, timestamp ?? null, false, (thumbnail) => {
+            const thumbnail = await createThumbnailCanvas(existingCanvas, videoID, width, height, brandingLocation, timestamp ?? null, false, async () => {
+                return brandingLocation === BrandingLocation.Watch ? getVideoID() === videoID 
+                    : await extractVideoIDFromElement(element, brandingLocation) === videoID;
+            }, (thumbnail) => {
                 thumbnail!.style.removeProperty("display");
 
                 if (brandingLocation === BrandingLocation.Related) {

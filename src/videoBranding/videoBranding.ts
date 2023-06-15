@@ -175,6 +175,15 @@ async function extractVideoID(link: HTMLAnchorElement) {
     return videoID;
 }
 
+export async function extractVideoIDFromElement(element: HTMLElement, brandingLocation: BrandingLocation): Promise<VideoID | null> {
+    const link = getLinkElement(element, brandingLocation);
+    if (link){ 
+        return await extractVideoID(link);
+    } else {
+        return null;
+    }
+}
+
 function isPlaylistTitle(link: HTMLAnchorElement) {
     return link.href?.match(/list=/)?.[0] !== undefined && link.href?.match(/index=/)?.[0] === undefined;
 }
