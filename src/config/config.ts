@@ -63,6 +63,7 @@ interface SBConfig {
     darkMode: boolean;
     invidiousInstances: string[];
     keepUnsubmitted: boolean;
+    keepUnsubmittedInPrivate: boolean;
     titleFormatting: TitleFormatting;
     serverAddress: string;
     thumbnailServerAddress: string;
@@ -111,6 +112,7 @@ const syncDefaults = {
     darkMode: true,
     invidiousInstances: [],
     keepUnsubmitted: true,
+    keepUnsubmittedInPrivate: false,
     titleFormatting: isEnglish ? TitleFormatting.TitleCase : TitleFormatting.Disable,
     serverAddress: CompileConfig.serverAddress,
     thumbnailServerAddress: CompileConfig.thumbnailServerAddress,

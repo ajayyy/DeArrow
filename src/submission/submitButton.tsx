@@ -147,7 +147,8 @@ export class SubmitButton {
             // Set the unsubmitted as selected
             const unsubmitted = Config.local!.unsubmitted[getVideoID()!];
             if (unsubmitted) {
-                if (Config.config!.keepUnsubmitted && !chrome.extension.inIncognitoContext) {
+                if (Config.config!.keepUnsubmitted 
+                        && (!chrome.extension.inIncognitoContext || Config.config!.keepUnsubmittedInPrivate)) {
                     unsubmitted.titles.forEach((t) => t.selected = false);
                     unsubmitted.thumbnails.forEach((t) => t.selected = false);
 
