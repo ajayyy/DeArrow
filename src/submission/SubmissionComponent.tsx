@@ -214,7 +214,9 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             </div>
 
             <div className="cbVoteButtonContainer">
-                <button className="cbNoticeButton cbVoteButton" disabled={!selectedThumbnail.current && !selectedTitle}
+                <button className="cbNoticeButton cbVoteButton" 
+                    disabled={(!selectedThumbnail.current && !selectedTitle) 
+                                || (!!selectedTitle && selectedTitle.title === chrome.i18n.getMessage("OriginalTitle"))}
                     onClick={() => void props.submitClicked(selectedTitle ? {
                     ...selectedTitle,
                     original: selectedTitle.title === getCurrentPageTitle()
