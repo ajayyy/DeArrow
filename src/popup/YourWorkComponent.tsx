@@ -36,9 +36,9 @@ export const YourWorkComponent = () => {
 
     return (
         <div className="sbYourWorkBox">
-            <h1 className="sbHeader" style={{ "padding": "8px 15px" }}>
+            <h2 className="sbHeader" style={{ "padding": "8px 15px" }}>
             {chrome.i18n.getMessage("yourWork")}
-            </h1>
+            </h2>
             <div className="sbYourWorkCols">
                 {/* Username */}
                 <div id="cbUsernameElement">
