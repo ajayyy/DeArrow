@@ -124,7 +124,7 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                     src={`https://i.ytimg.com/vi/${props.videoID}/${defaultThumbnailOptions[defaultThumbnailOption]}.jpg`}
                     onLoad={(e) => {
                         // If the image is the default thumbnail, try the next one
-                        if ((e.target as HTMLImageElement).width === 120) {
+                        if ((e.target as HTMLImageElement).naturalWidth === 120) {
                             if (defaultThumbnailOption < defaultThumbnailOptions.length - 1) {
                                 setDefaultThumbnailOption(defaultThumbnailOption + 1);
                             } else {
