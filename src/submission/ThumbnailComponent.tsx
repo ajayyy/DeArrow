@@ -82,10 +82,12 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                     renderCurrentFrame(props, canvasRef, inRenderingLoop, false);
                 } else {
                     renderThumbnail(props.videoID, canvasWidth, canvasHeight, false, props.time!).then((rendered) => {
-                        waitFor(() => canvasRef?.current).then(() => {
+                        waitFor(() => canvasRef?.current).then(async () => {
                             if (rendered) {
+                                const imageBitmap = await createImageBitmap(rendered.blob);
+
                                 drawCentered(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height,
-                                    rendered.width, rendered.height, rendered.canvas);
+                                    imageBitmap.width, imageBitmap.height, imageBitmap);
                             } else {
                                 props.onError(chrome.i18n.getMessage("FailedToRender"));
                             }

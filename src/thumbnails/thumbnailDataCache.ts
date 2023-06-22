@@ -15,7 +15,7 @@ interface ThumbnailVideoBase {
 }
 
 export type RenderedThumbnailVideo = ThumbnailVideoBase & {
-    canvas: HTMLCanvasElement;
+    blob: Blob;
     rendered: true;
     fromThumbnailCache: boolean;
 }

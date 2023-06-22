@@ -81,7 +81,7 @@ export function renderThumbnail(videoID: VideoID, width: number,
 
         let resolved = false;
 
-        const loadedData = () => {
+        const loadedData = async () => {
             const betterVideo = getFromCache(videoID)?.video?.find(v => v.width >= width && v.height >= height
                 && v.timestamp === timestamp && v.rendered);
             if (betterVideo) {
@@ -94,16 +94,12 @@ export function renderThumbnail(videoID: VideoID, width: number,
 
             log(videoID, "videoLoaded", video.currentTime, video.readyState, video.seeking, format)
             if (video.readyState < 2 || video.seeking) {
-                setTimeout(loadedData, 50);
+                setTimeout(loadedData, 50); // eslint-disable-line @typescript-eslint/no-misused-promises
                 return;
             }
-            const canvas = document.createElement("canvas");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext("2d")!.drawImage(video, 0, 0);
 
             const videoInfo: RenderedThumbnailVideo = {
-                canvas,
+                blob: await renderToBlob(video),
                 video: saveVideo ? video : null,
                 width: video.videoWidth,
                 height: video.videoHeight,
@@ -135,8 +131,8 @@ export function renderThumbnail(videoID: VideoID, width: number,
                 video.src = "";
                 video.remove();
             } else {
-                video.removeEventListener("loadeddata", loadedData);
-                video.removeEventListener("seeked", loadedData)
+                video.removeEventListener("loadeddata", loadedData); // eslint-disable-line @typescript-eslint/no-misused-promises
+                video.removeEventListener("seeked", loadedData) // eslint-disable-line @typescript-eslint/no-misused-promises
             }
 
             resolved = true;
@@ -184,16 +180,16 @@ export function renderThumbnail(videoID: VideoID, width: number,
                 }
 
                 video = createVideo(null, format?.url, timestamp);
-                video.addEventListener("loadeddata", loadedData);
+                video.addEventListener("loadeddata", loadedData); // eslint-disable-line @typescript-eslint/no-misused-promises
                 video.addEventListener("error", errorHandler);
             }
         })();
 
         video.addEventListener("error", errorHandler);
         if (reusedVideo) {
-            video.addEventListener("seeked", loadedData);
+            video.addEventListener("seeked", loadedData); // eslint-disable-line @typescript-eslint/no-misused-promises
         } else {
-            video.addEventListener("loadeddata", loadedData);
+            video.addEventListener("loadeddata", loadedData); // eslint-disable-line @typescript-eslint/no-misused-promises
         }
 
         // Give up after some times
@@ -204,8 +200,8 @@ export function renderThumbnail(videoID: VideoID, width: number,
         }, Config.config!.renderTimeout);
 
         addStopRenderingCallback(videoID, () => {
-            video.removeEventListener("loadeddata", loadedData);
-            video.removeEventListener("seeked", loadedData)
+            video.removeEventListener("loadeddata", loadedData); // eslint-disable-line @typescript-eslint/no-misused-promises
+            video.removeEventListener("seeked", loadedData) // eslint-disable-line @typescript-eslint/no-misused-promises
             video.removeEventListener("error", errorHandler);
 
             video.src = "";
@@ -243,6 +239,26 @@ function handleThumbnailRenderFailure(videoID: VideoID, width: number, height: n
             callback(null);
         }
     }
+}
+
+function renderToBlob(surface: HTMLVideoElement | HTMLCanvasElement): Promise<Blob> {
+    const width = surface instanceof HTMLVideoElement ? surface.videoWidth : surface.width;
+    const height = surface instanceof HTMLVideoElement ? surface.videoHeight : surface.height;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    canvas.getContext("2d")!.drawImage(surface, 0, 0);
+
+    return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+            if (blob) {
+                resolve(blob);
+            } else {
+                reject("Failed to create blob");
+            }
+        }, "image/webp", 1);
+    });
 }
 
 /**
@@ -301,7 +317,8 @@ export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | 
             return;
         }
 
-        drawCentered(canvas, width, height, canvasInfo.width, canvasInfo.height, canvasInfo.canvas);
+        const imageBitmap = await createImageBitmap(canvasInfo.blob);
+        drawCentered(canvas, width, height, imageBitmap.width, imageBitmap.height, imageBitmap);
         ready(canvas);
     }
 
@@ -316,7 +333,7 @@ export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | 
 }
 
 export function drawCentered(canvas: HTMLCanvasElement, width: number, height: number,
-    originalWidth: number, originalHeight: number, originalSurface: HTMLVideoElement | HTMLCanvasElement): void {
+    originalWidth: number, originalHeight: number, originalSurface: HTMLVideoElement | HTMLCanvasElement | ImageBitmap): void {
     const calculateWidth = height * originalWidth / originalHeight;
     const context = canvas.getContext("2d")!;
     
@@ -329,8 +346,8 @@ export function drawCentered(canvas: HTMLCanvasElement, width: number, height: n
     context.drawImage(originalSurface, (width - calculateWidth) / 2, 0, calculateWidth, height);
 }
 
-function runAntiAliasShrink(originalSurface: HTMLVideoElement | HTMLCanvasElement,
-        width: number, height: number): HTMLVideoElement | HTMLCanvasElement {
+function runAntiAliasShrink(originalSurface: HTMLVideoElement | HTMLCanvasElement | ImageBitmap,
+        width: number, height: number): HTMLVideoElement | HTMLCanvasElement | ImageBitmap {
     while (originalSurface.width > width * 2 && originalSurface.height > height * 2) {
         const newCanvas = document.createElement("canvas");
         newCanvas.width = originalSurface.width / 1.5;
@@ -524,22 +541,16 @@ function hideCanvas(image: HTMLElement) {
     }
 }
 
-export async function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, blob: Blob) {
-    const imageBitmap = await createImageBitmap(blob);
-    const canvas = document.createElement("canvas");
-    canvas.width = imageBitmap.width;
-    canvas.height = imageBitmap.height;
-    canvas.getContext("2d")?.drawImage(imageBitmap, 0, 0);
-    
+export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, blob: Blob) {
     const videoCache = setupCache(videoID);
     const videoObject: RenderedThumbnailVideo = {
         video: null,
-        width: imageBitmap.width,
-        height: imageBitmap.height,
+        width: 1280, // Can use arbitrary values, since the blob's image bitmap is actually used to render
+        height: 720,
         rendered: true,
         onReady: [],
         timestamp,
-        canvas,
+        blob,
         fromThumbnailCache: true
     }
     videoCache.video.push(videoObject);
@@ -549,7 +560,7 @@ export async function setupPreRenderedThumbnail(videoID: VideoID, timestamp: num
     const unrendered = videoCache.video.filter(v => v.timestamp === timestamp && !v.rendered);
     if (unrendered.length > 0) {
         for (const video of unrendered) {
-            (video as RenderedThumbnailVideo).canvas = canvas;
+            (video as RenderedThumbnailVideo).blob = blob;
             video.rendered = true;
 
             for (const callback of video.onReady) {
