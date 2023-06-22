@@ -242,16 +242,17 @@ function handleThumbnailRenderFailure(videoID: VideoID, width: number, height: n
 }
 
 function renderToBlob(surface: HTMLVideoElement | HTMLCanvasElement): Promise<Blob> {
-    const width = surface instanceof HTMLVideoElement ? surface.videoWidth : surface.width;
-    const height = surface instanceof HTMLVideoElement ? surface.videoHeight : surface.height;
+    if (surface instanceof HTMLVideoElement) {
+        const canvas = document.createElement("canvas");
+        canvas.width = surface.videoWidth;
+        canvas.height = surface.videoHeight;
+        canvas.getContext("2d")!.drawImage(surface, 0, 0);
 
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    canvas.getContext("2d")!.drawImage(surface, 0, 0);
+        surface = canvas;
+    }
 
     return new Promise((resolve, reject) => {
-        canvas.toBlob((blob) => {
+        (surface as HTMLCanvasElement).toBlob((blob) => {
             if (blob) {
                 resolve(blob);
             } else {
@@ -266,10 +267,10 @@ function renderToBlob(surface: HTMLVideoElement | HTMLCanvasElement): Promise<Bl
  * 
  * Starts with lower resolution and replaces it with higher resolution when ready.
  */
-export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | null, videoID: VideoID, width: number,
+export async function createThumbnailImageElement(existingElement: HTMLImageElement | null, videoID: VideoID, width: number,
     height: number, brandingLocation: BrandingLocation, forcedTimestamp: number | null,
-    saveVideo: boolean, stillValid: () => Promise<boolean>, ready: (canvas: HTMLCanvasElement) => unknown,
-    failure: () => unknown): Promise<HTMLCanvasElement | null> {
+    saveVideo: boolean, stillValid: () => Promise<boolean>, ready: (image: HTMLImageElement) => unknown,
+    failure: () => unknown): Promise<HTMLImageElement | null> {
 
     let timestamp = forcedTimestamp as number;
     if (timestamp === null) {
@@ -302,10 +303,8 @@ export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | 
         return null;
     }
 
-    const canvas = existingCanvas ?? document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    canvas.style.display = "none";
+    const image = existingElement ?? document.createElement("img");
+    image.style.display = "none";
 
     const result = async (canvasInfo: RenderedThumbnailVideo | null) => {
         if (!await stillValid()) {
@@ -317,9 +316,8 @@ export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | 
             return;
         }
 
-        const imageBitmap = await createImageBitmap(canvasInfo.blob);
-        drawCentered(canvas, width, height, imageBitmap.width, imageBitmap.height, imageBitmap);
-        ready(canvas);
+        drawBlob(image, canvasInfo.blob);
+        ready(image);
     }
 
     renderThumbnail(videoID, width, height, saveVideo, timestamp).then(result).catch(() => {
@@ -329,43 +327,26 @@ export async function createThumbnailCanvas(existingCanvas: HTMLCanvasElement | 
         });
     });
 
-    return canvas;
+    return image;
 }
 
-export function drawCentered(canvas: HTMLCanvasElement, width: number, height: number,
+export function drawBlob(image: HTMLImageElement, blob: Blob): void {
+    image.src = URL.createObjectURL(blob);
+}
+
+export function drawCenteredToCanvas(canvas: HTMLCanvasElement, width: number, height: number,
     originalWidth: number, originalHeight: number, originalSurface: HTMLVideoElement | HTMLCanvasElement | ImageBitmap): void {
     const calculateWidth = height * originalWidth / originalHeight;
     const context = canvas.getContext("2d")!;
     
-    if (Config.config!.antiAliasThumbnails 
-            && (originalSurface.width !== width || originalSurface.height !== height)) {
-        originalSurface = runAntiAliasShrink(originalSurface, width, height);
-        context.imageSmoothingEnabled = true;
-    }
-
     context.drawImage(originalSurface, (width - calculateWidth) / 2, 0, calculateWidth, height);
-}
-
-function runAntiAliasShrink(originalSurface: HTMLVideoElement | HTMLCanvasElement | ImageBitmap,
-        width: number, height: number): HTMLVideoElement | HTMLCanvasElement | ImageBitmap {
-    while (originalSurface.width > width * 2 && originalSurface.height > height * 2) {
-        const newCanvas = document.createElement("canvas");
-        newCanvas.width = originalSurface.width / 1.5;
-        newCanvas.height = originalSurface.height / 1.5;
-        const newContext = newCanvas.getContext("2d")!;
-        newContext.imageSmoothingEnabled = true;
-        newContext.drawImage(originalSurface, 0, 0, newCanvas.width, newCanvas.height);
-
-        originalSurface = newCanvas;
-    }
-
-    return originalSurface;
 }
 
 function createVideo(existingVideo: HTMLVideoElement | null, url: string, timestamp: number): HTMLVideoElement {
     if (timestamp === 0 && !isFirefoxOrSafari()) timestamp += 0.001;
     
     const video = existingVideo ?? document.createElement("video");
+    video.crossOrigin = "anonymous";
     // https://stackoverflow.com/a/69074004
     if (!existingVideo) video.src = `${url}#t=${timestamp}-${timestamp + 0.001}`;
     video.currentTime = timestamp;
@@ -457,10 +438,10 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
             }
         }).catch(logError);
 
-        const existingCanvas = image.parentElement?.querySelector(".cbCustomThumbnailCanvas") as HTMLCanvasElement | null;
+        const existingImageElement = image.parentElement?.querySelector(".cbCustomThumbnailCanvas") as HTMLImageElement | null;
 
         try {
-            const thumbnail = await createThumbnailCanvas(existingCanvas, videoID, width, height, brandingLocation, timestamp ?? null, false, async () => {
+            const thumbnail = await createThumbnailImageElement(existingImageElement, videoID, width, height, brandingLocation, timestamp ?? null, false, async () => {
                 return brandingLocation === BrandingLocation.Watch ? getVideoID() === videoID 
                     : await extractVideoIDFromElement(element, brandingLocation) === videoID;
             }, (thumbnail) => {

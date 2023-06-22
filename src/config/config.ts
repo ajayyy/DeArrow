@@ -71,7 +71,6 @@ interface SBConfig {
     startLocalRenderTimeout: number;
     renderTimeout: number;
     thumbnailCacheUse: ThumbnailCacheOption;
-    antiAliasThumbnails: boolean;
     showGuidelineHelp: boolean;
     thumbnailFallback: ThumbnailFallbackOption;
     extensionEnabled: boolean;
@@ -120,7 +119,6 @@ const syncDefaults = {
     startLocalRenderTimeout: 2000,
     renderTimeout: 25000,
     thumbnailCacheUse: ThumbnailCacheOption.OnAllPages,
-    antiAliasThumbnails: true,
     showGuidelineHelp: true,
     thumbnailFallback: ThumbnailFallbackOption.RandomTime,
     extensionEnabled: true,

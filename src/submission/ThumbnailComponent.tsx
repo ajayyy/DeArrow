@@ -1,5 +1,5 @@
 import * as React from "react";
-import { drawCentered, renderThumbnail } from "../thumbnails/thumbnailRenderer";
+import { drawCenteredToCanvas, renderThumbnail } from "../thumbnails/thumbnailRenderer";
 import { waitFor } from "@ajayyy/maze-utils"
 import { VideoID } from "@ajayyy/maze-utils/lib/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
@@ -86,7 +86,7 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                             if (rendered) {
                                 const imageBitmap = await createImageBitmap(rendered.blob);
 
-                                drawCentered(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height,
+                                drawCenteredToCanvas(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height,
                                     imageBitmap.width, imageBitmap.height, imageBitmap);
                             } else {
                                 props.onError(chrome.i18n.getMessage("FailedToRender"));
@@ -159,7 +159,7 @@ async function renderCurrentFrame(props: ThumbnailComponentProps,
 
         props.onError("");
         canvasRef.current!.getContext("2d")!.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
-        drawCentered(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height, props.video.videoWidth, props.video.videoHeight, props.video);
+        drawCenteredToCanvas(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height, props.video.videoWidth, props.video.videoHeight, props.video);
 
         if (waitForNextFrame && !props.video.paused && !inRenderingLoop.current) {
             inRenderingLoop.current = true;

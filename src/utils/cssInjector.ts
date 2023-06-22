@@ -51,7 +51,7 @@ function buildHideThumbnailCss(): string {
         ];
 
         for (const thumbnailType of thumbnailTypes) {
-            result.push(`${start} ${thumbnailType} img:not(.cb-visible, ytd-moving-thumbnail-renderer img)`);
+            result.push(`${start} ${thumbnailType} img:not(.cb-visible, ytd-moving-thumbnail-renderer img, .cbCustomThumbnailCanvas)`);
         }
     }
 
