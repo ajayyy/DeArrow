@@ -115,8 +115,6 @@ export class SubmitButton {
             randomTime: null,
             videoDuration: null
         });
-
-        this.render();
     }
 
     setSubmissions(submissions: BrandingResult): void {
