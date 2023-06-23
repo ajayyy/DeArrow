@@ -95,7 +95,7 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
 
     if (link) {
         const videoID = await extractVideoID(link);
-        const isPlaylistTitleStatus = isPlaylistTitle(link);
+        const isPlaylistOrClipTitleStatus = isPlaylistOrClipTitle(link);
 
         if (verifyVideoID && videoID !== verifyVideoID) {
             // Don't need this branding update anymore, it was trying to update for a different video
@@ -107,11 +107,11 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
         const showCustomBranding = videoBrandingInstance.showCustomBranding;
 
         const videoPromise = replaceThumbnail(element, videoID, brandingLocation, showCustomBranding);
-        const titlePromise = !isPlaylistTitleStatus 
+        const titlePromise = !isPlaylistOrClipTitleStatus 
             ? replaceTitle(element, videoID, showCustomBranding, brandingLocation) 
             : Promise.resolve(false);
 
-        if (isPlaylistTitleStatus) {
+        if (isPlaylistOrClipTitleStatus) {
             // Still create title element to make sure show original button will be in the right place
             const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
             const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
@@ -184,8 +184,9 @@ export async function extractVideoIDFromElement(element: HTMLElement, brandingLo
     }
 }
 
-function isPlaylistTitle(link: HTMLAnchorElement) {
-    return link.href?.match(/list=/)?.[0] !== undefined && link.href?.match(/index=/)?.[0] === undefined;
+function isPlaylistOrClipTitle(link: HTMLAnchorElement) {
+    return (link.href?.match(/list=/)?.[0] !== undefined && link.href?.match(/index=/)?.[0] === undefined)
+        || link.href?.match(/\/clip\//)?.[0] !== undefined;
 }
 
 export async function handleShowOriginalButton(element: HTMLElement, videoID: VideoID,
