@@ -149,7 +149,7 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
                 const numberToDelete = keys.length - cacheLimit;
     
                 for (let i = 0; i < numberToDelete; i++) {
-                    const oldestKey = keys.reduce((a, b) => cache[a].lastUsed < cache[b].lastUsed ? a : b);
+                    const oldestKey = keys.reduce((a, b) => cache[a]?.lastUsed < cache[b]?.lastUsed ? a : b);
                     delete cache[oldestKey];
                 }
             }
