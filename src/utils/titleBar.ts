@@ -1,7 +1,7 @@
 import { getYouTubeTitleNodeSelector } from "@ajayyy/maze-utils/lib/elements";
 import { getOriginalTitleElement } from "../titles/titleRenderer";
 import { BrandingLocation } from "../videoBranding/videoBranding";
-import { isVisible, waitForElement } from "@ajayyy/maze-utils/lib/dom";
+import { waitForElement } from "@ajayyy/maze-utils/lib/dom";
 
 export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLElement): Promise<HTMLElement | null> {
     const titleNode = forceTitleNode ?? await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
@@ -9,9 +9,7 @@ export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLEleme
 
     if (referenceNode) {
         let titleButtonContainer = document.querySelector(".cbTitleButtonContainer") as HTMLElement;
-        if (!titleButtonContainer || !isVisible(titleButtonContainer)) {
-            if (titleButtonContainer) titleButtonContainer.remove();
-
+        if (!titleButtonContainer) {
             titleButtonContainer = document.createElement("div");
             titleButtonContainer.classList.add("cbTitleButtonContainer");
             referenceNode.appendChild(titleButtonContainer);
