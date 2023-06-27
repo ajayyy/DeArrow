@@ -1,7 +1,7 @@
 import { Format, getPlaybackFormats } from "./thumbnailData";
 import { getFromCache, RenderedThumbnailVideo, setupCache, ThumbnailVideo } from "./thumbnailDataCache";
 import { VideoID, getVideoID } from "@ajayyy/maze-utils/lib/video";
-import { getVideoThumbnailIncludingUnsubmitted, isFetchingFromThumbnailCache, queueThumbnailCacheRequest, waitForThumbnailCache } from "../dataFetching";
+import { getNumberOfThumbnailCacheRequests, getVideoThumbnailIncludingUnsubmitted, isFetchingFromThumbnailCache, queueThumbnailCacheRequest, waitForThumbnailCache } from "../dataFetching";
 import { log, logError } from "../utils/logger";
 import { BrandingLocation, extractVideoIDFromElement } from "../videoBranding/videoBranding";
 import { isFirefoxOrSafari, timeoutPomise, waitFor } from "@ajayyy/maze-utils";
@@ -294,6 +294,16 @@ export async function createThumbnailImageElement(existingElement: HTMLImageElem
                 waitForThumbnailCache(videoID),
                 timeoutPomise(Config.config!.startLocalRenderTimeout).catch(() => ({}))
             ]);
+
+            let tries = 0;
+            if (isFetchingFromThumbnailCache(videoID, timestamp) 
+                    && getNumberOfThumbnailCacheRequests() > 5 && tries < 3) {
+                tries++;
+                log(videoID, "Lots of thumbnail cache requests in progress, waiting a little longer");
+
+                // Wait a little longer
+                await timeoutPomise(Config.config!.startLocalRenderTimeout).catch(() => ({}));
+            }
         } catch (e) {
             // Go on and do a local render
         }

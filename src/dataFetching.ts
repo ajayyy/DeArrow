@@ -378,6 +378,10 @@ export async function waitForThumbnailCache(videoID: VideoID): Promise<void> {
     await activeRequest.currentRequest;
 }
 
+export function getNumberOfThumbnailCacheRequests(): number {
+    return Object.keys(activeThumbnailCacheRequests).length;
+}
+
 export function queueThumbnailCacheRequest(videoID: VideoID, time?: number, title?: string,
         officialTime?: boolean, generateNow?: boolean): void {
     if (activeThumbnailCacheRequests[videoID]) {
