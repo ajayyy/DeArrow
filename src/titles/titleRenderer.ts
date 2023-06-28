@@ -53,6 +53,12 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
             const formattedTitle = await formatTitle(title, !titleData.original, videoID);
             if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
 
+            if (originalTitleElement?.textContent 
+                    && originalTitleElement.textContent.trim() === formattedTitle) {
+                showOriginalTitle(element, brandingLocation);
+                return false;
+            }
+
             setCustomTitle(formattedTitle, element, brandingLocation);
         } else if (originalTitleElement?.textContent) {
             // innerText is blank when visibility hidden
