@@ -220,6 +220,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                     onClick={() => void props.submitClicked(selectedTitle ? {
                     ...selectedTitle,
                     original: selectedTitle.title === getCurrentPageTitle()
+                                || (!!getCurrentPageTitle() && selectedTitle.title === toSentenceCase(getCurrentPageTitle()!, false))
                 } : null, selectedThumbnail.current)}>
                     {`${chrome.i18n.getMessage("Vote")}`}
                 </button>
