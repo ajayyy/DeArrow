@@ -33,7 +33,8 @@ const cacheLimit = 1000;
 const activeRequests: Record<VideoID, Promise<Record<VideoID, BrandingResult> | null>> = {};
 const activeThumbnailCacheRequests: Record<VideoID, ActiveThumbnailCacheRequestInfo> = {};
 
-export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, brandingLocation?: BrandingLocation): Promise<ThumbnailResult | null> {
+export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, brandingLocation?: BrandingLocation,
+        returnRandomTime = true): Promise<ThumbnailResult | null> {
     const unsubmitted = Config.local!.unsubmitted[videoID]?.thumbnails?.find(t => t.selected);
     if (unsubmitted) {
         return {
@@ -47,33 +48,10 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
     const brandingData = await getVideoBranding(videoID, brandingLocation === BrandingLocation.Watch, brandingLocation);
     const result = brandingData?.thumbnails[0];
     if (!result || (!result.locked && result.votes < 0)) {
-        const fastThumbnailOptionCheck = getThumbnailFallbackOptionFastCheck(videoID);
-        if (brandingData 
-                && (fastThumbnailOptionCheck === null || fastThumbnailOptionCheck === ThumbnailFallbackOption.RandomTime)) {
-            let videoDuration = brandingData.videoDuration;
-            if (!videoDuration) {
-                const metadata = await fetchVideoMetadata(videoID, false);
-                if (metadata) videoDuration = metadata.duration;
-            }
+        if (returnRandomTime && brandingData) {
+            const timestamp = await getTimestampFromRandomTime(videoID, brandingData, brandingLocation);
 
-            if (videoDuration) {
-                // Occurs when fetching by hash and no record exists in the db (SponsorBlock or otherwise)
-                if (brandingData.randomTime == null) {
-                    brandingData.randomTime = alea(videoID)() * videoDuration;
-                }
-
-                const timestamp = brandingData.randomTime * videoDuration;
-                if (!isCachedThumbnailLoaded(videoID, timestamp)) {
-                    // Only an official time for default server address
-                    queueThumbnailCacheRequest(videoID, timestamp, undefined, isOfficialTime(),
-                        checkShouldGenerateNow(brandingLocation));
-                }
-
-                // Wait here for actual thumbnail cache fallback option
-                if (await getThumbnailFallbackOption(videoID) !== ThumbnailFallbackOption.RandomTime) {
-                    return null;
-                }
-
+            if (timestamp !== null) {
                 return {
                     UUID: generateUserID() as BrandingUUID,
                     votes: 0,
@@ -89,6 +67,43 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
         }
     } else {
         return result;
+    }
+}
+
+async function getTimestampFromRandomTime(videoID: VideoID, brandingData: VideoBrandingCacheRecord,
+        brandingLocation?: BrandingLocation): Promise<number | null> {
+    const fastThumbnailOptionCheck = getThumbnailFallbackOptionFastCheck(videoID);
+    if (fastThumbnailOptionCheck === null || fastThumbnailOptionCheck === ThumbnailFallbackOption.RandomTime) {
+        let videoDuration = brandingData.videoDuration;
+        if (!videoDuration) {
+            const metadata = await fetchVideoMetadata(videoID, false);
+            if (metadata) videoDuration = metadata.duration;
+        }
+
+        if (videoDuration) {
+            // Occurs when fetching by hash and no record exists in the db (SponsorBlock or otherwise)
+            if (brandingData.randomTime == null) {
+                brandingData.randomTime = alea(videoID)() * videoDuration;
+            }
+
+            const timestamp = brandingData.randomTime * videoDuration;
+            if (!isCachedThumbnailLoaded(videoID, timestamp)) {
+                // Only an official time for default server address
+                queueThumbnailCacheRequest(videoID, timestamp, undefined, isOfficialTime(),
+                    checkShouldGenerateNow(brandingLocation));
+            }
+
+            // Wait here for actual thumbnail cache fallback option
+            if (await getThumbnailFallbackOption(videoID) !== ThumbnailFallbackOption.RandomTime) {
+                return null;
+            }
+
+            return timestamp;
+        } else {
+            return null;
+        }
+    } else {
+        return null;
     }
 }
 
