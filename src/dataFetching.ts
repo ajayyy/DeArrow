@@ -70,7 +70,7 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
     }
 }
 
-async function getTimestampFromRandomTime(videoID: VideoID, brandingData: VideoBrandingCacheRecord,
+async function getTimestampFromRandomTime(videoID: VideoID, brandingData: BrandingResult,
         brandingLocation?: BrandingLocation): Promise<number | null> {
     const fastThumbnailOptionCheck = getThumbnailFallbackOptionFastCheck(videoID);
     if (fastThumbnailOptionCheck === null || fastThumbnailOptionCheck === ThumbnailFallbackOption.RandomTime) {
@@ -172,7 +172,7 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
 
         let mainFetchDone = false;
         let thumbnailCacheFetchDone = false;
-        results.then((results) => {
+        results.then(async (results) => {
             mainFetchDone = true;
 
             if (results) {
@@ -182,11 +182,14 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
                 if (results[videoID]) {
                     const thumbnail = results[videoID].thumbnails[0];
                     const title = results[videoID].titles[0];
+
+                    const timestamp = thumbnail && !thumbnail.original ? thumbnail.timestamp 
+                        : await getTimestampFromRandomTime(videoID, results[videoID]);
+
                     // Fetch for a cached thumbnail if it is either not loaded yet, or has an out of date title
-                    if (thumbnail && !thumbnail.original 
-                            && (!isCachedThumbnailLoaded(videoID, thumbnail.timestamp) || (title?.title && oldResults?.titles?.length <= 0))) {
-                        // Only an official time for default server address
-                        queueThumbnailCacheRequest(videoID, thumbnail.timestamp, title?.title, isOfficialTime(),
+                    if (timestamp !== null
+                            && (!isCachedThumbnailLoaded(videoID, timestamp) || (title?.title && oldResults?.titles?.length <= 0))) {
+                        queueThumbnailCacheRequest(videoID, timestamp, title?.title, isOfficialTime(),
                             shouldGenerateNow);
                     }
                 }
