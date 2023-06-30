@@ -272,7 +272,7 @@ function cleanResultingTitle(title: string): string {
 }
 
 function cleanUnformattedTitle(title: string): string {
-    return title.replace(/\B>(?=\S)/g, "").trim();
+    return title.replace(/(^|\s)>(\S)/g, "$1$2").trim();
 }
 
 export function cleanPunctuation(title: string): string {
