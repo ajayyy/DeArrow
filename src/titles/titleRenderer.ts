@@ -20,7 +20,7 @@ let lastUrlWatchPageType: WatchPageType | null = null;
 export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, brandingLocation: BrandingLocation): Promise<boolean> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
 
-    if (shouldReplaceTitlesFastCheck(videoID) === false) {
+    if (!Config.config!.extensionEnabled || shouldReplaceTitlesFastCheck(videoID) === false) {
         showOriginalTitle(element, brandingLocation);
         return false;
     }
@@ -266,7 +266,7 @@ export async function hideAndUpdateShowOriginalButton(element: HTMLElement, bran
                 buttonImage.classList.add("cbOriginalShown");
             }
 
-            if (showCustomBranding === Config.config!.extensionEnabled 
+            if (showCustomBranding === Config.config!.defaultToCustom 
                     && brandingLocation !== BrandingLocation.Watch
                     && !Config.config!.alwaysShowShowOriginalButton) {
                 buttonElement.classList.remove("cbDontHide");
@@ -314,7 +314,7 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
     buttonImage.src = chrome.runtime.getURL("icons/logo.svg");
     buttonElement.appendChild(buttonImage);
 
-    if (!Config.config?.extensionEnabled) {
+    if (!Config.config?.defaultToCustom) {
         buttonImage.classList.add("cbOriginalShown");
     }
 

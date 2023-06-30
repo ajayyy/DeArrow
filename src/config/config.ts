@@ -74,6 +74,7 @@ interface SBConfig {
     showGuidelineHelp: boolean;
     thumbnailFallback: ThumbnailFallbackOption;
     extensionEnabled: boolean;
+    defaultToCustom: boolean;
     alwaysShowShowOriginalButton: boolean;
     importedConfig: boolean;
     replaceTitles: boolean;
@@ -123,6 +124,7 @@ const syncDefaults = {
     showGuidelineHelp: true,
     thumbnailFallback: ThumbnailFallbackOption.RandomTime,
     extensionEnabled: true,
+    defaultToCustom: true,
     alwaysShowShowOriginalButton: false,
     importedConfig: false,
     replaceTitles: true,

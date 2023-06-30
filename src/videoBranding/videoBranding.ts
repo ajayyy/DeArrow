@@ -224,7 +224,7 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
 function getAndUpdateVideoBrandingInstances(videoID: VideoID, updateBranding: () => Promise<void>): VideoBrandingInstance {
     if (!videoBrandingInstances[videoID]) {
         videoBrandingInstances[videoID] = {
-            showCustomBranding: Config.config?.extensionEnabled ?? true,
+            showCustomBranding: Config.config?.defaultToCustom ?? true,
             updateBrandingCallbacks: [updateBranding]
         }
     } else {
@@ -282,13 +282,14 @@ export function startThumbnailListener(): void {
 
 export function setupOptionChangeListener(): void {
     Config.configSyncListeners.push((changes) => {
-        if (changes.extensionEnabled && changes.extensionEnabled.newValue !== changes.extensionEnabled.oldValue) {
+        if (changes.defaultToCustom && changes.defaultToCustom.newValue !== changes.defaultToCustom.oldValue) {
             for (const videoID in videoBrandingInstances) {
-                setShowCustom(videoID as VideoID, changes.extensionEnabled.newValue).catch(logError);
+                setShowCustom(videoID as VideoID, changes.defaultToCustom.newValue).catch(logError);
             }
         }
 
         const settingsToReload = [
+            "extensionEnabled",
             "replaceTitles",
             "replaceThumbnails",
             "titleFormatting",
