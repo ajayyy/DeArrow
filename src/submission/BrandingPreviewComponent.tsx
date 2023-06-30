@@ -1,4 +1,4 @@
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { VideoID } from "../maze-utils/video";
 import * as React from "react";
 import { formatTitleDefaultSettings } from "../titles/titleFormatter";
 import { BrandingResult } from "../videoBranding/videoBranding";

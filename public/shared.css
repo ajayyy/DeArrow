@@ -1,3 +1,7 @@
+:root {
+    --sb-slider-color: #707070;
+}
+
 /*
  * Generic utilities
  */
@@ -159,4 +163,114 @@
 #sponsorTimesContributionsContainer {
     padding: 8px 14px;
     border-left: 2px solid var(--sb-grey-bg-color);
+}
+
+/* Options */
+
+.sb-optionsSelector {
+    background-color: #0e79ca;
+    color: white;
+    
+    border: none;
+    font-size: 14px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.sb-optionLabel {
+    font-size: 16px;
+    padding-bottom: 5px;
+
+    display: block;
+}
+
+.sb-optionContainer {
+    padding-bottom: 2px;
+}
+
+.sb-switch-container {
+	content: attr(label-name);
+    width: max-content;
+
+    font-size: 14px;
+
+    display: table;
+}
+
+.sb-switch-container .sb-switch-label {
+    display: table-cell;
+    vertical-align: middle;
+
+    padding-left: 4px;
+}
+
+.sb-switch-label {
+    width: inherit;
+}
+
+.sb-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 24px;
+}
+
+.sb-switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.sb-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--sb-slider-color);
+}
+
+.sb-animated * {
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.sb-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+}
+
+.sb-animated .sb-slider:before {
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .sb-slider {
+    background-color: #0e79ca;
+}
+
+input:checked + .sb-slider:before {
+    -webkit-transform: translateX(16px);
+    -ms-transform: translateX(16px);
+    transform: translateX(16px);
+}
+
+/* Rounded sliders */
+.sb-slider.sb-round {
+    border-radius: 34px;
+}
+
+.sb-slider.sb-round:before {
+    border-radius: 50%;
+}
+
+.sb-switch-container-container {
+    display: flex;
+    justify-content: center;
 }

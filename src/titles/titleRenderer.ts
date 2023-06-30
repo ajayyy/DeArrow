@@ -1,4 +1,4 @@
-import { VideoID, getVideoID } from "@ajayyy/maze-utils/lib/video";
+import { VideoID, getVideoID } from "../maze-utils/video";
 import Config from "../config/config";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";

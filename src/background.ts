@@ -1,10 +1,10 @@
-import { setupTabUpdates } from "@ajayyy/maze-utils/lib/tab-updates";
-import { setupBackgroundRequestProxy } from "@ajayyy/maze-utils/lib/background-request-proxy";
-import { generateUserID } from "@ajayyy/maze-utils/lib/setup";
+import { setupTabUpdates } from "./maze-utils/tab-updates";
+import { setupBackgroundRequestProxy } from "./maze-utils/background-request-proxy";
+import { generateUserID } from "./maze-utils/setup";
 import Config from "./config/config";
-import { isSafari } from "@ajayyy/maze-utils/lib/config";
+import { isSafari } from "./maze-utils/config";
 import * as CompileConfig from "../config.json";
-import { isFirefoxOrSafari } from "@ajayyy/maze-utils";
+import { isFirefoxOrSafari } from "./maze-utils";
 
 setupTabUpdates(Config);
 setupBackgroundRequestProxy();
@@ -58,6 +58,8 @@ chrome.runtime.onInstalled.addListener(() => {
                 const newUserID = generateUserID();
                 Config.config!.userID = newUserID;
             }
+
+            Config.config!.showInfoAboutRandomThumbnails = true;
 
             // Open up the install page
             setTimeout(() => void chrome.tabs.create({url: chrome.runtime.getURL("/help.html")}), 100);

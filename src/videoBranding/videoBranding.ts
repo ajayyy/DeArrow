@@ -1,14 +1,15 @@
-import { getYouTubeTitleNodeSelector } from "@ajayyy/maze-utils/lib/elements";
-import { getVideoID, VideoID } from "@ajayyy/maze-utils/lib/video";
-import { isVisible, waitForElement } from "@ajayyy/maze-utils/lib/dom";
+import { getYouTubeTitleNodeSelector } from "../maze-utils/elements";
+import { getVideoID, VideoID } from "../maze-utils/video";
+import { isVisible, waitForElement } from "../maze-utils/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
 import { findOrCreateShowOriginalButton, getOrCreateTitleElement, getOriginalTitleElement, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
-import { setThumbnailListener } from "@ajayyy/maze-utils/lib/thumbnailManagement";
+import { setThumbnailListener } from "../maze-utils/thumbnailManagement";
 import Config, { ThumbnailCacheOption } from "../config/config";
 import { logError } from "../utils/logger";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
+import { handleOnboarding } from "./onboarding";
 
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
 
@@ -131,6 +132,8 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
             // Video ID changed, so try again
             return replaceVideoCardBranding(element, brandingLocation, verifyVideoID, tries++);
         }
+
+        handleOnboarding(element, videoID, brandingLocation, showCustomBranding, result).catch(logError);
 
         return result;
     }

@@ -1,6 +1,6 @@
 import * as React from "react";
-import { getFormattedTime } from "@ajayyy/maze-utils/lib/formating";
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { getFormattedTime } from "../maze-utils/formating";
+import { VideoID } from "../maze-utils/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { ThumbnailComponent, ThumbnailType } from "./ThumbnailComponent";
 import AddIcon from "../svgIcons/addIcon";

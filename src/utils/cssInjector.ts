@@ -1,4 +1,4 @@
-import { isFirefoxOrSafari, waitFor } from "@ajayyy/maze-utils";
+import { isFirefoxOrSafari, waitFor } from "../maze-utils";
 import Config from "../config/config";
 import { brandingBoxSelector, watchPageThumbnailSelector } from "../videoBranding/videoBranding";
 

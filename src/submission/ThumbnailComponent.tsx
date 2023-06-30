@@ -1,7 +1,7 @@
 import * as React from "react";
 import { drawCenteredToCanvas, renderThumbnail } from "../thumbnails/thumbnailRenderer";
-import { waitFor } from "@ajayyy/maze-utils"
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { waitFor } from "../maze-utils"
+import { VideoID } from "../maze-utils/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 
 export enum ThumbnailType {

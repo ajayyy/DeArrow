@@ -118,7 +118,8 @@ module.exports = env => {
             ]
         },
         resolve: {
-            extensions: ['.ts', '.tsx', '.js']
+            extensions: ['.ts', '.tsx', '.js'],
+            symlinks: false
         },
         plugins: [
             new DocumentScriptCompiler(),

@@ -1,4 +1,4 @@
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { VideoID } from "../maze-utils/video";
 import { ChannelInfo, getChannelID, getChannelIDSync } from "../thumbnails/thumbnailData";
 import Config, { ThumbnailFallbackOption, TitleFormatting } from "./config";
 

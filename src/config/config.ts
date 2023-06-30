@@ -1,5 +1,5 @@
-import { ProtoConfig } from "@ajayyy/maze-utils/lib/config";
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { ProtoConfig } from "../maze-utils/config";
+import { VideoID } from "../maze-utils/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { logError } from "../utils/logger";
 import * as CompileConfig from "../../config.json";
@@ -80,6 +80,7 @@ interface SBConfig {
     replaceThumbnails: boolean;
     channelOverrides: Record<string, ConfigurationID>;
     customConfigurations: Record<ConfigurationID, CustomConfiguration>;
+    showInfoAboutRandomThumbnails: boolean;
 }
 
 interface SBStorage {
@@ -127,7 +128,8 @@ const syncDefaults = {
     replaceTitles: true,
     replaceThumbnails: true,
     channelOverrides: {},
-    customConfigurations: {}
+    customConfigurations: {},
+    showInfoAboutRandomThumbnails: false
 };
 
 const localDefaults = {

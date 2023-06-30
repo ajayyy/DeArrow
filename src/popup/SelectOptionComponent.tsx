@@ -20,13 +20,13 @@ export interface SelectOptionComponentProps {
 
 export const SelectOptionComponent = (props: SelectOptionComponentProps) => {
     return (
-        <div className={`optionContainer ${props.className ?? ""}`} style={props.style}>
+        <div className={`sb-optionContainer ${props.className ?? ""}`} style={props.style}>
             {
                 props.label &&
-                    <label className="optionLabel" htmlFor={props.id}>{props.label}</label>
+                    <label className="sb-optionLabel" htmlFor={props.id}>{props.label}</label>
             }
             <select id={props.id}
-                className="selector-element optionsSelector"
+                className="sb-selector-element sb-optionsSelector"
                 value={props.value}
                 onChange={(e) => {
                     props.onChange(e.target.value);

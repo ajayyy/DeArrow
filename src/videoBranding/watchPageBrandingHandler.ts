@@ -1,4 +1,4 @@
-import { waitForElement } from "@ajayyy/maze-utils/lib/dom";
+import { waitForElement } from "../maze-utils/dom";
 import { logError } from "../utils/logger";
 import { BrandingLocation, getLinkElement, replaceVideoCardBranding } from "./videoBranding";
 

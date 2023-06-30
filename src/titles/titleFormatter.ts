@@ -1,4 +1,4 @@
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { VideoID } from "../maze-utils/video";
 import Config, { TitleFormatting } from "../config/config";
 import { getTitleFormatting } from "../config/channelOverrides";
 

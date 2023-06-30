@@ -1,5 +1,5 @@
 import { BrandingUUID } from "../videoBranding/videoBranding";
-import { getYouTubeTitleNode } from "@ajayyy/maze-utils/lib/elements"
+import { getYouTubeTitleNode } from "../maze-utils/elements"
 
 export interface TitleSubmission {
     title: string;

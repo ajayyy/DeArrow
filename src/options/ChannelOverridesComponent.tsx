@@ -1,7 +1,7 @@
 import * as React from "react";
 import { SelectOptionComponent } from "../popup/SelectOptionComponent";
 import Config, { ConfigurationID, CustomConfiguration } from "../config/config";
-import { generateUserID } from "@ajayyy/maze-utils/lib/setup";
+import { generateUserID } from "../maze-utils/setup";
 import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
 import { toSentenceCase } from "../titles/titleFormatter";
 

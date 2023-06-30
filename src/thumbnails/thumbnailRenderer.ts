@@ -1,10 +1,10 @@
 import { Format, getPlaybackFormats } from "./thumbnailData";
 import { getFromCache, RenderedThumbnailVideo, setupCache, ThumbnailVideo } from "./thumbnailDataCache";
-import { VideoID, getVideoID } from "@ajayyy/maze-utils/lib/video";
+import { VideoID, getVideoID } from "../maze-utils/video";
 import { getNumberOfThumbnailCacheRequests, getVideoThumbnailIncludingUnsubmitted, isFetchingFromThumbnailCache, queueThumbnailCacheRequest, waitForThumbnailCache } from "../dataFetching";
 import { log, logError } from "../utils/logger";
 import { BrandingLocation, extractVideoIDFromElement } from "../videoBranding/videoBranding";
-import { isFirefoxOrSafari, timeoutPomise, waitFor } from "@ajayyy/maze-utils";
+import { isFirefoxOrSafari, timeoutPomise, waitFor } from "../maze-utils";
 import Config, { ThumbnailFallbackOption } from "../config/config";
 import { getThumbnailFallbackOption, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "../config/channelOverrides";
 

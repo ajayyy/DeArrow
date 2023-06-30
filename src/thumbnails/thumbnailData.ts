@@ -1,6 +1,6 @@
 import { BrandingUUID } from "../videoBranding/videoBranding";
 import { PlaybackUrl, cacheUsed, getFromCache, setupCache } from "./thumbnailDataCache";
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { VideoID } from "../maze-utils/video";
 import { log } from "../utils/logger";
 
 interface PartialThumbnailResult {

@@ -1,7 +1,7 @@
-import { getYouTubeTitleNodeSelector } from "@ajayyy/maze-utils/lib/elements";
+import { getYouTubeTitleNodeSelector } from "../maze-utils/elements";
 import { getOriginalTitleElement } from "../titles/titleRenderer";
 import { BrandingLocation } from "../videoBranding/videoBranding";
-import { waitForElement } from "@ajayyy/maze-utils/lib/dom";
+import { waitForElement } from "../maze-utils/dom";
 
 export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLElement): Promise<HTMLElement | null> {
     const titleNode = forceTitleNode ?? await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;

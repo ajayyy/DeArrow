@@ -1,4 +1,4 @@
-import { VideoID } from "@ajayyy/maze-utils/lib/video";
+import { VideoID } from "../maze-utils/video";
 
 export interface PlaybackUrl {
     url: string;

@@ -10,10 +10,10 @@ window["CB"] = Config;
 
 import KeybindComponent from "./options/KeybindComponent";
 import { showDonationLink } from "./utils/configUtils";
-import { localizeHtmlPage } from "@ajayyy/maze-utils/lib/setup";
-import { StorageChangesObject } from "@ajayyy/maze-utils/lib/config";
-import { getHash } from "@ajayyy/maze-utils/lib/hash";
-import { isFirefoxOrSafari, waitFor } from "@ajayyy/maze-utils";
+import { localizeHtmlPage } from "./maze-utils/setup";
+import { StorageChangesObject } from "./maze-utils/config";
+import { getHash } from "./maze-utils/hash";
+import { isFirefoxOrSafari, waitFor } from "./maze-utils";
 import { sendRequestToServer } from "./dataFetching";
 import { logError } from "./utils/logger";
 import ChannelOverrides from "./options/ChannelOverrides";
@@ -311,7 +311,7 @@ async function init() {
 
     window.addEventListener("scroll", () => createStickyHeader());
 
-    optionsContainer!.classList.add("animated");
+    optionsContainer!.classList.add("sb-animated");
 }
 
 function createStickyHeader() {

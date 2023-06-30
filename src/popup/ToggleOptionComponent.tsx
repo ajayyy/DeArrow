@@ -19,24 +19,24 @@ export interface ToggleOptionComponentProps {
 
 export const ToggleOptionComponent = (props: ToggleOptionComponentProps) => {
     return (
-        <div className={`switch-container-container ${props.className ?? ""}`} style={props.style}>
-            <div className="switch-container animated">
-                <label className="switch">
+        <div className={`sb-switch-container-container ${props.className ?? ""}`} style={props.style}>
+            <div className="sb-switch-container sb-animated">
+                <label className="sb-switch">
                     <input id={props.id} 
                         type="checkbox" 
                         checked={props.value}
                         onChange={(e) => {
                             props.onChange((e.target as HTMLInputElement).checked);
                         }}/>
-                    <span className="slider round"></span>
+                    <span className="sb-slider sb-round"></span>
                 </label>
-                <label className="switch-label" htmlFor={props.id}>
+                <label className="sb-switch-label" htmlFor={props.id}>
                     {props.label}
                 </label>
 
                 {
                     props.showResetButton &&
-                        <div className="reset-button switch-label" onClick={() => {
+                        <div className="reset-button sb-switch-label" onClick={() => {
                             props.onReset?.();
                         }}>
                             <ResetIcon/>

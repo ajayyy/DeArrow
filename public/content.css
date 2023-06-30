@@ -1,6 +1,7 @@
 :root {
     --cb-selected-thumbnail-border: 0.15em;
     --cb-thumbnail-padding: 0.3em;
+    --skip-notice-margin: 5px;
 }
 
 .cbCustomThumbnailCanvas.ytd-img-shadow:not(.ytp-autonav-endscreen-upnext-thumbnail, .ytp-videowall-still-image) {
@@ -387,4 +388,97 @@ ytd-playlist-panel-video-renderer #video-title {
 ytd-compact-radio-renderer ytd-badge-supported-renderer, ytd-grid-movie-renderer ytd-badge-supported-renderer {
     position: absolute;
     right: 0;
+}
+
+/* Tooltip */
+
+.sponsorBlockTooltip {
+    position: absolute;
+    background-color: rgba(28, 28, 28, 0.7);
+    border-radius: 5px;
+    padding: 10px;
+    max-width: 300px;
+	width: max-content;
+    white-space: normal;
+    line-height: 1.5em;
+	color: white;
+	font-size: 12px;
+	z-index: 10000;
+}
+
+.sponsorBlockTooltip a {
+	color: white;
+}
+
+.sponsorBlockTooltip.sbTriangle::after {
+    content: " ";
+    position: absolute;
+    top: 100%;
+    left: 15%;
+    margin-left: -15px;
+    border-width: 15px;
+    border-style: solid;
+    border-color: rgba(28, 28, 28, 0.7) transparent transparent transparent;
+}
+
+.sponsorBlockTooltip.sbTriangle.sbSolid::after {
+    border-color: rgba(28, 28, 28, 1) transparent transparent transparent;
+}
+
+.sponsorBlockTooltip.sbTriangle.sbSolid.rightSBTriangle::after {
+    border-color: transparent transparent transparent rgba(28, 28, 28, 1);
+}
+
+.sponsorBlockTooltip.sbTriangle.centeredSBTriangle::after {
+	left: 50%;
+	right: 50%;
+}
+
+.sponsorBlockTooltip.sbTriangle.rightSBTriangle::after {
+	left: 100%;
+	top: 50%;
+    margin-top: -15px;
+    margin-left: 0;
+}
+
+.sponsorSkipObject {
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+
+	margin-left: var(--skip-notice-margin);
+	margin-right: var(--skip-notice-margin);
+}
+
+.sponsorSkipObjectFirst {
+	margin-left: 0;
+}
+
+.sponsorSkipLogo {
+	height: 18px;
+
+	float: left;
+}
+
+.sponsorSkipNoticeButton {
+	background: none;
+	color: rgb(235, 235, 235);
+	border: none;
+	display: inline-block;
+	font-size: 13.3333px !important;
+
+	cursor: pointer;
+
+	margin-right: 10px;
+
+    padding: 2px 5px;
+}
+
+.sponsorSkipNoticeButton:hover {
+	background-color: rgba(235, 235, 235,0.2);
+	border-radius: 4px;
+
+	transition: background-color 0.4s;
+}
+
+.sponsorSkipNoticeRightButton {
+	margin-right: 0;
 }
