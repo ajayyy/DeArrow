@@ -12,7 +12,6 @@ export function countTitleReplacement(videoID: VideoID) {
 
         if (countedTitles.size >= 500) {
             for (const id of countedTitles) {
-                console.log(id, videoID)
                 countedTitles.delete(id);
                 break;
             }
