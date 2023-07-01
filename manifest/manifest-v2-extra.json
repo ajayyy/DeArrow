@@ -18,7 +18,8 @@
     ],
     "permissions": [
         "https://sponsor.ajay.app/*",
-        "https://dearrow-thumb.ajay.app/*"
+        "https://dearrow-thumb.ajay.app/*",
+        "https://*.googlevideo.com/*"
     ],
     "optional_permissions": [
         "*://*/*"

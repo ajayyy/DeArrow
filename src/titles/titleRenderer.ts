@@ -7,6 +7,7 @@ import { BrandingLocation, extractVideoIDFromElement, toggleShowCustom } from ".
 import { formatTitle } from "./titleFormatter";
 import { setPageTitle } from "./pageTitleHandler";
 import { shouldReplaceTitles, shouldReplaceTitlesFastCheck } from "../config/channelOverrides";
+import { countTitleReplacement } from "../config/stats";
 
 enum WatchPageType {
     Video,
@@ -60,6 +61,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
             }
 
             setCustomTitle(formattedTitle, element, brandingLocation);
+            countTitleReplacement(videoID);
         } else if (originalTitleElement?.textContent) {
             // innerText is blank when visibility hidden
             const originalText = originalTitleElement.textContent.trim();

@@ -106,6 +106,43 @@ export const YourWorkComponent = () => {
                     <p id="sponsorTimesContributionsDisplay" className="u-mZ">{thumbnailSubmissionCount}</p>
                 </div>
             </div>
+
+            {
+                Config.config!.countReplacements && getReplacementsMessage()
+            }
+
+            
         </div>
     );
 };
+
+function getReplacementsMessage(): JSX.Element {
+    const messageParts = chrome.i18n.getMessage("dearrowStatsMessage2")
+        .split("{titleAndThumbnailMessage}");
+
+    const titleParts = (Config.config!.titleReplacements === 1 ?
+        chrome.i18n.getMessage("dearrowStatsMessageTitlePart") :
+        chrome.i18n.getMessage("dearrowStatsMessageTitlesPart")).split("{titles}");
+    const thumbnailTemplate = (Config.config!.thumbnailReplacements === 1 ?
+        chrome.i18n.getMessage("dearrowStatsMessageThumbnailPart") :
+        chrome.i18n.getMessage("dearrowStatsMessageThumbnailsPart")).split("{thumbnails}");
+
+    return (
+        <p id="sponsorTimesSkipsDoneContainer" className="u-mZ sbStatsSentence">
+            {messageParts[0]}
+            {titleParts[0]}
+            <b>
+                {Config.config!.titleReplacements}
+            </b>
+            {titleParts[1]}
+
+            {thumbnailTemplate[0]}
+            <b>
+                {Config.config!.thumbnailReplacements}
+            </b>
+            {thumbnailTemplate[1]}
+
+            {messageParts[1]}
+        </p>
+    )  
+}

@@ -82,6 +82,9 @@ interface SBConfig {
     channelOverrides: Record<string, ConfigurationID>;
     customConfigurations: Record<ConfigurationID, CustomConfiguration>;
     showInfoAboutRandomThumbnails: boolean;
+    countReplacements: boolean;
+    titleReplacements: number;
+    thumbnailReplacements: number;
 }
 
 interface SBStorage {
@@ -131,7 +134,10 @@ const syncDefaults = {
     replaceThumbnails: true,
     channelOverrides: {},
     customConfigurations: {},
-    showInfoAboutRandomThumbnails: false
+    showInfoAboutRandomThumbnails: false,
+    countReplacements: true,
+    titleReplacements: 0,
+    thumbnailReplacements: 0
 };
 
 const localDefaults = {

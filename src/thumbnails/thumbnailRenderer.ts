@@ -7,6 +7,7 @@ import { BrandingLocation, extractVideoIDFromElement } from "../videoBranding/vi
 import { isFirefoxOrSafari, timeoutPomise, waitFor } from "../maze-utils";
 import Config, { ThumbnailFallbackOption } from "../config/config";
 import { getThumbnailFallbackOption, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "../config/channelOverrides";
+import { countThumbnailReplacement } from "../config/stats";
 
 const thumbnailRendererControls: Record<VideoID, Array<(error?: string) => void>> = {};
 
@@ -461,6 +462,8 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                 if (brandingLocation === BrandingLocation.Related) {
                     box.setAttribute("loaded", "");
                 }
+
+                countThumbnailReplacement(videoID);
             }, () => resetToShowOriginalThumbnail(image, brandingLocation));
     
             if (!thumbnail) {

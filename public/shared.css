@@ -50,6 +50,11 @@
     border-top: 2px solid var(--sb-grey-bg-color);
 }
 
+.sbStatsSentence {
+    padding: 6px 14px;
+    border-top: 2px solid var(--sb-grey-bg-color);
+}
+
 /*
  * Increase font size of username input and display
  */
