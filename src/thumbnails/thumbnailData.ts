@@ -163,6 +163,16 @@ export async function fetchVideoDataAndroidClient(videoID: VideoID): Promise<Inn
 
         if (result.ok) {
             const response = await result.json();
+            const videoID = response?.videoDetails?.videoId ?? null;
+            if (videoID !== videoID) {
+                return {
+                    formats: [],
+                    duration: null,
+                    channelID: null,
+                    author: null
+                };
+            }
+            
             const formats = response?.streamingData?.adaptiveFormats as InnerTubeFormat[];
             const duration = response?.videoDetails?.lengthSeconds ? parseInt(response.videoDetails.lengthSeconds) : null;
             const channelId = response?.videoDetails?.channelId ?? null;
@@ -210,6 +220,16 @@ export async function fetchVideoDataDesktopClient(videoID: VideoID): Promise<Inn
 
         if (result.ok) {
             const response = await result.json();
+            const videoID = response?.videoDetails?.videoId ?? null;
+            if (videoID !== videoID) {
+                return {
+                    formats: [],
+                    duration: null,
+                    channelID: null,
+                    author: null
+                };
+            }
+
             const formats = response?.streamingData?.adaptiveFormats as InnerTubeFormat[];
             const duration = response?.videoDetails?.lengthSeconds ? parseInt(response.videoDetails.lengthSeconds) : null;
             const channelId = response?.videoDetails?.channelId ?? null;
