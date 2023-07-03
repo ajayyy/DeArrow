@@ -28,7 +28,7 @@ interface ActiveThumbnailCacheRequestInfo {
 }
 
 const cache: Record<VideoID, VideoBrandingCacheRecord> = {};
-const cacheLimit = 1000;
+const cacheLimit = 10000;
 
 const activeRequests: Record<VideoID, Promise<Record<VideoID, BrandingResult> | null>> = {};
 const activeThumbnailCacheRequests: Record<VideoID, ActiveThumbnailCacheRequestInfo> = {};
@@ -139,10 +139,11 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
         queryByHash = true;
     }
 
-    activeRequests[videoID] ??= (() => {
-        const shouldGenerateBranding = brandingLocation !== BrandingLocation.Watch || Config.config!.thumbnailCacheUse > ThumbnailCacheOption.OnAllPagesExceptWatch;
+    activeRequests[videoID] ??= (async () => {
+        const shouldGenerateBranding = Config.config!.thumbnailCacheUse === ThumbnailCacheOption.OnAllPages 
+            || (brandingLocation !== BrandingLocation.Watch && Config.config!.thumbnailCacheUse !== ThumbnailCacheOption.Disable);
         const shouldGenerateNow = checkShouldGenerateNow(brandingLocation);
-    
+
         const results = fetchBranding(queryByHash, videoID);
         const thumbnailCacheResults = shouldGenerateBranding ? 
             fetchBrandingFromThumbnailCache(videoID, undefined, undefined, undefined, shouldGenerateNow) 
@@ -161,10 +162,10 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
     
             const keys = Object.keys(cache);
             if (keys.length > cacheLimit) {
-                const numberToDelete = keys.length - cacheLimit;
+                const numberToDelete = keys.length - cacheLimit + 20;
     
                 for (let i = 0; i < numberToDelete; i++) {
-                    const oldestKey = keys.reduce((a, b) => cache[a]?.lastUsed < cache[b]?.lastUsed ? a : b);
+                    const oldestKey = Object.keys(cache).reduce((a, b) => cache[a]?.lastUsed < cache[b]?.lastUsed ? a : b);
                     delete cache[oldestKey];
                 }
             }
@@ -201,17 +202,22 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
         }).catch(logError);
 
         thumbnailCacheResults.then(async (results) => {
-            thumbnailCacheFetchDone = true;
-
             if (results) {
-                if (!mainFetchDone && await getThumbnailFallbackOption(videoID) === ThumbnailFallbackOption.RandomTime) {
+                if (await getThumbnailFallbackOption(videoID) === ThumbnailFallbackOption.RandomTime && !mainFetchDone) {
+                    thumbnailCacheFetchDone = true;
+
                     handleResults(results);
                 }
             }
         }).catch(logError);
 
-
-        return Promise.race([results, thumbnailCacheResults]);
+        const fastest = await Promise.race([results, thumbnailCacheResults]);
+        if (fastest) {
+            return fastest;
+        } else {
+            // Always take results of thumbnail cache results is null
+            return results;
+        }
     })();
     activeRequests[videoID].catch(() => delete activeRequests[videoID]);
 

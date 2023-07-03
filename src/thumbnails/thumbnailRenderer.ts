@@ -8,6 +8,25 @@ import { isFirefoxOrSafari, timeoutPomise, waitFor } from "../maze-utils";
 import Config, { ThumbnailFallbackOption } from "../config/config";
 import { getThumbnailFallbackOption, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "../config/channelOverrides";
 import { countThumbnailReplacement } from "../config/stats";
+import { ThumbnailCacheOption } from "../config/config";
+
+const activeRendersMax = isFirefoxOrSafari() ? 3 : 6;
+const activeRenders: Record<VideoID, Promise<RenderedThumbnailVideo | null>> = {};
+const renderQueue: Array<() => void> = [];
+
+function waitForSpotInRenderQueue(): Promise<void> {
+    if (Object.keys(activeRenders).length >= activeRendersMax) {
+        return new Promise((resolve) => {
+            renderQueue.push(resolve);
+        });
+    }
+
+    return Promise.resolve();
+}
+
+function nextInRenderQueue() {
+    renderQueue.shift()?.();
+}
 
 const thumbnailRendererControls: Record<VideoID, Array<(error?: string) => void>> = {};
 
@@ -27,7 +46,7 @@ function addStopRenderingCallback(videoID: VideoID, callback: (error?: string) =
     thumbnailRendererControls[videoID].push(callback);
 }
 
-export function renderThumbnail(videoID: VideoID, width: number,
+export async function renderThumbnail(videoID: VideoID, width: number,
     height: number, saveVideo: boolean, timestamp: number): Promise<RenderedThumbnailVideo | null> {
     const existingCache = getFromCache(videoID);
     let reusedVideo: HTMLVideoElement | null = null;
@@ -39,9 +58,9 @@ export function renderThumbnail(videoID: VideoID, width: number,
         const sameTimestamp = bestVideos.find(v => v.timestamp === timestamp);
 
         if (sameTimestamp?.rendered) {
-            return Promise.resolve(sameTimestamp);
+            return sameTimestamp;
         } else if (sameTimestamp) {
-            return new Promise((resolve) => {
+            return await new Promise((resolve) => {
                 sameTimestamp.onReady.push((a) => {
                     resolve(a)
                 });
@@ -51,8 +70,10 @@ export function renderThumbnail(videoID: VideoID, width: number,
         }
     }
 
+    await waitForSpotInRenderQueue();
+
     // eslint-disable-next-line no-async-promise-executor, @typescript-eslint/no-misused-promises
-    return new Promise(async (resolve, reject) => {
+    return await new Promise(async (resolve, reject) => {
         const start = Date.now();
         const stopCallbackHandler = new Promise<string | undefined>((resolve) => {
             addStopRenderingCallback(videoID, resolve);
@@ -81,6 +102,7 @@ export function renderThumbnail(videoID: VideoID, width: number,
         videoCache.video.push(videoCacheObject);
 
         let resolved = false;
+        let videoLoadedTimeout: NodeJS.Timeout | null = null;
 
         const loadedData = async () => {
             const betterVideo = getFromCache(videoID)?.video?.find(v => v.width >= width && v.height >= height
@@ -95,7 +117,8 @@ export function renderThumbnail(videoID: VideoID, width: number,
 
             log(videoID, "videoLoaded", video.currentTime, video.readyState, video.seeking, format)
             if (video.readyState < 2 || video.seeking) {
-                setTimeout(loadedData, 50); // eslint-disable-line @typescript-eslint/no-misused-promises
+                if (videoLoadedTimeout) clearTimeout(videoLoadedTimeout);
+                videoLoadedTimeout = setTimeout(loadedData, 50); // eslint-disable-line @typescript-eslint/no-misused-promises
                 return;
             }
 
@@ -128,12 +151,11 @@ export function renderThumbnail(videoID: VideoID, width: number,
 
             // Remove this first to not trigger error when changing video src
             video.removeEventListener("error", errorHandler);
+            video.removeEventListener("loadeddata", loadedData); // eslint-disable-line @typescript-eslint/no-misused-promises
+            video.removeEventListener("seeked", loadedData) // eslint-disable-line @typescript-eslint/no-misused-promises
             if (!saveVideo) {
                 video.src = "";
                 video.remove();
-            } else {
-                video.removeEventListener("loadeddata", loadedData); // eslint-disable-line @typescript-eslint/no-misused-promises
-                video.removeEventListener("seeked", loadedData) // eslint-disable-line @typescript-eslint/no-misused-promises
             }
 
             resolved = true;
@@ -141,6 +163,8 @@ export function renderThumbnail(videoID: VideoID, width: number,
 
         const errorHandler = () => void (async () => {
             if (!resolved) {
+                if (videoLoadedTimeout) clearTimeout(videoLoadedTimeout);
+
                 // Try creating the video again
                 video.remove();
 
@@ -227,7 +251,7 @@ function handleThumbnailRenderFailure(videoID: VideoID, width: number, height: n
         listeners.push(...removedItems.flatMap((v) => v.onReady));
     }
 
-    if (!thumbnailFailed) {
+    if (!thumbnailFailed && Config.config!.thumbnailCacheUse !== ThumbnailCacheOption.Disable) {
         // Force the thumbnail to be generated by the server
         queueThumbnailCacheRequest(videoID, timestamp, undefined, false, true);
 
@@ -243,6 +267,7 @@ function handleThumbnailRenderFailure(videoID: VideoID, width: number, height: n
 }
 
 function renderToBlob(surface: HTMLVideoElement | HTMLCanvasElement): Promise<Blob> {
+    let deleteSurface = false;
     if (surface instanceof HTMLVideoElement) {
         const canvas = document.createElement("canvas");
         canvas.width = surface.videoWidth;
@@ -250,10 +275,14 @@ function renderToBlob(surface: HTMLVideoElement | HTMLCanvasElement): Promise<Bl
         canvas.getContext("2d")!.drawImage(surface, 0, 0);
 
         surface = canvas;
+        deleteSurface = true;
     }
 
     return new Promise((resolve, reject) => {
         (surface as HTMLCanvasElement).toBlob((blob) => {
+            if (deleteSurface) {
+                surface.remove();
+            }
             if (blob) {
                 resolve(blob);
             } else {
@@ -318,6 +347,9 @@ export async function createThumbnailImageElement(existingElement: HTMLImageElem
     image.style.display = "none";
 
     const result = async (canvasInfo: RenderedThumbnailVideo | null) => {
+        delete activeRenders[videoID];
+        nextInRenderQueue();
+
         if (!await stillValid()) {
             return;
         }
@@ -331,7 +363,10 @@ export async function createThumbnailImageElement(existingElement: HTMLImageElem
         ready(image);
     }
 
-    renderThumbnail(videoID, width, height, saveVideo, timestamp).then(result).catch(() => {
+    const activeRender = activeRenders[videoID] ?? renderThumbnail(videoID, width, height, saveVideo, timestamp);
+    activeRenders[videoID] = activeRender;
+    
+    activeRender.then(result).catch(() => {
         // Try again with lower resolution
         renderThumbnail(videoID, 0, 0, saveVideo, timestamp).then(result).catch(() => {
             logError(`Failed to render thumbnail for ${videoID}`);
