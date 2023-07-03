@@ -9,7 +9,7 @@ import Config, { ThumbnailCacheOption, ThumbnailFallbackOption } from "./config/
 import { generateUserID } from "./maze-utils/setup";
 import { BrandingUUID } from "./videoBranding/videoBranding";
 import { timeoutPomise } from "./maze-utils";
-import { isCachedThumbnailLoaded, setupPreRenderedThumbnail } from "./thumbnails/thumbnailRenderer";
+import { isCachedThumbnailLoaded, setupPreRenderedThumbnail, thumbnailCacheDownloaded } from "./thumbnails/thumbnailRenderer";
 import { setupCache } from "./thumbnails/thumbnailDataCache";
 import * as CompileConfig from "../config.json";
 import { alea } from "seedrandom";
@@ -374,6 +374,8 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
         currentRequest: result,
         time
     };
+
+    void result.then(() => thumbnailCacheDownloaded(videoID));
 
     return await result;
 }

@@ -13,11 +13,13 @@ import { ThumbnailCacheOption } from "../config/config";
 const activeRendersMax = isFirefoxOrSafari() ? 3 : 6;
 const activeRenders: Record<VideoID, Promise<RenderedThumbnailVideo | null>> = {};
 const renderQueue: Array<() => void> = [];
+const renderQueueCallbacks: Record<VideoID, () => void> = {};
 
-function waitForSpotInRenderQueue(): Promise<void> {
+function waitForSpotInRenderQueue(videoID: VideoID): Promise<void> {
     if (Object.keys(activeRenders).length >= activeRendersMax) {
         return new Promise((resolve) => {
             renderQueue.push(resolve);
+            renderQueueCallbacks[videoID] = resolve;
         });
     }
 
@@ -26,6 +28,10 @@ function waitForSpotInRenderQueue(): Promise<void> {
 
 function nextInRenderQueue() {
     renderQueue.shift()?.();
+}
+
+export function thumbnailCacheDownloaded(videoID: VideoID): void {
+    renderQueueCallbacks[videoID]?.();
 }
 
 const thumbnailRendererControls: Record<VideoID, Array<(error?: string) => void>> = {};
@@ -48,29 +54,20 @@ function addStopRenderingCallback(videoID: VideoID, callback: (error?: string) =
 
 export async function renderThumbnail(videoID: VideoID, width: number,
     height: number, saveVideo: boolean, timestamp: number): Promise<RenderedThumbnailVideo | null> {
-    const existingCache = getFromCache(videoID);
-    let reusedVideo: HTMLVideoElement | null = null;
-    if (existingCache && existingCache?.video?.length > 0) {
-        const bestVideos = ((width && height) ? existingCache.video.filter(v => (v.rendered && v.fromThumbnailCache)
-                || (v.width >= width && v.height >= height))
-            : existingCache.video).sort((a, b) => b.width - a.width).sort((a, b) => +b.rendered - +a.rendered);
 
-        const sameTimestamp = bestVideos.find(v => v.timestamp === timestamp);
-
-        if (sameTimestamp?.rendered) {
-            return sameTimestamp;
-        } else if (sameTimestamp) {
-            return await new Promise((resolve) => {
-                sameTimestamp.onReady.push((a) => {
-                    resolve(a)
-                });
-            });
-        } else if (bestVideos.length > 0) {
-            reusedVideo = bestVideos[0].video;
-        }
+    let bestVideoData = await findBestVideo(videoID, width, height, timestamp);
+    if (bestVideoData.renderedThumbnail) {
+        return bestVideoData.renderedThumbnail;
     }
+    
+    await waitForSpotInRenderQueue(videoID);
+    delete renderQueueCallbacks[videoID];
 
-    await waitForSpotInRenderQueue();
+    bestVideoData = await findBestVideo(videoID, width, height, timestamp);
+    if (bestVideoData.renderedThumbnail) {
+        return bestVideoData.renderedThumbnail;
+    }
+    const reusedVideo: HTMLVideoElement | null = bestVideoData.video ?? null;
 
     // eslint-disable-next-line no-async-promise-executor, @typescript-eslint/no-misused-promises
     return await new Promise(async (resolve, reject) => {
@@ -235,6 +232,43 @@ export async function renderThumbnail(videoID: VideoID, width: number,
             reject("Stopped while waiting for video to load");
         });
     });
+}
+
+interface BestVideoData {
+    renderedThumbnail?: Promise<RenderedThumbnailVideo | null>;
+    video?: HTMLVideoElement | null;
+}
+
+function findBestVideo(videoID: VideoID, width: number, height: number, timestamp: number): BestVideoData {
+    const existingCache = getFromCache(videoID);
+
+    if (existingCache && existingCache?.video?.length > 0) {
+        const bestVideos = ((width && height) ? existingCache.video.filter(v => (v.rendered && v.fromThumbnailCache)
+                || (v.width >= width && v.height >= height))
+            : existingCache.video).sort((a, b) => b.width - a.width).sort((a, b) => +b.rendered - +a.rendered);
+
+        const sameTimestamp = bestVideos.find(v => v.timestamp === timestamp);
+
+        if (sameTimestamp?.rendered) {
+            return {
+                renderedThumbnail: Promise.resolve(sameTimestamp)
+            };
+        } else if (sameTimestamp) {
+            return {
+                renderedThumbnail: new Promise((resolve) => {
+                    sameTimestamp.onReady.push((a) => {
+                        resolve(a)
+                    });
+                })
+            };
+        } else if (bestVideos.length > 0) {
+            return {
+                video: bestVideos[0].video
+            };
+        }
+    }
+
+    return {};
 }
 
 function handleThumbnailRenderFailure(videoID: VideoID, width: number, height: number,
