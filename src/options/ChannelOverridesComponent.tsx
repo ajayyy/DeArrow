@@ -205,7 +205,7 @@ export const ChannelOverridesComponent = () => {
                                 updateChannelList(setChannelListText, newID);
                             }
                         }}>
-                        Delete Configuration
+                        {chrome.i18n.getMessage("DeleteConfiguration")}
                     </div>
                 </>
             }
