@@ -161,7 +161,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             }
 
                             const { extraThumbnails } = updateUnsubmitted(unsubmitted, setExtraUnsubmittedThumbnails,
-                                setExtraUnsubmittedTitles, thumbnails, titles);
+                                null, thumbnails, titles);
                             Config.forceLocalUpdate("unsubmitted");
 
 
@@ -267,7 +267,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
 function updateUnsubmitted(unsubmitted: UnsubmittedSubmission,
         setExtraUnsubmittedThumbnails: React.Dispatch<React.SetStateAction<RenderedThumbnailSubmission[]>>,
-        setExtraUnsubmittedTitles: React.Dispatch<React.SetStateAction<RenderedTitleSubmission[]>>,
+        setExtraUnsubmittedTitles: React.Dispatch<React.SetStateAction<RenderedTitleSubmission[]>> | null,
         thumbnails: RenderedThumbnailSubmission[], titles: RenderedTitleSubmission[]): {
             extraTitles: RenderedTitleSubmission[];
             extraThumbnails: RenderedThumbnailSubmission[];
@@ -294,7 +294,7 @@ function updateUnsubmitted(unsubmitted: UnsubmittedSubmission,
             titlesResult = unsubmittedTitles
                 .filter((t) => titles.every((s) => s.title !== t.title))
 
-            setExtraUnsubmittedTitles(titlesResult);
+            setExtraUnsubmittedTitles?.(titlesResult);
         }
 
         Config.forceLocalUpdate("unsubmitted");
@@ -305,7 +305,7 @@ function updateUnsubmitted(unsubmitted: UnsubmittedSubmission,
         };
     } else {
         setExtraUnsubmittedThumbnails([]);
-        setExtraUnsubmittedTitles([]);
+        setExtraUnsubmittedTitles?.([]);
 
         return {
             extraTitles: [],
