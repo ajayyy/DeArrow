@@ -264,8 +264,10 @@ export async function hideAndUpdateShowOriginalButton(element: HTMLElement, bran
         if (buttonImage) {
             if (showCustomBranding) {
                 buttonImage.classList.remove("cbOriginalShown");
+                buttonElement.title = chrome.i18n.getMessage("ShowOriginal");
             } else {
                 buttonImage.classList.add("cbOriginalShown");
+                buttonElement.title = chrome.i18n.getMessage("ShowModified");
             }
 
             if (showCustomBranding === Config.config!.defaultToCustom 
@@ -301,7 +303,6 @@ export async function findOrCreateShowOriginalButton(element: HTMLElement, brand
 async function createShowOriginalButton(originalTitleElement: HTMLElement,
         brandingLocation: BrandingLocation): Promise<HTMLElement> {
     const buttonElement = document.createElement("button");
-    buttonElement.title = chrome.i18n.getMessage("ShowOriginal");
     buttonElement.classList.add("cbShowOriginal");
 
     buttonElement.classList.add("cbButton");
@@ -318,6 +319,9 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
 
     if (!Config.config?.defaultToCustom) {
         buttonImage.classList.add("cbOriginalShown");
+        buttonElement.title = chrome.i18n.getMessage("ShowModified");
+    } else {
+        buttonElement.title = chrome.i18n.getMessage("ShowOriginal");
     }
 
     buttonElement.addEventListener("click", (e) => void (async (e) => {
