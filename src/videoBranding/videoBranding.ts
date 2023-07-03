@@ -267,9 +267,11 @@ export async function updateBrandingForVideo(videoID: VideoID): Promise<void> {
 }
 
 export function clearVideoBrandingInstances(): void {
+    const visibleVideoIDs = [...document.querySelectorAll(".cbButton")].map((e) => e.getAttribute("videoid"));
+
     for (const videoID in videoBrandingInstances) {
         // Only clear if it is not on the page anymore
-        if (!document.querySelector(`.cbButton[videoid="${videoID}"]`)) {
+        if (!visibleVideoIDs.includes(videoID)) {
             delete videoBrandingInstances[videoID];
         }
     }
