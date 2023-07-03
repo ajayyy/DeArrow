@@ -3,7 +3,7 @@ import { logError } from "./utils/logger";
 import { ChannelIDInfo, checkIfNewVideoID, getVideoID, setupVideoModule, VideoID } from "./maze-utils/video"
 import Config from "./config/config";
 import { SubmitButton } from "./submission/submitButton";
-import { BrandingLocation, clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
+import { BrandingLocation, BrandingResult, clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
 import { getVideoBranding } from "./dataFetching";
 import * as documentScript from "../dist/js/document.js";
 import { listenForBadges, listenForMiniPlayerTitleChange, listenForTitleChange } from "./utils/titleBar";
@@ -29,6 +29,10 @@ async function videoIDChange(videoID: VideoID | null): Promise<void> {
     } catch (e) {
         logError(e);
     }
+}
+
+export function updateSubmitButton(branding: BrandingResult) {
+    submitButton.setSubmissions(branding)
 }
 
 function resetValues() {

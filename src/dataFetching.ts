@@ -1,4 +1,4 @@
-import { VideoID } from "./maze-utils/video";
+import { VideoID, getVideoID } from "./maze-utils/video";
 import { ThumbnailResult, ThumbnailSubmission, fetchVideoMetadata } from "./thumbnails/thumbnailData";
 import { TitleResult, TitleSubmission } from "./titles/titleData";
 import { FetchResponse, sendRealRequestToCustomServer, sendRequestToCustomServer } from "./maze-utils/background-request-proxy";
@@ -14,6 +14,7 @@ import { setupCache } from "./thumbnails/thumbnailDataCache";
 import * as CompileConfig from "../config.json";
 import { alea } from "seedrandom";
 import { getThumbnailFallbackOption, getThumbnailFallbackOptionFastCheck, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "./config/channelOverrides";
+import { updateSubmitButton } from "./video";
 
 interface VideoBrandingCacheRecord extends BrandingResult {
     lastUsed: number;
@@ -196,6 +197,10 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
                 }
 
                 if (thumbnailCacheFetchDone) {
+                    if (videoID === getVideoID()) {
+                        updateSubmitButton(results[videoID]);
+                    }
+
                     updateBrandingForVideo(videoID).catch(logError);
                 }
             }
