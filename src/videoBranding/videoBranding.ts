@@ -1,6 +1,6 @@
 import { getYouTubeTitleNodeSelector } from "../maze-utils/elements";
 import { getVideoID, VideoID } from "../maze-utils/video";
-import { isVisible, waitForElement } from "../maze-utils/dom";
+import { getElement, isVisible, waitForElement } from "../maze-utils/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
@@ -44,16 +44,25 @@ const videoBrandingInstances: Record<VideoID, VideoBrandingInstance> = {}
 export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]> {
     const onWatchPage = document.URL.includes("/watch");
     const possibleSelectors = onWatchPage ? [
-        getYouTubeTitleNodeSelector(),
-        ".ytp-title-text"
+        {
+            selector: getYouTubeTitleNodeSelector(),
+            checkVisibility: true
+        },
+        {
+            selector: ".ytp-title-text",
+            checkVisibility: false
+        }
     ] : [
-        ".miniplayer #info-bar"
+        {
+            selector: ".miniplayer #info-bar",
+            checkVisibility: false
+        }
     ];
 
     // Find first invisible one, or wait for the first one to be visible
-    const mainTitle = possibleSelectors.map((selector) => document.querySelector(selector) as HTMLElement).filter((element) => isVisible(element))[0] || 
-        await waitForElement(possibleSelectors[0], true) as HTMLElement;
-    const titles = (possibleSelectors.map((selector) => document.querySelector(selector)).filter((e) => !!e)) as HTMLElement[];
+    const mainTitle = possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility) as HTMLElement).filter((element) => isVisible(element))[0] || 
+        await waitForElement(possibleSelectors[0].selector, true) as HTMLElement;
+    const titles = (possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility)).filter((e) => !!e)) as HTMLElement[];
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
     const videoID = getVideoID();
 
