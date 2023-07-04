@@ -43,12 +43,17 @@ export class SubmitButton {
         if (referenceNode) {
             if (!referenceNode.contains(this.button)) {
                 if (!this.button) {
+                    const existingButton = referenceNode.querySelector(".cbSubmitButton");
+                    if (existingButton) {
+                        existingButton.remove();
+                    }
+
                     this.button = document.createElement('button');
                     this.button.className = "cbSubmitButton cbButton";
                     this.button.innerHTML = submitButtonIcon;
                     this.button.draggable = false;
 
-                    this.button.addEventListener('click', () => {
+                    this.button.addEventListener("click", () => {
                         this.openOrClose().catch(logError);
                     });
                 }

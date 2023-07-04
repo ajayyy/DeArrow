@@ -4,7 +4,9 @@ import { addTitleChangeListener, listenForBadges, listenForMiniPlayerTitleChange
 import { logError } from "./utils/logger";
 import { addCssToPage } from "./utils/cssInjector";
 import { runCompatibilityFunctions } from "./utils/extensionCompatibility";
+import { cleanPage } from "./utils/pageCleaner";
 
+cleanPage();
 addCssToPage();
 setupCBVideoModule();
 
