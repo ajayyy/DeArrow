@@ -267,7 +267,7 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
 }
 
 export async function hideAndUpdateShowOriginalButton(element: HTMLElement, brandingLocation: BrandingLocation,
-        showCustomBranding: boolean): Promise<void> {
+        showCustomBranding: boolean, dontHide: boolean): Promise<void> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const buttonElement = await findShowOriginalButton(originalTitleElement, brandingLocation);
     if (buttonElement) {
@@ -290,7 +290,7 @@ export async function hideAndUpdateShowOriginalButton(element: HTMLElement, bran
             }
         }
 
-        buttonElement.style.setProperty("display", "none", "important");
+        if (!dontHide) buttonElement.style.setProperty("display", "none", "important");
     }
 }
 

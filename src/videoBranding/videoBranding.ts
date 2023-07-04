@@ -89,7 +89,9 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
         }
 
         // Only the first title needs a button, it will affect all titles
-        if (onWatchPage) void handleShowOriginalButton(titles[0], videoID, brandingLocation, showCustomBranding, promises);
+        if (onWatchPage) {
+            void handleShowOriginalButton(titles[0], videoID, brandingLocation, showCustomBranding, promises, true);
+        }
     }
 
     return Promise.all(promises);
@@ -203,8 +205,9 @@ function isPlaylistOrClipTitle(link: HTMLAnchorElement) {
 
 export async function handleShowOriginalButton(element: HTMLElement, videoID: VideoID,
         brandingLocation: BrandingLocation, showCustomBranding: boolean,
-        promises: [Promise<boolean>, Promise<boolean>]): Promise<HTMLElement | null> {
-    await hideAndUpdateShowOriginalButton(element, brandingLocation, showCustomBranding);
+        promises: [Promise<boolean>, Promise<boolean>],
+        dontHide = false): Promise<void> {
+    await hideAndUpdateShowOriginalButton(element, brandingLocation, showCustomBranding, dontHide);
 
     const result = await Promise.race(promises);
     if (result || (await Promise.all(promises)).some((r) => r)) {
@@ -223,11 +226,11 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
                 image.classList.remove("cbAutoFormat");
             }
         }
+    } else if (dontHide) {
+        // Hide it now
 
-        return button;
+        await hideAndUpdateShowOriginalButton(element, brandingLocation, showCustomBranding, false);
     }
-
-    return null;
 }
 
 function getAndUpdateVideoBrandingInstances(videoID: VideoID, updateBranding: () => Promise<void>): VideoBrandingInstance {
