@@ -105,6 +105,7 @@ describe("toTitleCase", () => {
         ["First title: The Second title", "First Title: The Second Title"],
         ['Ski Aggu über Crazy Frog, "Party Sahne", Southstar & Domiziana – Interview mit Aria Nejati', 'Ski Aggu Über Crazy Frog, "Party Sahne", Southstar & Domiziana – Interview Mit Aria Nejati'],
         ["visionOS Success ISN'T Up to 3rd Party Devs", "visionOS Success Isn't Up to 3rd Party Devs"],
+        ["So, visionOS Success ISN'T Up to 3rd Party Devs", "So, visionOS Success Isn't Up to 3rd Party Devs"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
