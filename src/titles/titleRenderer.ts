@@ -125,7 +125,7 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
     const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
     
     titleElement.style.display = "none";
-    originalTitleElement.style.setProperty("display", "inherit", "important");
+    originalTitleElement.style.setProperty("display", "inline", "important");
 
     switch(brandingLocation) {
         case BrandingLocation.Watch: {
