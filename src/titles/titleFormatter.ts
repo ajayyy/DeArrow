@@ -206,7 +206,9 @@ export function capitalizeFirstLetter(word: string): string {
 
     for (const char of word) {
         if (char.match(/[\p{L}]/u)) {
-            result += char.toUpperCase() + word.substring(result.length + 1).toLowerCase();
+            // converts to an array in order to slice by Unicode code points
+            // (for Unicode characters outside the BMP)
+            result += char.toUpperCase() + [...word].slice(result.length + 1).join("").toLowerCase();
             break;
         } else {
             result += char;
