@@ -83,10 +83,10 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
             result += capitalizeFirstLetter(word) + " ";
         } else if (forceKeepFormatting(word)
             || isAcronymStrict(word) 
-            || ((!inTitleCase || !isWordCaptialCase(word)) && trustCaps && isAcronym(word))
-            || (!inTitleCase && isWordCaptialCase(word)) 
-            || (isCustom && isWordCustomCaptialization(word))
-            || (!isAllCaps(word) && isWordCustomCaptialization(word))) {
+            || ((!inTitleCase || !isWordCapitalCase(word)) && trustCaps && isAcronym(word))
+            || (!inTitleCase && isWordCapitalCase(word)) 
+            || (isCustom && isWordCustomCapitalization(word))
+            || (!isAllCaps(word) && isWordCustomCapitalization(word))) {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             // Trust it with capitalization
@@ -116,8 +116,8 @@ export function toTitleCase(str: string, isCustom: boolean): string {
             !(isAllCaps(words[index - 1]) || isAllCaps(words[index + 1]));
 
         if (forceKeepFormatting(word)
-            || (isCustom && isWordCustomCaptialization(word))
-            || (!isAllCaps(word) && isWordCustomCaptialization(word))
+            || (isCustom && isWordCustomCapitalization(word))
+            || (!isAllCaps(word) && isWordCustomCapitalization(word))
             || isYear(word)) {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
@@ -125,7 +125,7 @@ export function toTitleCase(str: string, isCustom: boolean): string {
         } else if (!startOfSentence(index, words) && titleCaseNotCapitalized.includes(word.toLowerCase())) {
             // Skip lowercase check for the first word
             result += word.toLowerCase() + " ";
-        } else if (isFirstLetterCaptial(word) && 
+        } else if (isFirstLetterCapital(word) && 
                 ((trustCaps && isAcronym(word)) || isAcronymStrict(word))) {
             // Trust it with capitalization
             result += word + " ";
@@ -146,9 +146,9 @@ export function toCapitalizeCase(str: string, isCustom: boolean): string {
     let result = "";
     for (const word of words) {
         if (forceKeepFormatting(word)
-                || (isCustom && isWordCustomCaptialization(word)) 
-                || (!isAllCaps(word) && isWordCustomCaptialization(word))
-                || (isFirstLetterCaptial(word) && 
+                || (isCustom && isWordCustomCapitalization(word)) 
+                || (!isAllCaps(word) && isWordCustomCapitalization(word))
+                || (isFirstLetterCapital(word) && 
                 ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word)))
                 || isYear(word)) {
             // For custom titles, allow any not just first capital
@@ -167,7 +167,7 @@ export function isInTitleCase(words: string[]): boolean {
     let count = 0;
     let ignored = 0;
     for (const word of words) {
-        if (isWordCaptialCase(word)) {
+        if (isWordCapitalCase(word)) {
             count++;
         } else if (!isWordAllLower(word) ||
                 titleCaseNotCapitalized.includes(word.toLowerCase())) {
@@ -218,19 +218,19 @@ export function capitalizeFirstLetter(word: string): string {
     return result;
 }
 
-function isWordCaptialCase(word: string): boolean {
+function isWordCapitalCase(word: string): boolean {
     return !!word.match(/^[^\p{L}]*[\p{Lu}][^\p{Lu}]+$/u);
 }
 
 /**
  * Not just capital at start
  */
-function isWordCustomCaptialization(word: string): boolean {
+function isWordCustomCapitalization(word: string): boolean {
     const capitalMatch = word.match(/[\p{Lu}]/gu);
     if (!capitalMatch) return false;
 
     const capitalNumber = capitalMatch.length;
-    return capitalNumber > 1 || (capitalNumber === 1 && !isFirstLetterCaptial(word));
+    return capitalNumber > 1 || (capitalNumber === 1 && !isFirstLetterCapital(word));
 }
 
 function isYear(word: string): boolean {
@@ -241,7 +241,7 @@ function isWordAllLower(word: string): boolean {
     return !!word.match(/^[\p{Ll}]+$/u);
 }
 
-function isFirstLetterCaptial(word: string): boolean {
+function isFirstLetterCapital(word: string): boolean {
     return !!word.match(/^[^\p{L}]*[\p{Lu}]/u);
 }
 
