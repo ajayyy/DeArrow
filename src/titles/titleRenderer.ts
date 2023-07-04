@@ -201,7 +201,8 @@ export function getOrCreateTitleElement(element: HTMLElement, brandingLocation: 
 }
 
 function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
-    const titleElement = brandingLocation !== BrandingLocation.Watch ? originalTitleElement.cloneNode() as HTMLElement 
+    const titleElement = brandingLocation !== BrandingLocation.Watch || originalTitleElement.classList.contains("miniplayer-title")
+        ? originalTitleElement.cloneNode() as HTMLElement 
         : document.createElement("div");
     titleElement.classList.add("cbCustomTitle");
 
@@ -250,6 +251,11 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
         if (metaElement && !smallBrandingBox) {
             metaElement.style.width = "100%";
         }
+    }
+
+    if (brandingLocation === BrandingLocation.Watch) {
+        // For mini player title
+        titleElement.removeAttribute("is-empty");
     }
 
     return titleElement;
