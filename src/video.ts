@@ -35,6 +35,10 @@ export function updateSubmitButton(branding: BrandingResult) {
     submitButton.setSubmissions(branding)
 }
 
+export function attachSubmitButtonToPage() {
+    submitButton.attachToPage().catch(logError);
+}
+
 function resetValues() {
     submitButton.clearSubmissions();
     submitButton.close();
@@ -48,7 +52,7 @@ function channelIDChange(channelIDInfo: ChannelIDInfo): void {
 
 function videoElementChange(newVideo: boolean) {
     if (newVideo) {
-        submitButton.attachToPage().catch(logError);
+        attachSubmitButtonToPage();
 
         listenForBadges().catch(logError);
         listenForTitleChange().catch(logError);

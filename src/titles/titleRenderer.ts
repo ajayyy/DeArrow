@@ -8,6 +8,7 @@ import { formatTitle } from "./titleFormatter";
 import { setPageTitle } from "./pageTitleHandler";
 import { shouldReplaceTitles, shouldReplaceTitlesFastCheck } from "../config/channelOverrides";
 import { countTitleReplacement } from "../config/stats";
+import { isReduxInstalled } from "../utils/extensionCompatibility";
 
 enum WatchPageType {
     Video,
@@ -125,7 +126,11 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
     const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
     
     titleElement.style.display = "none";
-    originalTitleElement.style.setProperty("display", "inline", "important");
+    if (isReduxInstalled()) {
+        originalTitleElement.style.setProperty("display", "-webkit-box", "important");
+    } else {
+        originalTitleElement.style.setProperty("display", "inline", "important");
+    }
 
     switch(brandingLocation) {
         case BrandingLocation.Watch: {
@@ -215,7 +220,7 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
         // Move original title element over to this element
         container.prepend(originalTitleElement);
     } else {
-        originalTitleElement.parentElement?.appendChild(titleElement);
+        originalTitleElement.parentElement?.insertBefore(titleElement, originalTitleElement);
     }
 
     if (brandingLocation !== BrandingLocation.Watch) {
