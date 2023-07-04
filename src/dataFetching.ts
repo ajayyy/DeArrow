@@ -84,7 +84,7 @@ async function getTimestampFromRandomTime(videoID: VideoID, brandingData: Brandi
         if (videoDuration) {
             // Occurs when fetching by hash and no record exists in the db (SponsorBlock or otherwise)
             if (brandingData.randomTime == null) {
-                brandingData.randomTime = alea(videoID)() * videoDuration;
+                brandingData.randomTime = alea(videoID)();
             }
 
             const timestamp = brandingData.randomTime * videoDuration;
