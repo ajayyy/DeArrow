@@ -8,6 +8,7 @@ import { formatTitle } from "./titleFormatter";
 import { setPageTitle } from "./pageTitleHandler";
 import { shouldReplaceTitles, shouldReplaceTitlesFastCheck } from "../config/channelOverrides";
 import { countTitleReplacement } from "../config/stats";
+import { isReduxInstalled } from "../utils/extensionCompatibility";
 
 enum WatchPageType {
     Video,
@@ -125,7 +126,11 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
     const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
     
     titleElement.style.display = "none";
-    originalTitleElement.style.setProperty("display", "inherit", "important");
+    if (isReduxInstalled()) {
+        originalTitleElement.style.setProperty("display", "-webkit-box", "important");
+    } else {
+        originalTitleElement.style.setProperty("display", "inline", "important");
+    }
 
     switch(brandingLocation) {
         case BrandingLocation.Watch: {
@@ -201,7 +206,8 @@ export function getOrCreateTitleElement(element: HTMLElement, brandingLocation: 
 }
 
 function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
-    const titleElement = brandingLocation !== BrandingLocation.Watch ? originalTitleElement.cloneNode() as HTMLElement 
+    const titleElement = brandingLocation !== BrandingLocation.Watch || originalTitleElement.classList.contains("miniplayer-title")
+        ? originalTitleElement.cloneNode() as HTMLElement 
         : document.createElement("div");
     titleElement.classList.add("cbCustomTitle");
 
@@ -214,7 +220,7 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
         // Move original title element over to this element
         container.prepend(originalTitleElement);
     } else {
-        originalTitleElement.parentElement?.appendChild(titleElement);
+        originalTitleElement.parentElement?.insertBefore(titleElement, originalTitleElement);
     }
 
     if (brandingLocation !== BrandingLocation.Watch) {
@@ -252,6 +258,11 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
         }
     }
 
+    if (brandingLocation === BrandingLocation.Watch) {
+        // For mini player title
+        titleElement.removeAttribute("is-empty");
+    }
+
     return titleElement;
 }
 
@@ -286,7 +297,7 @@ export async function hideAndUpdateShowOriginalButton(element: HTMLElement, bran
 export async function findShowOriginalButton(originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): Promise<HTMLElement> {
     const referenceNode = brandingLocation === BrandingLocation.Watch 
         ? (await getOrCreateTitleButtonContainer(originalTitleElement.parentElement!)) : originalTitleElement.parentElement;
-    return referenceNode?.querySelector(".cbShowOriginal") as HTMLElement;
+    return referenceNode?.querySelector?.(".cbShowOriginal") as HTMLElement;
 }
 
 export async function findOrCreateShowOriginalButton(element: HTMLElement, brandingLocation: BrandingLocation,

@@ -5,10 +5,13 @@ import { waitForElement } from "../maze-utils/dom";
 
 export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLElement): Promise<HTMLElement | null> {
     const titleNode = forceTitleNode ?? await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
-    const referenceNode = titleNode?.parentElement;
+
+    // First case is for "proper description" userscript
+    const referenceNode = titleNode?.classList?.contains("ytd-video-primary-info-renderer") ? 
+        titleNode : titleNode?.parentElement;
 
     if (referenceNode) {
-        let titleButtonContainer = document.querySelector(".cbTitleButtonContainer") as HTMLElement;
+        let titleButtonContainer = referenceNode.querySelector(".cbTitleButtonContainer") as HTMLElement;
         if (!titleButtonContainer) {
             titleButtonContainer = document.createElement("div");
             titleButtonContainer.classList.add("cbTitleButtonContainer");
