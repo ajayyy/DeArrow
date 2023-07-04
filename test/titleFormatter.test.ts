@@ -38,6 +38,7 @@ describe("Capitalize First Letter Tests", () => {
         ["[[-w", "[[-W"],
         ["[[-W", "[[-W"],
         ["2020", "2020"],
+        ["𝐕𝐞𝐝𝐚𝐥", "𝐕𝐞𝐝𝐚𝐥"]
     ];
     for (const testCase of capitalizeFirstCases) {
         const [input, expected] = testCase;
