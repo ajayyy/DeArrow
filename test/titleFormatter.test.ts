@@ -104,6 +104,7 @@ describe("toTitleCase", () => {
         ["You Don't Understand EQ - PART 1", "You Don't Understand EQ - Part 1"],
         ["First title: The Second title", "First Title: The Second Title"],
         ['Ski Aggu über Crazy Frog, "Party Sahne", Southstar & Domiziana – Interview mit Aria Nejati', 'Ski Aggu Über Crazy Frog, "Party Sahne", Southstar & Domiziana – Interview Mit Aria Nejati'],
+        ["visionOS Success ISN'T Up to 3rd Party Devs", "visionOS Success Isn't Up to 3rd Party Devs"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -141,7 +142,8 @@ describe("toSentenceCase", () => {
         ["Tomorrow I'll Go To The US", "Tomorrow I'll go to the US"],
         ["Tomorrow I'llllllll Go To The US", "Tomorrow i'llllllll go to the US"],
         ["First title: The second title", "First title: The second title"],
-        ["Prefer using Option<&T> over &Option", "Prefer using Option<&T> over &Option"]
+        ["Prefer using Option<&T> over &Option", "Prefer using Option<&T> over &Option"],
+        ["visionOS Success ISN'T Up to 3rd Party Devs", "visionOS success isn't up to 3rd party devs"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;

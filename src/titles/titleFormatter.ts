@@ -93,7 +93,11 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
             result += word + " ";
         } else {
             if (startOfSentence(index, words)) {
-                result += capitalizeFirstLetter(word) + " ";
+                if (!isAllCaps(word) && isWordCustomCapitalization(word)) {
+                    result += word + " ";
+                } else {
+                    result += capitalizeFirstLetter(word) + " ";
+                }
             } else {
                 result += word.toLowerCase() + " ";
             }
@@ -117,7 +121,7 @@ export function toTitleCase(str: string, isCustom: boolean): string {
 
         if (forceKeepFormatting(word)
             || (isCustom && isWordCustomCapitalization(word))
-            || (!isAllCaps(word) && isWordCustomCapitalization(word))
+            || (!isAllCaps(word) && (isWordCustomCapitalization(word) || isNumberThenLetter(word)))
             || isYear(word)) {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
@@ -231,6 +235,13 @@ function isWordCustomCapitalization(word: string): boolean {
 
     const capitalNumber = capitalMatch.length;
     return capitalNumber > 1 || (capitalNumber === 1 && !isFirstLetterCapital(word));
+}
+
+/**
+ * 3rd, 45th
+ */
+function isNumberThenLetter(word: string): boolean {
+    return !!word.match(/^[0-9]+\p{L}/u);
 }
 
 function isYear(word: string): boolean {
