@@ -70,6 +70,7 @@ export class SubmitButton {
     close(): void {
         if (this.container) {
             this.root?.unmount?.();
+            this.root = null;
             this.container.remove();
             this.container = null;
         }
