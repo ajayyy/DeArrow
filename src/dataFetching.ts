@@ -190,10 +190,21 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
 
                     // Fetch for a cached thumbnail if it is either not loaded yet, or has an out of date title
                     if (timestamp !== null
-                            && (!isCachedThumbnailLoaded(videoID, timestamp) || (title?.title && oldResults?.titles?.length <= 0))) {
+                            && (!isCachedThumbnailLoaded(videoID, timestamp) 
+                                || (title?.title && oldResults?.titles?.length <= 0)
+                                || (title?.title !== oldResults?.titles?.[0]?.title))) {
                         queueThumbnailCacheRequest(videoID, timestamp, title?.title, isOfficialTime(),
                             shouldGenerateNow);
                     }
+                } else if (thumbnailCacheFetchDone) {
+                    // The results from that thumbnail cache fetch are wrong still
+                    cache[videoID] = {
+                        titles: [],
+                        thumbnails: [],
+                        randomTime: null,
+                        videoDuration: null,
+                        lastUsed: Date.now()
+                    };
                 }
 
                 if (thumbnailCacheFetchDone) {
