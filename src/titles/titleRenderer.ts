@@ -335,6 +335,11 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
         buttonElement.title = chrome.i18n.getMessage("ShowOriginal");
     }
 
+    const getHoverPlayers = () => [
+        originalTitleElement.closest("#dismissible")?.querySelector?.("#mouseover-overlay") as HTMLElement,
+        document.querySelector("ytd-video-preview #player-container") as HTMLElement
+    ];
+
     buttonElement.addEventListener("click", (e) => void (async (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -342,8 +347,34 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
         const videoID = buttonElement.getAttribute("videoID");
         if (videoID) {
             await toggleShowCustom(videoID as VideoID);
+
+            // Hide hover play, made visible again when mouse leaves area
+            for (const player of getHoverPlayers()) {
+                if (player) {
+                    player.style.display = "none";
+                    const hoverPlayerVideo = player.querySelector("video");
+                    if (hoverPlayerVideo) {
+                        hoverPlayerVideo.pause();
+                    }
+                }
+            }
         }
     })(e));
+
+    if (originalTitleElement.parentElement) {
+        originalTitleElement.parentElement.addEventListener("mouseleave", () => {
+            for (const player of getHoverPlayers()) {
+                if (player) {
+                    player.style.removeProperty("display");
+
+                    const hoverPlayerVideo = player.querySelector("video");
+                    if (hoverPlayerVideo && hoverPlayerVideo.paused) {
+                        hoverPlayerVideo.play().catch(logError);
+                    }
+                }
+            }
+        });
+    }
 
     if (brandingLocation === BrandingLocation.Watch) {
         const referenceNode = await getOrCreateTitleButtonContainer();

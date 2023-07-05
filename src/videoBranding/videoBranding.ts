@@ -68,7 +68,7 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
 
     if (videoID !== null && isVisible(mainTitle)) {
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
-            async () => void await replaceCurrentVideoBranding());
+            async () => { await replaceCurrentVideoBranding(); });
         const brandingLocation = BrandingLocation.Watch;
         const showCustomBranding = videoBrandingInstance.showCustomBranding;
 
@@ -115,7 +115,7 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
         }
 
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
-            async () => void await replaceVideoCardBranding(element, brandingLocation, videoID));
+            async () => { await replaceVideoCardBranding(element, brandingLocation, videoID); });
         const showCustomBranding = videoBrandingInstance.showCustomBranding;
 
         const videoPromise = replaceThumbnail(element, videoID, brandingLocation, showCustomBranding);
