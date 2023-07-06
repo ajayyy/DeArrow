@@ -1,6 +1,7 @@
 import * as React from "react";
 import { RenderedTitleSubmission } from "./TitleDrawerComponent";
 import ResetIcon from "../svgIcons/resetIcon";
+import Config from "../config/config";
 
 export interface TitleComponentProps {
     submission: RenderedTitleSubmission;
@@ -56,7 +57,7 @@ export const TitleComponent = (props: TitleComponentProps) => {
                     const target = e.target as HTMLTextAreaElement;
                     const newTitle = target.innerText;
 
-                    if (target.innerText.length > maxTitleLength) {
+                    if (!Config.config!.vip && target.innerText.length > maxTitleLength) {
                         target.innerText = target.innerText.substring(0, maxTitleLength);
                         setSelectionToEnd(target);
                         return;
