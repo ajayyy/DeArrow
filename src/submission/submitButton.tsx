@@ -145,7 +145,7 @@ export class SubmitButton {
 
         const result = await submitVideoBranding(getVideoID()!, title, thumbnail);
 
-        if (result) {
+        if (result && result.ok) {
             this.close();
 
             // Set the unsubmitted as selected
@@ -181,6 +181,8 @@ export class SubmitButton {
             }
 
             replaceCurrentVideoBranding().catch(logError);
+        } else {
+            alert(result.responseText);
         }
     }
 }
