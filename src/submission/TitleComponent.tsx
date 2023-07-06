@@ -9,6 +9,8 @@ export interface TitleComponentProps {
     onDeselect: () => void;
 }
 
+const maxTitleLength = 110;
+
 export const TitleComponent = (props: TitleComponentProps) => {
     const titleRef = React.useRef<HTMLDivElement>(null);
     const title = React.useRef(props.submission.title);
@@ -53,6 +55,12 @@ export const TitleComponent = (props: TitleComponentProps) => {
 
                     const target = e.target as HTMLTextAreaElement;
                     const newTitle = target.innerText;
+
+                    if (target.innerText.length > maxTitleLength) {
+                        target.innerText = target.innerText.substring(0, maxTitleLength);
+                        setSelectionToEnd(target);
+                        return;
+                    }
                     
                     if (newTitle !== title.current) {
                         props.onSelectOrUpdate(newTitle, title.current);
