@@ -206,20 +206,20 @@ function isAllCaps(word: string): boolean {
 }
 
 export function capitalizeFirstLetter(word: string): string {
-    let result = "";
+    const result: string[] = [];
 
     for (const char of word) {
         if (char.match(/[\p{L}]/u)) {
             // converts to an array in order to slice by Unicode code points
             // (for Unicode characters outside the BMP)
-            result += char.toUpperCase() + [...word].slice(result.length + 1).join("").toLowerCase();
+            result.push(char.toUpperCase() + [...word].slice(result.length + 1).join("").toLowerCase());
             break;
         } else {
-            result += char;
+            result.push(char);
         }
     }
 
-    return result;
+    return result.join("");
 }
 
 function isWordCapitalCase(word: string): boolean {
