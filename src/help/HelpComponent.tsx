@@ -25,7 +25,11 @@ export const HelpComponent = () => {
                 </p>
 
                 <p>
-                    {chrome.i18n.getMessage("deArrowBetaStatus")}
+                    {chrome.i18n.getMessage("deArrowBetaStatus")}{" "}
+
+                    <a href="https://gist.github.com/ajayyy/36a96ffc786f4e518fb62cac8b9674aa" target="_blank" rel="noreferrer">
+                        {chrome.i18n.getMessage("LearnMore")}
+                    </a>
                 </p>
 
                 <p>
