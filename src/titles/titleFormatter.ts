@@ -64,27 +64,18 @@ function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: 
         case TitleFormatting.SentenceCase:
             return toSentenceCase(title, isCustom);
         case TitleFormatting.LowerCase:
-            return toLowerCase(title, isCustom);
+            return toLowerCase(title);
         default:
             return cleanUnformattedTitle(title);
     }
 }
 
-export function toLowerCase(str: string, isCustom: boolean): string {
+export function toLowerCase(str: string): string {
     const words = str.split(" ");
-    const mostlyAllCaps = isMostlyAllCaps(words);
 
     let result = "";
     for (const word of words) {
-        if (forceKeepFormatting(word)
-                || (isCustom && isWordCustomCapitalization(word)) 
-                || (!isAllCaps(word) && isWordCustomCapitalization(word))
-                || (isFirstLetterCapital(word) && 
-                ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word)))
-                || isYear(word)) {
-            // For custom titles, allow any not just first capital
-            // For non-custom, allow any that isn't all caps
-            // Trust it with capitalization
+        if (forceKeepFormatting(word) || isYear(word)) {
             result += word + " ";
         } else {
             result += word.toLowerCase() + " ";
