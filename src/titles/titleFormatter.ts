@@ -280,7 +280,7 @@ function isDelimeter(word: string): boolean {
     return word.match(/^[-:;~—|]$/) !== null || word.match(/[:?.!]$/) !== null;
 }
 
-function cleanResultingTitle(title: string): string {
+export function cleanResultingTitle(title: string): string {
     return cleanPunctuation(cleanUnformattedTitle(title));
 }
 

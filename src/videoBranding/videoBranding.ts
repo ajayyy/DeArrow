@@ -10,6 +10,7 @@ import Config, { ThumbnailCacheOption } from "../config/config";
 import { logError } from "../utils/logger";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { handleOnboarding } from "./onboarding";
+import { cleanResultingTitle } from "../titles/titleFormatter";
 
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
 
@@ -214,8 +215,10 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
         const button = await findOrCreateShowOriginalButton(element, brandingLocation, videoID);
         
         const title = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
-        
-        const customTitle = title && !title.original;
+        const originalTitle = getOriginalTitleElement(element, brandingLocation)?.textContent;
+
+        const customTitle = title && !title.original 
+            && (!originalTitle || (cleanResultingTitle(title.title)).toLowerCase() !== (cleanResultingTitle(originalTitle)).toLowerCase());
         const image = button.querySelector("img") as HTMLImageElement;
         if (image) {
             if (!customTitle) {
