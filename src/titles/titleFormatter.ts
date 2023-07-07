@@ -63,9 +63,35 @@ function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: 
             return toTitleCase(title, isCustom);
         case TitleFormatting.SentenceCase:
             return toSentenceCase(title, isCustom);
+        case TitleFormatting.LowerCase:
+            return toLowerCase(title, isCustom);
         default:
             return cleanUnformattedTitle(title);
     }
+}
+
+export function toLowerCase(str: string, isCustom: boolean): string {
+    const words = str.split(" ");
+    const mostlyAllCaps = isMostlyAllCaps(words);
+
+    let result = "";
+    for (const word of words) {
+        if (forceKeepFormatting(word)
+                || (isCustom && isWordCustomCapitalization(word)) 
+                || (!isAllCaps(word) && isWordCustomCapitalization(word))
+                || (isFirstLetterCapital(word) && 
+                ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word)))
+                || isYear(word)) {
+            // For custom titles, allow any not just first capital
+            // For non-custom, allow any that isn't all caps
+            // Trust it with capitalization
+            result += word + " ";
+        } else {
+            result += word.toLowerCase() + " ";
+        }
+    }
+
+    return cleanResultingTitle(result);
 }
 
 export function toSentenceCase(str: string, isCustom: boolean): string {

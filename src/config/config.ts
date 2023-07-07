@@ -26,7 +26,8 @@ export enum TitleFormatting {
     Disable = -1,
     CapitalizeWords,
     TitleCase,
-    SentenceCase
+    SentenceCase,
+    LowerCase
 }
 
 export enum ThumbnailCacheOption {
