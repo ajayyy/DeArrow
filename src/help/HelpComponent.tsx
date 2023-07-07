@@ -93,6 +93,10 @@ export const HelpComponent = () => {
                     <a href="https://mchang.name/" target="_blank" rel="noreferrer">Michael Chang</a> and more.
                 </p>
 
+                <p>
+                    {chrome.i18n.getMessage("dearrowLogoCredit")}
+                </p>
+
                 <p style={{textAlign: "center"}}>
                     <a href="/oss-attribution/attribution.txt">
                         {chrome.i18n.getMessage("openSourceLicenses")}
