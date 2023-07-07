@@ -144,7 +144,8 @@ export class SubmitButton {
         }
 
         if (getVideoID() !== getYouTubeVideoID()) {
-            alert(chrome.i18n.getMessage("videoIDWrongWhenSubmittingError"))
+            alert(chrome.i18n.getMessage("videoIDWrongWhenSubmittingError"));
+            return;
         }
         
         const result = await submitVideoBranding(getVideoID()!, title, thumbnail);
