@@ -6,7 +6,7 @@ import { log, logError } from "../utils/logger";
 import { BrandingLocation, extractVideoIDFromElement } from "../videoBranding/videoBranding";
 import { isFirefoxOrSafari, timeoutPomise, waitFor } from "../maze-utils";
 import Config, { ThumbnailFallbackOption } from "../config/config";
-import { getThumbnailFallbackOption, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "../config/channelOverrides";
+import { getThumbnailFallbackOption, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck, shouldReplaceTitles } from "../config/channelOverrides";
 import { countThumbnailReplacement } from "../config/stats";
 import { ThumbnailCacheOption } from "../config/config";
 
@@ -356,17 +356,23 @@ export async function createThumbnailImageElement(existingElement: HTMLImageElem
         try {
             await Promise.race([
                 waitForThumbnailCache(videoID),
-                timeoutPomise(Config.config!.startLocalRenderTimeout).catch(() => ({}))
+                timeoutPomise(Config.config!.startLocalRenderTimeout).catch(() => ({})),
+                shouldReplaceThumbnails(videoID)
             ]);
 
             let tries = 0;
             if (isFetchingFromThumbnailCache(videoID, timestamp) 
-                    && getNumberOfThumbnailCacheRequests() > 5 && tries < 3) {
+                    && getNumberOfThumbnailCacheRequests() > 5 && tries < 3
+                    && shouldReplaceThumbnailsFastCheck(videoID) !== false) {
                 tries++;
                 log(videoID, "Lots of thumbnail cache requests in progress, waiting a little longer");
 
                 // Wait a little longer
-                await timeoutPomise(Config.config!.startLocalRenderTimeout).catch(() => ({}));
+                await Promise.race([
+                    waitForThumbnailCache(videoID),
+                    timeoutPomise(Config.config!.startLocalRenderTimeout).catch(() => ({})),
+                    shouldReplaceThumbnails(videoID)
+                ]);
             }
         } catch (e) {
             // Go on and do a local render
