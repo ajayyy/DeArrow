@@ -6,7 +6,7 @@ import { log, logError } from "../utils/logger";
 import { BrandingLocation, extractVideoIDFromElement } from "../videoBranding/videoBranding";
 import { isFirefoxOrSafari, timeoutPomise, waitFor } from "../maze-utils";
 import Config, { ThumbnailFallbackOption } from "../config/config";
-import { getThumbnailFallbackOption, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck, shouldReplaceTitles } from "../config/channelOverrides";
+import { getThumbnailFallbackOption, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "../config/channelOverrides";
 import { countThumbnailReplacement } from "../config/stats";
 import { ThumbnailCacheOption } from "../config/config";
 
