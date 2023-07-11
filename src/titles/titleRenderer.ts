@@ -52,7 +52,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
 
         const title = titleData?.title;
         if (title) {
-            const formattedTitle = await formatTitle(title, !titleData.original, videoID);
+            const formattedTitle = await formatTitle(title, true, videoID);
             if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
 
             if (originalTitleElement?.textContent 

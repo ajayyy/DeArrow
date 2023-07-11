@@ -195,6 +195,7 @@ describe("titleFormatter custom cases", () => {
         ["POV: >f0rest vs. Virtus.pro >fnatic CS 1.6 demo part1", "POV: f0rest vs. Virtus.pro fnatic CS 1.6 Demo Part1","POV: f0rest vs. Virtus.pro fnatic CS 1.6 demo part1"], // Virtus.pro, fnatic
         ["Announcements at >Google I/O 2023", "Announcements at Google I/O 2023", "Announcements at Google I/O 2023"], // Google sould be capitalized
         ["WWDC 2022 - iOS 16 announcement", "WWDC 2022 - iOS 16 Announcement", "WWDC 2022 - iOS 16 announcement"], // iOS should NOT be capitalized
+        [`My thoughts on GM and Ford's move to abandon the CCS connector in favor of "NACS"`, `My Thoughts on GM and Ford's Move to Abandon the CCS Connector in Favor of "NACS"`, `My thoughts on GM and Ford's move to abandon the CCS connector in favor of "NACS"`],
     ];
     for (const testCase of customTitles) {
         const [input, title, sentence] = testCase;
