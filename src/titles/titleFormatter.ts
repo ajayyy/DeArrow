@@ -308,3 +308,7 @@ export function cleanPunctuation(title: string): string {
 
     return cleanTitle;
 }
+
+export function cleanEmojis(title: string): string {
+    return title.replace(/\p{Extended_Pictographic}/ug, "")
+}
