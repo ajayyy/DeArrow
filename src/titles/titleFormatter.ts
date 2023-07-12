@@ -202,7 +202,7 @@ function isAllCaps(word: string): boolean {
     return !!word && !!word.match(/[\p{L}]/u) 
         && word.toUpperCase() === word 
         && !isAcronymStrict(word)
-        && !word.match(/^[\p{L}]+[-~—]/u); // USB-C not all caps
+        && !word.match(/^[\p{L}]{1,3}[-~—]/u); // USB-C not all caps, HANDS-ON is
 }
 
 export function capitalizeFirstLetter(word: string): string {
