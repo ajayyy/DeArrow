@@ -281,7 +281,7 @@ function isDelimeter(word: string): boolean {
 }
 
 export function cleanResultingTitle(title: string): string {
-    return cleanPunctuation(cleanUnformattedTitle(title));
+    return cleanEmojis(cleanPunctuation(cleanUnformattedTitle(title)));
 }
 
 function cleanUnformattedTitle(title: string): string {
