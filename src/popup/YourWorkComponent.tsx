@@ -128,7 +128,7 @@ function getReplacementsMessage(): JSX.Element {
         chrome.i18n.getMessage("dearrowStatsMessageThumbnailsPart")).split("{thumbnails}");
 
     return (
-        <p id="sponsorTimesSkipsDoneContainer" className="u-mZ sbStatsSentence">
+        <p id="dearrowReplacementsDone" className="u-mZ sbStatsSentence">
             {messageParts[0]}
             {titleParts[0]}
             <b>

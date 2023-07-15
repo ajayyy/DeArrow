@@ -25,7 +25,11 @@ export const HelpComponent = () => {
                 </p>
 
                 <p>
-                    {chrome.i18n.getMessage("deArrowBetaStatus")}
+                    {chrome.i18n.getMessage("deArrowBetaStatus")}{" "}
+
+                    <a href="https://gist.github.com/ajayyy/36a96ffc786f4e518fb62cac8b9674aa" target="_blank" rel="noreferrer">
+                        {chrome.i18n.getMessage("LearnMore")}
+                    </a>
                 </p>
 
                 <p>
@@ -91,6 +95,10 @@ export const HelpComponent = () => {
                     <a href="https://github.com/ajayyy/SponsorBlockSite/graphs/contributors" target="_blank" rel="noreferrer">SponsorBlockSite contributors</a> such{" "}
                     as <a href="https://github.com/NDevTK" target="_blank" rel="noreferrer">NDev</a>, <a href="https://github.com/Joe-Dowd" target="_blank" rel="noreferrer">Joe Dowd</a>,{" "}
                     <a href="https://mchang.name/" target="_blank" rel="noreferrer">Michael Chang</a> and more.
+                </p>
+
+                <p>
+                    {chrome.i18n.getMessage("dearrowLogoCredit")}
                 </p>
 
                 <p style={{textAlign: "center"}}>

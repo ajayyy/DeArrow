@@ -254,7 +254,7 @@ input[type='number'] {
 }
 
 .hiding {
-    opacity: 0;
+    opacity: 0 !important;
 }
 
 .hidden {
@@ -733,13 +733,32 @@ svg {
     padding-right: 10px;
 }
 
+.cb-channel-override-option {
+    transition: opacity 0.3s;
+}
+
 .partiallyHidden {
     opacity: 0.5;
-    transition: opacity 0.3s;
 }
 
 .partiallyHidden:hover {
     opacity: 1;
+}
+
+.overrides-disabled {
+    animation: shrinkAway 0.5s;
+}
+
+@keyframes shrinkAway {
+    0% {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+    100% {
+        display: none;
+        opacity: 0;
+        transform: scaleY(0);
+    }
 }
 
 .channelOverrides .reset-button svg {

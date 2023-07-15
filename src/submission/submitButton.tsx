@@ -2,7 +2,7 @@ import * as React from "react";
 import { createRoot, Root } from "react-dom/client";
 import { BrandingResult, replaceCurrentVideoBranding } from "../videoBranding/videoBranding";
 import { SubmissionComponent } from "./SubmissionComponent";
-import { getVideo, getVideoID, isOnMobileYouTube } from "../maze-utils/video";
+import { getVideo, getVideoID, getYouTubeVideoID, isOnMobileYouTube } from "../maze-utils/video";
 import { log, logError } from "../utils/logger";
 import { TitleSubmission } from "../titles/titleData";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
@@ -143,6 +143,11 @@ export class SubmitButton {
             }
         }
 
+        if (getVideoID() !== getYouTubeVideoID()) {
+            alert(chrome.i18n.getMessage("videoIDWrongWhenSubmittingError"));
+            return;
+        }
+        
         const result = await submitVideoBranding(getVideoID()!, title, thumbnail);
 
         if (result && result.ok) {

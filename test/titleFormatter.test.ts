@@ -108,6 +108,7 @@ describe("toTitleCase", () => {
         ['Ski Aggu über Crazy Frog, "Party Sahne", Southstar & Domiziana – Interview mit Aria Nejati', 'Ski Aggu Über Crazy Frog, "Party Sahne", Southstar & Domiziana – Interview Mit Aria Nejati'],
         ["visionOS Success ISN'T Up to 3rd Party Devs", "visionOS Success Isn't Up to 3rd Party Devs"],
         ["So, visionOS Success ISN'T Up to 3rd Party Devs", "So, visionOS Success Isn't Up to 3rd Party Devs"],
+        ["Lego 10321: Corvette - HANDS-ON review", "Lego 10321: Corvette - Hands-on Review"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -147,6 +148,7 @@ describe("toSentenceCase", () => {
         ["First title: The second title", "First title: The second title"],
         ["Prefer using Option<&T> over &Option", "Prefer using Option<&T> over &Option"],
         ["visionOS Success ISN'T Up to 3rd Party Devs", "visionOS success isn't up to 3rd party devs"],
+        ["Lego 10321: Corvette - HANDS-ON review", "Lego 10321: Corvette - Hands-on review"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
@@ -195,6 +197,7 @@ describe("titleFormatter custom cases", () => {
         ["POV: >f0rest vs. Virtus.pro >fnatic CS 1.6 demo part1", "POV: f0rest vs. Virtus.pro fnatic CS 1.6 Demo Part1","POV: f0rest vs. Virtus.pro fnatic CS 1.6 demo part1"], // Virtus.pro, fnatic
         ["Announcements at >Google I/O 2023", "Announcements at Google I/O 2023", "Announcements at Google I/O 2023"], // Google sould be capitalized
         ["WWDC 2022 - iOS 16 announcement", "WWDC 2022 - iOS 16 Announcement", "WWDC 2022 - iOS 16 announcement"], // iOS should NOT be capitalized
+        [`My thoughts on GM and Ford's move to abandon the CCS connector in favor of "NACS"`, `My Thoughts on GM and Ford's Move to Abandon the CCS Connector in Favor of "NACS"`, `My thoughts on GM and Ford's move to abandon the CCS connector in favor of "NACS"`],
     ];
     for (const testCase of customTitles) {
         const [input, title, sentence] = testCase;

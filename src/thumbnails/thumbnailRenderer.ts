@@ -351,25 +351,27 @@ export async function createThumbnailImageElement(existingElement: HTMLImageElem
         }
     }
 
-    if (isFetchingFromThumbnailCache(videoID, timestamp)) {
+    let waitingForFetchTries = 0;
+    while (isFetchingFromThumbnailCache(videoID, timestamp)) {
         // Wait for the thumbnail to be fetched from the cache before trying local generation
         try {
             await Promise.race([
                 waitForThumbnailCache(videoID),
-                timeoutPomise(Config.config!.startLocalRenderTimeout).catch(() => ({}))
+                timeoutPomise(Config.config!.startLocalRenderTimeout).catch(() => ({})),
+                shouldReplaceThumbnails(videoID)
             ]);
 
-            let tries = 0;
             if (isFetchingFromThumbnailCache(videoID, timestamp) 
-                    && getNumberOfThumbnailCacheRequests() > 5 && tries < 3) {
-                tries++;
+                    && getNumberOfThumbnailCacheRequests() > 3 && waitingForFetchTries < 5
+                    && shouldReplaceThumbnailsFastCheck(videoID) !== false) {
+                waitingForFetchTries++;
                 log(videoID, "Lots of thumbnail cache requests in progress, waiting a little longer");
-
-                // Wait a little longer
-                await timeoutPomise(Config.config!.startLocalRenderTimeout).catch(() => ({}));
+            } else {
+                break;
             }
         } catch (e) {
             // Go on and do a local render
+            break;
         }
     }
 

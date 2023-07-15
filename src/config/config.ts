@@ -48,6 +48,7 @@ export interface CustomConfiguration {
     name: string;
     replaceTitles: boolean | null;
     replaceThumbnails: boolean | null;
+    useCrowdsourcedTitles: boolean | null;
     titleFormatting: TitleFormatting | null;
     thumbnailFallback: ThumbnailFallbackOption | null;
 }
@@ -80,6 +81,7 @@ interface SBConfig {
     importedConfig: boolean;
     replaceTitles: boolean;
     replaceThumbnails: boolean;
+    useCrowdsourcedTitles: boolean;
     channelOverrides: Record<string, ConfigurationID>;
     customConfigurations: Record<ConfigurationID, CustomConfiguration>;
     showInfoAboutRandomThumbnails: boolean;
@@ -133,6 +135,7 @@ const syncDefaults = {
     importedConfig: false,
     replaceTitles: true,
     replaceThumbnails: true,
+    useCrowdsourcedTitles: true,
     channelOverrides: {},
     customConfigurations: {},
     showInfoAboutRandomThumbnails: false,

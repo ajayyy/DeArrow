@@ -160,6 +160,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 .cbTitlePreview {
     display: flex;
     justify-content: center;
+    text-align: center;
 
     padding-top: 0;
     margin-top: 0;
@@ -485,4 +486,8 @@ ytd-compact-radio-renderer ytd-badge-supported-renderer, ytd-grid-movie-renderer
 
 .sponsorSkipNoticeRightButton {
 	margin-right: 0;
+}
+
+#dearrowReplacementsDone {
+    text-align: center;
 }

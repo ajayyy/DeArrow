@@ -219,7 +219,7 @@ function isAllCaps(word: string): boolean {
     return !!word && !!word.match(/[\p{L}]/u) 
         && word.toUpperCase() === word 
         && !isAcronymStrict(word)
-        && !word.match(/^[\p{L}]+[-~—]/u); // USB-C not all caps
+        && !word.match(/^[\p{L}]{1,3}[-~—]/u); // USB-C not all caps, HANDS-ON is
 }
 
 export function capitalizeFirstLetter(word: string): string {
@@ -297,7 +297,7 @@ function isDelimeter(word: string): boolean {
     return word.match(/^[-:;~—|]$/) !== null || word.match(/[:?.!]$/) !== null;
 }
 
-function cleanResultingTitle(title: string): string {
+export function cleanResultingTitle(title: string): string {
     return cleanPunctuation(cleanUnformattedTitle(title));
 }
 
