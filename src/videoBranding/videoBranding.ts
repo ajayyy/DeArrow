@@ -11,6 +11,7 @@ import { logError } from "../utils/logger";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { handleOnboarding } from "./onboarding";
 import { cleanResultingTitle } from "../titles/titleFormatter";
+import { shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
 
@@ -218,7 +219,8 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
         const originalTitle = getOriginalTitleElement(element, brandingLocation)?.textContent;
 
         const customTitle = title && !title.original 
-            && (!originalTitle || (cleanResultingTitle(title.title)).toLowerCase() !== (cleanResultingTitle(originalTitle)).toLowerCase());
+            && (!originalTitle || (cleanResultingTitle(title.title)).toLowerCase() !== (cleanResultingTitle(originalTitle)).toLowerCase())
+            && await shouldUseCrowdsourcedTitles(videoID);
         const image = button.querySelector("img") as HTMLImageElement;
         if (image) {
             if (!customTitle) {
@@ -309,6 +311,7 @@ export function setupOptionChangeListener(): void {
             "extensionEnabled",
             "replaceTitles",
             "replaceThumbnails",
+            "useCrowdsourcedTitles",
             "titleFormatting",
             "thumbnailFallback",
             "alwaysShowShowOriginalButton",
