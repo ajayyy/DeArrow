@@ -63,9 +63,26 @@ function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: 
             return toTitleCase(title, isCustom);
         case TitleFormatting.SentenceCase:
             return toSentenceCase(title, isCustom);
+        case TitleFormatting.LowerCase:
+            return toLowerCase(title);
         default:
             return cleanUnformattedTitle(title);
     }
+}
+
+export function toLowerCase(str: string): string {
+    const words = str.split(" ");
+
+    let result = "";
+    for (const word of words) {
+        if (forceKeepFormatting(word)) {
+            result += word + " ";
+        } else {
+            result += word.toLowerCase() + " ";
+        }
+    }
+
+    return cleanResultingTitle(result);
 }
 
 export function toSentenceCase(str: string, isCustom: boolean): string {
