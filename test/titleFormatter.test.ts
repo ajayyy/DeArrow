@@ -1,4 +1,5 @@
-import { capitalizeFirstLetter, cleanPunctuation, isAcronym, isAcronymStrict, isInTitleCase, isMostlyAllCaps, toCapitalizeCase, toSentenceCase, toTitleCase } from "../src/titles/titleFormatter";
+import { TitleFormatting } from "../src/config/config";
+import { capitalizeFirstLetter, cleanPunctuation, formatTitleInternal, isAcronym, isAcronymStrict, isInTitleCase, isMostlyAllCaps, toCapitalizeCase, toSentenceCase, toTitleCase } from "../src/titles/titleFormatter";
 
 describe("Acronym Tests", () => {
     const acronymCases: [string, boolean][] = [
@@ -114,6 +115,21 @@ describe("toTitleCase", () => {
         const [input, expected] = testCase;
         it(input, () => {
             expect(toTitleCase(input, false)).toBe(expected);
+        });
+    }
+});
+
+describe("toTitleCase cleanEmojis", () => {
+    const titleCases: [string, string][] = [
+        ["5 Minute Timer [MOUSE 🐭 MAZE] 🐭", "5 Minute Timer [Mouse Maze]"],
+        ["5 min countdown timer (roller coaster) 🎢", "5 Min Countdown Timer (Roller Coaster)"],
+        ["5 min countdown timer (roller🎢coaster) 🎢", "5 Min Countdown Timer (Roller Coaster)"],
+        [" 🎢  🎢🎢 🎢🎢\t🎢", "🎢  🎢🎢 🎢🎢\t🎢"] // Leave emojis when there is no text
+    ];
+    for (const testCase of titleCases) {
+        const [input, expected] = testCase;
+        it(input, () => {
+            expect(formatTitleInternal(input, false, TitleFormatting.TitleCase, true)).toBe(expected);
         });
     }
 });

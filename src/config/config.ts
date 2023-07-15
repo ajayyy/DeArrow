@@ -51,6 +51,7 @@ export interface CustomConfiguration {
     replaceThumbnails: boolean | null;
     useCrowdsourcedTitles: boolean | null;
     titleFormatting: TitleFormatting | null;
+    shouldCleanEmojis: boolean | null;
     thumbnailFallback: ThumbnailFallbackOption | null;
 }
 
@@ -68,6 +69,7 @@ interface SBConfig {
     keepUnsubmitted: boolean;
     keepUnsubmittedInPrivate: boolean;
     titleFormatting: TitleFormatting;
+    shouldCleanEmojis: boolean;
     serverAddress: string;
     thumbnailServerAddress: string;
     fetchTimeout: number;
@@ -122,6 +124,7 @@ const syncDefaults = {
     keepUnsubmitted: true,
     keepUnsubmittedInPrivate: false,
     titleFormatting: isEnglish ? TitleFormatting.TitleCase : TitleFormatting.Disable,
+    shouldCleanEmojis: true,
     serverAddress: CompileConfig.serverAddress,
     thumbnailServerAddress: CompileConfig.thumbnailServerAddress,
     fetchTimeout: 7000,

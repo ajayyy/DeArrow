@@ -313,6 +313,7 @@ export function setupOptionChangeListener(): void {
             "replaceThumbnails",
             "useCrowdsourcedTitles",
             "titleFormatting",
+            "shouldCleanEmojis",
             "thumbnailFallback",
             "alwaysShowShowOriginalButton",
             "customConfigurations",
