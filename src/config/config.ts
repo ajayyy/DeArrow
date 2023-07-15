@@ -27,7 +27,8 @@ export enum TitleFormatting {
     CapitalizeWords,
     TitleCase,
     SentenceCase,
-    LowerCase
+    LowerCase,
+    FirstLetterUppercase
 }
 
 export enum ThumbnailCacheOption {

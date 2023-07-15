@@ -1,6 +1,6 @@
 import * as React from "react";
 import Config from "../config/config";
-import { toLowerCase, toSentenceCase } from "../titles/titleFormatter";
+import { toFirstLetterUppercase, toLowerCase, toSentenceCase } from "../titles/titleFormatter";
 import { SelectOptionComponent } from "./SelectOptionComponent";
 
 export const FormattingOptionsComponent = () => {
@@ -26,6 +26,7 @@ export const FormattingOptionsComponent = () => {
                     { value: "1", label: chrome.i18n.getMessage("TitleCase") },
                     { value: "2", label: toSentenceCase(chrome.i18n.getMessage("SentenceCase"), false) },
                     { value: "3", label: toLowerCase(chrome.i18n.getMessage("LowerCase")) },
+                    { value: "4", label: toFirstLetterUppercase(chrome.i18n.getMessage("FirstLetterUppercase")) },
                     { value: "0", label: chrome.i18n.getMessage("CapitalizeWords") },
                 ]}
             />

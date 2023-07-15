@@ -65,6 +65,8 @@ function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: 
             return toSentenceCase(title, isCustom);
         case TitleFormatting.LowerCase:
             return toLowerCase(title);
+        case TitleFormatting.FirstLetterUppercase:
+            return toFirstLetterUppercase(title);
         default:
             return cleanUnformattedTitle(title);
     }
@@ -80,6 +82,26 @@ export function toLowerCase(str: string): string {
         } else {
             result += word.toLowerCase() + " ";
         }
+    }
+
+    return cleanResultingTitle(result);
+}
+
+export function toFirstLetterUppercase(str: string): string {
+    const words = str.split(" ");
+
+    let result = "";
+    let index = 0;
+    for (const word of words) {
+        if (forceKeepFormatting(word)) {
+            result += word + " ";
+        } else if (startOfSentence(index, words)) {
+            result += capitalizeFirstLetter(word) + " ";
+        } else {
+            result += word.toLowerCase() + " ";
+        }
+
+        index++;
     }
 
     return cleanResultingTitle(result);
