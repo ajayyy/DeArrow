@@ -491,3 +491,8 @@ ytd-compact-radio-renderer ytd-badge-supported-renderer, ytd-grid-movie-renderer
 #dearrowReplacementsDone {
     text-align: center;
 }
+
+.sb-switch-container-container {
+    display: flex;
+    justify-content: left !important;
+}
