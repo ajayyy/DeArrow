@@ -30,6 +30,10 @@ export function getTitleFormatting(videoID: VideoID | null): Promise<TitleFormat
     return checkChannelOverrideOption<number>(videoID, "titleFormatting");
 }
 
+export function shouldCleanEmojis(videoID: VideoID | null): Promise<boolean> {
+    return checkChannelOverrideOption<boolean>(videoID, "shouldCleanEmojis");
+}
+
 export function getThumbnailFallbackOption(videoID: VideoID | null): Promise<ThumbnailFallbackOption> {
     return checkChannelOverrideOption<number>(videoID, "thumbnailFallback");
 }
@@ -56,7 +60,8 @@ function checkChannelOverrideOptionBase<T>(option: string, channelInfo?: Channel
 
         for (const override of overrideOptions) {
             if (override && Config.config!.customConfigurations[override] 
-                    && Config.config!.customConfigurations[override][option] !== null) {
+                    && Config.config!.customConfigurations[override][option] !== null
+                    && Config.config!.customConfigurations[override][option] !== undefined) {
                 return Config.config!.customConfigurations[override][option];
             }
         }

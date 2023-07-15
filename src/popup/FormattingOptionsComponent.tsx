@@ -2,9 +2,11 @@ import * as React from "react";
 import Config from "../config/config";
 import { toFirstLetterUppercase, toLowerCase, toSentenceCase } from "../titles/titleFormatter";
 import { SelectOptionComponent } from "./SelectOptionComponent";
+import { ToggleOptionComponent } from "./ToggleOptionComponent";
 
 export const FormattingOptionsComponent = () => {
     const [titleFormatting, setTitleFormatting] = React.useState(String(Config.config!.titleFormatting));
+    const [shouldCleanEmojis, setShouldCleanEmojis] = React.useState(Config.config!.shouldCleanEmojis);
     const [thumbnailFallback, setThumbnailFallback] = React.useState(String(Config.config!.thumbnailFallback));
 
     return (
@@ -29,6 +31,20 @@ export const FormattingOptionsComponent = () => {
                     { value: "4", label: toFirstLetterUppercase(chrome.i18n.getMessage("FirstLetterUppercase")) },
                     { value: "0", label: chrome.i18n.getMessage("CapitalizeWords") },
                 ]}
+            />
+
+            {/* Should Clean Emojis */}
+            <ToggleOptionComponent
+                id="shouldCleanEmojis"
+                style={{
+                    paddingTop: "15px"
+                }}
+                onChange={(value) => {
+                    setShouldCleanEmojis(value);
+                    Config.config!.shouldCleanEmojis = value;
+                }}
+                value={shouldCleanEmojis}
+                label={chrome.i18n.getMessage("shouldCleanEmojis")}
             />
 
             {/* Thumbnail Fallback Option */}

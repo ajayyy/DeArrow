@@ -18,6 +18,7 @@ export const ChannelOverridesComponent = () => {
     const [replaceThumbnails, setReplaceThumbnails] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "replaceThumbnails") : false);
     const [useCrowdsourcedTitles, setUseCrowdsourcedTitles] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "useCrowdsourcedTitles") : false);
     const [titleFormatting, setTitleFormatting] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "titleFormatting") : "");
+    const [shouldCleanEmojis, setShouldCleanEmojis] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "shouldCleanEmojis") : false);
     const [thumbnailFallback, setThumbnailFallback] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "thumbnailFallback") : "");
 
     const [hideUseCrowdsourcedTitles, setHideUseCrowdsourcedTitles] = React.useState(!getValueWithDefault(replaceTitles, "replaceTitles"));
@@ -59,6 +60,7 @@ export const ChannelOverridesComponent = () => {
                             replaceThumbnails: null,
                             useCrowdsourcedTitles: null,
                             titleFormatting: null,
+                            shouldCleanEmojis: null,
                             thumbnailFallback: null
                         };
 
@@ -197,6 +199,20 @@ export const ChannelOverridesComponent = () => {
                         }}
                     />
 
+                    <ToggleOptionComponent
+                        id="shouldCleanEmojis"
+                        onChange={(value) => {
+                            updateValue(getConfig(selectedConfigurationID)!, "shouldCleanEmojis", value, setShouldCleanEmojis);
+                        }}
+                        value={getValueWithDefault(shouldCleanEmojis, "shouldCleanEmojis")}
+                        label={chrome.i18n.getMessage("shouldCleanEmojis")}
+                        className={getClassNames(shouldCleanEmojis)}
+                        showResetButton={shouldShowResetButton(shouldCleanEmojis)}
+                        onReset={() => {
+                            updateValue(getConfig(selectedConfigurationID)!, "shouldCleanEmojis", null, setShouldCleanEmojis);
+                        }}
+                    />
+
                     <SelectOptionComponent
                         id="thumbnailFallback"
                         onChange={(value) => {
@@ -273,11 +289,11 @@ function getValueWithDefault<T>(value: T, option: string): T {
 }
 
 function getClassNames(value: unknown | null) {
-    return `cb-channel-override-option ${value === null ? "partiallyHidden" : ""}`;
+    return `cb-channel-override-option ${value === null || value === undefined ? "partiallyHidden" : ""}`;
 }
 
 function shouldShowResetButton(value: unknown | null) {
-    return value !== null;
+    return value !== null && value !== undefined;
 }
 
 function forceUpdateConfigurations() {

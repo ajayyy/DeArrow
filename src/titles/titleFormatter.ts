@@ -1,6 +1,6 @@
 import { VideoID } from "../maze-utils/video";
 import Config, { TitleFormatting } from "../config/config";
-import { getTitleFormatting } from "../config/channelOverrides";
+import { getTitleFormatting, shouldCleanEmojis } from "../config/channelOverrides";
 
 /**
  * Useful regex expressions:
@@ -48,14 +48,18 @@ const titleCaseNotCapitalized = [
 ];
 
 export async function formatTitle(title: string, isCustom: boolean, videoID: VideoID | null): Promise<string> {
-    return formatTitleInternal(title, isCustom, await getTitleFormatting(videoID));
+    return formatTitleInternal(title, isCustom, await getTitleFormatting(videoID), await shouldCleanEmojis(videoID));
 }
 
 export function formatTitleDefaultSettings(title: string, isCustom: boolean): string {
-    return formatTitleInternal(title, isCustom, Config.config!.titleFormatting);
+    return formatTitleInternal(title, isCustom, Config.config!.titleFormatting, Config.config!.shouldCleanEmojis);
 }
 
-function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: TitleFormatting): string {
+export function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: TitleFormatting, shouldCleanEmojis: boolean): string {
+    if (shouldCleanEmojis) {
+        title = cleanEmojis(title);
+    }
+
     switch (titleFormatting) {
         case TitleFormatting.CapitalizeWords:
             return toCapitalizeCase(title, isCustom);
@@ -67,8 +71,9 @@ function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: 
             return toLowerCase(title);
         case TitleFormatting.FirstLetterUppercase:
             return toFirstLetterUppercase(title);
-        default:
+        default: {
             return cleanUnformattedTitle(title);
+        }
     }
 }
 
@@ -320,7 +325,7 @@ function isDelimeter(word: string): boolean {
 }
 
 export function cleanResultingTitle(title: string): string {
-    return cleanEmojis(cleanPunctuation(cleanUnformattedTitle(title)));
+    return cleanPunctuation(cleanUnformattedTitle(title));
 }
 
 function cleanUnformattedTitle(title: string): string {
@@ -349,5 +354,14 @@ export function cleanPunctuation(title: string): string {
 }
 
 export function cleanEmojis(title: string): string {
-    return title.replace(/\p{Extended_Pictographic}/ug, " ")
+    const cleaned = title
+        .replace(/ \p{Extended_Pictographic}+(?= )/ug, "") // Clear extra spaces between emoji "words"
+        .replace(/(\S)\p{Extended_Pictographic}(\S)/ug, "$1 $2") // Emojis in between letters should be spaces
+        .replace(/\p{Extended_Pictographic}/ug, "");
+
+    if (cleaned.trim().length > 0) {
+        return cleaned;
+    } else {
+        return title;
+    }
 }
