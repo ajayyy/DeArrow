@@ -75,7 +75,7 @@ export function toLowerCase(str: string): string {
 
     let result = "";
     for (const word of words) {
-        if (forceKeepFormatting(word) || isYear(word)) {
+        if (forceKeepFormatting(word)) {
             result += word + " ";
         } else {
             result += word.toLowerCase() + " ";
