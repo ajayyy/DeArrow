@@ -191,6 +191,7 @@ export const ChannelOverridesComponent = () => {
                             { value: "1", label: chrome.i18n.getMessage("TitleCase") },
                             { value: "2", label: toSentenceCase(chrome.i18n.getMessage("SentenceCase"), false) },
                             { value: "3", label: chrome.i18n.getMessage("LowerCase") },
+                            { value: "4", label: chrome.i18n.getMessage("FirstLetterUppercase") },
                             { value: "0", label: chrome.i18n.getMessage("CapitalizeWords") },
                         ]}
                         showResetButton={shouldShowResetButton(titleFormatting)}
