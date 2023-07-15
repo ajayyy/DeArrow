@@ -63,9 +63,48 @@ function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: 
             return toTitleCase(title, isCustom);
         case TitleFormatting.SentenceCase:
             return toSentenceCase(title, isCustom);
+        case TitleFormatting.LowerCase:
+            return toLowerCase(title);
+        case TitleFormatting.FirstLetterUppercase:
+            return toFirstLetterUppercase(title);
         default:
             return cleanUnformattedTitle(title);
     }
+}
+
+export function toLowerCase(str: string): string {
+    const words = str.split(" ");
+
+    let result = "";
+    for (const word of words) {
+        if (forceKeepFormatting(word)) {
+            result += word + " ";
+        } else {
+            result += word.toLowerCase() + " ";
+        }
+    }
+
+    return cleanResultingTitle(result);
+}
+
+export function toFirstLetterUppercase(str: string): string {
+    const words = str.split(" ");
+
+    let result = "";
+    let index = 0;
+    for (const word of words) {
+        if (forceKeepFormatting(word)) {
+            result += word + " ";
+        } else if (startOfSentence(index, words)) {
+            result += capitalizeFirstLetter(word) + " ";
+        } else {
+            result += word.toLowerCase() + " ";
+        }
+
+        index++;
+    }
+
+    return cleanResultingTitle(result);
 }
 
 export function toSentenceCase(str: string, isCustom: boolean): string {
@@ -202,7 +241,7 @@ function isAllCaps(word: string): boolean {
     return !!word && !!word.match(/[\p{L}]/u) 
         && word.toUpperCase() === word 
         && !isAcronymStrict(word)
-        && !word.match(/^[\p{L}]+[-~—]/u); // USB-C not all caps
+        && !word.match(/^[\p{L}]{1,3}[-~—]/u); // USB-C not all caps, HANDS-ON is
 }
 
 export function capitalizeFirstLetter(word: string): string {

@@ -160,6 +160,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 .cbTitlePreview {
     display: flex;
     justify-content: center;
+    text-align: center;
 
     padding-top: 0;
     margin-top: 0;

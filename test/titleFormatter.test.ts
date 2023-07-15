@@ -108,6 +108,7 @@ describe("toTitleCase", () => {
         ['Ski Aggu über Crazy Frog, "Party Sahne", Southstar & Domiziana – Interview mit Aria Nejati', 'Ski Aggu Über Crazy Frog, "Party Sahne", Southstar & Domiziana – Interview Mit Aria Nejati'],
         ["visionOS Success ISN'T Up to 3rd Party Devs", "visionOS Success Isn't Up to 3rd Party Devs"],
         ["So, visionOS Success ISN'T Up to 3rd Party Devs", "So, visionOS Success Isn't Up to 3rd Party Devs"],
+        ["Lego 10321: Corvette - HANDS-ON review", "Lego 10321: Corvette - Hands-on Review"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -147,6 +148,7 @@ describe("toSentenceCase", () => {
         ["First title: The second title", "First title: The second title"],
         ["Prefer using Option<&T> over &Option", "Prefer using Option<&T> over &Option"],
         ["visionOS Success ISN'T Up to 3rd Party Devs", "visionOS success isn't up to 3rd party devs"],
+        ["Lego 10321: Corvette - HANDS-ON review", "Lego 10321: Corvette - Hands-on review"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;

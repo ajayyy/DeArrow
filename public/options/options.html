@@ -85,6 +85,20 @@
 					</div>
 				</div>
 
+				<div data-type="toggle" data-sync="useCrowdsourcedTitles" data-dependent-on="replaceTitles">
+					<div class="sb-switch-container">
+						<label class="sb-switch">
+							<input id="useCrowdsourcedTitles" type="checkbox" checked>
+							<span class="sb-slider sb-round"></span>
+						</label>
+						<label class="sb-switch-label" for="useCrowdsourcedTitles">
+							__MSG_useCrowdsourcedTitles__
+						</label>
+					</div>
+
+					<div class="small-description">__MSG_whatUseCrowdsourcedTitles__</div>
+				</div>
+
 				<div data-type="toggle" data-toggle-type="reverse" data-sync="defaultToCustom">
 					<div class="sb-switch-container">
 						<label class="sb-switch">
@@ -106,6 +120,8 @@
 						<option value="-1">__MSG_Disabled__</option>
 						<option value="1">__MSG_TitleCase__</option>
 						<option value="2">__MSG_SentenceCase__</option>
+						<option value="3">__MSG_LowerCase__</option>
+						<option value="4">__MSG_FirstLetterUppercase__</option>
 						<option value="0">__MSG_CapitalizeWords__</option>
 					</select>
 				</div>

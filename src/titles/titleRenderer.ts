@@ -6,7 +6,7 @@ import { getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { BrandingLocation, extractVideoIDFromElement, toggleShowCustom } from "../videoBranding/videoBranding";
 import { formatTitle } from "./titleFormatter";
 import { setPageTitle } from "./pageTitleHandler";
-import { shouldReplaceTitles, shouldReplaceTitlesFastCheck } from "../config/channelOverrides";
+import { shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { countTitleReplacement } from "../config/stats";
 import { isReduxInstalled } from "../utils/extensionCompatibility";
 
@@ -51,7 +51,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
 
         const title = titleData?.title;
-        if (title) {
+        if (title && await shouldUseCrowdsourcedTitles(videoID)) {
             const formattedTitle = await formatTitle(title, true, videoID);
             if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
 

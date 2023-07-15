@@ -16,8 +16,11 @@ export const ChannelOverridesComponent = () => {
     const [configurationName, setConfigurationName] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "name") : "");
     const [replaceTitles, setReplaceTitles] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "replaceTitles") : false);
     const [replaceThumbnails, setReplaceThumbnails] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "replaceThumbnails") : false);
+    const [useCrowdsourcedTitles, setUseCrowdsourcedTitles] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "useCrowdsourcedTitles") : false);
     const [titleFormatting, setTitleFormatting] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "titleFormatting") : "");
     const [thumbnailFallback, setThumbnailFallback] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "thumbnailFallback") : "");
+
+    const [hideUseCrowdsourcedTitles, setHideUseCrowdsourcedTitles] = React.useState(!getValueWithDefault(replaceTitles, "replaceTitles"));
 
     React.useEffect(() => {
         setConfigurationName(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "name") : "");
@@ -54,6 +57,7 @@ export const ChannelOverridesComponent = () => {
                             name: `${chrome.i18n.getMessage("NewConfiguration")} ${Object.keys(Config.config!.customConfigurations).length}`,
                             replaceTitles: null,
                             replaceThumbnails: null,
+                            useCrowdsourcedTitles: null,
                             titleFormatting: null,
                             thumbnailFallback: null
                         };
@@ -122,6 +126,12 @@ export const ChannelOverridesComponent = () => {
                         id="replaceTitles"
                         onChange={(value) => {
                             updateValue(getConfig(selectedConfigurationID)!, "replaceTitles", value, setReplaceTitles);
+
+                            if (!value) {
+                                setTimeout(() => setHideUseCrowdsourcedTitles(true), 300);
+                            } else {
+                                setHideUseCrowdsourcedTitles(false);
+                            }
                         }}
                         value={getValueWithDefault(replaceTitles, "replaceTitles")}
                         label={chrome.i18n.getMessage("replaceTitles")}
@@ -129,6 +139,12 @@ export const ChannelOverridesComponent = () => {
                         showResetButton={shouldShowResetButton(replaceTitles)}
                         onReset={() => {
                             updateValue(getConfig(selectedConfigurationID)!, "replaceTitles", null, setReplaceTitles);
+
+                            if (!Config.config!.replaceTitles) {
+                                setTimeout(() => setHideUseCrowdsourcedTitles(true), 300);
+                            } else {
+                                setHideUseCrowdsourcedTitles(false);
+                            }
                         }}
                     />
                     <ToggleOptionComponent
@@ -144,6 +160,21 @@ export const ChannelOverridesComponent = () => {
                             updateValue(getConfig(selectedConfigurationID)!, "replaceThumbnails", null, setReplaceThumbnails);
                         }}
                     />
+                    <ToggleOptionComponent
+                        id="useCrowdsourcedTitles"
+                        onChange={(value) => {
+                            updateValue(getConfig(selectedConfigurationID)!, "useCrowdsourcedTitles", value, setUseCrowdsourcedTitles);
+                        }}
+                        value={getValueWithDefault(useCrowdsourcedTitles, "useCrowdsourcedTitles")}
+                        label={chrome.i18n.getMessage("useCrowdsourcedTitles")}
+                        className={getClassNames(useCrowdsourcedTitles) 
+                            + (!getValueWithDefault(replaceTitles, "replaceTitles") ? " hiding" : "")
+                            + (hideUseCrowdsourcedTitles ? " hidden" : "")}
+                        showResetButton={shouldShowResetButton(useCrowdsourcedTitles)}
+                        onReset={() => {
+                            updateValue(getConfig(selectedConfigurationID)!, "useCrowdsourcedTitles", null, setUseCrowdsourcedTitles);
+                        }}
+                    />
 
                     <SelectOptionComponent
                         id="titleFormatting"
@@ -157,6 +188,7 @@ export const ChannelOverridesComponent = () => {
                             { value: "-1", label: chrome.i18n.getMessage("Disabled") },
                             { value: "1", label: chrome.i18n.getMessage("TitleCase") },
                             { value: "2", label: toSentenceCase(chrome.i18n.getMessage("SentenceCase"), false) },
+                            { value: "3", label: chrome.i18n.getMessage("LowerCase") },
                             { value: "0", label: chrome.i18n.getMessage("CapitalizeWords") },
                         ]}
                         showResetButton={shouldShowResetButton(titleFormatting)}
@@ -241,7 +273,7 @@ function getValueWithDefault<T>(value: T, option: string): T {
 }
 
 function getClassNames(value: unknown | null) {
-    return value === null ? "partiallyHidden" : "";
+    return `cb-channel-override-option ${value === null ? "partiallyHidden" : ""}`;
 }
 
 function shouldShowResetButton(value: unknown | null) {
