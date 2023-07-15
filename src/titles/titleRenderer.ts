@@ -141,6 +141,10 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
             setPageTitle(originalTitleElement.textContent ?? "");
             break;
         }
+        default: {
+            originalTitleElement.title = originalTitleElement.textContent ?? "";
+            break;
+        }
     }
 }
 
