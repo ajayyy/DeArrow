@@ -332,7 +332,7 @@ function cleanUnformattedTitle(title: string): string {
     return title.replace(/(^|\s)>(\S)/g, "$1$2").trim();
 }
 
-export function cleanPunctuation(title: string): string {
+function cleanWordPunctuation(title: string): string {
     let toTrim = 0;
     let questionMarkCount = 0;
     for (let i = title.length - 1; i >= 0; i--) {
@@ -351,6 +351,35 @@ export function cleanPunctuation(title: string): string {
     }
 
     return cleanTitle;
+}
+
+export function cleanPunctuation(title: string): string {
+    title = cleanWordPunctuation(title);
+    const words = title.split(" ");
+
+    let result = "";
+    let index = 0;
+    for (let word of words) {
+        if (word.includes("?")) {
+            word = cleanWordPunctuation(word);
+        } else if (word.match(/[.!]+$/)) {
+            if (words.length > index + 1 && !isDelimeter(words[index + 1])) {
+                // Insert a period instead
+                word = cleanWordPunctuation(word) + ". ";
+            } else {
+                word = cleanWordPunctuation(word);
+            }
+        }
+
+        word = word.trim();
+        if (word.trim().length > 0) {
+            result += word + " ";
+        }
+
+        index++;
+    }
+
+    return result.trim();
 }
 
 export function cleanEmojis(title: string): string {

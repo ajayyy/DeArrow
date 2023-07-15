@@ -110,6 +110,9 @@ describe("toTitleCase", () => {
         ["visionOS Success ISN'T Up to 3rd Party Devs", "visionOS Success Isn't Up to 3rd Party Devs"],
         ["So, visionOS Success ISN'T Up to 3rd Party Devs", "So, visionOS Success Isn't Up to 3rd Party Devs"],
         ["Lego 10321: Corvette - HANDS-ON review", "Lego 10321: Corvette - Hands-on Review"],
+        ["The World’s Largest Metro System! | Shanghai Metro Explained", "The World’s Largest Metro System | Shanghai Metro Explained"],
+        ["The World’s Largest Metro System! Shanghai Metro Explained", "The World’s Largest Metro System. Shanghai Metro Explained"],
+        ["The World’s Largest Metro System!", "The World’s Largest Metro System"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -124,7 +127,7 @@ describe("toTitleCase cleanEmojis", () => {
         ["5 Minute Timer [MOUSE 🐭 MAZE] 🐭", "5 Minute Timer [Mouse Maze]"],
         ["5 min countdown timer (roller coaster) 🎢", "5 Min Countdown Timer (Roller Coaster)"],
         ["5 min countdown timer (roller🎢coaster) 🎢", "5 Min Countdown Timer (Roller Coaster)"],
-        [" 🎢  🎢🎢 🎢🎢\t🎢", "🎢  🎢🎢 🎢🎢\t🎢"] // Leave emojis when there is no text
+        [" 🎢  🎢🎢 🎢🎢\t🎢", "🎢 🎢🎢 🎢🎢\t🎢"] // Leave emojis when there is no text
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -186,7 +189,7 @@ describe("titleFormatter custom cases", () => {
         ["m0NESY - 2023 highlights (CS:GO)", "m0NESY - 2023 Highlights (CS:GO)", "m0NESY - 2023 highlights (CS:GO)"], // don't capitalize m0NESY but retain CS:GO
         [">s1mple - the best player in the world - HLTV.org's #1 of 2021","s1mple - The Best Player in the World - HLTV.org's #1 of 2021","s1mple - The best player in the world - HLTV.org's #1 of 2021"], // keep s1mple, keep HLTV.org
         ["CS 1.6 vs CS:S vs CS:GO vs CS2 - weapons comparison", "CS 1.6 vs CS:S vs CS:GO vs CS2 - Weapons Comparison", "CS 1.6 vs CS:S vs CS:GO vs CS2 - Weapons comparison"], // lots of abbreviations
-        ["Oh sh*t, y'all can hear that?! | C9 valorant voice comms #3 ft. Annie >alexis Jazzyk1ns meL >katsumi", "Oh Sh*t, Y'all Can Hear That?! | C9 Valorant Voice Comms #3 ft. Annie alexis Jazzyk1ns meL katsumi", "Oh sh*t, y'all can hear that?! | C9 valorant voice comms #3 ft. Annie alexis Jazzyk1ns meL katsumi"], // lots of names with purposeful capitalization
+        ["Oh sh*t, y'all can hear that?! | C9 valorant voice comms #3 ft. Annie >alexis Jazzyk1ns meL >katsumi", "Oh Sh*t, Y'all Can Hear That? | C9 Valorant Voice Comms #3 ft. Annie alexis Jazzyk1ns meL katsumi", "Oh sh*t, y'all can hear that? | C9 valorant voice comms #3 ft. Annie alexis Jazzyk1ns meL katsumi"], // lots of names with purposeful capitalization
         ["Tarik reacts to team Shroud vs team meL II RE//LOAD - CROWN >x riot games VALORANT tour", "Tarik Reacts to Team Shroud vs Team meL II RE//LOAD - CROWN x Riot Games VALORANT Tour", "Tarik reacts to team Shroud vs team meL II RE//LOAD - CROWN x riot games VALORANT tour"], // meL, mix of RE//LOAD and CROWN
         [">2b2t's first war - >4chan vs. Facepunch (2011-2012)", "2b2t's First War - 4chan vs. Facepunch (2011-2012)", "2b2t's first war - 4chan vs. Facepunch (2011-2012)"], // preserve lower and upper cases
         ["Bill Swearingen - HAKC THE POLICE - DEF CON 27 conference", "Bill Swearingen - HAKC THE POLICE - DEF CON 27 Conference", "Bill Swearingen - HAKC THE POLICE - DEF CON 27 conference"], // preserve delibrate uppercases
