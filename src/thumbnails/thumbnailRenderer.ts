@@ -109,6 +109,18 @@ export async function renderThumbnail(videoID: VideoID, width: number,
         let resolved = false;
         let videoLoadedTimeout: NodeJS.Timeout | null = null;
 
+        const clearVideo = (saveVideo: boolean) => {
+            video.removeEventListener("error", errorHandler);
+            video.removeEventListener("loadeddata", loadedData); // eslint-disable-line @typescript-eslint/no-misused-promises
+            video.removeEventListener("seeked", loadedData) // eslint-disable-line @typescript-eslint/no-misused-promises
+
+            if (!saveVideo) {
+                video.removeAttribute("src");
+                video.load();
+                video.remove();
+            }
+        };
+
         const loadedData = async () => {
             const betterVideo = getFromCache(videoID)?.video?.find(v => v.width >= width && v.height >= height
                 && v.timestamp === timestamp && v.rendered);
@@ -123,7 +135,13 @@ export async function renderThumbnail(videoID: VideoID, width: number,
             log(videoID, "videoLoaded", video.currentTime, video.readyState, video.seeking, format)
             if (video.readyState < 2 || video.seeking) {
                 if (videoLoadedTimeout) clearTimeout(videoLoadedTimeout);
-                videoLoadedTimeout = setTimeout(loadedData, 50); // eslint-disable-line @typescript-eslint/no-misused-promises
+
+                if (video.seeking) {
+                    video.addEventListener("seeked", loadedData, { once: true }); // eslint-disable-line @typescript-eslint/no-misused-promises
+                } else {
+                    videoLoadedTimeout = setTimeout(loadedData, 50); // eslint-disable-line @typescript-eslint/no-misused-promises
+                }
+
                 return;
             }
 
@@ -154,15 +172,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
 
             log(videoID, (Date.now() - start) / 1000, width > 0 ? "full" : "smaller");
 
-            // Remove this first to not trigger error when changing video src
-            video.removeEventListener("error", errorHandler);
-            video.removeEventListener("loadeddata", loadedData); // eslint-disable-line @typescript-eslint/no-misused-promises
-            video.removeEventListener("seeked", loadedData) // eslint-disable-line @typescript-eslint/no-misused-promises
-            if (!saveVideo) {
-                video.src = "";
-                video.remove();
-            }
-
+            clearVideo(saveVideo);
             resolved = true;
         };
 
@@ -170,9 +180,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
             if (!resolved) {
                 if (videoLoadedTimeout) clearTimeout(videoLoadedTimeout);
 
-                // Try creating the video again
-                video.remove();
-
+                clearVideo(false);
                 handleThumbnailRenderFailure(videoID, width, height, timestamp, resolve);
             }
         })();
@@ -193,14 +201,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
 
         addStopRenderingCallback(videoID, () => {
             resolved = true;
-
-            video.removeEventListener("loadeddata", loadedData); // eslint-disable-line @typescript-eslint/no-misused-promises
-            video.removeEventListener("seeked", loadedData) // eslint-disable-line @typescript-eslint/no-misused-promises
-            video.removeEventListener("error", errorHandler);
-
-            video.removeAttribute("src");
-            video.load();
-            video.remove();
+            clearVideo(false);
 
             reject("Stopped while waiting for video to load");
         });
