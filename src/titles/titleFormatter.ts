@@ -1,6 +1,7 @@
 import { VideoID } from "../maze-utils/video";
 import Config, { TitleFormatting } from "../config/config";
 import { getTitleFormatting, shouldCleanEmojis } from "../config/channelOverrides";
+import { allowlistedWords, titleCaseNotCapitalized } from "./titleFormatterData";
 
 /**
  * Useful regex expressions:
@@ -9,43 +10,6 @@ import { getTitleFormatting, shouldCleanEmojis } from "../config/channelOverride
  * Upper: \p{Lu}
  * Lower: \p{Ll}
  */
-
-const titleCaseNotCapitalized = [
-    "a",
-    "an",
-    "the",
-    "and",
-    "but",
-    "or",
-    "nor",
-    "for",
-    "yet",
-    "so",
-    "as",
-    "in",
-    "of",
-    "on",
-    "to",
-    "from",
-    "into",
-    "like",
-    "over",
-    "with",
-    "w/",
-    "upon",
-    "at",
-    "by",
-    "via",
-    "to",
-    "vs",
-    "v.s.",
-    "vs.",
-    "ft",
-    "ft.",
-    "feat",
-    "etc.",
-    "etc"
-];
 
 export async function formatTitle(title: string, isCustom: boolean, videoID: VideoID | null): Promise<string> {
     return formatTitleInternal(title, isCustom, await getTitleFormatting(videoID), await shouldCleanEmojis(videoID));
@@ -170,7 +134,7 @@ export function toTitleCase(str: string, isCustom: boolean): string {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             result += word + " ";
-        } else if (!startOfSentence(index, words) && titleCaseNotCapitalized.includes(word.toLowerCase())) {
+        } else if (!startOfSentence(index, words) && titleCaseNotCapitalized.has(word.toLowerCase())) {
             // Skip lowercase check for the first word
             result += word.toLowerCase() + " ";
         } else if (isFirstLetterCapital(word) && 
@@ -218,7 +182,7 @@ export function isInTitleCase(words: string[]): boolean {
         if (isWordCapitalCase(word)) {
             count++;
         } else if (!isWordAllLower(word) ||
-                titleCaseNotCapitalized.includes(word.toLowerCase())) {
+                titleCaseNotCapitalized.has(word.toLowerCase())) {
             ignored++;
         }
     }
@@ -300,15 +264,30 @@ function isFirstLetterCapital(word: string): boolean {
     return !!word.match(/^[^\p{L}]*[\p{Lu}]/u);
 }
 
-function forceKeepFormatting(word: string): boolean {
-    return !!word.match(/^>/);
+function forceKeepFormatting(word: string, ignorePunctuation = true): boolean {
+    let result = !!word.match(/^>/) 
+        || allowlistedWords.has(word);
+
+    if (ignorePunctuation) {
+        const withoutPunctuation = word.replace(/[:?.!+\]]+$|^[[+:/]+/, "");
+        if (word !== withoutPunctuation) {
+            result ||= allowlistedWords.has(withoutPunctuation);
+        }
+    }
+
+    return result;
 }
 
 export function isAcronym(word: string): boolean {
     // 2 - 3 chars, or has dots after each letter except last word
     // U.S.A allowed
     // US allowed
-    return (word.length <= 3 && word.length > 1 && isAllCaps(word)) || isAcronymStrict(word);
+    return ((word.length <= 3 || countLetters(word) <= 3) && word.length > 1 && isAllCaps(word)) 
+        || isAcronymStrict(word);
+}
+
+function countLetters(word: string): number {
+    return word.match(/[\p{L}]/gu)?.length ?? 0;
 }
 
 export function isAcronymStrict(word: string): boolean {
@@ -321,11 +300,12 @@ function startOfSentence(index: number, words: string[]): boolean {
 }
 
 function isDelimeter(word: string): boolean {
-    return word.match(/^[-:;~—|]$/) !== null || word.match(/[:?.!]$/) !== null;
+    return word.match(/^[-:;~—|]$/) !== null || word.match(/[:?.!]$/) !== null
+        && !allowlistedWords.has(word);
 }
 
 export function cleanResultingTitle(title: string): string {
-    return cleanPunctuation(cleanUnformattedTitle(title));
+    return cleanUnformattedTitle(cleanPunctuation(title));
 }
 
 function cleanUnformattedTitle(title: string): string {
@@ -333,8 +313,8 @@ function cleanUnformattedTitle(title: string): string {
 }
 
 function cleanWordPunctuation(title: string): string {
-    const words = title.split(" ");
-    if (words.length > 0 && forceKeepFormatting(words[words.length - 1])) {
+    const words = title.trim().split(" ");
+    if (words.length > 0 && forceKeepFormatting(words[words.length - 1], false)) {
         return title;
     }
 
@@ -365,7 +345,8 @@ export function cleanPunctuation(title: string): string {
     let result = "";
     let index = 0;
     for (let word of words) {
-        if (!forceKeepFormatting(word)) {
+        if (!forceKeepFormatting(word, false) 
+                && index !== words.length - 1) { // Last already handled
             if (word.includes("?")) {
                 word = cleanWordPunctuation(word);
             } else if (word.match(/[.!]+$/)) {

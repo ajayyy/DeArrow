@@ -113,6 +113,9 @@ describe("toTitleCase", () => {
         ["The World’s Largest Metro System! | Shanghai Metro Explained", "The World’s Largest Metro System | Shanghai Metro Explained"],
         ["The World’s Largest Metro System! Shanghai Metro Explained", "The World’s Largest Metro System. Shanghai Metro Explained"],
         ["The World’s Largest Metro System!", "The World’s Largest Metro System"],
+        ["Did you know that osu! is a game?", "Did You Know That osu! Is a Game?"],
+        ["Did you know that NASA is real?", "Did You Know That NASA Is Real?"],
+        ["Wow, NASA! Did you know that NASA is real?", "Wow, NASA. Did You Know That NASA Is Real?"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -168,6 +171,11 @@ describe("toSentenceCase", () => {
         ["Prefer using Option<&T> over &Option", "Prefer using Option<&T> over &Option"],
         ["visionOS Success ISN'T Up to 3rd Party Devs", "visionOS success isn't up to 3rd party devs"],
         ["Lego 10321: Corvette - HANDS-ON review", "Lego 10321: Corvette - Hands-on review"],
+        ["Did you know that osu! is a game?", "Did you know that osu! is a game?"],
+        ["Some interesting >title!", "Some interesting title!"],
+        ["Did you know that >osssuu! >is a game?", "Did you know that osssuu! is a game?"],
+        ["Some thing [TAS]", "Some thing [TAS]"],
+        ["Some thing +HDDT", "Some thing +HDDT"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
