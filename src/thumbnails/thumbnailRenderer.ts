@@ -75,7 +75,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
         const stopCallbackHandler = new Promise<string | undefined>((resolve) => {
             addStopRenderingCallback(videoID, resolve);
         });
-        let format = await Promise.race([getPlaybackFormats(videoID, width, height), stopCallbackHandler]);
+        const format = await Promise.race([getPlaybackFormats(videoID, width, height), stopCallbackHandler]);
         const videoCache = setupCache(videoID);
         if (!format || !(format as Format)?.url) {
             handleThumbnailRenderFailure(videoID, width, height, timestamp, resolve);
@@ -86,9 +86,8 @@ export async function renderThumbnail(videoID: VideoID, width: number,
             return;
         }
         
-        let video = createVideo(reusedVideo, format.url, timestamp);
-        let tries = 1;
-        let videoCacheObject: ThumbnailVideo = {
+        const video = createVideo(reusedVideo, format.url, timestamp);
+        const videoCacheObject: ThumbnailVideo = {
             video: video,
             width: format.width,
             height: format.height,
@@ -165,45 +164,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
                 // Try creating the video again
                 video.remove();
 
-                if (tries++ > 5) {
-                    // Give up
-                    handleThumbnailRenderFailure(videoID, width, height, timestamp, resolve);
-                    return;
-                }
-
-                // New format variable being used for casting reasons
-                const newFormat = await getPlaybackFormats(videoID, width, height, true);
-                format = newFormat;
-                if (format === null) {
-                    for (const callback of videoCacheObject.onReady) {
-                        callback(null);
-                    }
-
-                    resolved = true;
-                    return;
-                }
-
-                const videoCache = setupCache(videoID);
-                const index = videoCache.video.findIndex(v => v.width === newFormat?.width 
-                    && v.height === newFormat?.height && v.timestamp === timestamp);
-                if (index !== -1) {
-                    videoCache.video[index].video = video;
-                } else {
-                    videoCacheObject = {
-                        video: video,
-                        width: format?.width,
-                        height: format?.height,
-                        rendered: false,
-                        onReady: [resolve],
-                        timestamp
-                    };
-
-                    videoCache.video.push(videoCacheObject);
-                }
-
-                video = createVideo(null, format?.url, timestamp);
-                video.addEventListener("loadeddata", loadedData); // eslint-disable-line @typescript-eslint/no-misused-promises
-                video.addEventListener("error", errorHandler);
+                handleThumbnailRenderFailure(videoID, width, height, timestamp, resolve);
             }
         })();
 
@@ -222,11 +183,14 @@ export async function renderThumbnail(videoID: VideoID, width: number,
         }, Config.config!.renderTimeout);
 
         addStopRenderingCallback(videoID, () => {
+            resolved = true;
+
             video.removeEventListener("loadeddata", loadedData); // eslint-disable-line @typescript-eslint/no-misused-promises
             video.removeEventListener("seeked", loadedData) // eslint-disable-line @typescript-eslint/no-misused-promises
             video.removeEventListener("error", errorHandler);
 
-            video.src = "";
+            video.removeAttribute("src");
+            video.load();
             video.remove();
 
             reject("Stopped while waiting for video to load");
@@ -355,11 +319,17 @@ export async function createThumbnailImageElement(existingElement: HTMLImageElem
     while (isFetchingFromThumbnailCache(videoID, timestamp)) {
         // Wait for the thumbnail to be fetched from the cache before trying local generation
         try {
-            await Promise.race([
+            const promises = [
                 waitForThumbnailCache(videoID),
-                timeoutPomise(Config.config!.startLocalRenderTimeout).catch(() => ({})),
-                shouldReplaceThumbnails(videoID)
-            ]);
+                timeoutPomise(Config.config!.startLocalRenderTimeout).catch(() => ({}))
+            ];
+
+            // If we know about it, we don't want to return early without using the timeout
+            if (shouldReplaceThumbnailsFastCheck(videoID) === null) {
+                promises.push(shouldReplaceThumbnails(videoID));
+            }
+
+            await Promise.race(promises);
 
             if (isFetchingFromThumbnailCache(videoID, timestamp) 
                     && getNumberOfThumbnailCacheRequests() > 3 && waitingForFetchTries < 5
