@@ -333,6 +333,11 @@ function cleanUnformattedTitle(title: string): string {
 }
 
 function cleanWordPunctuation(title: string): string {
+    const words = title.split(" ");
+    if (words.length > 0 && forceKeepFormatting(words[words.length - 1])) {
+        return title;
+    }
+
     let toTrim = 0;
     let questionMarkCount = 0;
     for (let i = title.length - 1; i >= 0; i--) {
@@ -360,14 +365,16 @@ export function cleanPunctuation(title: string): string {
     let result = "";
     let index = 0;
     for (let word of words) {
-        if (word.includes("?")) {
-            word = cleanWordPunctuation(word);
-        } else if (word.match(/[.!]+$/)) {
-            if (words.length > index + 1 && !isDelimeter(words[index + 1])) {
-                // Insert a period instead
-                word = cleanWordPunctuation(word) + ". ";
-            } else {
+        if (!forceKeepFormatting(word)) {
+            if (word.includes("?")) {
                 word = cleanWordPunctuation(word);
+            } else if (word.match(/[.!]+$/)) {
+                if (words.length > index + 1 && !isDelimeter(words[index + 1])) {
+                    // Insert a period instead
+                    word = cleanWordPunctuation(word) + ". ";
+                } else {
+                    word = cleanWordPunctuation(word);
+                }
             }
         }
 
