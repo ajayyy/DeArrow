@@ -68,7 +68,8 @@ export async function renderThumbnail(videoID: VideoID, width: number,
     ]);
     delete renderQueueCallbacks[videoID];
 
-    if (performance.now() - startTime > Config.config!.renderTimeout) {
+    if (performance.now() - startTime > Config.config!.renderTimeout
+            && !isCachedThumbnailLoaded(videoID, timestamp)) {
         return null;
     }
 
