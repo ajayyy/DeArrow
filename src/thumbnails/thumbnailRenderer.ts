@@ -55,13 +55,22 @@ function addStopRenderingCallback(videoID: VideoID, callback: (error?: string) =
 export async function renderThumbnail(videoID: VideoID, width: number,
     height: number, saveVideo: boolean, timestamp: number): Promise<RenderedThumbnailVideo | null> {
 
+    const startTime = performance.now();
+
     let bestVideoData = await findBestVideo(videoID, width, height, timestamp);
     if (bestVideoData.renderedThumbnail) {
         return bestVideoData.renderedThumbnail;
     }
     
-    await waitForSpotInRenderQueue(videoID);
+    await Promise.race([
+        waitForSpotInRenderQueue(videoID),
+        timeoutPomise(Config.config!.renderTimeout - (performance.now() - startTime)).catch(() => ({}))
+    ]);
     delete renderQueueCallbacks[videoID];
+
+    if (performance.now() - startTime > Config.config!.renderTimeout) {
+        return null;
+    }
 
     bestVideoData = await findBestVideo(videoID, width, height, timestamp);
     if (bestVideoData.renderedThumbnail) {
@@ -180,7 +189,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
             if (!resolved) {
                 errorHandler();
             }
-        }, Config.config!.renderTimeout);
+        }, Config.config!.renderTimeout - (performance.now() - startTime));
 
         addStopRenderingCallback(videoID, () => {
             resolved = true;
