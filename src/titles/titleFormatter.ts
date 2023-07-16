@@ -84,8 +84,7 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
     let result = "";
     let index = 0;
     for (const word of words) {
-        const trustCaps = !mostlyAllCaps && 
-            !(isAllCaps(words[index - 1]) || isAllCaps(words[index + 1]));
+        const trustCaps = shouldTrustCaps(mostlyAllCaps, words, index);
 
         if (word.match(/^[Ii]$|^[Ii]['’][\p{L}]{1,3}$/u)) {
             result += capitalizeFirstLetter(word) + " ";
@@ -124,8 +123,7 @@ export function toTitleCase(str: string, isCustom: boolean): string {
     let result = "";
     let index = 0;
     for (const word of words) {
-        const trustCaps = !mostlyAllCaps && 
-            !(isAllCaps(words[index - 1]) || isAllCaps(words[index + 1]));
+        const trustCaps = shouldTrustCaps(mostlyAllCaps, words, index);
 
         if (forceKeepFormatting(word)
             || (isCustom && isWordCustomCapitalization(word))
@@ -189,6 +187,12 @@ export function isInTitleCase(words: string[]): boolean {
 
     const length = words.length - ignored;
     return (length > 4 && count > length * 0.8) || count >= length;
+}
+
+function shouldTrustCaps(mostlyAllCaps: boolean, words: string[], index: number): boolean {
+    return !mostlyAllCaps && 
+        !((isAllCaps(words[index - 1]) && !forceKeepFormatting(words[index - 1])) 
+            || isAllCaps(words[index + 1]) && !forceKeepFormatting(words[index + 1]));
 }
 
 export function isMostlyAllCaps(words: string[]): boolean {
