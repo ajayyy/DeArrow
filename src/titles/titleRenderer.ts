@@ -160,6 +160,10 @@ function showCustomTitle(element: HTMLElement, brandingLocation: BrandingLocatio
     const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
     titleElement.style.removeProperty("display");
 
+    if (titleElement.nodeName === "A") {
+        titleElement.setAttribute("href", originalTitleElement.getAttribute("href") ?? "");
+    }
+
     switch(brandingLocation) {
         case BrandingLocation.Watch: {
             setPageTitle(titleElement.textContent ?? "");
