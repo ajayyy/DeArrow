@@ -176,6 +176,7 @@ describe("toSentenceCase", () => {
         ["Did you know that >osssuu! >is a game?", "Did you know that osssuu! is a game?"],
         ["Some thing [TAS]", "Some thing [TAS]"],
         ["Some thing +HDDT", "Some thing +HDDT"],
+        ["1st FC on Because Maybe // 996pp", "1st FC on because maybe // 996pp"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;

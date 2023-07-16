@@ -64,7 +64,7 @@ export function toFirstLetterUppercase(str: string): string {
     for (const word of words) {
         if (forceKeepFormatting(word)) {
             result += word + " ";
-        } else if (startOfSentence(index, words)) {
+        } else if (startOfSentence(index, words) && !isNumberThenLetter(word)) {
             result += capitalizeFirstLetter(word) + " ";
         } else {
             result += word.toLowerCase() + " ";
@@ -100,7 +100,7 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
             // Trust it with capitalization
             result += word + " ";
         } else {
-            if (startOfSentence(index, words)) {
+            if (startOfSentence(index, words) && !isNumberThenLetter(word)) {
                 if (!isAllCaps(word) && isWordCustomCapitalization(word)) {
                     result += word + " ";
                 } else {
