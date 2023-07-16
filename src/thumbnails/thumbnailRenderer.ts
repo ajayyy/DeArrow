@@ -166,7 +166,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
             resolved = true;
         };
 
-        const errorHandler = () => void (async () => {
+        const errorHandler = () => void (() => {
             if (!resolved) {
                 if (videoLoadedTimeout) clearTimeout(videoLoadedTimeout);
 
