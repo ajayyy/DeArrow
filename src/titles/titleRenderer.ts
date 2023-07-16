@@ -216,7 +216,7 @@ export function getOrCreateTitleElement(element: HTMLElement, brandingLocation: 
 function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
     const titleElement = brandingLocation !== BrandingLocation.Watch || originalTitleElement.classList.contains("miniplayer-title")
         ? originalTitleElement.cloneNode() as HTMLElement 
-        : document.createElement("div");
+        : document.createElement("span");
     titleElement.classList.add("cbCustomTitle");
 
     if (brandingLocation === BrandingLocation.EndRecommendations
