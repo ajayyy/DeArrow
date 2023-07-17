@@ -539,6 +539,8 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
 
             if (brandingLocation === BrandingLocation.EndRecommendations) {
                 thumbnail.classList.add("ytp-videowall-still-image");
+                thumbnail.style.marginLeft = "auto";
+                thumbnail.style.marginRight = "auto";
             } else if (brandingLocation === BrandingLocation.Autoplay) {
                 thumbnail.classList.add("ytp-autonav-endscreen-upnext-thumbnail");
             }
