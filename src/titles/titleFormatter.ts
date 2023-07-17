@@ -257,7 +257,7 @@ function isNumberThenLetter(word: string): boolean {
 }
 
 function isYear(word: string): boolean {
-    return !!word.match(/^[0-9]{2,4}s$/);
+    return !!word.match(/^[0-9]{2,4}'?s$/);
 }
 
 function isWordAllLower(word: string): boolean {
