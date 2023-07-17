@@ -45,3 +45,16 @@ export const allowlistedWords = new Set([
     "HDDT",
     "HDDTHR"
 ]);
+
+export const acronymBlocklist = new Set([
+    "not",
+    "see",
+    "be",
+    "you",
+    "are",
+    "is",
+    "it",
+    "of",
+    "the",
+    "to"
+]);

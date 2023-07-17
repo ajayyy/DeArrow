@@ -117,6 +117,7 @@ describe("toTitleCase", () => {
         ["Did you know that NASA is real?", "Did You Know That NASA Is Real?"],
         ["Wow, NASA! Did you know that NASA is real?", "Wow, NASA. Did You Know That NASA Is Real?"],
         ["[9.98⭐] Merami | xi - Ascension to Heaven [Death] 1st +HDDTHR FC 85.25% {1123pp FC} - osu!", "[9.98⭐] Merami | Xi - Ascension to Heaven [Death] 1st +HDDTHR FC 85.25% {1123Pp FC} - osu!"],
+        ["Did you SEE that?", "Did You See That?"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;

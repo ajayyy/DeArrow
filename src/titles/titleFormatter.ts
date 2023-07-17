@@ -1,7 +1,7 @@
 import { VideoID } from "../maze-utils/video";
 import Config, { TitleFormatting } from "../config/config";
 import { getTitleFormatting, shouldCleanEmojis } from "../config/channelOverrides";
-import { allowlistedWords, titleCaseNotCapitalized } from "./titleFormatterData";
+import { acronymBlocklist, allowlistedWords, titleCaseNotCapitalized } from "./titleFormatterData";
 
 /**
  * Useful regex expressions:
@@ -286,7 +286,8 @@ export function isAcronym(word: string): boolean {
     // 2 - 3 chars, or has dots after each letter except last word
     // U.S.A allowed
     // US allowed
-    return ((word.length <= 3 || countLetters(word) <= 3) && word.length > 1 && isAllCaps(word)) 
+    return ((word.length <= 3 || countLetters(word) <= 3) 
+                && word.length > 1 && isAllCaps(word) && !acronymBlocklist.has(word.toLowerCase())) 
         || isAcronymStrict(word);
 }
 
