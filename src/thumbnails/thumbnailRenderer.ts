@@ -571,6 +571,7 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
     image.style.removeProperty("display");
 
     if (brandingLocation === BrandingLocation.Autoplay
+            || BrandingLocation.Related
             || !!image.closest("ytd-grid-playlist-renderer")) {
         hideCanvas(image);
     }
