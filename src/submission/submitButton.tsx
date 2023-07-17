@@ -187,7 +187,13 @@ export class SubmitButton {
 
             replaceCurrentVideoBranding().catch(logError);
         } else {
-            alert(result.responseText);
+            const text = result.responseText;
+
+            if (text.includes("<head>")) {
+                alert(chrome.i18n.getMessage("502"));
+            } else {
+                alert(text);
+            }
         }
     }
 }
