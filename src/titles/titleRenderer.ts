@@ -142,7 +142,7 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
             break;
         }
         default: {
-            originalTitleElement.title = originalTitleElement.textContent ?? "";
+            originalTitleElement.title = originalTitleElement.textContent?.trim() ?? "";
             break;
         }
     }
