@@ -56,5 +56,6 @@ export const acronymBlocklist = new Set([
     "it",
     "of",
     "the",
-    "to"
+    "to",
+    "new"
 ]);
