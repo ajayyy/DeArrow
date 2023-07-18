@@ -19,6 +19,7 @@ import PersonIcon from "../svgIcons/personIcon";
 import QuestionIcon from "../svgIcons/questionIcon";
 import ExclamationIcon from "../svgIcons/exclamationIcon";
 import CursorIcon from "../svgIcons/cursorIcon";
+import FontIcon from "../svgIcons/fontIcon";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -339,6 +340,9 @@ function getTips(): React.ReactElement[] {
     }, {
         icon: CursorIcon,
         text: chrome.i18n.getMessage("tip4")
+    }, {
+        icon: FontIcon,
+        text: chrome.i18n.getMessage("tip5")
     }];
 
     return tipInfo.map((tip, i) => (
