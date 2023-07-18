@@ -43,7 +43,21 @@ export const allowlistedWords = new Set([
     "DEFCON",
     "HDHR",
     "HDDT",
-    "HDDTHR"
+    "HDDTHR",
+    "TUYU",
+    "umu.",
+    "MIMI",
+    "S3RL",
+    "NOMA",
+    "DECO*27",
+    "EVO+",
+    "VINXIS",
+    "IOSYS",
+    "fhána",
+    "LGBT",
+    "LGBTQ",
+    "LGBTQIA",
+    "LGBTQ+IA",
 ]);
 
 export const acronymBlocklist = new Set([
