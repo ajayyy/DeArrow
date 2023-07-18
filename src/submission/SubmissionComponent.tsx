@@ -20,6 +20,7 @@ import QuestionIcon from "../svgIcons/questionIcon";
 import ExclamationIcon from "../svgIcons/exclamationIcon";
 import CursorIcon from "../svgIcons/cursorIcon";
 import FontIcon from "../svgIcons/fontIcon";
+import { Tooltip } from "../utils/tooltip";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -40,12 +41,13 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
         getHash(Config.config!.userID!).then(async (publicUserID) => {
             let username: string | null = null;
 
-            setChatDisplayName({
+            const displayName = {
                 publicUserID,
                 username
-            });
+            };
+            setChatDisplayName(displayName);
 
-            const values = ["userName"];
+            const values = ["userName", "deArrowWarningReason"];
                 const result = await sendRequestToServer("GET", "/api/userInfo", {
                     publicUserID: publicUserID,
                     values
@@ -54,6 +56,10 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             if (result.ok) {
                 const userInfo = JSON.parse(result.responseText);
                 username = userInfo.userName;
+
+                if (userInfo.deArrowWarningReason) {
+                    createWarningTooltip(userInfo.deArrowWarningReason, displayName);
+                }
             }
 
             setChatDisplayName({
@@ -351,4 +357,51 @@ function getTips(): React.ReactElement[] {
             <span className="cbTipText">{tip.text}</span>
         </div>
     ));
+}
+
+function createWarningTooltip(reason: string, name: ChatDisplayName) {
+    const element = document.querySelector(".cbVoteButton") as HTMLElement | null;
+
+    if (element) {
+        const tooltip = new Tooltip({
+            textBoxes: `${chrome.i18n.getMessage("deArrowMessageRecieved")}:\n\n${reason}`.split("\n"),
+            referenceNode: element.parentElement!,
+            prependElement: element,
+            positionRealtive: false,
+            containerAbsolute: true,
+            bottomOffset: "25px",
+            rightOffset: "0",
+            leftOffset: "0",
+            displayTriangle: true,
+            extraClass: "centeredSBTriangle",
+            center: true,
+            showGotIt: false,
+            buttonsAtBottom: true,
+            textBoxMaxHeight: "350px",
+            opacity: 1,
+            buttons: [{
+                name: chrome.i18n.getMessage("GotIt"),
+                listener: async () => {
+                    const result = await sendRequestToServer("POST", "/api/warnUser", {
+                        userID: Config.config!.userID,
+                        enabled: false,
+                        type: 1
+                    });
+
+                    if (result.ok) {
+                        tooltip?.close();
+                    } else {
+                        alert(`${chrome.i18n.getMessage("warningError")} ${result.status}`);
+                    }
+                }
+        }, {
+            name: chrome.i18n.getMessage("questionButton"),
+            listener: () => window.open(`https://chat.sponsor.ajay.app/#${objectToURI("", {
+                displayName: getChatDisplayName(name),
+                customDescription: `${chrome.i18n.getMessage("chatboxDescription")}\n\nhttps://discord.gg/SponsorBlock\nhttps://matrix.to/#/#sponsor:ajay.app?via=matrix.org`,
+                bigDescription: true
+            }, false)}`)
+        }],
+        });
+    }
 }
