@@ -58,6 +58,12 @@ export const allowlistedWords = new Set([
     "LGBTQ",
     "LGBTQIA",
     "LGBTQ+IA",
+    "LGBTQ2S",
+    "BIPOC",
+    "STFU",
+    "TLDR",
+    "TOTK",
+    "BOTW"
 ]);
 
 export const acronymBlocklist = new Set([
