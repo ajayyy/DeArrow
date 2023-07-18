@@ -25,7 +25,13 @@ export const ChannelOverridesComponent = () => {
 
     React.useEffect(() => {
         setConfigurationName(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "name") : "");
-        setReplaceTitles(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "replaceTitles") : false);
+
+        const replaceTitles = getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "replaceTitles") : false;
+        setReplaceTitles(replaceTitles);
+
+        setUseCrowdsourcedTitles(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "useCrowdsourcedTitles") : false);
+        setHideUseCrowdsourcedTitles(!getValueWithDefault(replaceTitles, "replaceTitles"));
+
         setReplaceThumbnails(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "replaceThumbnails") : false);
         setTitleFormatting(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "titleFormatting") : "");
         setThumbnailFallback(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "thumbnailFallback") : "");
