@@ -49,7 +49,7 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
     const brandingData = await getVideoBranding(videoID, brandingLocation === BrandingLocation.Watch, brandingLocation);
     const result = brandingData?.thumbnails[0];
     if (!result || (!result.locked && result.votes < 0)) {
-        if (returnRandomTime && brandingData) {
+        if (returnRandomTime) {
             const timestamp = await getTimestampFromRandomTime(videoID, brandingData, brandingLocation);
 
             if (timestamp !== null) {
@@ -71,11 +71,11 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
     }
 }
 
-async function getTimestampFromRandomTime(videoID: VideoID, brandingData: BrandingResult,
+async function getTimestampFromRandomTime(videoID: VideoID, brandingData: BrandingResult | null,
         brandingLocation?: BrandingLocation): Promise<number | null> {
     const fastThumbnailOptionCheck = getThumbnailFallbackOptionFastCheck(videoID);
     if (fastThumbnailOptionCheck === null || fastThumbnailOptionCheck === ThumbnailFallbackOption.RandomTime) {
-        let videoDuration = brandingData.videoDuration;
+        let videoDuration = brandingData?.videoDuration;
         if (!videoDuration) {
             const metadata = await fetchVideoMetadata(videoID, false);
             if (metadata) videoDuration = metadata.duration;
@@ -83,7 +83,16 @@ async function getTimestampFromRandomTime(videoID: VideoID, brandingData: Brandi
 
         if (videoDuration) {
             // Occurs when fetching by hash and no record exists in the db (SponsorBlock or otherwise)
-            if (brandingData.randomTime == null) {
+            if (!brandingData || brandingData.randomTime == null) {
+                if (!brandingData) {
+                    brandingData = {
+                        thumbnails: [],
+                        titles: [],
+                        randomTime: 0,
+                        videoDuration: videoDuration
+                    };
+                }
+
                 brandingData.randomTime = alea(videoID)();
             }
 
