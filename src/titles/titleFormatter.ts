@@ -254,9 +254,6 @@ function isWordCustomCapitalization(word: string): boolean {
  */
 function isNumberThenLetter(word: string): boolean {
     return !!word.match(/^[「〈《【〔⦗『〖〘<({["'‘]*[0-9]+\p{L}[〙〗』⦘〕】》〉」)}\]"']*/u);
-
-    // 「 」 〈 〉 《 》 【 】 〔 〕 ⦗ ⦘『 』 〖 〗 〘 
-    
 }
 
 function isYear(word: string): boolean {
