@@ -311,7 +311,8 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
                     const timestamp = parseFloat(request.headers.get("x-timestamp") as string);
                     const title = request.headers.get("x-title");
                     
-                    if (activeThumbnailCacheRequests[videoID].shouldRerequest 
+                    if (activeThumbnailCacheRequests[videoID]
+                        && activeThumbnailCacheRequests[videoID].shouldRerequest 
                         && activeThumbnailCacheRequests[videoID].time !== timestamp
                         && tries < 2) {
                         // Stop and refetch with the proper timestamp
