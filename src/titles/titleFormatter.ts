@@ -253,11 +253,14 @@ function isWordCustomCapitalization(word: string): boolean {
  * 3rd, 45th
  */
 function isNumberThenLetter(word: string): boolean {
-    return !!word.match(/^[0-9]+\p{L}/u);
+    return !!word.match(/^[「〈《【〔⦗『〖〘<({["'‘]*[0-9]+\p{L}[〙〗』⦘〕】》〉」)}\]"']*/u);
+
+    // 「 」 〈 〉 《 》 【 】 〔 〕 ⦗ ⦘『 』 〖 〗 〘 
+    
 }
 
 function isYear(word: string): boolean {
-    return !!word.match(/^[0-9]{2,4}'?s$/);
+    return !!word.match(/^[「〈《【〔⦗『〖〘<({["'‘]*[0-9]{2,4}'?s[〙〗』⦘〕】》〉」)}\]"']*$/);
 }
 
 function isWordAllLower(word: string): boolean {

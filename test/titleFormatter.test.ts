@@ -116,11 +116,12 @@ describe("toTitleCase", () => {
         ["Did you know that osu! is a game?", "Did You Know That osu! Is a Game?"],
         ["Did you know that NASA is real?", "Did You Know That NASA Is Real?"],
         ["Wow, NASA! Did you know that NASA is real?", "Wow, NASA. Did You Know That NASA Is Real?"],
-        ["[9.98⭐] Merami | xi - Ascension to Heaven [Death] 1st +HDDTHR FC 85.25% {1123pp FC} - osu!", "[9.98⭐] Merami | Xi - Ascension to Heaven [Death] 1st +HDDTHR FC 85.25% {1123Pp FC} - osu!"],
+        ["[9.98⭐] Merami | xi - Ascension to Heaven [Death] 1st +HDDTHR FC 85.25% {1123pp FC} - osu!", "[9.98⭐] Merami | Xi - Ascension to Heaven [Death] 1st +HDDTHR FC 85.25% {1123pp FC} - osu!"],
         ["Did you SEE that?", "Did You See That?"],
         ["1980's Gadget Censors Bad Words", "1980's Gadget Censors Bad Words"],
         ["Magic iPad", "Magic iPad"],
         ["Review of this thing called an iPad", "Review of This Thing Called an iPad"],
+        ["Review of some product (1980s)", "Review of Some Product (1980s)"]
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
