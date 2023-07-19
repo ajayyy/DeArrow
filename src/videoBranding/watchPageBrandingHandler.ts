@@ -166,3 +166,60 @@ function setupVideoBrandReplacement(element: HTMLElement, brandingLocation: Bran
         }
     }
 }
+
+
+let mobileControlsObserver: MutationObserver | null = null;
+export async function setupMobileAutoplayHandler() {
+    const rootControlContainer = await waitForElement("#player-control-container ytm-custom-control");
+
+    if (mobileControlsObserver) mobileControlsObserver.disconnect();
+
+    mobileControlsObserver = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            if (mutation.type === "childList") {
+                for (const node of mutation.addedNodes) {
+                    if (node instanceof HTMLElement) {
+                        if (node.id === "player-control-overlay") {
+                            watchForMobileAutoplay();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    mobileControlsObserver.observe(rootControlContainer, {
+        childList: true
+    });
+}
+
+let mobileAutoplayObserver: MutationObserver | null = null;
+function watchForMobileAutoplay() {
+    const controls = document.querySelector(".player-controls-content");
+
+    if (controls) {
+        if (mobileAutoplayObserver) mobileAutoplayObserver.disconnect();
+
+        mobileAutoplayObserver = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                if (mutation.type === "childList") {
+                    for (const node of mutation.addedNodes) {
+                        if (node instanceof HTMLElement) {
+                            if (node.classList.contains("ytm-player-endscreen")) {
+                                const autoplayElement = node.querySelector(".autonav-endscreen-countdown-container") as HTMLElement;
+
+                                if (autoplayElement) {
+                                    replaceVideoCardBranding(autoplayElement, BrandingLocation.Related).catch(logError);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        mobileAutoplayObserver.observe(controls, {
+            childList: true
+        });
+    }
+}

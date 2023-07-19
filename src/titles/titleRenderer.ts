@@ -2,13 +2,14 @@ import { VideoID, getVideoID } from "../maze-utils/video";
 import Config from "../config/config";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
-import { getOrCreateTitleButtonContainer } from "../utils/titleBar";
+import { MobileFix, addNodeToListenFor, getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { BrandingLocation, extractVideoIDFromElement, toggleShowCustom } from "../videoBranding/videoBranding";
 import { formatTitle } from "./titleFormatter";
 import { setPageTitle } from "./pageTitleHandler";
 import { shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { countTitleReplacement } from "../config/stats";
 import { isReduxInstalled } from "../utils/extensionCompatibility";
+import { onMobile } from "../../maze-utils/src/pageInfo";
 
 enum WatchPageType {
     Video,
@@ -60,7 +61,11 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
                 showOriginalTitle(element, brandingLocation);
                 return false;
             }
-
+            
+            if (onMobile()) {
+                hideOriginalTitle(element, brandingLocation);
+            }
+            
             setCustomTitle(formattedTitle, element, brandingLocation);
             countTitleReplacement(videoID);
         } else if (originalTitleElement?.textContent) {
@@ -194,9 +199,21 @@ export function getOriginalTitleElement(element: HTMLElement, brandingLocation: 
 function getTitleSelector(brandingLocation: BrandingLocation): string[] {
     switch (brandingLocation) {
         case BrandingLocation.Watch:
-            return ["yt-formatted-string", ".ytp-title-link.yt-uix-sessionlink"];
+            return [
+                "yt-formatted-string", 
+                ".ytp-title-link.yt-uix-sessionlink",
+                ".yt-core-attributed-string"
+            ];
         case BrandingLocation.Related:
-            return ["#video-title"];
+            return [
+                "#video-title",
+                ".details .media-item-headline .yt-core-attributed-string", // Mobile YouTube
+                ".reel-item-metadata h3 .yt-core-attributed-string", // Mobile YouTube Shorts
+                ".details > .yt-core-attributed-string", // Mobile YouTube Channel Feature
+                ".compact-media-item-headline .yt-core-attributed-string", // Mobile YouTube Compact,
+                ".amsterdam-playlist-title .yt-core-attributed-string", // Mobile YouTube Playlist Header,
+                ".autonav-endscreen-video-title .yt-core-attributed-string" // Mobile YouTube Autoplay
+            ];
         case BrandingLocation.Endcards:
             return [".ytp-ce-video-title", ".ytp-ce-playlist-title"];
         case BrandingLocation.Autoplay:
@@ -228,7 +245,11 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
         // Move original title element over to this element
         container.prepend(originalTitleElement);
     } else {
-        originalTitleElement.parentElement?.insertBefore(titleElement, originalTitleElement);
+        if (!onMobile()) {
+            originalTitleElement.parentElement?.insertBefore(titleElement, originalTitleElement);
+        } else {
+            originalTitleElement.parentElement?.insertBefore(titleElement, originalTitleElement.nextSibling);
+        }
     }
 
     if (brandingLocation !== BrandingLocation.Watch) {
@@ -238,6 +259,7 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
         titleElement.parentElement!.style.display = "flex";
         titleElement.parentElement!.style.alignItems = "center";
         if (smallBrandingBox) titleElement.parentElement!.style.alignItems = "flex-start";
+        if (onMobile()) titleElement.parentElement!.style.alignItems = "normal";
         titleElement.parentElement!.style.justifyContent = "space-between";
         titleElement.parentElement!.style.width = "100%";
 
@@ -269,6 +291,15 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
     if (brandingLocation === BrandingLocation.Watch) {
         // For mini player title
         titleElement.removeAttribute("is-empty");
+
+        if (onMobile()) {
+            addNodeToListenFor(titleElement, MobileFix.Replace);
+            addNodeToListenFor(originalTitleElement, MobileFix.CopyStyles);
+        }
+    } else {
+        if (onMobile()) {
+            addNodeToListenFor(titleElement, MobileFix.Replace);
+        }
     }
 
     return titleElement;
@@ -323,6 +354,7 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
         brandingLocation: BrandingLocation): Promise<HTMLElement> {
     const buttonElement = document.createElement("button");
     buttonElement.classList.add("cbShowOriginal");
+    if (onMobile()) buttonElement.classList.add("cbMobileButton");
 
     buttonElement.classList.add("cbButton");
     if (brandingLocation === BrandingLocation.Watch 
@@ -389,6 +421,41 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
         referenceNode?.prepend(buttonElement);
     } else {
         originalTitleElement.parentElement?.appendChild(buttonElement);
+    }
+
+    if (onMobile()) {
+        addNodeToListenFor(buttonElement, MobileFix.Replace);
+
+        buttonElement.classList.add("cbMobile");
+
+        // Add hover to show
+        const box = buttonElement.closest(".details, .compact-media-item-metadata, .reel-item-metadata");
+        if (box) {
+            let readyToHide = false;
+            box.addEventListener("touchstart", () => {
+                readyToHide = false;
+
+                if (!buttonElement.classList.contains("cbDontHide")) {
+                    buttonElement.classList.add("cbMobileDontHide");
+                }
+            });
+
+            box.addEventListener("touchend", () => {
+                readyToHide = true;
+            });
+
+            box.addEventListener("contextmenu", () => {
+                readyToHide = true;
+            });
+
+            document.addEventListener("touchstart", () => {
+                if (readyToHide) {
+                    buttonElement.classList.remove("cbMobileDontHide");
+
+                    readyToHide = false;
+                }
+            });
+        }
     }
 
     return buttonElement;

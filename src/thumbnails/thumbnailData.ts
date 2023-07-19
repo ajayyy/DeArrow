@@ -2,6 +2,7 @@ import { BrandingUUID } from "../videoBranding/videoBranding";
 import { PlaybackUrl, cacheUsed, getFromCache, setupCache } from "./thumbnailDataCache";
 import { VideoID } from "../maze-utils/video";
 import { log } from "../utils/logger";
+import { onMobile } from "../../maze-utils/src/pageInfo";
 
 interface PartialThumbnailResult {
     votes: number;
@@ -66,8 +67,8 @@ export async function fetchVideoMetadata(videoID: VideoID, ignoreCache: boolean)
 
     try {
         const result = activeRequests[videoID] ?? (async () => {
-            let metadata = Math.random() > 0.5 ? await fetchVideoDataAndroidClient(videoID) : await fetchVideoDataDesktopClient(videoID);
-            if (!metadata || metadata.formats.length === 0) metadata = await fetchVideoDataDesktopClient(videoID);
+            let metadata = Math.random() > 0.5 && !onMobile() ? await fetchVideoDataAndroidClient(videoID) : await fetchVideoDataDesktopClient(videoID);
+            if (!onMobile() && (!metadata || metadata.formats.length === 0)) metadata = await fetchVideoDataDesktopClient(videoID);
     
             if (metadata && metadata.formats.length > 0) {
                 const formats = metadata.formats;

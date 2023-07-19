@@ -9,6 +9,9 @@ import Config, { ThumbnailFallbackOption } from "../config/config";
 import { getThumbnailFallbackOption, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "../config/channelOverrides";
 import { countThumbnailReplacement } from "../config/stats";
 import { ThumbnailCacheOption } from "../config/config";
+import { getThumbnailImageSelectors, getThumbnailSelectors } from "../maze-utils/thumbnail-selectors";
+import { onMobile } from "../../maze-utils/src/pageInfo";
+import { MobileFix, addNodeToListenFor } from "../utils/titleBar";
 
 const activeRendersMax = isFirefoxOrSafari() ? 3 : 6;
 const activeRenders: Record<VideoID, Promise<RenderedThumbnailVideo | null>> = {};
@@ -423,7 +426,7 @@ function createVideo(existingVideo: HTMLVideoElement | null, url: string, timest
 function getThumbnailSelector(brandingLocation: BrandingLocation): string {
     switch (brandingLocation) {
         case BrandingLocation.Related:
-            return "ytd-thumbnail:not([hidden]) img, ytd-playlist-thumbnail yt-image:not(.blurred-image) img";
+            return getThumbnailImageSelectors();
         case BrandingLocation.Endcards:
             return ".ytp-ce-covering-image";
         case BrandingLocation.Autoplay:
@@ -440,7 +443,11 @@ function getThumbnailSelector(brandingLocation: BrandingLocation): string {
 function getThumbnailBox(image: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
     switch (brandingLocation) {
         case BrandingLocation.Related:
-            return image.closest("ytd-thumbnail:not([hidden]), ytd-playlist-thumbnail") as HTMLElement;
+            if (!onMobile()) {
+                return image.closest(getThumbnailSelectors(":not([hidden])")) as HTMLElement;
+            } else {
+                return image;
+            }
         case BrandingLocation.Autoplay:
             return image;
         default:
@@ -534,6 +541,12 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
             image.classList.remove("cb-visible");
             thumbnail.classList.add("style-scope");
             thumbnail.classList.add("ytd-img-shadow");
+
+            if (image.classList.contains("amsterdam-playlist-thumbnail")) {
+                // Playlist header on mobile
+                thumbnail.className = image.className;
+            }
+
             thumbnail.classList.add("cbCustomThumbnailCanvas");
             thumbnail.style.removeProperty("display");
 
@@ -546,6 +559,15 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
             }
 
             thumbnail.style.height = "100%";
+
+            if (onMobile() && !image.classList.contains("amsterdam-playlist-thumbnail")) {
+                thumbnail.style.position = "absolute";
+                thumbnail.style.top = "0";
+            } else if (image.classList.contains("amsterdam-playlist-thumbnail")) {
+                // Playlist header on mobile
+                thumbnail.style.removeProperty("height");
+            }
+
             if (brandingLocation === BrandingLocation.Autoplay) {
                 // For autoplay, the thumbnail is placed inside the image div, which has the image as the background image
                 // This is because hiding the entire div would hide the video duration
@@ -554,6 +576,10 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                 image.classList.add("cb-visible");
             } else {
                 image.parentElement?.appendChild?.(thumbnail);
+            }
+
+            if (onMobile()) {
+                addNodeToListenFor(thumbnail, MobileFix.Replace);
             }
         } catch (e) {
             logError(e);
@@ -570,7 +596,8 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
     image.classList.add("cb-visible");
     image.style.removeProperty("display");
 
-    if (brandingLocation === BrandingLocation.Autoplay
+    if (onMobile()
+            || brandingLocation === BrandingLocation.Autoplay
             || BrandingLocation.Related
             || !!image.closest("ytd-grid-playlist-renderer")) {
         hideCanvas(image);

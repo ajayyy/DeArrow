@@ -2,6 +2,8 @@ import { isFirefoxOrSafari, waitFor } from "../maze-utils";
 import Config from "../config/config";
 import { brandingBoxSelector, watchPageThumbnailSelector } from "../videoBranding/videoBranding";
 import { logError } from "./logger";
+import { getThumbnailElements } from "../maze-utils/thumbnail-selectors";
+import { onMobile } from "../../maze-utils/src/pageInfo";
 
 const cssFiles = [
     "content.css",
@@ -33,6 +35,10 @@ export function addCssToPage() {
                 head.appendChild(fileref);
             }
         }
+
+        if (onMobile()) {
+            setTimeout(() => injectMobileCss(), 200);
+        }
     };
     
 
@@ -55,10 +61,7 @@ function buildHideThumbnailCss(): string {
         "ytd-video-preview"
     ]);
     for (const start of boxesToHide) {
-        const thumbnailTypes = [
-            "ytd-thumbnail",
-            "ytd-playlist-thumbnail"
-        ];
+        const thumbnailTypes = getThumbnailElements();
 
         for (const thumbnailType of thumbnailTypes) {
             result.push(`${start} ${thumbnailType} img:not(.cb-visible, ytd-moving-thumbnail-renderer img, .cbCustomThumbnailCanvas)`);
@@ -73,8 +76,45 @@ function buildHideThumbnailCss(): string {
 function buildHideTitleCss(): string {
     const result: string[] = [];
     for (const start of brandingBoxSelector.split(", ")) {
-        result.push(`${start} #video-title:not(.cbCustomTitle)`);
+        if (!onMobile()) {
+            result.push(`${start} #video-title:not(.cbCustomTitle)`);
+        } else {
+            result.push(`${start} .media-item-headline .yt-core-attributed-string:not(.cbCustomTitle)`);
+        }
+    }
+
+    if (onMobile()) {
+        result.push(".compact-media-item-headline .yt-core-attributed-string:not(.cbCustomTitle)");
     }
 
     return `${result.join(", ")} { display: none !important; }\n`;
+}
+
+function injectMobileCss() {
+    const head = document.getElementsByTagName("head")[0];
+
+    const style = document.createElement("style");
+    style.className = "cb-mobile-css";
+    style.innerHTML = buildMobileCss();
+
+    head.appendChild(style);
+}
+
+function buildMobileCss(): string {
+    if (!onMobile()) return "";
+
+    const html = document.getElementsByTagName("html")[0];
+    if (html) {
+        const style = window.getComputedStyle(html);
+        if (style) {
+            const color = style.getPropertyValue("color");
+            return `
+                :root {
+                    --yt-spec-text-primary: ${color};
+                }
+            `;
+        }
+    }
+
+    return "";
 }

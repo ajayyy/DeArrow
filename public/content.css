@@ -355,13 +355,19 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     opacity: 0.7;
 }
 
-.cbShowOriginal.cbDontHide {
-    display: inline !important;
+.cbMobileButton.cbShowOriginal {
+    margin-left: 0;
 }
 
 /* General case, endcards */
-*:hover > *:not(.ytp-ce-element) > * > .cbShowOriginal, .ytp-ce-element:hover > * > .cbShowOriginal {
+*:hover > *:not(.ytp-ce-element) > * > .cbShowOriginal:not(.cbMobile),
+        .ytp-ce-element:hover > * > .cbShowOriginal:not(.cbMobile),
+        .cbShowOriginal.cbDontHide, .cbShowOriginal.cbMobileDontHide {
     display: inline !important;
+}
+
+.cbMobileButton.cbSubmitButton {
+    margin-right: 0;
 }
 
 .cbSubmitButton svg {

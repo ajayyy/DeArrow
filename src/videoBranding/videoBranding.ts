@@ -12,6 +12,7 @@ import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { handleOnboarding } from "./onboarding";
 import { cleanResultingTitle } from "../titles/titleFormatter";
 import { shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
+import { onMobile } from "../../maze-utils/src/pageInfo";
 
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
 
@@ -35,7 +36,10 @@ export interface VideoBrandingInstance {
     updateBrandingCallbacks: Array<() => Promise<void>>;
 }
 
-export const brandingBoxSelector = "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer, ytd-compact-playlist-renderer, ytd-playlist-renderer, ytd-grid-playlist-renderer, ytd-grid-show-renderer";
+export const brandingBoxSelector = !onMobile() 
+    ? "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer, ytd-compact-playlist-renderer, ytd-playlist-renderer, ytd-grid-playlist-renderer, ytd-grid-show-renderer"
+    : "ytm-video-with-context-renderer, ytm-compact-radio-renderer, ytm-reel-item-renderer, ytm-channel-featured-video-renderer, ytm-compact-video-renderer, ytm-playlist-video-renderer, .playlist-immersive-header-content, ytm-compact-playlist-renderer";
+
 export const watchPageThumbnailSelector = ".ytp-cued-thumbnail-overlay";
 
 const twoRingLogo = chrome.runtime.getURL("icons/logo-2r.svg");
@@ -45,21 +49,7 @@ const videoBrandingInstances: Record<VideoID, VideoBrandingInstance> = {}
 
 export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]> {
     const onWatchPage = document.URL.includes("/watch");
-    const possibleSelectors = onWatchPage ? [
-        {
-            selector: getYouTubeTitleNodeSelector(),
-            checkVisibility: true
-        },
-        {
-            selector: ".ytp-title-text",
-            checkVisibility: false
-        }
-    ] : [
-        {
-            selector: ".miniplayer #info-bar",
-            checkVisibility: false
-        }
-    ];
+    const possibleSelectors = getPossibleSelectors(onWatchPage);
 
     // Find first invisible one, or wait for the first one to be visible
     const mainTitle = possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility) as HTMLElement).filter((element) => isVisible(element))[0] || 
@@ -97,6 +87,41 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
     }
 
     return Promise.all(promises);
+}
+
+function getPossibleSelectors(onWatchPage: boolean) {
+    if (onWatchPage) {
+        if (!onMobile()) {
+            return [
+                {
+                    selector: getYouTubeTitleNodeSelector(),
+                    checkVisibility: true
+                },
+                {
+                    selector: ".ytp-title-text",
+                    checkVisibility: false
+                }
+            ];
+        } else {
+            return [
+                {
+                    selector: getYouTubeTitleNodeSelector(),
+                    checkVisibility: true
+                },
+                {
+                    selector: ".primary-info .title",
+                    checkVisibility: false
+                }
+            ];
+        }
+    } else {
+        return [
+            {
+                selector: ".miniplayer #info-bar",
+                checkVisibility: false
+            }
+        ];
+    }
 }
 
 export async function replaceVideoCardsBranding(elements: HTMLElement[]): Promise<[boolean, boolean][]> {
@@ -157,7 +182,12 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
 export function getLinkElement(element: HTMLElement, brandingLocation: BrandingLocation): HTMLAnchorElement {
     switch (brandingLocation) {
         case BrandingLocation.Related:
-            return element.querySelector("a#thumbnail") as HTMLAnchorElement;
+            if (!onMobile()) {
+                return element.querySelector("a#thumbnail") as HTMLAnchorElement;
+            } else {
+                // Big thumbnails, compact thumbnails, shorts, channel feature, playlist header
+                return element.querySelector("a.media-item-thumbnail-container, a.compact-media-item-image, a.reel-item-endpoint, :scope > a, .amsterdam-playlist-thumbnail-wrapper > a") as HTMLAnchorElement;
+            }
         case BrandingLocation.Endcards:
             return element.querySelector("a.ytp-ce-covering-overlay") as HTMLAnchorElement;
         case BrandingLocation.Autoplay:

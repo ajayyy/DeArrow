@@ -5,6 +5,7 @@ import { logError } from "./utils/logger";
 import { addCssToPage } from "./utils/cssInjector";
 import { runCompatibilityFunctions } from "./utils/extensionCompatibility";
 import { cleanPage } from "./utils/pageCleaner";
+import { setupPageTitleHandler } from "./titles/pageTitleHandler";
 
 cleanPage();
 addCssToPage();
@@ -16,5 +17,6 @@ listenForTitleChange().catch(logError);
 listenForMiniPlayerTitleChange().catch(logError);
 addTitleChangeListener(() => void replaceCurrentVideoBranding().catch(logError));
 setupOptionChangeListener();
+setupPageTitleHandler();
 
 runCompatibilityFunctions();

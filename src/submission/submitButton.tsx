@@ -9,6 +9,7 @@ import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { submitVideoBranding } from "../dataFetching";
 import Config from "../config/config";
 import { addTitleChangeListener, getOrCreateTitleButtonContainer } from "../utils/titleBar";
+import { onMobile } from "../../maze-utils/src/pageInfo";
 
 const submitButtonIcon = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -49,11 +50,12 @@ export class SubmitButton {
                     }
 
                     this.button = document.createElement('button');
-                    this.button.className = "cbSubmitButton cbButton";
+                    this.button.className = "cbSubmitButton cbButton" + (onMobile() ? " cbMobileButton" : "");
                     this.button.innerHTML = submitButtonIcon;
                     this.button.draggable = false;
 
-                    this.button.addEventListener("click", () => {
+                    this.button.addEventListener("click", (e) => {
+                        e.stopPropagation();
                         this.openOrClose().catch(logError);
                     });
                 }
@@ -80,7 +82,9 @@ export class SubmitButton {
         const referenceNode = await getOrCreateTitleButtonContainer();
         if (!referenceNode) return;
 
-        let popupNode = document.querySelector("#secondary-inner");
+        let popupNode = onMobile() 
+            ? document.querySelector(".watch-below-the-player") 
+            : document.querySelector("#secondary-inner");
         if (!popupNode || popupNode.childElementCount < 2) {
             popupNode = referenceNode.parentElement;
         }
