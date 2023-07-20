@@ -379,9 +379,10 @@ export function cleanEmojis(title: string): string {
     const cleaned = title
         .replace(/ \p{Extended_Pictographic}+(?= )/ug, "") // Clear extra spaces between emoji "words"
         .replace(/(\S)\p{Extended_Pictographic}(\S)/ug, "$1 $2") // Emojis in between letters should be spaces
-        .replace(/\p{Extended_Pictographic}/ug, "");
+        .replace(/\p{Extended_Pictographic}/ug, "")
+        .trim();
 
-    if (cleaned.trim().length > 0) {
+    if (cleaned.length > 0) {
         return cleaned;
     } else {
         return title;
