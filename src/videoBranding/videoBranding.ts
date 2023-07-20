@@ -200,7 +200,8 @@ export function getLinkElement(element: HTMLElement, brandingLocation: BrandingL
 }
 
 async function extractVideoID(link: HTMLAnchorElement) {
-    let videoID = link.href?.match(/(?<=(?:\?|&)v=).{11}|(?<=\/shorts\/).{11}/)?.[0] as VideoID;
+    const videoIDRegex = link.href?.match?.(/(?:\?|&)v=(\S{11})|\/shorts\/(\S{11})/);
+    let videoID = (videoIDRegex?.[1] || videoIDRegex?.[2]) as VideoID;
 
     if (!videoID) {
         const image = link.querySelector("yt-image img") as HTMLImageElement;
@@ -213,7 +214,7 @@ async function extractVideoID(link: HTMLAnchorElement) {
             }
 
             if (href) {
-                videoID = href.match(/(?<=\/vi\/).{11}/)?.[0] as VideoID;
+                videoID = href.match(/\/vi\/(\S{11})/)?.[1] as VideoID;
             }
         }
     }
