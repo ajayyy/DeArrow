@@ -214,7 +214,8 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
                 ".details > .yt-core-attributed-string", // Mobile YouTube Channel Feature
                 ".compact-media-item-headline .yt-core-attributed-string", // Mobile YouTube Compact,
                 ".amsterdam-playlist-title .yt-core-attributed-string", // Mobile YouTube Playlist Header,
-                ".autonav-endscreen-video-title .yt-core-attributed-string" // Mobile YouTube Autoplay
+                ".autonav-endscreen-video-title .yt-core-attributed-string", // Mobile YouTube Autoplay
+                ".video-card-title .yt-core-attributed-string", // Mobile YouTube History List
             ];
         case BrandingLocation.Endcards:
             return [".ytp-ce-video-title", ".ytp-ce-playlist-title"];
@@ -427,8 +428,23 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
 
     if (brandingLocation === BrandingLocation.Watch) {
         const referenceNode = await getOrCreateTitleButtonContainer();
-        referenceNode?.prepend(buttonElement);
+        
+        // Verify again it doesn't already exist
+        const existingButton = referenceNode?.querySelector?.(".cbShowOriginal");
+        if (existingButton) {
+            buttonElement.remove();
+            return existingButton as HTMLElement;
+        }
+
+        referenceNode?.prepend?.(buttonElement);
     } else {
+        // Verify again it doesn't already exist
+        const existingButton = originalTitleElement.parentElement?.querySelector?.(".cbShowOriginal");
+        if (existingButton) {
+            buttonElement.remove();
+            return existingButton as HTMLElement;
+        }
+
         originalTitleElement.parentElement?.appendChild(buttonElement);
     }
 

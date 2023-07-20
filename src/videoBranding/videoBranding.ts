@@ -38,7 +38,7 @@ export interface VideoBrandingInstance {
 
 export const brandingBoxSelector = !onMobile() 
     ? "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer, ytd-compact-playlist-renderer, ytd-playlist-renderer, ytd-grid-playlist-renderer, ytd-grid-show-renderer"
-    : "ytm-video-with-context-renderer, ytm-compact-radio-renderer, ytm-reel-item-renderer, ytm-channel-featured-video-renderer, ytm-compact-video-renderer, ytm-playlist-video-renderer, .playlist-immersive-header-content, ytm-compact-playlist-renderer";
+    : "ytm-video-with-context-renderer, ytm-compact-radio-renderer, ytm-reel-item-renderer, ytm-channel-featured-video-renderer, ytm-compact-video-renderer, ytm-playlist-video-renderer, .playlist-immersive-header-content, ytm-compact-playlist-renderer, ytm-video-card-renderer, ytm-vertical-list-renderer";
 
 export const watchPageThumbnailSelector = ".ytp-cued-thumbnail-overlay";
 
@@ -204,7 +204,7 @@ async function extractVideoID(link: HTMLAnchorElement) {
     let videoID = (videoIDRegex?.[1] || videoIDRegex?.[2]) as VideoID;
 
     if (!videoID) {
-        const image = link.querySelector("yt-image img") as HTMLImageElement;
+        const image = link.querySelector("yt-image img, img.video-thumbnail-img") as HTMLImageElement;
         if (image) {
             let href = image.getAttribute("src");
             if (!href) {
