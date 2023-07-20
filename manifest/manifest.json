@@ -1,7 +1,7 @@
 {
     "name": "__MSG_deArrowFullName__",
     "short_name": "DeArrow",
-    "version": "1.1.9",
+    "version": "1.2.0",
     "default_locale": "en",
     "description": "__MSG_deArrowDescription__",
     "homepage_url": "https://sponsor.ajay.app",
