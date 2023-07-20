@@ -10,6 +10,8 @@ import { shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsource
 import { countTitleReplacement } from "../config/stats";
 import { isReduxInstalled } from "../utils/extensionCompatibility";
 import { onMobile } from "../../maze-utils/src/pageInfo";
+import { isFirefoxOrSafari } from "../maze-utils";
+import { isSafari } from "../maze-utils/config";
 
 enum WatchPageType {
     Video,
@@ -293,6 +295,13 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
         titleElement.removeAttribute("is-empty");
 
         if (onMobile()) {
+            titleElement.parentElement!.style.alignItems = "center";
+            if (isFirefoxOrSafari() && !isSafari()) {
+                titleElement.style.width = "-moz-available";
+            } else {
+                titleElement.style.width = "-webkit-fill-available";
+            }
+
             addNodeToListenFor(titleElement, MobileFix.Replace);
             addNodeToListenFor(originalTitleElement, MobileFix.CopyStyles);
         }
