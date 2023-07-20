@@ -42,6 +42,7 @@ Lastly, it adds a "show original" button if anything was changed, allowing you t
 | Extension | https://github.com/ajayyy/DeArrow |
 | Shared Library With SponsorBlock | https://github.com/ajayyy/maze-utils |
 | Translations | https://github.com/ajayyy/ExtensionTranslations |
+| Safari | https://github.com/ajayyy/DeArrowSafari |
 | Backend | https://github.com/ajayyy/SponsorBlockServer|
 | Backend Kubernetes Manifests | https://github.com/ajayyy/SponsorBlockKubernetes |
 | Thumbnail Cache Backend | https://github.com/ajayyy/DeArrowThumbnailCache |
