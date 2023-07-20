@@ -4,6 +4,7 @@ import { showDonationLink } from "../utils/configUtils";
 import { YourWorkComponent } from "./YourWorkComponent";
 import { ToggleOptionComponent } from "./ToggleOptionComponent";
 import { FormattingOptionsComponent } from "./FormattingOptionsComponent";
+import { isSafari } from "../maze-utils/config";
 
 export const PopupComponent = () => {
     const [extensionEnabled, setExtensionEnabled] = React.useState(Config.config!.extensionEnabled);
@@ -87,7 +88,7 @@ export const PopupComponent = () => {
                         {chrome.i18n.getMessage("help")}
                 </a>
                 <a href="https://dearrow.ajay.app" target="_blank" rel="noreferrer">{chrome.i18n.getMessage("website")}</a>
-                <a href="https://dearrow.ajay.app/stats" target="_blank" rel="noreferrer">{chrome.i18n.getMessage("viewLeaderboard")}</a>
+                <a href="https://dearrow.ajay.app/stats" target="_blank" rel="noreferrer" className={isSafari() ? " hidden" : ""}>{chrome.i18n.getMessage("viewLeaderboard")}</a>
                 <a href="https://dearrow.ajay.app/donate" target="_blank" rel="noreferrer" className={!showDonationLink() ? " hidden" : ""}>
                     {chrome.i18n.getMessage("Donate")}
                 </a>
