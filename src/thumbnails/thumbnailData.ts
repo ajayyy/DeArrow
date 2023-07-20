@@ -168,8 +168,8 @@ export async function fetchVideoDataAndroidClient(videoID: VideoID): Promise<Inn
 
         if (result.ok) {
             const response = await result.json();
-            const videoID = response?.videoDetails?.videoId ?? null;
-            if (videoID !== videoID) {
+            const newVideoID = response?.videoDetails?.videoId ?? null;
+            if (newVideoID !== videoID) {
                 return {
                     formats: [],
                     duration: null,
@@ -225,8 +225,8 @@ export async function fetchVideoDataDesktopClient(videoID: VideoID): Promise<Inn
 
         if (result.ok) {
             const response = await result.json();
-            const videoID = response?.videoDetails?.videoId ?? null;
-            if (videoID !== videoID) {
+            const newVideoID = response?.videoDetails?.videoId ?? null;
+            if (newVideoID !== videoID) {
                 return {
                     formats: [],
                     duration: null,
