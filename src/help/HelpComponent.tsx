@@ -1,6 +1,7 @@
 import * as React from "react";
 import Config from "../config/config";
 import { showDonationLink } from "../utils/configUtils";
+import { isSafari } from "../maze-utils/config";
 
 export const HelpComponent = () => {
 
@@ -24,17 +25,23 @@ export const HelpComponent = () => {
                     {chrome.i18n.getMessage("thanksForTryingOutDeArrow")}!
                 </p>
 
-                <p>
-                    {chrome.i18n.getMessage("deArrowBetaStatus")}{" "}
+                {
+                    !isSafari() ?
+                    <>
+                        <p>
+                            {chrome.i18n.getMessage("deArrowBetaStatus")}{" "}
 
-                    <a href="https://gist.github.com/ajayyy/36a96ffc786f4e518fb62cac8b9674aa" target="_blank" rel="noreferrer">
-                        {chrome.i18n.getMessage("LearnMore")}
-                    </a>
-                </p>
+                            <a href="https://gist.github.com/ajayyy/36a96ffc786f4e518fb62cac8b9674aa" target="_blank" rel="noreferrer">
+                                {chrome.i18n.getMessage("LearnMore")}
+                            </a>
+                        </p>
 
-                <p>
-                    {chrome.i18n.getMessage("deArrowTryingOut")} :)
-                </p>
+                        <p>
+                            {chrome.i18n.getMessage("deArrowTryingOut")} :)
+                        </p>
+                    </>
+                    : null
+                }
 
                 {
                     showDonationLink() ? 
