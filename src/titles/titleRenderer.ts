@@ -335,7 +335,7 @@ export async function hideAndUpdateShowOriginalButton(element: HTMLElement, bran
 
 export async function findShowOriginalButton(originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): Promise<HTMLElement> {
     const referenceNode = brandingLocation === BrandingLocation.Watch 
-        ? (await getOrCreateTitleButtonContainer())?.parentElement : originalTitleElement.parentElement;
+        ? (await getOrCreateTitleButtonContainer()) : originalTitleElement.parentElement;
     return referenceNode?.querySelector?.(".cbShowOriginal") as HTMLElement;
 }
 
