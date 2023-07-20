@@ -3,6 +3,7 @@ import { PlaybackUrl, cacheUsed, getFromCache, setupCache } from "./thumbnailDat
 import { VideoID } from "../maze-utils/video";
 import { log } from "../utils/logger";
 import { onMobile } from "../../maze-utils/src/pageInfo";
+import { isSafari } from "../maze-utils/config";
 
 interface PartialThumbnailResult {
     votes: number;
@@ -71,7 +72,10 @@ export async function fetchVideoMetadata(videoID: VideoID, ignoreCache: boolean)
             if (!onMobile() && (!metadata || metadata.formats.length === 0)) metadata = await fetchVideoDataDesktopClient(videoID);
     
             if (metadata && metadata.formats.length > 0) {
-                const formats = metadata.formats;
+                let formats = metadata.formats;
+                if (isSafari()) {
+                    formats = formats.filter((format) => format.mimeType.includes("avc"));
+                }
 
                 const containsVp9 = formats.some((format) => format.mimeType.includes("vp9"));
                 // Should already be reverse sorted, but reverse sort just incase (not slow if it is correct already)
