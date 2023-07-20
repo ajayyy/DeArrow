@@ -22,7 +22,9 @@ const edgeLanguages = [
     "tr",
     "uk",
     "zh_CN"
-]
+];
+
+const english = JSON.parse(fs.readFileSync(path.join(__dirname, "../public/_locales/en/messages.json")));
 
 module.exports = env => {
     const documentScriptBuild = webpack({
@@ -157,11 +159,26 @@ module.exports = env => {
                                     parsed.deArrowFullName.message = parsed.deArrowFullName.message.replace(" on YouTube", "");
                                 }
 
-                                if (env.browser.toLowerCase() === "safari" || env.browser.toLowerCase() === "firefox") {
+                                if (env.browser.toLowerCase() === "firefox") {
                                     if (parsed.deArrowFullName) {
                                         parsed.deArrowFullName.message = parsed.deArrowFullName.message.match(/^.+(?= -)/)?.[0] || parsed.deArrowFullName.message;
                                         if (parsed.deArrowFullName.message.length > 50) {
                                             parsed.deArrowFullName.message = parsed.deArrowFullName.message.slice(0, 47) + "...";
+                                        }
+                                    }
+                                }
+
+                                if (env.browser.toLowerCase() === "safari") {
+                                    if (path.includes("/en/")) {
+                                        parsed.deArrowFullName.message = parsed.deArrowFullName.message.replace(" - Better Titles and Thumbnails on YouTube", " for YouTube");
+                                    } else if (parsed.deArrowFullName) {
+                                        parsed.deArrowFullName.message = parsed.deArrowFullName.message.match(/^.+(?= -)/)?.[0] || parsed.deArrowFullName.message;
+                                        if (parsed.deArrowFullName.message.length > 40) {
+                                            parsed.deArrowFullName.message = parsed.deArrowFullName.message.slice(0, 47) + "...";
+                                        }
+                                    } else {
+                                        parsed.deArrowFullName = {
+                                            message: english.deArrowFullName.message.replace(" - Better Titles and Thumbnails on YouTube", " for YouTube")
                                         }
                                     }
                                 }
