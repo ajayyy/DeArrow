@@ -172,9 +172,9 @@ module.exports = env => {
                                     if (path.includes("/en/")) {
                                         parsed.deArrowFullName.message = parsed.deArrowFullName.message.replace(" - Better Titles and Thumbnails on YouTube", " for YouTube");
                                     } else if (parsed.deArrowFullName) {
-                                        parsed.deArrowFullName.message = parsed.deArrowFullName.message.match(/^.+(?= -)/)?.[0] || parsed.deArrowFullName.message;
+                                        parsed.deArrowFullName.message = parsed.deArrowFullName.message.match(/^.+(?= -| –)/)?.[0] || parsed.deArrowFullName.message;
                                         if (parsed.deArrowFullName.message.length > 40) {
-                                            parsed.deArrowFullName.message = parsed.deArrowFullName.message.slice(0, 47) + "...";
+                                            parsed.deArrowFullName.message = parsed.deArrowFullName.message.slice(0, 37) + "...";
                                         }
                                     } else {
                                         parsed.deArrowFullName = {
