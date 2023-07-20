@@ -220,6 +220,11 @@ function isAllCaps(word: string): boolean {
 export function capitalizeFirstLetter(word: string): string {
     const result: string[] = [];
 
+    if (startsWithEmojiLetter(word)) {
+        // Emoji letter is already "capitalized"
+        return word.toLowerCase();
+    }
+
     for (const char of word) {
         if (char.match(/[\p{L}]/u)) {
             // converts to an array in order to slice by Unicode code points
@@ -236,6 +241,10 @@ export function capitalizeFirstLetter(word: string): string {
 
 function isWordCapitalCase(word: string): boolean {
     return !!word.match(/^[^\p{L}]*[\p{Lu}][^\p{Lu}]+$/u);
+}
+
+function startsWithEmojiLetter(word: string): boolean {
+    return !!word.match(/^[^\p{L}]*[🅰🆎🅱🆑🅾][^\p{Lu}]+$/u);
 }
 
 /**
@@ -377,9 +386,9 @@ export function cleanPunctuation(title: string): string {
 
 export function cleanEmojis(title: string): string {
     const cleaned = title
-        .replace(/ \p{Extended_Pictographic}+(?= )/ug, "") // Clear extra spaces between emoji "words"
-        .replace(/(\S)\p{Extended_Pictographic}(\S)/ug, "$1 $2") // Emojis in between letters should be spaces
-        .replace(/\p{Extended_Pictographic}/ug, "")
+        .replace(/ ((?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S)+(?= )/ug, "") // Clear extra spaces between emoji "words"
+        .replace(/(\S)(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(\S)/ug, "$1 $2") // Emojis in between letters should be spaces
+        .replace(/(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S/ug, "")
         .trim();
 
     if (cleaned.length > 0) {
