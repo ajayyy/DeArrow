@@ -457,7 +457,10 @@ function getThumbnailBox(image: HTMLElement, brandingLocation: BrandingLocation)
 
 export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation,
         showCustomBranding: boolean, timestamp?: number): Promise<boolean> {
-    const image = element.querySelector(getThumbnailSelector(brandingLocation)) as HTMLImageElement;
+    const thumbnailSelector = getThumbnailSelector(brandingLocation);
+    const image = !onMobile() 
+        ? element.querySelector(thumbnailSelector) as HTMLImageElement
+        : await waitFor(() => element.querySelector(thumbnailSelector) as HTMLImageElement);
     const box = getThumbnailBox(image, brandingLocation);
 
     if (!showCustomBranding || !Config.config!.extensionEnabled 
@@ -563,6 +566,11 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
             if (onMobile() && !image.classList.contains("amsterdam-playlist-thumbnail")) {
                 thumbnail.style.position = "absolute";
                 thumbnail.style.top = "0";
+
+                thumbnail.style.marginLeft = "auto";
+                thumbnail.style.marginRight = "auto";
+                thumbnail.style.left = "0";
+                thumbnail.style.right = "0";
             } else if (image.classList.contains("amsterdam-playlist-thumbnail")) {
                 // Playlist header on mobile
                 thumbnail.style.removeProperty("height");
