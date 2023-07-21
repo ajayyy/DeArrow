@@ -299,8 +299,10 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
             titleElement.parentElement!.style.alignItems = "center";
             if (isFirefoxOrSafari() && !isSafari()) {
                 titleElement.style.width = "-moz-available";
+                originalTitleElement.style.width = "-moz-available";
             } else {
                 titleElement.style.width = "-webkit-fill-available";
+                originalTitleElement.style.width = "-webkit-fill-available";
             }
 
             addNodeToListenFor(titleElement, MobileFix.Replace);
