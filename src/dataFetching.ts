@@ -61,6 +61,7 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
                     original: false
                 };
             } else {
+                console.log(videoID, "no random timestamp found")
                 return null;
             }
         } else {
@@ -269,7 +270,9 @@ async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Re
     let results: Record<VideoID, BrandingResult> | null = null;
 
     if (queryByHash) {
-        const request = await sendRequestToServer("GET", `/api/branding/${(await getHash(videoID, 1)).slice(0, 4)}`);
+        const request = await sendRequestToServer("GET", `/api/branding/${(await getHash(videoID, 1)).slice(0, 4)}`, {
+            fetchAll: true
+        });
 
         if (request.ok || request.status === 404) {
             try {
