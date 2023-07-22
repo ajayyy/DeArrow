@@ -61,7 +61,6 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
                     original: false
                 };
             } else {
-                console.log(videoID, "no random timestamp found")
                 return null;
             }
         } else {
