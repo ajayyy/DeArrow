@@ -17,6 +17,7 @@ export const ChannelOverridesComponent = () => {
     const [replaceTitles, setReplaceTitles] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "replaceTitles") : false);
     const [replaceThumbnails, setReplaceThumbnails] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "replaceThumbnails") : false);
     const [useCrowdsourcedTitles, setUseCrowdsourcedTitles] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "useCrowdsourcedTitles") : false);
+    const [defaultToCustom, setDefaultToCustom] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "defaultToCustom") : false);
     const [titleFormatting, setTitleFormatting] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "titleFormatting") : "");
     const [shouldCleanEmojis, setShouldCleanEmojis] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "shouldCleanEmojis") : false);
     const [thumbnailFallback, setThumbnailFallback] = React.useState(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "thumbnailFallback") : "");
@@ -31,6 +32,8 @@ export const ChannelOverridesComponent = () => {
 
         setUseCrowdsourcedTitles(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "useCrowdsourcedTitles") : false);
         setHideUseCrowdsourcedTitles(!getValueWithDefault(replaceTitles, "replaceTitles"));
+
+        setDefaultToCustom(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "defaultToCustom") : false);
 
         setReplaceThumbnails(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "replaceThumbnails") : false);
         setTitleFormatting(getConfig(selectedConfigurationID) ? getValue(getConfig(selectedConfigurationID)!, "titleFormatting") : "");
@@ -65,6 +68,7 @@ export const ChannelOverridesComponent = () => {
                             replaceTitles: null,
                             replaceThumbnails: null,
                             useCrowdsourcedTitles: null,
+                            defaultToCustom: null,
                             titleFormatting: null,
                             shouldCleanEmojis: null,
                             thumbnailFallback: null
@@ -181,6 +185,19 @@ export const ChannelOverridesComponent = () => {
                         showResetButton={shouldShowResetButton(useCrowdsourcedTitles)}
                         onReset={() => {
                             updateValue(getConfig(selectedConfigurationID)!, "useCrowdsourcedTitles", null, setUseCrowdsourcedTitles);
+                        }}
+                    />
+                    <ToggleOptionComponent
+                        id="defaultToCustom"
+                        onChange={(value) => {
+                            updateValue(getConfig(selectedConfigurationID)!, "defaultToCustom", !value, setDefaultToCustom);
+                        }}
+                        value={!getValueWithDefault(defaultToCustom, "defaultToCustom")}
+                        label={chrome.i18n.getMessage("defaultToOriginals")}
+                        className={getClassNames(defaultToCustom)}
+                        showResetButton={shouldShowResetButton(defaultToCustom)}
+                        onReset={() => {
+                            updateValue(getConfig(selectedConfigurationID)!, "defaultToCustom", null, setDefaultToCustom);
                         }}
                     />
 

@@ -3,10 +3,10 @@ import Config from "../config/config";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
 import { MobileFix, addNodeToListenFor, getOrCreateTitleButtonContainer } from "../utils/titleBar";
-import { BrandingLocation, extractVideoIDFromElement, toggleShowCustom } from "../videoBranding/videoBranding";
+import { BrandingLocation, ShowCustomBrandingInfo, extractVideoIDFromElement, getActualShowCustomBranding, toggleShowCustom } from "../videoBranding/videoBranding";
 import { formatTitle } from "./titleFormatter";
 import { setPageTitle } from "./pageTitleHandler";
-import { shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
+import { shouldDefaultToCustom, shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { countTitleReplacement } from "../config/stats";
 import { isReduxInstalled } from "../utils/extensionCompatibility";
 import { onMobile } from "../../maze-utils/src/pageInfo";
@@ -22,7 +22,7 @@ let lastWatchTitle = "";
 let lastWatchVideoID: VideoID | null = null;
 let lastUrlWatchPageType: WatchPageType | null = null;
 
-export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: boolean, brandingLocation: BrandingLocation): Promise<boolean> {
+export async function replaceTitle(element: HTMLElement, videoID: VideoID, showCustomBranding: ShowCustomBrandingInfo, brandingLocation: BrandingLocation): Promise<boolean> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
 
     if (!Config.config!.extensionEnabled || shouldReplaceTitlesFastCheck(videoID) === false) {
@@ -93,7 +93,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
 
         showCustomTitle(element, brandingLocation);
 
-        if (!showCustomBranding) {
+        if (!await getActualShowCustomBranding(showCustomBranding)) {
             showOriginalTitle(element, brandingLocation);
         }
 
@@ -318,13 +318,13 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
 }
 
 export async function hideAndUpdateShowOriginalButton(element: HTMLElement, brandingLocation: BrandingLocation,
-        showCustomBranding: boolean, dontHide: boolean): Promise<void> {
+        showCustomBranding: ShowCustomBrandingInfo, dontHide: boolean): Promise<void> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const buttonElement = await findShowOriginalButton(originalTitleElement, brandingLocation);
     if (buttonElement) {
         const buttonImage = buttonElement.querySelector(".cbShowOriginalImage") as HTMLElement;
         if (buttonImage) {
-            if (showCustomBranding) {
+            if (await getActualShowCustomBranding(showCustomBranding)) {
                 buttonImage.classList.remove("cbOriginalShown");
                 buttonElement.title = chrome.i18n.getMessage("ShowOriginal");
             } else {
@@ -332,7 +332,9 @@ export async function hideAndUpdateShowOriginalButton(element: HTMLElement, bran
                 buttonElement.title = chrome.i18n.getMessage("ShowModified");
             }
 
-            if (showCustomBranding === Config.config!.defaultToCustom 
+            const isDefault = showCustomBranding.knownValue === null 
+                || showCustomBranding.knownValue === showCustomBranding.originalValue;
+            if (isDefault
                     && brandingLocation !== BrandingLocation.Watch
                     && !Config.config!.alwaysShowShowOriginalButton) {
                 buttonElement.classList.remove("cbDontHide");
@@ -355,7 +357,7 @@ export async function findOrCreateShowOriginalButton(element: HTMLElement, brand
         videoID: VideoID): Promise<HTMLElement> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const buttonElement = await findShowOriginalButton(originalTitleElement, brandingLocation) 
-        ?? await createShowOriginalButton(originalTitleElement, brandingLocation);
+        ?? await createShowOriginalButton(originalTitleElement, brandingLocation, videoID);
 
     buttonElement.setAttribute("videoID", videoID);
     buttonElement.style.removeProperty("display");
@@ -363,7 +365,7 @@ export async function findOrCreateShowOriginalButton(element: HTMLElement, brand
 }
 
 async function createShowOriginalButton(originalTitleElement: HTMLElement,
-        brandingLocation: BrandingLocation): Promise<HTMLElement> {
+        brandingLocation: BrandingLocation, videoID: VideoID): Promise<HTMLElement> {
     const buttonElement = document.createElement("button");
     buttonElement.classList.add("cbShowOriginal");
     if (onMobile()) buttonElement.classList.add("cbMobileButton");
@@ -380,7 +382,7 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
     buttonImage.src = chrome.runtime.getURL("icons/logo.svg");
     buttonElement.appendChild(buttonImage);
 
-    if (!Config.config?.defaultToCustom) {
+    if (!await shouldDefaultToCustom(videoID)) {
         buttonImage.classList.add("cbOriginalShown");
         buttonElement.title = chrome.i18n.getMessage("ShowModified");
     } else {

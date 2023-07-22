@@ -18,6 +18,14 @@ export function shouldReplaceThumbnailsFastCheck(videoID: VideoID | null): boole
     return fastChannelOverrideOption<boolean>(videoID, "replaceThumbnails");
 }
 
+export function shouldDefaultToCustom(videoID: VideoID | null): Promise<boolean> {
+    return checkChannelOverrideOption<boolean>(videoID, "defaultToCustom");
+}
+
+export function shouldDefaultToCustomFastCheck(videoID: VideoID | null): boolean | null {
+    return fastChannelOverrideOption<boolean>(videoID, "defaultToCustom");
+}
+
 export function shouldUseCrowdsourcedTitles(videoID: VideoID | null): Promise<boolean> {
     return checkChannelOverrideOption<boolean>(videoID, "useCrowdsourcedTitles");
 }

@@ -3,7 +3,7 @@ import { getFromCache, RenderedThumbnailVideo, setupCache, ThumbnailVideo } from
 import { VideoID, getVideoID } from "../maze-utils/video";
 import { getNumberOfThumbnailCacheRequests, getVideoThumbnailIncludingUnsubmitted, isFetchingFromThumbnailCache, queueThumbnailCacheRequest, waitForThumbnailCache } from "../dataFetching";
 import { log, logError } from "../utils/logger";
-import { BrandingLocation, extractVideoIDFromElement } from "../videoBranding/videoBranding";
+import { BrandingLocation, ShowCustomBrandingInfo, extractVideoIDFromElement, getActualShowCustomBranding } from "../videoBranding/videoBranding";
 import { isFirefoxOrSafari, timeoutPomise, waitFor } from "../maze-utils";
 import Config, { ThumbnailFallbackOption } from "../config/config";
 import { getThumbnailFallbackOption, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "../config/channelOverrides";
@@ -456,14 +456,14 @@ function getThumbnailBox(image: HTMLElement, brandingLocation: BrandingLocation)
 }
 
 export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation,
-        showCustomBranding: boolean, timestamp?: number): Promise<boolean> {
+        showCustomBranding: ShowCustomBrandingInfo, timestamp?: number): Promise<boolean> {
     const thumbnailSelector = getThumbnailSelector(brandingLocation);
     const image = !onMobile() 
         ? element.querySelector(thumbnailSelector) as HTMLImageElement
         : await waitFor(() => element.querySelector(thumbnailSelector) as HTMLImageElement);
     const box = getThumbnailBox(image, brandingLocation);
 
-    if (!showCustomBranding || !Config.config!.extensionEnabled 
+    if (showCustomBranding.knownValue === false || !Config.config!.extensionEnabled 
             || shouldReplaceThumbnailsFastCheck(videoID) === false) {
         resetToShowOriginalThumbnail(image, brandingLocation);
 
@@ -503,6 +503,10 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
 
         // Trigger a fetch to start, and display the original thumbnail if necessary
         getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation).then(async (thumbnail) => {
+            if (!await getActualShowCustomBranding(showCustomBranding)) {
+                return;
+            }
+
             if (!thumbnail || thumbnail.original) {
                 if (!thumbnail && await getThumbnailFallbackOption(videoID) === ThumbnailFallbackOption.Blank) {
                     resetToBlankThumbnail(image);
@@ -518,7 +522,11 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
             const thumbnail = await createThumbnailImageElement(existingImageElement, videoID, width, height, brandingLocation, timestamp ?? null, false, async () => {
                 return brandingLocation === BrandingLocation.Watch ? getVideoID() === videoID 
                     : await extractVideoIDFromElement(element, brandingLocation) === videoID;
-            }, (thumbnail) => {
+            }, async (thumbnail) => {
+                if (!await getActualShowCustomBranding(showCustomBranding)) {
+                    return;
+                }
+
                 thumbnail!.style.removeProperty("display");
 
                 if (brandingLocation === BrandingLocation.Related) {
@@ -538,6 +546,14 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                 resetToShowOriginalThumbnail(image, brandingLocation);
 
                 return false;
+            }
+
+            if (!await getActualShowCustomBranding(showCustomBranding)) {
+                resetToShowOriginalThumbnail(image, brandingLocation);
+
+                // Still check if the thumbnail is supposed to be changed or not
+                const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation);
+                return !!thumbnail && !thumbnail.original;
             }
 
             image.style.display = "none";

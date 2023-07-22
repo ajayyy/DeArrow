@@ -4,13 +4,13 @@ import { getVideoThumbnailIncludingUnsubmitted, getVideoTitleIncludingUnsubmitte
 import { VideoID } from "../maze-utils/video";
 import { FormattingOptionsComponent } from "../popup/FormattingOptionsComponent";
 import { Tooltip } from "../utils/tooltip";
-import { BrandingLocation } from "./videoBranding";
+import { BrandingLocation, ShowCustomBrandingInfo, getActualShowCustomBranding } from "./videoBranding";
 import * as CompileConfig from "../../config.json"
 
 export async function handleOnboarding(element: HTMLElement, videoID: VideoID,
-        brandingLocation: BrandingLocation, showCustomBranding: boolean, result: [boolean, boolean]): Promise<void> {
+        brandingLocation: BrandingLocation, showCustomBranding: ShowCustomBrandingInfo, result: [boolean, boolean]): Promise<void> {
 
-    if (Config.config!.showInfoAboutRandomThumbnails && showCustomBranding && element && videoID
+    if (Config.config!.showInfoAboutRandomThumbnails && await getActualShowCustomBranding(showCustomBranding) && element && videoID
             && brandingLocation === BrandingLocation.Related && document.URL === "https://www.youtube.com/"
             && !CompileConfig.debug) {
         

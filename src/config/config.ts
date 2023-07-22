@@ -49,6 +49,7 @@ export interface CustomConfiguration {
     name: string;
     replaceTitles: boolean | null;
     replaceThumbnails: boolean | null;
+    defaultToCustom: boolean | null;
     useCrowdsourcedTitles: boolean | null;
     titleFormatting: TitleFormatting | null;
     shouldCleanEmojis: boolean | null;

@@ -11,7 +11,7 @@ import { logError } from "../utils/logger";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { handleOnboarding } from "./onboarding";
 import { cleanResultingTitle } from "../titles/titleFormatter";
-import { shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
+import { shouldDefaultToCustom, shouldDefaultToCustomFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
@@ -31,8 +31,17 @@ export enum BrandingLocation {
     EndRecommendations
 }
 
+export type ShowCustomBrandingInfo = {
+    knownValue: boolean;
+    originalValue: boolean | null;
+} | {
+    knownValue: null;
+    actualValue: Promise<boolean>;
+    originalValue: boolean | null;
+};
+
 export interface VideoBrandingInstance {
-    showCustomBranding: boolean;
+    showCustomBranding: ShowCustomBrandingInfo;
     updateBrandingCallbacks: Array<() => Promise<void>>;
 }
 
@@ -237,7 +246,7 @@ function isPlaylistOrClipTitle(link: HTMLAnchorElement) {
 }
 
 export async function handleShowOriginalButton(element: HTMLElement, videoID: VideoID,
-        brandingLocation: BrandingLocation, showCustomBranding: boolean,
+        brandingLocation: BrandingLocation, showCustomBranding: ShowCustomBrandingInfo,
         promises: [Promise<boolean>, Promise<boolean>],
         dontHide = false): Promise<void> {
     await hideAndUpdateShowOriginalButton(element, brandingLocation, showCustomBranding, dontHide);
@@ -272,7 +281,11 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
 function getAndUpdateVideoBrandingInstances(videoID: VideoID, updateBranding: () => Promise<void>): VideoBrandingInstance {
     if (!videoBrandingInstances[videoID]) {
         videoBrandingInstances[videoID] = {
-            showCustomBranding: Config.config?.defaultToCustom ?? true,
+            showCustomBranding: {
+                knownValue: shouldDefaultToCustomFastCheck(videoID),
+                actualValue: shouldDefaultToCustom(videoID),
+                originalValue: shouldDefaultToCustomFastCheck(videoID)
+            },
             updateBrandingCallbacks: [updateBranding]
         }
     } else {
@@ -282,26 +295,39 @@ function getAndUpdateVideoBrandingInstances(videoID: VideoID, updateBranding: ()
     return videoBrandingInstances[videoID];
 }
 
-export function toggleShowCustom(videoID: VideoID): Promise<boolean> {
+export async function toggleShowCustom(videoID: VideoID): Promise<void> {
     if (videoBrandingInstances[videoID]) {
-        return setShowCustom(videoID, !videoBrandingInstances[videoID].showCustomBranding);
+        return await setShowCustom(videoID, !await getActualShowCustomBranding(videoBrandingInstances[videoID].showCustomBranding));
     }
-
-    // Assume still showing, but something has gone very wrong if it gets here
-    return Promise.resolve(true);
 }
 
-export async function setShowCustom(videoID: VideoID, value: boolean): Promise<boolean> {
+export async function setShowCustom(videoID: VideoID, value: boolean): Promise<void> {
     if (videoBrandingInstances[videoID]) {
-        videoBrandingInstances[videoID].showCustomBranding = value;
+        videoBrandingInstances[videoID].showCustomBranding = {
+            knownValue: value,
+            originalValue: shouldDefaultToCustomFastCheck(videoID)
+        };
 
         await updateBrandingForVideo(videoID);
+    }
+}
 
-        return value;
+/**
+ * If a video is currently at the default state, it will be updated to it's newest state
+ */
+async function updateCurrentlyDefaultShowCustom(videoID: VideoID): Promise<void> {
+    if (videoBrandingInstances[videoID] 
+            && [null, videoBrandingInstances[videoID].showCustomBranding.originalValue]
+                    .includes(videoBrandingInstances[videoID].showCustomBranding.knownValue)) {
+
+        videoBrandingInstances[videoID].showCustomBranding = {
+            knownValue: shouldDefaultToCustomFastCheck(videoID),
+            actualValue: shouldDefaultToCustom(videoID),
+            originalValue: shouldDefaultToCustomFastCheck(videoID)
+        };
     }
 
-    // Assume still showing, but something has gone very wrong if it gets here
-    return true;
+    await updateBrandingForVideo(videoID);
 }
 
 export async function updateBrandingForVideo(videoID: VideoID): Promise<void> {
@@ -332,9 +358,14 @@ export function startThumbnailListener(): void {
 
 export function setupOptionChangeListener(): void {
     Config.configSyncListeners.push((changes) => {
-        if (changes.defaultToCustom && changes.defaultToCustom.newValue !== changes.defaultToCustom.oldValue) {
+        const settingsToReloadShowCustom = [
+            "defaultToCustom",
+            "customConfigurations"
+        ];
+
+        if (settingsToReloadShowCustom.some((name) => (changes[name] && changes[name].newValue !== changes[name].oldValue))) {
             for (const videoID in videoBrandingInstances) {
-                setShowCustom(videoID as VideoID, changes.defaultToCustom.newValue).catch(logError);
+                updateCurrentlyDefaultShowCustom(videoID as VideoID).catch(logError);
             }
         }
 
@@ -347,7 +378,6 @@ export function setupOptionChangeListener(): void {
             "shouldCleanEmojis",
             "thumbnailFallback",
             "alwaysShowShowOriginalButton",
-            "customConfigurations",
             "channelOverrides"
         ];
 
@@ -392,4 +422,10 @@ function waitForImageSrc(image: HTMLImageElement): Promise<void> {
     }
 
     return existingPromise;
+}
+
+export function getActualShowCustomBranding(showCustomBranding: ShowCustomBrandingInfo): Promise<boolean> {
+    return showCustomBranding.knownValue === null 
+        ? showCustomBranding.actualValue
+        : Promise.resolve(showCustomBranding.knownValue);
 }
