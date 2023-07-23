@@ -138,7 +138,7 @@ export class SubmitButton {
         }
     }
 
-    private async submitPressed(title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null): Promise<void> {
+    private async submitPressed(title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null): Promise<boolean> {
         if (title) {
             title.title = title.title.trim();
 
@@ -149,7 +149,7 @@ export class SubmitButton {
 
         if (getVideoID() !== getYouTubeVideoID()) {
             alert(chrome.i18n.getMessage("videoIDWrongWhenSubmittingError"));
-            return;
+            return false;
         }
         
         const result = await submitVideoBranding(getVideoID()!, title, thumbnail);
@@ -190,6 +190,8 @@ export class SubmitButton {
             }
 
             replaceCurrentVideoBranding().catch(logError);
+
+            return true;
         } else {
             const text = result.responseText;
 
@@ -198,6 +200,8 @@ export class SubmitButton {
             } else {
                 alert(text);
             }
+
+            return false;
         }
     }
 }

@@ -27,7 +27,7 @@ export interface SubmissionComponentProps {
     video: HTMLVideoElement;
     submissions: BrandingResult;
     
-    submitClicked: (title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null) => void;
+    submitClicked: (title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null) => Promise<boolean>;
 }
 
 interface ChatDisplayName {
@@ -68,6 +68,8 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             });
         }).catch(logError);
     }, []);
+
+    const [currentlySubmitting, setCurrentlySubmitting] = React.useState(false);
 
     const originalTitle = toSentenceCase(getCurrentPageTitle() || chrome.i18n.getMessage("OriginalTitle"), false);
     const titles: RenderedTitleSubmission[] = [{
@@ -222,13 +224,22 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
             <div className="cbVoteButtonContainer">
                 <button className="cbNoticeButton cbVoteButton" 
-                    disabled={(!selectedThumbnail.current && !selectedTitle) 
+                    disabled={currentlySubmitting 
+                                || (!selectedThumbnail.current && !selectedTitle) 
                                 || (!!selectedTitle && selectedTitle.title === chrome.i18n.getMessage("OriginalTitle"))}
-                    onClick={() => void props.submitClicked(selectedTitle ? {
-                    ...selectedTitle,
-                    original: selectedTitle.title === getCurrentPageTitle()
-                                || (!!getCurrentPageTitle() && selectedTitle.title === toSentenceCase(getCurrentPageTitle()!, false))
-                } : null, selectedThumbnail.current)}>
+                    onClick={() => {
+                        setCurrentlySubmitting(true);
+
+                        props.submitClicked(selectedTitle ? {
+                            ...selectedTitle,
+                            original: selectedTitle.title === getCurrentPageTitle()
+                                        || (!!getCurrentPageTitle() && selectedTitle.title === toSentenceCase(getCurrentPageTitle()!, false))
+                        } : null, selectedThumbnail.current).then((success) => {
+                            if (!success) {
+                                setCurrentlySubmitting(false);
+                            }
+                        });
+                    }}>
                     {`${chrome.i18n.getMessage("Vote")}`}
                 </button>
             </div>
