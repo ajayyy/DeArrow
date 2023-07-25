@@ -60,7 +60,7 @@ export interface ChannelInfo {
 const activeRequests: Record<VideoID, Promise<VideoMetadata>> = {};
 export async function fetchVideoMetadata(videoID: VideoID, ignoreCache: boolean): Promise<VideoMetadata> {
     const cachedData = getFromCache(videoID);
-    if (!ignoreCache && cachedData?.metadata) {
+    if (!ignoreCache && cachedData?.metadata && cachedData.metadata.duration !== null) {
         return cachedData.metadata;
     }
 
