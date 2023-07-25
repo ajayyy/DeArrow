@@ -4,6 +4,17 @@
 
 <h1 align="center">DeArrow</h1>
 
+<p align="center">
+  <b>Download:</b>
+  <a href="https://chrome.google.com/webstore/detail/dearrow-better-titles-and/enamippconapkdmgfgjchkhakpfinmaj">Chrome/Chromium</a> |
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/dearrow/">Firefox</a> |
+  <a href="https://github.com/ajayyy/DeArrow/wiki/Android">Android</a> |
+  <!-- <a href="https://github.com/ajayyy/DeArrow/wiki/Edge">Edge</a> | -->
+  <!-- <a href="https://github.com/ajayyy/DeArrow/wiki/Safari">Safari for MacOS and iOS</a> | -->
+  <a href="https://dearrow.ajay.app">Website</a> |
+  <a href="https://dearrow.ajay.app/stats">Stats</a>
+</p>
+
 DeArrow is a browser extension for crowdsourcing better titles and thumbnails on YouTube.
 
 The goal of DeArrow is to make titles accurate and reduce sensationalism.
