@@ -68,9 +68,9 @@ export async function fetchVideoMetadata(videoID: VideoID, ignoreCache: boolean)
 
     try {
         const result = activeRequests[videoID] ?? (async () => {
-            let metadata = Math.random() > 0.5 && !onMobile() ? await fetchVideoDataAndroidClient(videoID) : await fetchVideoDataDesktopClient(videoID);
-            if (!onMobile() && (!metadata || metadata.formats.length === 0)) metadata = await fetchVideoDataDesktopClient(videoID);
-    
+            let metadata = Math.random() > 0.5 && !onMobile() ? await fetchVideoDataAndroidClient(videoID).catch(() => null) : await fetchVideoDataDesktopClient(videoID).catch(() => null);
+            if (!onMobile() && (!metadata || metadata.formats.length === 0)) metadata = await fetchVideoDataDesktopClient(videoID).catch(() => null);
+
             if (metadata && metadata.formats.length > 0) {
                 let formats = metadata.formats;
                 if (isSafari()) {
