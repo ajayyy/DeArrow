@@ -8,9 +8,8 @@
   <b>Download:</b>
   <a href="https://chrome.google.com/webstore/detail/dearrow-better-titles-and/enamippconapkdmgfgjchkhakpfinmaj">Chrome/Chromium</a> |
   <a href="https://addons.mozilla.org/en-US/firefox/addon/dearrow/">Firefox</a> |
+  <a href="https://apps.apple.com/app/dearrow-for-youtube/id6451469297">Safari for MacOS and iOS</a> |
   <a href="https://github.com/ajayyy/DeArrow/wiki/Android">Android</a> |
-  <!-- <a href="https://github.com/ajayyy/DeArrow/wiki/Edge">Edge</a> | -->
-  <!-- <a href="https://github.com/ajayyy/DeArrow/wiki/Safari">Safari for MacOS and iOS</a> | -->
   <a href="https://dearrow.ajay.app">Website</a> |
   <a href="https://dearrow.ajay.app/stats">Stats</a>
 </p>
@@ -39,12 +38,6 @@ All thumbnails are just timestamps in a video, so they need to be generated. The
 If no thumbnails or titles are submitted, it switches to the configurable fallback options. Titles will be formatted according to user preference (title or sentence cases). Thumbnails, by default, are generated at a random timestamp that is not in a [SponsorBlock](https://github.com/ajayyy/SponsorBlock) segment.
 
 Lastly, it adds a "show original" button if anything was changed, allowing you to peek at the original title and thumbnail when you want.
-
-### Download
-
-[Firefox](https://addons.mozilla.org/en-US/firefox/addon/dearrow/)
-[Chromium](https://chrome.google.com/webstore/detail/dearrow-better-titles-and/enamippconapkdmgfgjchkhakpfinmaj)
-
 
 ### Related Repositories
 
