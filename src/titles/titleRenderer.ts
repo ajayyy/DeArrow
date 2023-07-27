@@ -5,7 +5,7 @@ import { logError } from "../utils/logger";
 import { MobileFix, addNodeToListenFor, getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { BrandingLocation, ShowCustomBrandingInfo, extractVideoIDFromElement, getActualShowCustomBranding, toggleShowCustom } from "../videoBranding/videoBranding";
 import { formatTitle } from "./titleFormatter";
-import { setPageTitle } from "./pageTitleHandler";
+import { setCurrentVideoTitle } from "./pageTitleHandler";
 import { shouldDefaultToCustom, shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { countTitleReplacement } from "../config/stats";
 import { isReduxInstalled } from "../utils/extensionCompatibility";
@@ -122,7 +122,7 @@ function hideOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
 
     switch(brandingLocation) {
         case BrandingLocation.Watch: {
-            setPageTitle("");
+            setCurrentVideoTitle("");
             break;
         }
     }
@@ -145,7 +145,7 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
                 originalTitleElement.style.setProperty("display", "inline-block", "important");
             }
 
-            setPageTitle(originalTitleElement.textContent ?? "");
+            setCurrentVideoTitle(originalTitleElement.textContent ?? "");
             break;
         }
         default: {
@@ -173,7 +173,7 @@ function showCustomTitle(element: HTMLElement, brandingLocation: BrandingLocatio
 
     switch(brandingLocation) {
         case BrandingLocation.Watch: {
-            setPageTitle(titleElement.textContent ?? "");
+            setCurrentVideoTitle(titleElement.textContent ?? "");
             break;
         }
     }
@@ -187,7 +187,7 @@ function setCustomTitle(title: string, element: HTMLElement, brandingLocation: B
 
     switch(brandingLocation) {
         case BrandingLocation.Watch: {
-            setPageTitle(title);
+            setCurrentVideoTitle(title);
             break;
         }
     }

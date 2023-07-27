@@ -8,7 +8,7 @@ import { getHash } from "./maze-utils/hash";
 import Config, { ThumbnailCacheOption, ThumbnailFallbackOption } from "./config/config";
 import { generateUserID } from "./maze-utils/setup";
 import { BrandingUUID } from "./videoBranding/videoBranding";
-import { timeoutPomise } from "./maze-utils";
+import { objectToURI, timeoutPomise } from "./maze-utils";
 import { isCachedThumbnailLoaded, setupPreRenderedThumbnail, thumbnailCacheDownloaded } from "./thumbnails/thumbnailRenderer";
 import { setupCache } from "./thumbnails/thumbnailDataCache";
 import * as CompileConfig from "../config.json";
@@ -494,4 +494,11 @@ export function sendRequestToThumbnailCache(videoID: string, time?: number, titl
     }
     
     return sendRealRequestToCustomServer("GET", `${Config.config?.thumbnailServerAddress}/api/v1/getThumbnail`, data);
+}
+
+export function getThumbnailUrl(videoID: string, time: number): string {
+    return objectToURI(`${Config.config?.thumbnailServerAddress}/api/v1/getThumbnail`, {
+        videoID,
+        time
+    }, true);
 }

@@ -1,7 +1,7 @@
 import { Format, getPlaybackFormats } from "./thumbnailData";
 import { getFromCache, RenderedThumbnailVideo, setupCache, ThumbnailVideo } from "./thumbnailDataCache";
 import { VideoID, getVideoID } from "../maze-utils/video";
-import { getNumberOfThumbnailCacheRequests, getVideoThumbnailIncludingUnsubmitted, isFetchingFromThumbnailCache, queueThumbnailCacheRequest, waitForThumbnailCache } from "../dataFetching";
+import { getNumberOfThumbnailCacheRequests, getThumbnailUrl, getVideoThumbnailIncludingUnsubmitted, isFetchingFromThumbnailCache, queueThumbnailCacheRequest, waitForThumbnailCache } from "../dataFetching";
 import { log, logError } from "../utils/logger";
 import { BrandingLocation, ShowCustomBrandingInfo, extractVideoIDFromElement, getActualShowCustomBranding } from "../videoBranding/videoBranding";
 import { isFirefoxOrSafari, timeoutPomise, waitFor } from "../maze-utils";
@@ -12,6 +12,7 @@ import { ThumbnailCacheOption } from "../config/config";
 import { getThumbnailImageSelectors, getThumbnailSelectors } from "../maze-utils/thumbnail-selectors";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { MobileFix, addNodeToListenFor } from "../utils/titleBar";
+import { resetMediaSessionThumbnail, setMediaSessionThumbnail } from "../videoBranding/mediaSessionHandler";
 
 const activeRendersMax = isFirefoxOrSafari() ? 3 : 6;
 const activeRenders: Record<VideoID, Promise<RenderedThumbnailVideo | null>> = {};
@@ -311,7 +312,7 @@ function renderToBlob(surface: HTMLVideoElement | HTMLCanvasElement): Promise<Bl
  */
 export async function createThumbnailImageElement(existingElement: HTMLImageElement | null, videoID: VideoID, width: number,
     height: number, brandingLocation: BrandingLocation, forcedTimestamp: number | null,
-    saveVideo: boolean, stillValid: () => Promise<boolean>, ready: (image: HTMLImageElement) => unknown,
+    saveVideo: boolean, stillValid: () => Promise<boolean>, ready: (image: HTMLImageElement, timestamp: number) => unknown,
     failure: () => unknown): Promise<HTMLImageElement | null> {
 
     let timestamp = forcedTimestamp as number;
@@ -379,8 +380,9 @@ export async function createThumbnailImageElement(existingElement: HTMLImageElem
             return;
         }
 
-        drawBlob(image, canvasInfo.blob);
-        ready(image);
+        const url = URL.createObjectURL(canvasInfo.blob);
+        image.src = url;
+        ready(image, timestamp);
     }
 
     const activeRender = activeRenders[videoID] ?? renderThumbnail(videoID, width, height, saveVideo, timestamp);
@@ -394,10 +396,6 @@ export async function createThumbnailImageElement(existingElement: HTMLImageElem
     });
 
     return image;
-}
-
-export function drawBlob(image: HTMLImageElement, blob: Blob): void {
-    image.src = URL.createObjectURL(blob);
 }
 
 export function drawCenteredToCanvas(canvas: HTMLCanvasElement, width: number, height: number,
@@ -509,7 +507,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
 
             if (!thumbnail || thumbnail.original) {
                 if (!thumbnail && await getThumbnailFallbackOption(videoID) === ThumbnailFallbackOption.Blank) {
-                    resetToBlankThumbnail(image);
+                    resetToBlankThumbnail(image, brandingLocation);
                 } else {
                     resetToShowOriginalThumbnail(image, brandingLocation);
                 }
@@ -522,7 +520,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
             const thumbnail = await createThumbnailImageElement(existingImageElement, videoID, width, height, brandingLocation, timestamp ?? null, false, async () => {
                 return brandingLocation === BrandingLocation.Watch ? getVideoID() === videoID 
                     : await extractVideoIDFromElement(element, brandingLocation) === videoID;
-            }, async (thumbnail) => {
+            }, async (thumbnail, timestamp) => {
                 if (!await getActualShowCustomBranding(showCustomBranding)) {
                     return;
                 }
@@ -531,6 +529,11 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
 
                 if (brandingLocation === BrandingLocation.Related) {
                     box.setAttribute("loaded", "");
+                }
+
+                if (brandingLocation === BrandingLocation.Watch
+                        && Config.config!.thumbnailCacheUse === ThumbnailCacheOption.OnAllPages) {
+                    setMediaSessionThumbnail(getThumbnailUrl(videoID, timestamp));
                 }
 
                 countThumbnailReplacement(videoID);
@@ -626,13 +629,21 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
             || !!image.closest("ytd-grid-playlist-renderer")) {
         hideCanvas(image);
     }
+
+    if (brandingLocation === BrandingLocation.Watch) {
+        resetMediaSessionThumbnail();
+    }
 }
 
-function resetToBlankThumbnail(image: HTMLImageElement) {
+function resetToBlankThumbnail(image: HTMLImageElement, brandingLocation: BrandingLocation) {
     image.classList.remove("cb-visible");
     image.style.setProperty("display", "none", "important");
 
     hideCanvas(image);
+
+    if (brandingLocation === BrandingLocation.Watch) {
+        setMediaSessionThumbnail("");
+    }
 }
 
 function hideCanvas(image: HTMLElement) {

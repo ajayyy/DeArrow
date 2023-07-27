@@ -1,10 +1,13 @@
 import { onMobile } from "../maze-utils/pageInfo";
+import { setMediaSessionTitle } from "../videoBranding/mediaSessionHandler";
 
 let targetTitle: string | null = null;
 let targetFullTitle = "";
 
 
-export function setPageTitle(title: string) {
+export function setCurrentVideoTitle(title: string) {
+    setMediaSessionTitle(title);
+
     if (title === targetTitle) return;
 
     changePageTitleNow(title);
