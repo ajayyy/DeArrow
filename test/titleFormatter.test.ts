@@ -84,8 +84,8 @@ describe("toCapitalizeCase", () => {
     ];
     for (const testCase of capitalizeCases) {
         const [input, expected] = testCase;
-        it(input, () => {
-            expect(toCapitalizeCase(input, false)).toBe(expected);
+        it(input, async () => {
+            expect(await toCapitalizeCase(input, false)).toBe(expected);
         });
     }
 });
@@ -125,8 +125,8 @@ describe("toTitleCase", () => {
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
-        it(input, () => {
-            expect(toTitleCase(input, false)).toBe(expected);
+        it(input, async () => {
+            expect(await toTitleCase(input, false)).toBe(expected);
         });
     }
 });
@@ -144,8 +144,8 @@ describe("toTitleCase cleanEmojis", () => {
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
-        it(input, () => {
-            expect(formatTitleInternal(input, false, TitleFormatting.TitleCase, true)).toBe(expected);
+        it(input, async () => {
+            expect(await formatTitleInternal(input, false, TitleFormatting.TitleCase, true)).toBe(expected);
         });
     }
 });
@@ -190,8 +190,8 @@ describe("toSentenceCase", () => {
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
-        it(input, () => {
-            expect(toSentenceCase(input, false)).toBe(expected);
+        it(input, async () => {
+            expect(await toSentenceCase(input, false)).toBe(expected);
         });
     }
 });
@@ -239,11 +239,11 @@ describe("titleFormatter custom cases", () => {
     ];
     for (const testCase of customTitles) {
         const [input, title, sentence] = testCase;
-        it(`toTitleCase "${input}"`, () => {
-            expect(toTitleCase(input, true)).toBe(title);
+        it(`toTitleCase "${input}"`, async () => {
+            expect(await toTitleCase(input, true)).toBe(title);
         });
-        it(`toSentenceCase "${input}"`, () => {
-            expect(toSentenceCase(input, true)).toBe(sentence);
+        it(`toSentenceCase "${input}"`, async () => {
+            expect(await toSentenceCase(input, true)).toBe(sentence);
         });
     }
 });

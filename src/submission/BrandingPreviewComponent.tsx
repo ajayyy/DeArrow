@@ -20,16 +20,21 @@ export interface BrandingPreviewComponentComponentProps {
 }
 
 export const  BrandingPreviewComponent = (props: BrandingPreviewComponentComponentProps) => {
-    const [displayedTitle, setDisplayedTitle] = React.useState(getDefaultTitle(props.submissions, props.titles));
+    const [displayedTitle, setDisplayedTitle] = React.useState("");
     const [displayedThumbnail, setDisplayedThumbnail] = React.useState(getDefaultThumbnail(props.submissions, props.thumbnails));
 
     React.useEffect(() => {
-        if (props.selectedTitle?.title) {
-            setDisplayedTitle(props.selectedTitle);
-        } else {
-            setDisplayedTitle(getDefaultTitle(props.submissions, props.titles));
-        }
-    }, [props.selectedTitle]);
+        (async () => {
+            if (props.selectedTitle?.title) {
+                setDisplayedTitle(await formatTitleDefaultSettings(props.selectedTitle.title, true));
+            } else {
+                const defaultTitle = getDefaultTitle(props.submissions, props.titles);
+                if (defaultTitle) {
+                    setDisplayedTitle(await formatTitleDefaultSettings(defaultTitle.title, true));
+                }
+            }
+        })();
+    }, [props.selectedTitle, props.submissions, props.titles]);
 
     React.useEffect(() => {
         if (props.selectedThumbnail) {
@@ -51,7 +56,7 @@ export const  BrandingPreviewComponent = (props: BrandingPreviewComponentCompone
             ></ThumbnailSelectionComponent>
 
             <div className="cbTitle cbTitlePreview">
-                {formatTitleDefaultSettings(displayedTitle.title, true)}
+                {displayedTitle}
             </div>
         </div>
     );

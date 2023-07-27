@@ -71,16 +71,24 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
     const [currentlySubmitting, setCurrentlySubmitting] = React.useState(false);
 
-    const originalTitle = toSentenceCase(getCurrentPageTitle() || chrome.i18n.getMessage("OriginalTitle"), false);
-    const titles: RenderedTitleSubmission[] = [{
-        title: originalTitle
-    }, {
-        title: ""
-    }, ...props.submissions.titles
-    .filter((s) => s.title !== originalTitle)
-    .map((s) => ({
-        title: s.title
-    }))];
+    const [originalTitle, setOriginalTitle] = React.useState("");
+    const [titles, setTitles] = React.useState<RenderedTitleSubmission[]>([]);
+    React.useEffect(() => {
+        (async () => {
+            const originalTitle = await toSentenceCase(getCurrentPageTitle() || chrome.i18n.getMessage("OriginalTitle"), false);
+            setOriginalTitle(originalTitle);
+
+            setTitles([{
+                title: originalTitle
+            }, {
+                title: ""
+            }, ...props.submissions.titles
+            .filter((s) => s.title !== originalTitle)
+            .map((s) => ({
+                title: s.title
+            }))]);
+        })();
+    }, []);
 
     const defaultThumbnails: RenderedThumbnailSubmission[] = [{
         type: ThumbnailType.Original
@@ -227,13 +235,13 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                     disabled={currentlySubmitting 
                                 || (!selectedThumbnail.current && !selectedTitle) 
                                 || (!!selectedTitle && selectedTitle.title === chrome.i18n.getMessage("OriginalTitle"))}
-                    onClick={() => {
+                    onClick={async () => {
                         setCurrentlySubmitting(true);
 
                         props.submitClicked(selectedTitle ? {
                             ...selectedTitle,
                             original: selectedTitle.title === getCurrentPageTitle()
-                                        || (!!getCurrentPageTitle() && selectedTitle.title === toSentenceCase(getCurrentPageTitle()!, false))
+                                        || (!!getCurrentPageTitle() && selectedTitle.title === await toSentenceCase(getCurrentPageTitle()!, false))
                         } : null, selectedThumbnail.current).then((success) => {
                             if (!success) {
                                 setCurrentlySubmitting(false);

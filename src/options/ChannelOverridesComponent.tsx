@@ -3,7 +3,7 @@ import { SelectOptionComponent } from "../popup/SelectOptionComponent";
 import Config, { ConfigurationID, CustomConfiguration } from "../config/config";
 import { generateUserID } from "../maze-utils/setup";
 import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
-import { toSentenceCase } from "../titles/titleFormatter";
+import { toFirstLetterUppercase, toLowerCase, toSentenceCase } from "../titles/titleFormatter";
 
 let forceUpdateConfigurationsTimeout: NodeJS.Timeout | null = null;
 let forceUpdateOverridesTimeout: NodeJS.Timeout | null = null;
@@ -41,6 +41,17 @@ export const ChannelOverridesComponent = () => {
 
         updateChannelList(setChannelListText, selectedConfigurationID!);
     }, [selectedConfigurationID]);
+
+    const [sentenceCaseText, setSentenceCaseText] = React.useState(chrome.i18n.getMessage("SentenceCase"));
+    const [lowerCaseText, setLowerCaseText] = React.useState(chrome.i18n.getMessage("LowerCase"));
+    const [firstLetterUppercaseText, setFirstLetterUppercaseText] = React.useState(chrome.i18n.getMessage("FirstLetterUppercase"));
+    React.useEffect(() => {
+        (async () => {
+            setSentenceCaseText(await toSentenceCase(chrome.i18n.getMessage("SentenceCase"), false));
+            setLowerCaseText(await toLowerCase(chrome.i18n.getMessage("LowerCase")));
+            setFirstLetterUppercaseText(await toFirstLetterUppercase(chrome.i18n.getMessage("FirstLetterUppercase")));
+        })();
+    }, []);
 
     return (
         <div className="channelOverrides">
@@ -212,9 +223,9 @@ export const ChannelOverridesComponent = () => {
                         options={[
                             { value: "-1", label: chrome.i18n.getMessage("Disabled") },
                             { value: "1", label: chrome.i18n.getMessage("TitleCase") },
-                            { value: "2", label: toSentenceCase(chrome.i18n.getMessage("SentenceCase"), false) },
-                            { value: "3", label: chrome.i18n.getMessage("LowerCase") },
-                            { value: "4", label: chrome.i18n.getMessage("FirstLetterUppercase") },
+                            { value: "2", label: sentenceCaseText },
+                            { value: "3", label: lowerCaseText },
+                            { value: "4", label: firstLetterUppercaseText },
                             { value: "0", label: chrome.i18n.getMessage("CapitalizeWords") },
                         ]}
                         showResetButton={shouldShowResetButton(titleFormatting)}

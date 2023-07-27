@@ -15,38 +15,38 @@ export async function formatTitle(title: string, isCustom: boolean, videoID: Vid
     return formatTitleInternal(title, isCustom, await getTitleFormatting(videoID), await shouldCleanEmojis(videoID));
 }
 
-export function formatTitleDefaultSettings(title: string, isCustom: boolean): string {
-    return formatTitleInternal(title, isCustom, Config.config!.titleFormatting, Config.config!.shouldCleanEmojis);
+export async function formatTitleDefaultSettings(title: string, isCustom: boolean): Promise<string> {
+    return await formatTitleInternal(title, isCustom, Config.config!.titleFormatting, Config.config!.shouldCleanEmojis);
 }
 
-export function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: TitleFormatting, shouldCleanEmojis: boolean): string {
+export async function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: TitleFormatting, shouldCleanEmojis: boolean): Promise<string> {
     if (shouldCleanEmojis) {
         title = cleanEmojis(title);
     }
 
     switch (titleFormatting) {
         case TitleFormatting.CapitalizeWords:
-            return toCapitalizeCase(title, isCustom);
+            return await toCapitalizeCase(title, isCustom);
         case TitleFormatting.TitleCase:
-            return toTitleCase(title, isCustom);
+            return await toTitleCase(title, isCustom);
         case TitleFormatting.SentenceCase:
-            return toSentenceCase(title, isCustom);
+            return await toSentenceCase(title, isCustom);
         case TitleFormatting.LowerCase:
-            return toLowerCase(title);
+            return await toLowerCase(title);
         case TitleFormatting.FirstLetterUppercase:
-            return toFirstLetterUppercase(title);
+            return await toFirstLetterUppercase(title);
         default: {
             return cleanUnformattedTitle(title);
         }
     }
 }
 
-export function toLowerCase(str: string): string {
+export async function toLowerCase(str: string): Promise<string> {
     const words = str.split(" ");
 
     let result = "";
     for (const word of words) {
-        if (forceKeepFormatting(word)) {
+        if (forceKeepFormatting(word) || await greekLetterAllowed(word, str)) {
             result += word + " ";
         } else {
             result += word.toLowerCase() + " ";
@@ -56,13 +56,13 @@ export function toLowerCase(str: string): string {
     return cleanResultingTitle(result);
 }
 
-export function toFirstLetterUppercase(str: string): string {
+export async function toFirstLetterUppercase(str: string): Promise<string> {
     const words = str.split(" ");
 
     let result = "";
     let index = 0;
     for (const word of words) {
-        if (forceKeepFormatting(word)) {
+        if (forceKeepFormatting(word) || await greekLetterAllowed(word, str)) {
             result += word + " ";
         } else if (startOfSentence(index, words) && !isNumberThenLetter(word)) {
             result += capitalizeFirstLetter(word) + " ";
@@ -76,7 +76,7 @@ export function toFirstLetterUppercase(str: string): string {
     return cleanResultingTitle(result);
 }
 
-export function toSentenceCase(str: string, isCustom: boolean): string {
+export async function toSentenceCase(str: string, isCustom: boolean): Promise<string> {
     const words = str.split(" ");
     const inTitleCase = isInTitleCase(words);
     const mostlyAllCaps = isMostlyAllCaps(words);
@@ -93,7 +93,8 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
             || ((!inTitleCase || !isWordCapitalCase(word)) && trustCaps && isAcronym(word))
             || (!inTitleCase && isWordCapitalCase(word)) 
             || (isCustom && isWordCustomCapitalization(word))
-            || (!isAllCaps(word) && isWordCustomCapitalization(word))) {
+            || (!isAllCaps(word) && isWordCustomCapitalization(word))
+            || await greekLetterAllowed(word, str)) {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             // Trust it with capitalization
@@ -116,7 +117,7 @@ export function toSentenceCase(str: string, isCustom: boolean): string {
     return cleanResultingTitle(result);
 }
 
-export function toTitleCase(str: string, isCustom: boolean): string {
+export async function toTitleCase(str: string, isCustom: boolean): Promise<string> {
     const words = str.split(" ");
     const mostlyAllCaps = isMostlyAllCaps(words);
 
@@ -128,7 +129,8 @@ export function toTitleCase(str: string, isCustom: boolean): string {
         if (forceKeepFormatting(word)
             || (isCustom && isWordCustomCapitalization(word))
             || (!isAllCaps(word) && (isWordCustomCapitalization(word) || isNumberThenLetter(word)))
-            || isYear(word)) {
+            || isYear(word)
+            || await greekLetterAllowed(word, str)) {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             result += word + " ";
@@ -149,7 +151,7 @@ export function toTitleCase(str: string, isCustom: boolean): string {
     return cleanResultingTitle(result);
 }
 
-export function toCapitalizeCase(str: string, isCustom: boolean): string {
+export async function toCapitalizeCase(str: string, isCustom: boolean): Promise<string> {
     const words = str.split(" ");
     const mostlyAllCaps = isMostlyAllCaps(words);
 
@@ -160,7 +162,8 @@ export function toCapitalizeCase(str: string, isCustom: boolean): string {
                 || (!isAllCaps(word) && isWordCustomCapitalization(word))
                 || (isFirstLetterCapital(word) && 
                 ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word)))
-                || isYear(word)) {
+                || isYear(word)
+                || await greekLetterAllowed(word, str)) {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             // Trust it with capitalization
@@ -289,6 +292,25 @@ function forceKeepFormatting(word: string, ignorePunctuation = true): boolean {
     }
 
     return result;
+}
+
+/**
+ * Allow mathematical greek symbols without breaking greek
+ */
+async function greekLetterAllowed(word: string, title: string): Promise<boolean> {
+    if (word.match(/[Ͱ-Ͽ]/)) {
+        return !await checkLanguage(title, "el")
+    }
+
+    return false;
+}
+
+async function checkLanguage(title: string, language: string): Promise<boolean> {
+    if (typeof chrome === "undefined" || !("detectLanguage" in chrome.i18n)) return false;
+
+    const detectedLanguages = await chrome.i18n.detectLanguage(title);
+    const detectedLanguage = detectedLanguages.languages.find((l) => l.language === language);
+    return !!detectedLanguage && detectedLanguage.percentage > 30;
 }
 
 export function isAcronym(word: string): boolean {
