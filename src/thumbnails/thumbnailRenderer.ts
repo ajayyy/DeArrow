@@ -431,6 +431,8 @@ function getThumbnailSelector(brandingLocation: BrandingLocation): string {
             return "div.ytp-autonav-endscreen-upnext-thumbnail";
         case BrandingLocation.EndRecommendations:
             return "div.ytp-videowall-still-image";
+        case BrandingLocation.EmbedSuggestions:
+            return ".ytp-suggestion-image";
         case BrandingLocation.Watch:
             return ".ytp-cued-thumbnail-overlay-image";
         default:
@@ -582,6 +584,11 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
 
             thumbnail.style.height = "100%";
 
+            if (brandingLocation === BrandingLocation.EmbedSuggestions) {
+                thumbnail.style.width = image.style.width;
+                thumbnail.style.height = image.style.height;
+            }
+
             if (onMobile() && !image.classList.contains("amsterdam-playlist-thumbnail")) {
                 thumbnail.style.position = "absolute";
                 thumbnail.style.top = "0";
@@ -625,6 +632,7 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
 
     if (onMobile()
             || brandingLocation === BrandingLocation.Autoplay
+            || brandingLocation === BrandingLocation.EmbedSuggestions
             || BrandingLocation.Related
             || !!image.closest("ytd-grid-playlist-renderer")) {
         hideCanvas(image);

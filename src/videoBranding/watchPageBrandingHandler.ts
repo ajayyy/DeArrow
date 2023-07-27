@@ -20,6 +20,10 @@ export async function replaceVideoPlayerSuggestionsBranding(): Promise<void> {
     if (waiting) return;
     waiting = true;
 
+    if (document.URL.includes("/embed")) {
+        replaceEmbedSuggestionsBranding().catch(logError);
+    }
+
     const refNode = await waitForElement("#movie_player", true);
 
     if (!mutationObserver || observerElement !== refNode) {
@@ -80,6 +84,22 @@ export async function replaceVideoPlayerSuggestionsBranding(): Promise<void> {
     }
 
     waiting = false;
+}
+
+async function replaceEmbedSuggestionsBranding(): Promise<void> {
+    const refNode = await waitForElement(".ytp-pause-overlay");
+
+    if (!mutationObserver || observerElement !== refNode) {
+        if (mutationObserver) mutationObserver.disconnect();
+
+        const suggestionSelector = ".ytp-suggestion-link";
+        const initialSuggestionElements = refNode.querySelectorAll(suggestionSelector);
+        if (initialSuggestionElements.length > 0) {
+            for (const initialSuggestionElement of initialSuggestionElements) {
+                setupVideoBrandReplacement(initialSuggestionElement as HTMLElement, BrandingLocation.EmbedSuggestions);
+            }
+        }
+    }
 }
 
 export function setupAutoplayObserver(element: HTMLElement): void {
@@ -145,7 +165,8 @@ const handledElements = new Set<HTMLElement>();
 function setupVideoBrandReplacement(element: HTMLElement, brandingLocation: BrandingLocation): void {
     replaceVideoCardBranding(element, brandingLocation).catch(logError);
 
-    if (brandingLocation === BrandingLocation.EndRecommendations) {
+    if (brandingLocation === BrandingLocation.EndRecommendations
+            || brandingLocation === BrandingLocation.EmbedSuggestions) {
         if (element && !handledElements.has(element)) {
             handledElements.add(element);
             const observer = new MutationObserver((mutations) => {

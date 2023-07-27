@@ -28,7 +28,8 @@ export enum BrandingLocation {
     Watch,
     Endcards,
     Autoplay,
-    EndRecommendations
+    EndRecommendations,
+    EmbedSuggestions
 }
 
 export type ShowCustomBrandingInfo = {
@@ -210,6 +211,8 @@ export function getLinkElement(element: HTMLElement, brandingLocation: BrandingL
         case BrandingLocation.Autoplay:
             return element.querySelector("a.ytp-autonav-endscreen-link-container") as HTMLAnchorElement;
         case BrandingLocation.EndRecommendations:
+            return element as HTMLAnchorElement;
+        case BrandingLocation.EmbedSuggestions:
             return element as HTMLAnchorElement;
         default:
             throw new Error("Invalid branding location");

@@ -223,6 +223,8 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
             return [".ytp-autonav-endscreen-upnext-title"];
         case BrandingLocation.EndRecommendations:
             return [".ytp-videowall-still-info-title"];
+        case BrandingLocation.EmbedSuggestions:
+            return [".ytp-suggestion-title"];
         default:
             throw new Error("Invalid branding location");
     }
@@ -240,7 +242,8 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
     titleElement.classList.add("cbCustomTitle");
 
     if (brandingLocation === BrandingLocation.EndRecommendations
-            || brandingLocation === BrandingLocation.Autoplay) {
+            || brandingLocation === BrandingLocation.Autoplay
+            || brandingLocation === BrandingLocation.EmbedSuggestions) {
         const container = document.createElement("div");
         container.appendChild(titleElement);
         originalTitleElement.parentElement?.prepend(container);
