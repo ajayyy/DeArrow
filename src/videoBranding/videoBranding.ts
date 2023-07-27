@@ -68,8 +68,6 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
     const videoID = getVideoID();
 
-    console.log("hmm", videoID, mainTitle, titles, promises, onWatchPage, isVisible(mainTitle))
-
     if (videoID !== null && isVisible(mainTitle)) {
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
             async () => { await replaceCurrentVideoBranding(); });
