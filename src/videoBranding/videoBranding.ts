@@ -58,7 +58,8 @@ const videoBrandingInstances: Record<VideoID, VideoBrandingInstance> = {}
 
 export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]> {
     const onWatchPage = document.URL.includes("/watch");
-    const possibleSelectors = getPossibleSelectors(onWatchPage);
+    const onEmbedPage = document.URL.includes("/embed/");
+    const possibleSelectors = getPossibleSelectors(onWatchPage, onEmbedPage);
 
     // Find first invisible one, or wait for the first one to be visible
     const mainTitle = possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility) as HTMLElement).filter((element) => isVisible(element))[0] || 
@@ -66,6 +67,8 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
     const titles = (possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility)).filter((e) => !!e)) as HTMLElement[];
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
     const videoID = getVideoID();
+
+    console.log("hmm", videoID, mainTitle, titles, promises, onWatchPage, isVisible(mainTitle))
 
     if (videoID !== null && isVisible(mainTitle)) {
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
@@ -98,7 +101,7 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
     return Promise.all(promises);
 }
 
-function getPossibleSelectors(onWatchPage: boolean) {
+function getPossibleSelectors(onWatchPage: boolean, onEmbedPage: boolean) {
     if (onWatchPage) {
         if (!onMobile()) {
             return [
@@ -123,6 +126,13 @@ function getPossibleSelectors(onWatchPage: boolean) {
                 }
             ];
         }
+    } else if (onEmbedPage) {
+        return [
+            {
+                selector: ".ytp-title-text",
+                checkVisibility: false
+            }
+        ];
     } else {
         return [
             {
