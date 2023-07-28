@@ -168,7 +168,10 @@ function showCustomTitle(element: HTMLElement, brandingLocation: BrandingLocatio
     titleElement.style.removeProperty("display");
 
     if (titleElement.nodeName === "A") {
-        titleElement.setAttribute("href", originalTitleElement.getAttribute("href") ?? "");
+        const href = originalTitleElement.getAttribute("href");
+        if (href) {
+            titleElement.setAttribute("href", href);
+        }
     }
 
     switch(brandingLocation) {
@@ -236,7 +239,9 @@ export function getOrCreateTitleElement(element: HTMLElement, brandingLocation: 
 }
 
 function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
-    const titleElement = brandingLocation !== BrandingLocation.Watch || originalTitleElement.classList.contains("miniplayer-title")
+    const titleElement = brandingLocation !== BrandingLocation.Watch 
+            || originalTitleElement.classList.contains("miniplayer-title")
+            || originalTitleElement.classList.contains("ytp-title-link")
         ? originalTitleElement.cloneNode() as HTMLElement 
         : document.createElement("span");
     titleElement.classList.add("cbCustomTitle");
