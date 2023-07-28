@@ -147,6 +147,7 @@ describe("toTitleCase cleanEmojis", () => {
         ["🏳️‍🌈🏳️‍🌈🏳️‍🌈 5 min countdown timer🏳️‍🌈 🏳️‍🌈🏳️‍🌈🏳️‍🌈 (roller🏳️‍🌈🏳️‍🌈🏳️‍🌈coaster) 🏳️‍🌈", "5 Min Countdown Timer (Roller Coaster)"],
         ["5 min countdown 👷🏾‍♀️👷🏾‍♀️👷🏾‍♀️ timer (roller👷🏾‍♀️👷🏾‍♀️👷🏾‍♀️coaster) 👷🏾‍♀️", "5 Min Countdown Timer (Roller Coaster)"],
         ["5 min countdown 👩🏽‍👨🏽‍👦🏽‍👦🏽 timer (roller👩🏽‍👨🏽‍👦🏽‍👦🏽👩🏽‍👨🏽‍👦🏽‍👦🏽coaster) 👩🏽‍👨🏽‍👦🏽‍👦🏽👩🏽‍👨🏽‍👦🏽‍👦🏽", "5 Min Countdown Timer (Roller Coaster)"],
+        ["😀︎😀︎😀︎ 5 min countdown timer😀︎ 😀︎😀︎😀︎ (roller😀︎😀︎😀︎coaster) 😀︎", "5 Min Countdown Timer (Roller Coaster)"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
