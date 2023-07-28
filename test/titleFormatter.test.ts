@@ -136,11 +136,17 @@ describe("toTitleCase cleanEmojis", () => {
         ["5 Minute Timer [MOUSE 🐭 MAZE] 🐭", "5 Minute Timer [Mouse Maze]"],
         ["5 min countdown timer (roller coaster) 🎢", "5 Min Countdown Timer (Roller Coaster)"],
         ["5 min countdown timer (roller🎢coaster) 🎢", "5 Min Countdown Timer (Roller Coaster)"],
+        ["5 min countdown timer (roller🎢🎢🎢coaster) 🎢", "5 Min Countdown Timer (Roller Coaster)"],
+        ["5 min countdown timer (roller🎢🛠️🎢coaster) 🎢", "5 Min Countdown Timer (Roller Coaster)"],
         [" 🎢  🎢🎢 🎢🎢\t🎢", "🎢 🎢🎢 🎢🎢\t🎢"], // Leave emojis when there is no text
         ["Rush 🅱️", "Rush 🅱️"],
         ["5 min countdown timer (roller🎢🅱️oaster) 🎢", "5 Min Countdown Timer (Roller 🅱️oaster)"],
         ["5 min countdown 🎢🅱️🎢🎢 timer (roller coaster) 🎢", "5 Min Countdown 🅱️ Timer (Roller Coaster)"],
         ["🎢🅱️🎢🎢 5 min countdown timer (roller coaster) 🎢", "🅱️ 5 Min Countdown Timer (Roller Coaster)"],
+        ["🛠️ How You Can Repair Your Things", "How You Can Repair Your Things"],
+        ["🏳️‍🌈🏳️‍🌈🏳️‍🌈 5 min countdown timer🏳️‍🌈 🏳️‍🌈🏳️‍🌈🏳️‍🌈 (roller🏳️‍🌈🏳️‍🌈🏳️‍🌈coaster) 🏳️‍🌈", "5 Min Countdown Timer (Roller Coaster)"],
+        ["5 min countdown 👷🏾‍♀️👷🏾‍♀️👷🏾‍♀️ timer (roller👷🏾‍♀️👷🏾‍♀️👷🏾‍♀️coaster) 👷🏾‍♀️", "5 Min Countdown Timer (Roller Coaster)"],
+        ["5 min countdown 👩🏽‍👨🏽‍👦🏽‍👦🏽 timer (roller👩🏽‍👨🏽‍👦🏽‍👦🏽👩🏽‍👨🏽‍👦🏽‍👦🏽coaster) 👩🏽‍👨🏽‍👦🏽‍👦🏽👩🏽‍👨🏽‍👦🏽‍👦🏽", "5 Min Countdown Timer (Roller Coaster)"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;

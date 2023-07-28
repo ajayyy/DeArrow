@@ -9,6 +9,9 @@ import { acronymBlocklist, allowlistedWords, titleCaseNotCapitalized } from "./t
  * Characters: \p{L}
  * Upper: \p{Lu}
  * Lower: \p{Ll}
+ * 
+ * https://javascript.info/regexp-unicode#example-hexadecimal-numbers
+ * https://util.unicode.org/UnicodeJsps/character.jsp
  */
 
 export async function formatTitle(title: string, isCustom: boolean, videoID: VideoID | null): Promise<string> {
@@ -89,9 +92,9 @@ export async function toSentenceCase(str: string, isCustom: boolean): Promise<st
         if (word.match(/^[Ii]$|^[Ii]['’][\p{L}]{1,3}$/u)) {
             result += capitalizeFirstLetter(word) + " ";
         } else if (forceKeepFormatting(word)
-            || isAcronymStrict(word) 
+            || isAcronymStrict(word)
             || ((!inTitleCase || !isWordCapitalCase(word)) && trustCaps && isAcronym(word))
-            || (!inTitleCase && isWordCapitalCase(word)) 
+            || (!inTitleCase && isWordCapitalCase(word))
             || (isCustom && isWordCustomCapitalization(word))
             || (!isAllCaps(word) && isWordCustomCapitalization(word))
             || await greekLetterAllowed(word, str)) {
@@ -137,8 +140,8 @@ export async function toTitleCase(str: string, isCustom: boolean): Promise<strin
         } else if (!startOfSentence(index, words) && titleCaseNotCapitalized.has(word.toLowerCase())) {
             // Skip lowercase check for the first word
             result += word.toLowerCase() + " ";
-        } else if (isFirstLetterCapital(word) && 
-                ((trustCaps && isAcronym(word)) || isAcronymStrict(word))) {
+        } else if (isFirstLetterCapital(word) &&
+            ((trustCaps && isAcronym(word)) || isAcronymStrict(word))) {
             // Trust it with capitalization
             result += word + " ";
         } else {
@@ -158,12 +161,12 @@ export async function toCapitalizeCase(str: string, isCustom: boolean): Promise<
     let result = "";
     for (const word of words) {
         if (forceKeepFormatting(word)
-                || (isCustom && isWordCustomCapitalization(word)) 
-                || (!isAllCaps(word) && isWordCustomCapitalization(word))
-                || (isFirstLetterCapital(word) && 
+            || (isCustom && isWordCustomCapitalization(word))
+            || (!isAllCaps(word) && isWordCustomCapitalization(word))
+            || (isFirstLetterCapital(word) &&
                 ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word)))
-                || isYear(word)
-                || await greekLetterAllowed(word, str)) {
+            || isYear(word)
+            || await greekLetterAllowed(word, str)) {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             // Trust it with capitalization
@@ -183,7 +186,7 @@ export function isInTitleCase(words: string[]): boolean {
         if (isWordCapitalCase(word)) {
             count++;
         } else if (!isWordAllLower(word) ||
-                titleCaseNotCapitalized.has(word.toLowerCase())) {
+            titleCaseNotCapitalized.has(word.toLowerCase())) {
             ignored++;
         }
     }
@@ -193,8 +196,8 @@ export function isInTitleCase(words: string[]): boolean {
 }
 
 function shouldTrustCaps(mostlyAllCaps: boolean, words: string[], index: number): boolean {
-    return !mostlyAllCaps && 
-        !((isAllCaps(words[index - 1]) && !forceKeepFormatting(words[index - 1])) 
+    return !mostlyAllCaps &&
+        !((isAllCaps(words[index - 1]) && !forceKeepFormatting(words[index - 1]))
             || isAllCaps(words[index + 1]) && !forceKeepFormatting(words[index + 1]));
 }
 
@@ -214,8 +217,8 @@ export function isMostlyAllCaps(words: string[]): boolean {
  * Has at least one char and is upper case
  */
 function isAllCaps(word: string): boolean {
-    return !!word && !!word.match(/[\p{L}]/u) 
-        && word.toUpperCase() === word 
+    return !!word && !!word.match(/[\p{L}]/u)
+        && word.toUpperCase() === word
         && !isAcronymStrict(word)
         && !word.match(/^[\p{L}]{1,3}[-~—]/u); // USB-C not all caps, HANDS-ON is
 }
@@ -281,7 +284,7 @@ function isFirstLetterCapital(word: string): boolean {
 }
 
 function forceKeepFormatting(word: string, ignorePunctuation = true): boolean {
-    let result = !!word.match(/^>/) 
+    let result = !!word.match(/^>/)
         || allowlistedWords.has(word);
 
     if (ignorePunctuation) {
@@ -317,8 +320,8 @@ export function isAcronym(word: string): boolean {
     // 2 - 3 chars, or has dots after each letter except last word
     // U.S.A allowed
     // US allowed
-    return ((word.length <= 3 || countLetters(word) <= 3) 
-                && word.length > 1 && isAllCaps(word) && !acronymBlocklist.has(word.toLowerCase())) 
+    return ((word.length <= 3 || countLetters(word) <= 3)
+        && word.length > 1 && isAllCaps(word) && !acronymBlocklist.has(word.toLowerCase()))
         || isAcronymStrict(word);
 }
 
@@ -381,8 +384,8 @@ export function cleanPunctuation(title: string): string {
     let result = "";
     let index = 0;
     for (let word of words) {
-        if (!forceKeepFormatting(word, false) 
-                && index !== words.length - 1) { // Last already handled
+        if (!forceKeepFormatting(word, false)
+            && index !== words.length - 1) { // Last already handled
             if (word.includes("?")) {
                 word = cleanWordPunctuation(word);
             } else if (word.match(/[.!]+$/)) {
@@ -407,10 +410,15 @@ export function cleanPunctuation(title: string): string {
 }
 
 export function cleanEmojis(title: string): string {
+    // \uFE0F is the emoji variation selector, it comes after non colored symbols to turn them into emojis
+    // \u200D is the zero width joiner, it joins emojis together
+
     const cleaned = title
-        .replace(/ ((?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S)+(?= )/ug, "") // Clear extra spaces between emoji "words"
-        .replace(/(\S)(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(\S)/ug, "$1 $2") // Emojis in between letters should be spaces
-        .replace(/(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S/ug, "")
+        // Clear extra spaces between emoji "words"
+        .replace(/ ((?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\p{Emoji_Modifier}?\u200D?)*)+(?= )/ug, "")
+        // Emojis in between letters should be spaces, varient selector is allowed before to allow B emoji
+        .replace(/(\p{L}|[\uFE0F🆎🆑])(?:(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\p{Emoji_Modifier}?\u200D?)*)+(\p{L}|[🅰🆎🅱🆑🅾])/ug, "$1 $2")
+        .replace(/(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\p{Emoji_Modifier}?\u200D?)*/ug, "")
         .trim();
 
     if (cleaned.length > 0) {
