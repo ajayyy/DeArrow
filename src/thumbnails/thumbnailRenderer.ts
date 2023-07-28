@@ -297,7 +297,7 @@ function renderToBlob(surface: HTMLVideoElement | HTMLCanvasElement): Promise<Bl
 
         if (isFirefoxOrSafari() 
             && !isSafari()
-            && context.getImageData(0, 0, 1, 1).data[0] === 0) {
+            && context.getImageData(0, 0, 1, 1).data[3] === 0) {
             // Firefox has a bug and has failed to render this
             return Promise.resolve(null);
         }
