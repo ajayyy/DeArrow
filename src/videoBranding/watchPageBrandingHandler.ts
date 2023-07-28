@@ -89,15 +89,11 @@ export async function replaceVideoPlayerSuggestionsBranding(): Promise<void> {
 async function replaceEmbedSuggestionsBranding(): Promise<void> {
     const refNode = await waitForElement(".ytp-pause-overlay");
 
-    if (!mutationObserver || observerElement !== refNode) {
-        if (mutationObserver) mutationObserver.disconnect();
-
-        const suggestionSelector = ".ytp-suggestion-link";
-        const initialSuggestionElements = refNode.querySelectorAll(suggestionSelector);
-        if (initialSuggestionElements.length > 0) {
-            for (const initialSuggestionElement of initialSuggestionElements) {
-                setupVideoBrandReplacement(initialSuggestionElement as HTMLElement, BrandingLocation.EmbedSuggestions);
-            }
+    const suggestionSelector = ".ytp-suggestion-link";
+    const initialSuggestionElements = refNode.querySelectorAll(suggestionSelector);
+    if (initialSuggestionElements.length > 0) {
+        for (const initialSuggestionElement of initialSuggestionElements) {
+            setupVideoBrandReplacement(initialSuggestionElement as HTMLElement, BrandingLocation.EmbedSuggestions);
         }
     }
 }
