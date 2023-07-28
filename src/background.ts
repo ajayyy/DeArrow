@@ -5,6 +5,8 @@ import Config from "./config/config";
 import { isSafari } from "./maze-utils/config";
 import * as CompileConfig from "../config.json";
 import { isFirefoxOrSafari } from "./maze-utils";
+import { logError } from "./utils/logger";
+import { injectUpdatedScripts } from "../maze-utils/src/cleanup";
 
 setupTabUpdates(Config);
 setupBackgroundRequestProxy();
@@ -65,6 +67,11 @@ chrome.runtime.onInstalled.addListener(() => {
             setTimeout(() => void chrome.tabs.create({url: chrome.runtime.getURL("/help.html")}), 100);
         }
     }, 1500);
+
+    // Only do this once the old version understands how to clean itself up
+    if (!isFirefoxOrSafari() && chrome.runtime.getManifest().version !== "1.2.4") {
+        injectUpdatedScripts().catch(logError);
+    }
 });
 
 function getExtensionIdsToImportFrom(): string[] {

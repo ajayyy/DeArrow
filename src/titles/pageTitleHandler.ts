@@ -1,3 +1,4 @@
+import { addCleanupListener } from "../maze-utils/cleanup";
 import { onMobile } from "../maze-utils/pageInfo";
 import { setMediaSessionTitle } from "../videoBranding/mediaSessionHandler";
 
@@ -39,8 +40,13 @@ function changePageTitleNow(title: string) {
 
 export function setupPageTitleHandler() {
     if (onMobile()) {
-        window.addEventListener("state-navigatestart", () => {
+        const navigateStartListener = () => {
             targetTitle = null;
+        };
+        window.addEventListener("state-navigatestart", navigateStartListener);
+        
+        addCleanupListener(() => {
+            window.removeEventListener("state-navigatestart", navigateStartListener);
         });
     }
 }
@@ -65,4 +71,8 @@ function setupTitleChangeListener() {
             characterData: true
         });
     }
+
+    addCleanupListener(() => {
+        titleChangeObserver?.disconnect?.();
+    });
 }

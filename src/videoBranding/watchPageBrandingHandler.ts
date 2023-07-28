@@ -1,3 +1,4 @@
+import { addCleanupListener } from "../maze-utils/cleanup";
 import { waitForElement } from "../maze-utils/dom";
 import { logError } from "../utils/logger";
 import { BrandingLocation, getLinkElement, replaceVideoCardBranding } from "./videoBranding";
@@ -239,4 +240,14 @@ function watchForMobileAutoplay() {
             childList: true
         });
     }
+}
+
+export function setupWatchPageBrandingCleanup() {
+    addCleanupListener(() => {
+        autoplayObserver?.disconnect?.();
+        endRecommendationsObserver?.disconnect?.();
+        mobileControlsObserver?.disconnect?.();
+        mobileAutoplayObserver?.disconnect?.();
+        mutationObserver?.disconnect?.();
+    });
 }

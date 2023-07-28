@@ -420,6 +420,8 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
 
     if (originalTitleElement.parentElement) {
         originalTitleElement.parentElement.addEventListener("mouseleave", () => {
+            if (!chrome.runtime?.id) return; // Extension context invalidated
+
             for (const player of getHoverPlayers()) {
                 if (player) {
                     player.style.removeProperty("display");
@@ -465,6 +467,7 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
         if (box) {
             let readyToHide = false;
             box.addEventListener("touchstart", () => {
+                if (!chrome.runtime?.id) return; // Extension context invalidated
                 readyToHide = false;
 
                 if (!buttonElement.classList.contains("cbDontHide")) {
@@ -473,14 +476,17 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
             });
 
             box.addEventListener("touchend", () => {
+                if (!chrome.runtime?.id) return; // Extension context invalidated
                 readyToHide = true;
             });
 
             box.addEventListener("contextmenu", () => {
+                if (!chrome.runtime?.id) return; // Extension context invalidated
                 readyToHide = true;
             });
 
             document.addEventListener("touchstart", () => {
+                if (!chrome.runtime?.id) return; // Extension context invalidated
                 if (readyToHide) {
                     buttonElement.classList.remove("cbMobileDontHide");
 

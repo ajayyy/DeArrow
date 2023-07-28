@@ -412,6 +412,8 @@ function waitForImageSrc(image: HTMLImageElement): Promise<void> {
     if (!existingPromise) {
         const result = new Promise<void>((resolve) => {
             const observer = new MutationObserver((mutations) => {
+                if (!chrome.runtime?.id) return;
+
                 for (const mutation of mutations) {
                     if (mutation.attributeName === "src"
                             && image.src !== "") {

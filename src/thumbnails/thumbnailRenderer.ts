@@ -157,6 +157,12 @@ export async function renderThumbnail(videoID: VideoID, width: number,
                 return;
             }
 
+            if (!chrome.runtime?.id) {
+                // Extension context has been invalidated, just give up;
+                errorHandler();
+                return;
+            }
+
             const videoInfo: RenderedThumbnailVideo = {
                 blob: blobResult,
                 video: saveVideo ? video : null,
@@ -193,7 +199,11 @@ export async function renderThumbnail(videoID: VideoID, width: number,
                 if (videoLoadedTimeout) clearTimeout(videoLoadedTimeout);
 
                 clearVideo(false);
-                handleThumbnailRenderFailure(videoID, width, height, timestamp, resolve);
+
+                if (chrome.runtime?.id) {
+                    // Make sure extension context is still valid
+                    handleThumbnailRenderFailure(videoID, width, height, timestamp, resolve);
+                }
             }
         })();
 

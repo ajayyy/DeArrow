@@ -10,6 +10,7 @@ import { submitVideoBranding } from "../dataFetching";
 import Config from "../config/config";
 import { addTitleChangeListener, getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { onMobile } from "../../maze-utils/src/pageInfo";
+import { addCleanupListener } from "../maze-utils/cleanup";
 
 const submitButtonIcon = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -31,7 +32,13 @@ export class SubmitButton {
             titles: [],
             randomTime: null,
             videoDuration: null
-        }
+        };
+
+        addCleanupListener(() => {
+            this.mutationObserver?.disconnect?.();
+
+            this.close();
+        });
     }
 
     async attachToPage(): Promise<void> {
@@ -55,6 +62,8 @@ export class SubmitButton {
                     this.button.draggable = false;
 
                     this.button.addEventListener("click", (e) => {
+                        if (!chrome.runtime?.id) return;
+
                         e.stopPropagation();
                         this.openOrClose().catch(logError);
                     });

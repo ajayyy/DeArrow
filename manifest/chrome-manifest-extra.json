@@ -2,6 +2,9 @@
     "optional_permissions": [
         "declarativeContent"
     ],
+    "permissions": [
+        "scripting"
+    ],
     "content_scripts": [
         {
             "world": "MAIN",

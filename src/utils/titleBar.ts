@@ -6,6 +6,7 @@ import { onMobile } from "../../maze-utils/src/pageInfo";
 import { logError } from "./logger";
 import { waitFor } from "../maze-utils";
 import { getYouTubeTitleNode } from "../maze-utils/elements";
+import { addCleanupListener } from "../maze-utils/cleanup";
 
 export enum MobileFix {
     Replace,
@@ -57,6 +58,8 @@ export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLEleme
                         addNodeToListenFor(titleButtonContainer, MobileFix.Replace);
 
                         referenceNode.parentElement!.addEventListener("click", () => {
+                            if (!chrome.runtime?.id) return; // Extension context invalidated
+
                             // Now the description with a second title element will be shown
                             const selector = ".primary-info .title";
 
@@ -221,6 +224,8 @@ function setupTextChangeListener(mutationObserver: MutationObserver | null, elem
 
             let oldText = originalTitleElement.textContent;
             mutationObserver = new MutationObserver(() => {
+                if (!chrome.runtime?.id) return;
+
                 if (onMobile() && lookForOriginalTitleElement) {
                     const newElement = getYouTubeTitleNode();
                     if (newElement && element !== newElement) {
@@ -261,4 +266,18 @@ export function removeTitleChangeListener(listener: () => void) {
     if (index !== -1) {
         titleChangeListeners.splice(index, 1);
     }
+}
+
+export function setupTitlebarCleanup() {
+    addCleanupListener(() => {
+        for (const mobileMutationObserver of mobileMutationObservers) {
+            mobileMutationObserver[1].disconnect();
+        }
+
+        mobileMutationObservers.clear();
+
+        badgeListener?.disconnect?.();
+        titleChangeObserver?.disconnect?.();
+        miniplayerTitleChangeObserver?.disconnect?.();
+    });
 }
