@@ -411,14 +411,15 @@ export function cleanPunctuation(title: string): string {
 
 export function cleanEmojis(title: string): string {
     // \uFE0F is the emoji variation selector, it comes after non colored symbols to turn them into emojis
+    // \uFE0E is similar but makes colored emojis into non colored ones
     // \u200D is the zero width joiner, it joins emojis together
 
     const cleaned = title
         // Clear extra spaces between emoji "words"
-        .replace(/ ((?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\p{Emoji_Modifier}?\u200D?)*)+(?= )/ug, "")
+        .replace(/ ((?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*)+(?= )/ug, "")
         // Emojis in between letters should be spaces, varient selector is allowed before to allow B emoji
-        .replace(/(\p{L}|[\uFE0F🆎🆑])(?:(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\p{Emoji_Modifier}?\u200D?)*)+(\p{L}|[🅰🆎🅱🆑🅾])/ug, "$1 $2")
-        .replace(/(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\p{Emoji_Modifier}?\u200D?)*/ug, "")
+        .replace(/(\p{L}|[\uFE0F\uFE0E🆎🆑])(?:(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*)+(\p{L}|[🅰🆎🅱🆑🅾])/ug, "$1 $2")
+        .replace(/(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*/ug, "")
         .trim();
 
     if (cleaned.length > 0) {
