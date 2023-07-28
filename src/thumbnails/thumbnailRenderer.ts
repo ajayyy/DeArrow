@@ -13,6 +13,7 @@ import { getThumbnailImageSelectors, getThumbnailSelectors } from "../maze-utils
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { MobileFix, addNodeToListenFor } from "../utils/titleBar";
 import { resetMediaSessionThumbnail, setMediaSessionThumbnail } from "../videoBranding/mediaSessionHandler";
+import { isSafari } from "../maze-utils/config";
 
 const activeRendersMax = isFirefoxOrSafari() ? 3 : 6;
 const activeRenders: Record<VideoID, Promise<RenderedThumbnailVideo | null>> = {};
@@ -150,8 +151,14 @@ export async function renderThumbnail(videoID: VideoID, width: number,
                 return;
             }
 
+            const blobResult = await renderToBlob(video);
+            if (blobResult === null) {
+                errorHandler();
+                return;
+            }
+
             const videoInfo: RenderedThumbnailVideo = {
-                blob: await renderToBlob(video),
+                blob: blobResult,
                 video: saveVideo ? video : null,
                 width: video.videoWidth,
                 height: video.videoHeight,
@@ -279,13 +286,21 @@ function handleThumbnailRenderFailure(videoID: VideoID, width: number, height: n
     }
 }
 
-function renderToBlob(surface: HTMLVideoElement | HTMLCanvasElement): Promise<Blob> {
+function renderToBlob(surface: HTMLVideoElement | HTMLCanvasElement): Promise<Blob | null> {
     let deleteSurface = false;
     if (surface instanceof HTMLVideoElement) {
         const canvas = document.createElement("canvas");
         canvas.width = surface.videoWidth;
         canvas.height = surface.videoHeight;
-        canvas.getContext("2d")!.drawImage(surface, 0, 0);
+        const context = canvas.getContext("2d")!;
+        context.drawImage(surface, 0, 0);
+
+        if (isFirefoxOrSafari() 
+            && !isSafari()
+            && context.getImageData(0, 0, 1, 1).data[0] === 0) {
+            // Firefox has a bug and has failed to render this
+            return Promise.resolve(null);
+        }
 
         surface = canvas;
         deleteSurface = true;
