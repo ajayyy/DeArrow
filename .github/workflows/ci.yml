@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - run: docker run --rm -v $(pwd):/app node:18-bookworm 'cd app; npm ci'
+      - run: docker run --rm -v $(pwd):/app node:18-bookworm bash -c 'cd app; npm ci'
       - name: Copy configuration
         run: cp config.json.example config.json
 
@@ -23,7 +23,7 @@ jobs:
 
       # Create Chrome artifacts
       - name: Create Chrome artifacts
-        run: docker run --rm -v $(pwd):/app node:18-bookworm 'cd app; npm run build:chrome'
+        run: docker run --rm -v $(pwd):/app node:18-bookworm bash -c 'cd app; npm run build:chrome'
       - uses: actions/upload-artifact@v3
         with:
           name: ChromeExtension
