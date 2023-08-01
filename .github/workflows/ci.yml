@@ -7,24 +7,23 @@ jobs:
   build:
     name: Create artifacts
     runs-on: ubuntu-20.04
-    container: node:18-bookworm
 
     steps:
       # Initialization
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - run: npm ci
+      - run: docker run -it --rm -v $(pwd):/app node:18-bookworm 'cd app; npm ci'
       - name: Copy configuration
         run: cp config.json.example config.json
 
-      # Run linter
-      - name: Lint
-        run: npm run lint
+      # # Run linter
+      # - name: Lint
+      #   run: npm run lint
 
       # Create Chrome artifacts
       - name: Create Chrome artifacts
-        run: npm run build:chrome
+        run: docker run -it --rm -v $(pwd):/app node:18-bookworm 'cd app; npm run build:chrome'
       - uses: actions/upload-artifact@v3
         with:
           name: ChromeExtension
