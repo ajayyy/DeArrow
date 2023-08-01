@@ -72,7 +72,7 @@ git submodule update --init --recursive
 
     - You will need to repeat this step in the future if you get build errors related to `CompileConfig`.
 
-3. Run `npm install` in the repository to install dependencies.
+3. Run `npm ci` in the repository to install dependencies.
 
 4. Run `npm run build:dev` (for Chrome) or `npm run build:dev:firefox` (for Firefox) to generate a development version of the extension with source maps.
 
