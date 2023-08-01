@@ -7,15 +7,13 @@ jobs:
   build:
     name: Create artifacts
     runs-on: ubuntu-latest
+    container: node:18-bookworm
 
     steps:
       # Initialization
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '20'
       - run: npm ci
       - name: Copy configuration
         run: cp config.json.example config.json
