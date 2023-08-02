@@ -4,7 +4,7 @@ import { showDonationLink } from "../utils/configUtils";
 import { YourWorkComponent } from "./YourWorkComponent";
 import { ToggleOptionComponent } from "./ToggleOptionComponent";
 import { FormattingOptionsComponent } from "./FormattingOptionsComponent";
-import { isSafari } from "../maze-utils/config";
+import { isSafari } from "../../maze-utils/src/config";
 
 export const PopupComponent = () => {
     const [extensionEnabled, setExtensionEnabled] = React.useState(Config.config!.extensionEnabled);

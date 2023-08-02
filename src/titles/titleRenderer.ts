@@ -1,4 +1,4 @@
-import { VideoID, getVideoID } from "../maze-utils/video";
+import { VideoID, getVideoID } from "../../maze-utils/src/video";
 import Config from "../config/config";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
@@ -10,8 +10,8 @@ import { shouldDefaultToCustom, shouldReplaceTitles, shouldReplaceTitlesFastChec
 import { countTitleReplacement } from "../config/stats";
 import { isReduxInstalled } from "../utils/extensionCompatibility";
 import { onMobile } from "../../maze-utils/src/pageInfo";
-import { isFirefoxOrSafari } from "../maze-utils";
-import { isSafari } from "../maze-utils/config";
+import { isFirefoxOrSafari } from "../../maze-utils/src";
+import { isSafari } from "../../maze-utils/src/config";
 
 enum WatchPageType {
     Video,

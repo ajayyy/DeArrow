@@ -1,5 +1,5 @@
-import { addCleanupListener } from "../maze-utils/cleanup";
-import { waitForElement } from "../maze-utils/dom";
+import { addCleanupListener } from "../../maze-utils/src/cleanup";
+import { waitForElement } from "../../maze-utils/src/dom";
 import { logError } from "../utils/logger";
 import { BrandingLocation, getLinkElement, replaceVideoCardBranding } from "./videoBranding";
 

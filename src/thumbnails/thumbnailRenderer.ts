@@ -1,19 +1,19 @@
 import { Format, getPlaybackFormats } from "./thumbnailData";
 import { getFromCache, RenderedThumbnailVideo, setupCache, ThumbnailVideo } from "./thumbnailDataCache";
-import { VideoID, getVideoID } from "../maze-utils/video";
+import { VideoID, getVideoID } from "../../maze-utils/src/video";
 import { getNumberOfThumbnailCacheRequests, getThumbnailUrl, getVideoThumbnailIncludingUnsubmitted, isFetchingFromThumbnailCache, queueThumbnailCacheRequest, waitForThumbnailCache } from "../dataFetching";
 import { log, logError } from "../utils/logger";
 import { BrandingLocation, ShowCustomBrandingInfo, extractVideoIDFromElement, getActualShowCustomBranding } from "../videoBranding/videoBranding";
-import { isFirefoxOrSafari, timeoutPomise, waitFor } from "../maze-utils";
+import { isFirefoxOrSafari, timeoutPomise, waitFor } from "../../maze-utils/src";
 import Config, { ThumbnailFallbackOption } from "../config/config";
 import { getThumbnailFallbackOption, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "../config/channelOverrides";
 import { countThumbnailReplacement } from "../config/stats";
 import { ThumbnailCacheOption } from "../config/config";
-import { getThumbnailImageSelectors, getThumbnailSelectors } from "../maze-utils/thumbnail-selectors";
+import { getThumbnailImageSelectors, getThumbnailSelectors } from "../../maze-utils/src/thumbnail-selectors";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { MobileFix, addNodeToListenFor } from "../utils/titleBar";
 import { resetMediaSessionThumbnail, setMediaSessionThumbnail } from "../videoBranding/mediaSessionHandler";
-import { isSafari } from "../maze-utils/config";
+import { isSafari } from "../../maze-utils/src/config";
 
 const activeRendersMax = isFirefoxOrSafari() ? 3 : 6;
 const activeRenders: Record<VideoID, Promise<RenderedThumbnailVideo | null>> = {};

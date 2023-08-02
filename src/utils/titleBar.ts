@@ -1,12 +1,12 @@
-import { getYouTubeTitleNodeSelector } from "../maze-utils/elements";
+import { getYouTubeTitleNodeSelector } from "../../maze-utils/src/elements";
 import { getOriginalTitleElement } from "../titles/titleRenderer";
 import { BrandingLocation, replaceCurrentVideoBranding } from "../videoBranding/videoBranding";
-import { waitForElement } from "../maze-utils/dom";
+import { waitForElement } from "../../maze-utils/src/dom";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { logError } from "./logger";
-import { waitFor } from "../maze-utils";
-import { getYouTubeTitleNode } from "../maze-utils/elements";
-import { addCleanupListener } from "../maze-utils/cleanup";
+import { waitFor } from "../../maze-utils/src";
+import { getYouTubeTitleNode } from "../../maze-utils/src/elements";
+import { addCleanupListener } from "../../maze-utils/src/cleanup";
 
 export enum MobileFix {
     Replace,

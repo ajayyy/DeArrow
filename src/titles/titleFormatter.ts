@@ -1,4 +1,4 @@
-import { VideoID } from "../maze-utils/video";
+import { VideoID } from "../../maze-utils/src/video";
 import Config, { TitleFormatting } from "../config/config";
 import { getTitleFormatting, shouldCleanEmojis } from "../config/channelOverrides";
 import { acronymBlocklist, allowlistedWords, titleCaseNotCapitalized } from "./titleFormatterData";

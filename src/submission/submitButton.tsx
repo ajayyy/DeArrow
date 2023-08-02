@@ -2,7 +2,7 @@ import * as React from "react";
 import { createRoot, Root } from "react-dom/client";
 import { BrandingResult, replaceCurrentVideoBranding } from "../videoBranding/videoBranding";
 import { SubmissionComponent } from "./SubmissionComponent";
-import { getVideo, getVideoID, getYouTubeVideoID, isOnMobileYouTube } from "../maze-utils/video";
+import { getVideo, getVideoID, getYouTubeVideoID, isOnMobileYouTube } from "../../maze-utils/src/video";
 import { log, logError } from "../utils/logger";
 import { TitleSubmission } from "../titles/titleData";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
@@ -10,7 +10,7 @@ import { queueThumbnailCacheRequest, submitVideoBranding } from "../dataFetching
 import Config from "../config/config";
 import { addTitleChangeListener, getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { onMobile } from "../../maze-utils/src/pageInfo";
-import { addCleanupListener } from "../maze-utils/cleanup";
+import { addCleanupListener } from "../../maze-utils/src/cleanup";
 
 const submitButtonIcon = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

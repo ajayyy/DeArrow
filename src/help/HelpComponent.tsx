@@ -1,7 +1,7 @@
 import * as React from "react";
 import Config from "../config/config";
 import { showDonationLink } from "../utils/configUtils";
-import { isSafari } from "../maze-utils/config";
+import { isSafari } from "../../maze-utils/src/config";
 
 export const HelpComponent = () => {
 

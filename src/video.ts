@@ -1,6 +1,6 @@
 import { BackgroundToContentMessage } from "./types/messaging";
 import { logError } from "./utils/logger";
-import { ChannelIDInfo, checkIfNewVideoID, getVideoID, setupVideoModule, VideoID } from "./maze-utils/video"
+import { ChannelIDInfo, checkIfNewVideoID, getVideoID, setupVideoModule, VideoID } from "../maze-utils/src/video"
 import Config from "./config/config";
 import { SubmitButton } from "./submission/submitButton";
 import { BrandingLocation, BrandingResult, clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
@@ -9,7 +9,7 @@ import * as documentScript from "../dist/js/document.js";
 import { listenForBadges, listenForMiniPlayerTitleChange, listenForTitleChange } from "./utils/titleBar";
 import { getPlaybackFormats } from "./thumbnails/thumbnailData";
 import { replaceVideoPlayerSuggestionsBranding, setupMobileAutoplayHandler } from "./videoBranding/watchPageBrandingHandler";
-import { onMobile } from "./maze-utils/pageInfo";
+import { onMobile } from "../maze-utils/src/pageInfo";
 
 export const submitButton = new SubmitButton();
 

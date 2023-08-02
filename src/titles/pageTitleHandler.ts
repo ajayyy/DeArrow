@@ -1,5 +1,5 @@
-import { addCleanupListener } from "../maze-utils/cleanup";
-import { onMobile } from "../maze-utils/pageInfo";
+import { addCleanupListener } from "../../maze-utils/src/cleanup";
+import { onMobile } from "../../maze-utils/src/pageInfo";
 import { setMediaSessionTitle } from "../videoBranding/mediaSessionHandler";
 
 let targetTitle: string | null = null;

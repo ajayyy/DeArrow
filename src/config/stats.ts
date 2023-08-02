@@ -1,4 +1,4 @@
-import { VideoID } from "../maze-utils/video";
+import { VideoID } from "../../maze-utils/src/video";
 import Config from "./config";
 
 const countedTitles = new Set<VideoID>();

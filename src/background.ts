@@ -1,10 +1,10 @@
-import { setupTabUpdates } from "./maze-utils/tab-updates";
-import { setupBackgroundRequestProxy } from "./maze-utils/background-request-proxy";
-import { generateUserID } from "./maze-utils/setup";
+import { setupTabUpdates } from "../maze-utils/src/tab-updates";
+import { setupBackgroundRequestProxy } from "../maze-utils/src/background-request-proxy";
+import { generateUserID } from "../maze-utils/src/setup";
 import Config from "./config/config";
-import { isSafari } from "./maze-utils/config";
+import { isSafari } from "../maze-utils/src/config";
 import * as CompileConfig from "../config.json";
-import { isFirefoxOrSafari } from "./maze-utils";
+import { isFirefoxOrSafari } from "../maze-utils/src";
 import { logError } from "./utils/logger";
 import { injectUpdatedScripts } from "../maze-utils/src/cleanup";
 

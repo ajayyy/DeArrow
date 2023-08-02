@@ -1,11 +1,11 @@
-import { getYouTubeTitleNodeSelector } from "../maze-utils/elements";
-import { getVideoID, VideoID } from "../maze-utils/video";
-import { getElement, isVisible, waitForElement } from "../maze-utils/dom";
+import { getYouTubeTitleNodeSelector } from "../../maze-utils/src/elements";
+import { getVideoID, VideoID } from "../../maze-utils/src/video";
+import { getElement, isVisible, waitForElement } from "../../maze-utils/src/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
 import { findOrCreateShowOriginalButton, getOrCreateTitleElement, getOriginalTitleElement, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
-import { setThumbnailListener } from "../maze-utils/thumbnailManagement";
+import { setThumbnailListener } from "../../maze-utils/src/thumbnailManagement";
 import Config, { ThumbnailCacheOption } from "../config/config";
 import { logError } from "../utils/logger";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";

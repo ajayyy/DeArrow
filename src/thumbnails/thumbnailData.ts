@@ -1,9 +1,9 @@
 import { BrandingUUID } from "../videoBranding/videoBranding";
 import { PlaybackUrl, cacheUsed, getFromCache, setupCache } from "./thumbnailDataCache";
-import { VideoID } from "../maze-utils/video";
+import { VideoID } from "../../maze-utils/src/video";
 import { log } from "../utils/logger";
 import { onMobile } from "../../maze-utils/src/pageInfo";
-import { isSafari } from "../maze-utils/config";
+import { isSafari } from "../../maze-utils/src/config";
 
 interface PartialThumbnailResult {
     votes: number;

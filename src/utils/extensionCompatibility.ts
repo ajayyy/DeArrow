@@ -1,5 +1,5 @@
-import { waitForElement } from "../maze-utils/dom";
-import { getVideoID } from "../maze-utils/video";
+import { waitForElement } from "../../maze-utils/src/dom";
+import { getVideoID } from "../../maze-utils/src/video";
 import { attachSubmitButtonToPage } from "../video";
 import { replaceCurrentVideoBranding } from "../videoBranding/videoBranding";
 import { logError } from "./logger";

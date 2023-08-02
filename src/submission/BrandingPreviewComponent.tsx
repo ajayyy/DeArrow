@@ -1,4 +1,4 @@
-import { VideoID } from "../maze-utils/video";
+import { VideoID } from "../../maze-utils/src/video";
 import * as React from "react";
 import { formatTitleDefaultSettings } from "../titles/titleFormatter";
 import { BrandingResult } from "../videoBranding/videoBranding";

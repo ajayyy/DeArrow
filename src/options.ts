@@ -10,10 +10,10 @@ window["CB"] = Config;
 
 import KeybindComponent from "./options/KeybindComponent";
 import { showDonationLink } from "./utils/configUtils";
-import { localizeHtmlPage } from "./maze-utils/setup";
-import { StorageChangesObject } from "./maze-utils/config";
-import { getHash } from "./maze-utils/hash";
-import { isFirefoxOrSafari, waitFor } from "./maze-utils";
+import { localizeHtmlPage } from "../maze-utils/src/setup";
+import { StorageChangesObject } from "../maze-utils/src/config";
+import { getHash } from "../maze-utils/src/hash";
+import { isFirefoxOrSafari, waitFor } from "../maze-utils/src";
 import { sendRequestToServer } from "./dataFetching";
 import { logError } from "./utils/logger";
 import ChannelOverrides from "./options/ChannelOverrides";

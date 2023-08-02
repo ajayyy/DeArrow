@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { HelpComponent } from "./HelpComponent";
-import { waitFor } from "../maze-utils";
+import { waitFor } from "../../maze-utils/src";
 import Config from "../config/config";
 
 

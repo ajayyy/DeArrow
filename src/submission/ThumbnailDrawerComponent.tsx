@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ThumbnailType } from "./ThumbnailComponent";
-import { VideoID } from "../maze-utils/video";
+import { VideoID } from "../../maze-utils/src/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { ThumbnailSelectionComponent } from "./ThumbnailSelectionComponent";
 

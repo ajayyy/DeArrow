@@ -1,8 +1,8 @@
 import * as React from "react";
 import Config from "../config/config";
 import { sendRequestToServer } from "../dataFetching";
-import { getHash } from "../maze-utils/hash";
-import { getErrorMessage } from "../maze-utils/formating";
+import { getHash } from "../../maze-utils/src/hash";
+import { getErrorMessage } from "../../maze-utils/src/formating";
 import PencilIcon from "../svgIcons/pencilIcon";
 import ClipboardIcon from "../svgIcons/clipboardIcon";
 import CheckIcon from "../svgIcons/checkIcon";

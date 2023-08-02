@@ -1,5 +1,5 @@
-import { ProtoConfig } from "../maze-utils/config";
-import { VideoID } from "../maze-utils/video";
+import { ProtoConfig } from "../../maze-utils/src/config";
+import { VideoID } from "../../maze-utils/src/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { logError } from "../utils/logger";
 import * as CompileConfig from "../../config.json";
