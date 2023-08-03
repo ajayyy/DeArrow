@@ -388,7 +388,7 @@ export function cleanPunctuation(title: string): string {
             && index !== words.length - 1) { // Last already handled
             if (word.includes("?")) {
                 word = cleanWordPunctuation(word);
-            } else if (word.match(/[.!]+$/)) {
+            } else if (word.match(/[!]+$/)) {
                 if (words.length > index + 1 && !isDelimeter(words[index + 1])) {
                     // Insert a period instead
                     word = cleanWordPunctuation(word) + ". ";

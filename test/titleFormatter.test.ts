@@ -121,7 +121,9 @@ describe("toTitleCase", () => {
         ["1980's Gadget Censors Bad Words", "1980's Gadget Censors Bad Words"],
         ["Magic iPad", "Magic iPad"],
         ["Review of this thing called an iPad", "Review of This Thing Called an iPad"],
-        ["Review of some product (1980s)", "Review of Some Product (1980s)"]
+        ["Review of some product (1980s)", "Review of Some Product (1980s)"],
+        ["The Collatz Conjecture... but in Binary", "The Collatz Conjecture... But in Binary"],
+        ["The Collatz Conjecture.!! but in Binary", "The Collatz Conjecture. But in Binary"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
