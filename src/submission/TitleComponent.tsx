@@ -25,6 +25,10 @@ export const TitleComponent = (props: TitleComponentProps) => {
         }
     }, [focused]);
 
+    React.useEffect(() => {
+        titleRef.current!.innerText = props.submission.title;
+    }, []);
+
     const showTitleHint = !focused && title.current === "";
     return (
         <div className={`cbTitle${props.selected ? " cbTitleSelected" : ""}`}
@@ -84,8 +88,7 @@ export const TitleComponent = (props: TitleComponentProps) => {
 
                     const text = e.clipboardData?.getData?.("text/plain")?.replace(/\n/g, " ") ?? "";
                     document.execCommand("insertText", false, text);
-                }}
-                dangerouslySetInnerHTML={{ __html: props.submission.title }}>
+                }}>
             </span>
 
             <button className="resetCustomTitle cbButton" 
