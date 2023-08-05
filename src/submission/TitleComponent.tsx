@@ -83,6 +83,9 @@ export const TitleComponent = (props: TitleComponentProps) => {
                         e.preventDefault();
                     }
                 }}
+                onKeyUp={(e) => {
+                    e.stopPropagation()
+                }}
                 onPaste={(e) => {
                     e.preventDefault();
 
