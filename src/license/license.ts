@@ -40,7 +40,9 @@ export async function getLicenseKey(): Promise<string | null> {
 }
 
 async function generateLicenseKey(type: "free") {
-    const result = await sendRequestToServer("GET", `/api/generateToken/${type}`);
+    const result = await sendRequestToServer("GET", `/api/generateToken/${type}`, {
+        key: Date.now()
+    });
 
     if (result.status === 200) {
         const json = JSON.parse(result.responseText);
