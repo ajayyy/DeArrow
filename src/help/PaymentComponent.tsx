@@ -2,7 +2,7 @@ import * as React from "react";
 import { sendRequestToServer } from "../utils/requests";
 import { askBackgroundToRegisterNeededContentScripts, askBackgroundToSetupAlarms, freeTrialActive, isFreeAccessRequestActive } from "../license/license";
 import Config from "../config/config";
-import { objectToURI } from "../../maze-utils";
+import { objectToURI } from "../../maze-utils/src";
 
 const websiteDomain = "https://dearrow.ajay.app"
 

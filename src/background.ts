@@ -8,7 +8,7 @@ import { isFirefoxOrSafari } from "../maze-utils/src";
 import { logError } from "./utils/logger";
 import { injectUpdatedScripts } from "../maze-utils/src/cleanup";
 import { freeTrialActive, getContentScripts, getFreeAccessRequestTimeLeft, getFreeTrialTimeLeft, isActivated } from "./license/license";
-import { waitFor } from "../maze-utils";
+import { waitFor } from "../maze-utils/src";
 
 let ranOnInstall = false;
 
