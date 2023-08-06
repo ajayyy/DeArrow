@@ -1,4 +1,4 @@
-import { isFirefoxOrSafari } from "../maze-utils/lib";
+import { isFirefoxOrSafari } from "../maze-utils";
 import { cleanPage } from "./utils/pageCleaner";
 
 if (isFirefoxOrSafari()) {

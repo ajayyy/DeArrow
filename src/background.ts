@@ -1,5 +1,5 @@
 import { setupTabUpdates } from "../maze-utils/src/tab-updates";
-import { setupBackgroundRequestProxy } from "../maze-utils/src/background-request-proxy";
+import { sendRealRequestToCustomServer, setupBackgroundRequestProxy } from "../maze-utils/src/background-request-proxy";
 import { generateUserID } from "../maze-utils/src/setup";
 import Config from "./config/config";
 import { isSafari } from "../maze-utils/src/config";
@@ -8,8 +8,7 @@ import { isFirefoxOrSafari } from "../maze-utils/src";
 import { logError } from "./utils/logger";
 import { injectUpdatedScripts } from "../maze-utils/src/cleanup";
 import { freeTrialActive, getContentScripts, getFreeAccessRequestTimeLeft, getFreeTrialTimeLeft, isActivated } from "./license/license";
-import { waitFor } from "../maze-utils/lib";
-import { sendRealRequestToCustomServer } from "../maze-utils/lib/background-request-proxy";
+import { waitFor } from "../maze-utils";
 
 let ranOnInstall = false;
 
