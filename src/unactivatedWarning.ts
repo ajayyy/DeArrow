@@ -21,9 +21,6 @@ if (document.hasFocus()) {
     window.addEventListener("mousemove", displayWarningIfNeeded, { once: true });
 }
 
-
-
-
 function displayWarningIfNeeded() {
     chrome.storage.sync.get(["activated", "freeTrialStart", "freeTrialEnded", "freeAccessRequestStart"], (v) => {
         if (!v.activated && !v.freeTrialStart && !v.freeTrialEnded && !v.freeAccessRequestStart) {
