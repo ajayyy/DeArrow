@@ -166,7 +166,8 @@ export const PaymentComponent = () => {
                     onLoad={(e) => {
                         setHideFrame(false);
                         const frame = e.currentTarget as HTMLIFrameElement;
-                        setTimeout(() => frame.contentWindow!.postMessage("dearrow-payment-page", "*"), 1000)
+                        setTimeout(() => frame.contentWindow!.postMessage("dearrow-payment-page", "*"), 100);
+                        setTimeout(() => frame.contentWindow!.postMessage("dearrow-payment-page", "*"), 1500);
                     }}
                 />
             </div>
