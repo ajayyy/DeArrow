@@ -189,7 +189,11 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
             return replaceVideoCardBranding(element, brandingLocation, verifyVideoID, tries++);
         }
 
-        handleOnboarding(element, videoID, brandingLocation, showCustomBranding, result).catch(logError);
+        if (document.hasFocus()) {
+            handleOnboarding(element, videoID, brandingLocation, showCustomBranding, result).catch(logError);
+        } else {
+            document.addEventListener("mousemove", () => void handleOnboarding(element, videoID, brandingLocation, showCustomBranding, result).catch(logError), { once: true });
+        }
 
         return result;
     }

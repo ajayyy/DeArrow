@@ -21,7 +21,14 @@
 			<div id="title" class="titleBar">
 				<img src="../icons/logo.svg" class="profilepic" alt="DeArrow logo"/>
 				DeArrow
-				<div id="version"></div>
+				<div class="logoSubtext">
+					<span id="version"></span>
+					<span class="licenseKeyButtonParent">
+						<span id="licenseKeyButton" class="hidden">__MSG_ViewLicenseKey__</span>
+					</span>
+				</div>
+				<div class="logoSubtextCentered hidden" id="licenseKey"></div>
+				<div class="logoSubtextCentered hidden" id="sharingLicense">(__MSG_SharingIsCaring__)</div>
 			</div>
 
 			<div id="navigation">
@@ -52,7 +59,7 @@
 					__MSG_createdBy__ 
 					<a href="https://ajay.app">Ajay Ramachandran</a> 
 				</div>
-				<a href="https://sponsor.ajay.app/donate" target="_blank" rel="noopener" id="sbDonate">(__MSG_Donate__)</a>
+				<a href="https://sponsor.ajay.app/donate" target="_blank" rel="noopener" class="hidden" id="sbDonate">(__MSG_Donate__)</a>
 			</div>
 
 		</div>
@@ -245,7 +252,7 @@
 					</div>
 				</div>
 
-				<div data-type="toggle" data-toggle-type="reverse" data-sync="showDonationLink" data-no-safari="true">
+				<div data-type="toggle" data-toggle-type="reverse" data-sync="showDonationLink" data-only-paid="true" data-no-safari="true">
 					<div class="sb-switch-container">
 						<label class="sb-switch">
 							<input id="showDonationLink" type="checkbox" checked>

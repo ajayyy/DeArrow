@@ -1,6 +1,6 @@
 import * as React from "react";
 import Config from "../config/config";
-import { sendRequestToServer } from "../dataFetching";
+import { sendRequestToServer } from "../utils/requests";
 import { getHash } from "../../maze-utils/src/hash";
 import { getErrorMessage } from "../../maze-utils/src/formating";
 import PencilIcon from "../svgIcons/pencilIcon";

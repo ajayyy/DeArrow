@@ -19,7 +19,9 @@
     "permissions": [
         "https://sponsor.ajay.app/*",
         "https://dearrow-thumb.ajay.app/*",
-        "https://*.googlevideo.com/*"
+        "https://*.googlevideo.com/*",
+        "https://*.youtube.com/*",
+        "https://www.youtube-nocookie.com/embed/*"
     ],
     "optional_permissions": [
         "*://*/*"

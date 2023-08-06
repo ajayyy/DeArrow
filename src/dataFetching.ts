@@ -1,7 +1,7 @@
 import { VideoID, getVideoID } from "../maze-utils/src/video";
 import { ThumbnailResult, ThumbnailSubmission, fetchVideoMetadata } from "./thumbnails/thumbnailData";
 import { TitleResult, TitleSubmission } from "./titles/titleData";
-import { FetchResponse, sendRealRequestToCustomServer, sendRequestToCustomServer } from "../maze-utils/src/background-request-proxy";
+import { FetchResponse, sendRealRequestToCustomServer } from "../maze-utils/src/background-request-proxy";
 import { BrandingLocation, BrandingResult, updateBrandingForVideo } from "./videoBranding/videoBranding";
 import { logError } from "./utils/logger";
 import { getHash } from "../maze-utils/src/hash";
@@ -15,6 +15,7 @@ import * as CompileConfig from "../config.json";
 import { alea } from "seedrandom";
 import { getThumbnailFallbackOption, getThumbnailFallbackOptionFastCheck, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "./config/channelOverrides";
 import { updateSubmitButton } from "./video";
+import { sendRequestToServer } from "./utils/requests";
 
 interface VideoBrandingCacheRecord extends BrandingResult {
     lastUsed: number;
@@ -471,10 +472,6 @@ export async function submitVideoBranding(videoID: VideoID, title: TitleSubmissi
 
     clearCache(videoID);
     return result;
-}
-
-export function sendRequestToServer(type: string, url: string, data = {}): Promise<FetchResponse> {
-    return sendRequestToCustomServer(type, Config.config!.serverAddress + url, data);
 }
 
 export function sendRequestToThumbnailCache(videoID: string, time?: number, title?: string,

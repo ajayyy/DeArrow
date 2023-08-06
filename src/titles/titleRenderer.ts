@@ -375,6 +375,10 @@ export async function findOrCreateShowOriginalButton(element: HTMLElement, brand
 async function createShowOriginalButton(originalTitleElement: HTMLElement,
         brandingLocation: BrandingLocation, videoID: VideoID): Promise<HTMLElement> {
     const buttonElement = document.createElement("button");
+    // Style set here for when css disappears during updates
+    buttonElement.style.backgroundColor = "transparent";
+    buttonElement.style.border = "none";
+
     buttonElement.classList.add("cbShowOriginal");
     if (onMobile()) buttonElement.classList.add("cbMobileButton");
 
@@ -385,6 +389,8 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
     }
 
     const buttonImage = document.createElement("img");
+    buttonImage.style.maxHeight = "20px";
+
     buttonElement.draggable = false;
     buttonImage.className = "cbShowOriginalImage";
     buttonImage.src = chrome.runtime.getURL("icons/logo.svg");

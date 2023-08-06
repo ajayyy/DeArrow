@@ -11,7 +11,7 @@ import { addTitleChangeListener, removeTitleChangeListener } from "../utils/titl
 import { toSentenceCase } from "../titles/titleFormatter";
 import { BrandingPreviewComponent } from "./BrandingPreviewComponent";
 import { getHash } from "../../maze-utils/src/hash";
-import { sendRequestToServer } from "../dataFetching";
+import { sendRequestToServer } from "../utils/requests";
 import { objectToURI } from "../../maze-utils/src";
 import { logError } from "../utils/logger";
 import { YourWorkComponent } from "../popup/YourWorkComponent";
@@ -21,6 +21,8 @@ import ExclamationIcon from "../svgIcons/exclamationIcon";
 import CursorIcon from "../svgIcons/cursorIcon";
 import FontIcon from "../svgIcons/fontIcon";
 import { Tooltip } from "../utils/tooltip";
+import { freeTrialActive } from "../license/license";
+import { LicenseComponent } from "../license/LicenseComponent";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -232,7 +234,8 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
             <div className="cbVoteButtonContainer">
                 <button className="cbNoticeButton cbVoteButton" 
-                    disabled={currentlySubmitting 
+                    disabled={freeTrialActive()
+                                || currentlySubmitting 
                                 || (!selectedThumbnail.current && !selectedTitle) 
                                 || (!!selectedTitle && selectedTitle.title === chrome.i18n.getMessage("OriginalTitle"))}
                     onClick={async () => {
@@ -282,6 +285,8 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             {`${chrome.i18n.getMessage("askAQuestion")}`}
                         </a>
                     </div>
+
+                    <LicenseComponent/>
                 </>
                 : null
             }

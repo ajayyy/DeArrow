@@ -5,6 +5,8 @@ import { YourWorkComponent } from "./YourWorkComponent";
 import { ToggleOptionComponent } from "./ToggleOptionComponent";
 import { FormattingOptionsComponent } from "./FormattingOptionsComponent";
 import { isSafari } from "../../maze-utils/src/config";
+import { isActivated } from "../license/license";
+import { LicenseComponent } from "../license/LicenseComponent";
 
 export const PopupComponent = () => {
     const [extensionEnabled, setExtensionEnabled] = React.useState(Config.config!.extensionEnabled);
@@ -18,75 +20,99 @@ export const PopupComponent = () => {
                 <p className="u-mZ">DeArrow</p>
             </header>
 
-            {/* Toggle Box */}
-            <div className="sbControlsMenu">
-                {/* github: mbledkowski/toggle-switch */}
-                <label id="disableExtension" htmlFor="toggleSwitch" className="toggleSwitchContainer sbControlsMenu-item">
-                <span className="toggleSwitchContainer-switch">
-                    <input type="checkbox" 
-                        style={{ "display": "none" }} 
-                        id="toggleSwitch" 
-                        checked={extensionEnabled}
-                        onChange={(e) => {
-                            Config.config!.extensionEnabled = e.target.checked;
-                            setExtensionEnabled(e.target.checked)
-                        }}/>
-                    <span className="switchBg shadow"></span>
-                    <span className="switchBg white"></span>
-                    <span className="switchBg blue"></span>
-                    <span className="switchDot"></span>
-                </span>
-                <span id="disableSkipping" className={extensionEnabled ? " hidden" : ""}>{chrome.i18n.getMessage("disable")}</span>
-                <span id="enableSkipping" className={!extensionEnabled ? " hidden" : ""}>{chrome.i18n.getMessage("Enable")}</span>
-                </label>
-                <button id="optionsButton" 
-                    className="sbControlsMenu-item" 
-                    title={chrome.i18n.getMessage("Options")}
-                    onClick={() => {
-                        chrome.runtime.sendMessage({ "message": "openConfig" });
-                    }}>
-                <img src="/icons/settings.svg" alt="Settings icon" width="23" height="23" className="sbControlsMenu-itemIcon" id="sbPopupIconSettings" />
-                    {chrome.i18n.getMessage("Options")}
-                </button>
-            </div>
+            {
+                !isActivated() &&
+                <div className="activation-needed">
+                    <p>
+                        {chrome.i18n.getMessage("DeArrowNotActivated")}
+                    </p>
 
-            {/* Replace titles/thumbnails */}
-            <ToggleOptionComponent
-                id="replaceTitles"
-                onChange={(value) => {
-                    setReplaceTitles(value);
-                    Config.config!.replaceTitles = value;
-                }}
-                value={replaceTitles}
-                label={chrome.i18n.getMessage("replaceTitles")}
-            />
+                    <div className="option-button"
+                        onClick={() => {
+                            void chrome.runtime.sendMessage({ message: "openPayment" });
+                        }}>
+                        {chrome.i18n.getMessage("ActivateDeArrow")}
+                    </div>
+                </div>
+            }
 
-            <ToggleOptionComponent
-                id="replaceThumbnails"
-                style={{
-                    paddingTop: "15px"
-                }}
-                onChange={(value) => {
-                    setReplaceThumbnails(value);
-                    Config.config!.replaceThumbnails = value;
-                }}
-                value={replaceThumbnails}
-                label={chrome.i18n.getMessage("replaceThumbnails")}
-            />
+            {
+                isActivated() &&
+                <>
+                    {/* Toggle Box */}
+                    <div className="sbControlsMenu">
+                        {/* github: mbledkowski/toggle-switch */}
+                        <label id="disableExtension" htmlFor="toggleSwitch" className="toggleSwitchContainer sbControlsMenu-item">
+                        <span className="toggleSwitchContainer-switch">
+                            <input type="checkbox" 
+                                style={{ "display": "none" }} 
+                                id="toggleSwitch" 
+                                checked={extensionEnabled}
+                                onChange={(e) => {
+                                    Config.config!.extensionEnabled = e.target.checked;
+                                    setExtensionEnabled(e.target.checked)
+                                }}/>
+                            <span className="switchBg shadow"></span>
+                            <span className="switchBg white"></span>
+                            <span className="switchBg blue"></span>
+                            <span className="switchDot"></span>
+                        </span>
+                        <span id="disableSkipping" className={extensionEnabled ? " hidden" : ""}>{chrome.i18n.getMessage("disable")}</span>
+                        <span id="enableSkipping" className={!extensionEnabled ? " hidden" : ""}>{chrome.i18n.getMessage("Enable")}</span>
+                        </label>
+                        <button id="optionsButton" 
+                            className="sbControlsMenu-item" 
+                            title={chrome.i18n.getMessage("Options")}
+                            onClick={() => {
+                                chrome.runtime.sendMessage({ "message": "openConfig" });
+                            }}>
+                        <img src="/icons/settings.svg" alt="Settings icon" width="23" height="23" className="sbControlsMenu-itemIcon" id="sbPopupIconSettings" />
+                            {chrome.i18n.getMessage("Options")}
+                        </button>
+                    </div>
 
-            <FormattingOptionsComponent/>
+                    {/* Replace titles/thumbnails */}
+                    <ToggleOptionComponent
+                        id="replaceTitles"
+                        onChange={(value) => {
+                            setReplaceTitles(value);
+                            Config.config!.replaceTitles = value;
+                        }}
+                        value={replaceTitles}
+                        label={chrome.i18n.getMessage("replaceTitles")}
+                    />
 
-            {/* Your Work box */}
-            <YourWorkComponent/>
+                    <ToggleOptionComponent
+                        id="replaceThumbnails"
+                        style={{
+                            paddingTop: "15px"
+                        }}
+                        onChange={(value) => {
+                            setReplaceThumbnails(value);
+                            Config.config!.replaceThumbnails = value;
+                        }}
+                        value={replaceThumbnails}
+                        label={chrome.i18n.getMessage("replaceThumbnails")}
+                    />
+
+                    <FormattingOptionsComponent/>
+
+                    {/* Your Work box */}
+                    <YourWorkComponent/>
+                </>
+            }
 
             {/* Footer */}
             <footer id="sbFooter">
-                <a id="helpButton"
-                    onClick={() => {
-                        chrome.runtime.sendMessage({ "message": "openHelp" });
-                    }}>
-                        {chrome.i18n.getMessage("help")}
-                </a>
+                {
+                    isActivated() &&
+                    <a id="helpButton"
+                        onClick={() => {
+                            chrome.runtime.sendMessage({ "message": "openHelp" });
+                        }}>
+                            {chrome.i18n.getMessage("help")}
+                    </a>
+                }
                 <a href="https://dearrow.ajay.app" target="_blank" rel="noreferrer">{chrome.i18n.getMessage("website")}</a>
                 <a href="https://dearrow.ajay.app/stats" target="_blank" rel="noreferrer" className={isSafari() ? " hidden" : ""}>{chrome.i18n.getMessage("viewLeaderboard")}</a>
                 <a href="https://dearrow.ajay.app/donate" target="_blank" rel="noreferrer" className={!showDonationLink() ? " hidden" : ""}>
@@ -97,6 +123,8 @@ export const PopupComponent = () => {
                 <a href="https://discord.gg/SponsorBlock" target="_blank" rel="noreferrer">Discord</a>
                 <a href="https://matrix.to/#/#sponsor:ajay.app?via=ajay.app&via=matrix.org&via=mozilla.org" target="_blank" rel="noreferrer">Matrix</a>
             </footer>
+
+            <LicenseComponent/>
         </>
     );
 };

@@ -135,9 +135,18 @@ html, body {
     border-bottom: inherit;
 }
 
-.sb-optionLabel, #version {
+.sb-optionLabel, .logoSubtext {
     font-size: 14px;
-    height: 15px;
+}
+
+.logoSubtextCentered {
+    font-size: 14px;
+    margin: auto;
+    margin-top: 5px;
+}
+
+.licenseKeyButtonParent {
+    display: block;
 }
 
 div[data-type="keybind-change"] .sb-optionLabel {
@@ -668,10 +677,21 @@ svg {
         right: 30px;
         margin-top: 10px;
     }
-    #version {
+    .logoSubtext {
         font-size: 10px;
         height: 10px;
-        transform: translate(-20px, -5px);
+        
+        display: flex;
+        justify-content: space-between;
+        width: 158.28px;
+        margin: auto;
+        margin-top: 5px;
+    }
+    .logoSubtextCentered {
+        
+        font-size: 10px;
+        margin: auto;
+        margin-top: 5px;
     }
     .sticky #menubar {
         position: fixed;
@@ -775,4 +795,8 @@ svg {
 
 .no-configurations {
     text-align: center;
+}
+
+#licenseKeyButton {
+    cursor: pointer;
 }

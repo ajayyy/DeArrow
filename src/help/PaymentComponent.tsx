@@ -1,0 +1,192 @@
+import * as React from "react";
+import { sendRequestToServer } from "../utils/requests";
+import { askBackgroundToRegisterNeededContentScripts, askBackgroundToSetupAlarms, freeTrialActive, isFreeAccessRequestActive } from "../license/license";
+import Config from "../config/config";
+import { objectToURI } from "../../maze-utils/lib";
+
+const websiteDomain = "https://dearrow.ajay.app"
+
+interface PaymentComponentChoices {
+    freeTrial?: boolean;
+    licenseKey?: string;
+    freeAccess?: boolean;
+}
+
+enum PaymentResultMessageType {
+    FreeTrial,
+    FreeAccess
+}
+
+export const PaymentComponent = () => {
+    const [paymentResult, setPaymentResult] = React.useState<PaymentResultMessageType | null>(isFreeAccessRequestActive() 
+        ? PaymentResultMessageType.FreeAccess : (freeTrialActive() ? PaymentResultMessageType.FreeTrial : null));
+    const [hideFrame, setHideFrame] = React.useState(true);
+
+    const iframeSource = React.useRef(`${websiteDomain}/payment#${objectToURI("", {
+        hideFreeTrial: Config.config!.freeTrialStart !== null || Config.config!.freeTrialEnded,
+        hideRequestFreeAccessButton: Config.config!.freeAccessRequestStart !== null
+    }, false)}`);
+
+    const applyChoices = async (choices: PaymentComponentChoices) => {
+        if (Config.config!.freeTrialStart) {
+            // Can't have two trials
+            choices.freeTrial = false;
+        }
+
+        const validLicenseKey = choices.licenseKey && await shouldAllowLicenseKey(choices.licenseKey);
+        if (validLicenseKey) {
+            Config.config!.licenseKey = choices.licenseKey!;
+        }
+
+        if (choices.freeAccess) {
+            Config.config!.freeAccessRequestStart = Date.now();
+        }
+
+        if (validLicenseKey) {
+            Config.config!.activated = true;
+        } else {
+            if (choices.freeAccess) {
+                setPaymentResult(PaymentResultMessageType.FreeAccess)
+            } else if (choices.freeTrial) {
+                setPaymentResult(PaymentResultMessageType.FreeTrial)
+                Config.config!.freeTrialStart = Date.now();
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        if (validLicenseKey || choices.freeTrial) {
+            await askBackgroundToRegisterNeededContentScripts(true);
+        } else if (choices.freeAccess) {
+            setTimeout(() => void askBackgroundToSetupAlarms(), 2000);
+        }
+
+        if (validLicenseKey) {
+            chrome.runtime.sendMessage({ "message": "openHelp" }, () => window.close());
+        }
+    }
+
+    React.useEffect(() => {
+        window.addEventListener("message", (e) => {
+            if (e.data && e.data.message === "dearrow-payment-page-data") {
+                applyChoices(e.data.choices);
+            }
+        });
+    }, []);
+
+    return (
+        <>
+            <div id="title">
+                <img src="icons/logo-256.png" height="80" className="profilepic" />
+                <span id="titleText">
+                    DeArrow
+                </span>
+            </div>
+
+            <div className="container sponsorBlockPageBody" style={{
+                maxWidth: "768px"
+            }}>
+
+                <p className="createdBy">
+                    <img src="https://ajay.app/newprofilepic.jpg" height="30" className="profilepiccircle" />
+                    {chrome.i18n.getMessage("createdBy")}{" "}<a href="https://ajay.app">Ajay Ramachandran</a>
+                </p>
+
+                <div className="payment-announcement-container">
+                    <div className="payment-announcement center">
+                        {
+                            !freeTrialActive() && Config.config!.freeTrialEnded &&
+                                <p>
+                                    {chrome.i18n.getMessage("freeTrialEnded")}
+                                </p>
+                        }
+                    </div>
+
+                    {
+                        paymentResult === PaymentResultMessageType.FreeAccess ? (
+                            <div className="payment-announcement center">
+                                <p>
+                                    {chrome.i18n.getMessage("freeAccessRequested")}
+                                </p>
+
+                                {
+                                    Config.config!.freeTrialStart === null && !Config.config!.freeTrialEnded &&
+                                    <>
+                                        <p>
+                                            {chrome.i18n.getMessage("freeTrialPrompt")}
+                                        </p>
+
+                                        <div>
+                                            <div className="option-button center-button" 
+                                                onClick={() => {
+                                                    applyChoices({
+                                                        freeTrial: true
+                                                    });
+                                                }}>
+                                                {chrome.i18n.getMessage("startFreeTrial")}
+                                            </div>
+                                        </div>
+                                    </>
+                                }
+
+                                {
+                                    freeTrialActive() &&
+                                        <p>
+                                            {chrome.i18n.getMessage("freeTrialStarted")}
+                                        </p>
+                                }
+                                
+                                <br/>
+                                <br/>
+                            </div>
+                        ) : (paymentResult === PaymentResultMessageType.FreeTrial ? (
+                            <>
+                                <div className="payment-announcement center">
+                                    <p>
+                                        {chrome.i18n.getMessage("freeTrialStarted")}
+                                    </p>
+                                </div>
+
+                                <br/>
+                                <br/>
+                            </>
+                        ): null)
+                    }
+                </div>
+
+                <iframe
+                    key="main-frame"
+                    className={hideFrame ? "hidden" : ""}
+                    src={iframeSource.current}
+                    style={{
+                        border: "none",
+                        width: "100%",
+                        height: "1400px"
+                    }}
+                    onLoad={(e) => {
+                        setHideFrame(false);
+                        const frame = e.currentTarget as HTMLIFrameElement;
+                        setTimeout(() => frame.contentWindow!.postMessage("dearrow-payment-page", "*"), 1000)
+                    }}
+                />
+            </div>
+        </>
+    );
+};
+
+async function shouldAllowLicenseKey(licenseKey: string): Promise<boolean> {
+    try {
+        const result = await sendRequestToServer("GET", `${websiteDomain}/api/verifyToken`, {
+            licenseKey: licenseKey
+        });
+
+        if (result.status === 200) {
+            const json = JSON.parse(result.responseText);
+            return json.allowed;
+        } else {
+            return true;
+        }
+    } catch (e) { } // eslint-disable-line no-empty
+
+    return true;
+}

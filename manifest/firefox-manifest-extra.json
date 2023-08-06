@@ -3,5 +3,23 @@
     "gecko": {
       "id": "deArrow@ajay.app"
     }
-  }
+  },
+  "permissions": [
+    "scripting"
+  ],
+  "content_scripts": [{
+    "run_at": "document_start",
+    "matches": [
+        "https://*.youtube.com/*",
+        "https://www.youtube-nocookie.com/embed/*"
+    ],
+    "all_frames": true,
+    "js": [
+        "./js/documentScriptInjector.js"
+    ],
+    "css": [
+        "content.css",
+        "shared.css"
+    ]
+  }]
 }

@@ -6,7 +6,7 @@
     --dialog-border: white;
     --text: #c4c4c4;
     --title: #dad8d8;
-    --disabled: #520000;
+    --disabled: #080052;
     --black: black;
     --white: white;
 }
@@ -29,6 +29,10 @@ html {
 }
 
 .bigText {
+    font-size: 50px;
+}
+
+.bigText > * {
     font-size: 50px;
 }
 
@@ -327,7 +331,7 @@ svg {
 .option-button {
     cursor: pointer;
 
-    background-color: #c00000;
+    background-color: #0e79ca;
     padding: 10px;
     color: white;
     border-radius: 5px;
@@ -337,7 +341,7 @@ svg {
 }
 
 .option-button:hover:not(.disabled) {
-    background-color: #fc0303;
+    background-color: #0e79ca;
 }
 
 .option-button.disabled {
@@ -349,4 +353,29 @@ svg {
 .selfpromo-text {
     color: #8a8a8a;
     cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
+
+.payment-announcement-container {
+    padding: 15px;
+    border-radius: 20px;
+    background-color: #171717;
+}
+
+.payment-announcement-container * {
+    color: white;
+}
+
+.payment-announcement > * {
+    font-size: 25px;
+    margin-top: 0;
+    text-align: center;
+}
+
+.center-button {
+    margin-left: auto;
+    margin-right: auto;
 }

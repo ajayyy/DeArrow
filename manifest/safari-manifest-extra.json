@@ -1,5 +1,20 @@
 {
   "background": {
     "persistent": false
-  }
+  },
+  "content_scripts": [{
+    "run_at": "document_start",
+    "matches": [
+        "https://*.youtube.com/*",
+        "https://www.youtube-nocookie.com/embed/*"
+    ],
+    "all_frames": true,
+    "js": [
+        "./js/content.js"
+    ],
+    "css": [
+        "content.css",
+        "shared.css"
+    ]
+  }]
 }

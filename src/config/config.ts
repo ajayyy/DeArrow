@@ -92,6 +92,15 @@ interface SBConfig {
     countReplacements: boolean;
     titleReplacements: number;
     thumbnailReplacements: number;
+    licenseKey: string | null;
+    activated: boolean;
+    freeActivation: boolean;
+    freeTrialStart: number | null;
+    freeTrialEnded: boolean;
+    freeAccessRequestStart: number | null;
+    firefoxOldContentScriptRegistration: boolean;
+    showActivatedMessage: boolean;
+    lastVersion: string;
 }
 
 interface SBStorage {
@@ -103,7 +112,14 @@ class ConfigClass extends ProtoConfig<SBConfig, SBStorage> {
     resetToDefault() {
         chrome.storage.sync.set({
             ...this.syncDefaults,
-            userID: this.config!.userID
+            userID: this.config!.userID,
+            licenseKey: this.config!.licenseKey,
+            freeActivation: this.config!.freeActivation,
+            activated: this.config!.activated,
+            freeTrialStart: this.config!.freeTrialStart,
+            freeTrialEnded: this.config!.freeTrialEnded,
+            freeAccessRequestStart: this.config!.freeAccessRequestStart,
+            firefoxOldContentScriptRegistration: this.config!.firefoxOldContentScriptRegistration
         }).catch(logError);
     }
 }
@@ -146,7 +162,16 @@ const syncDefaults = {
     showInfoAboutRandomThumbnails: false,
     countReplacements: true,
     titleReplacements: 0,
-    thumbnailReplacements: 0
+    thumbnailReplacements: 0,
+    licenseKey: null,
+    activated: true,
+    freeActivation: true,
+    freeTrialStart: null,
+    freeTrialEnded: false,
+    freeAccessRequestStart: null,
+    firefoxOldContentScriptRegistration: false,
+    showActivatedMessage: false,
+    lastVersion: ""
 };
 
 const localDefaults = {

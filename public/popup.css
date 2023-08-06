@@ -196,3 +196,32 @@
     color: var(--sb-main-fg-color);
     text-decoration: none;
 }
+
+.activation-needed {
+    background-color: #171717;
+    border-radius: 15px;
+
+    padding: 20px;
+    margin: 20px;
+
+    font-size: 20px;
+}
+
+.option-button {
+    cursor: pointer;
+
+    background-color: #0e79ca;
+    padding: 10px;
+    color: white;
+    border-radius: 5px;
+    font-size: 14px;
+
+    width: max-content;
+
+    margin: auto;
+    text-align: center;
+}
+
+.option-button:hover:not(.disabled) {
+    background-color: #0e79ca;
+}

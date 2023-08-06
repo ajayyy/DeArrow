@@ -4,25 +4,11 @@
     "version": "1.2.5",
     "default_locale": "en",
     "description": "__MSG_deArrowDescription__",
-    "homepage_url": "https://sponsor.ajay.app",
-    "content_scripts": [{
-        "run_at": "document_start",
-        "matches": [
-            "https://*.youtube.com/*",
-            "https://www.youtube-nocookie.com/embed/*"
-        ],
-        "all_frames": true,
-        "js": [
-            "./js/content.js"
-        ],
-        "css": [
-            "content.css",
-            "shared.css"
-        ]
-    }],
+    "homepage_url": "https://dearrow.ajay.app",
     "permissions": [
         "storage",
-        "unlimitedStorage"
+        "unlimitedStorage",
+        "alarms"
     ],
     "icons": {
         "16": "icons/logo-16.png",

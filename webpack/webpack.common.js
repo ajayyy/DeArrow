@@ -94,9 +94,12 @@ module.exports = env => {
         entry: {
             background: path.join(__dirname, srcDir + 'background.ts'),
             content: path.join(__dirname, srcDir + 'content.ts'),
+            documentScriptInjector: path.join(__dirname, srcDir + 'documentScriptInjector.ts'),
             options: path.join(__dirname, srcDir + 'options.ts'),
             popup: path.join(__dirname, srcDir + 'popup/popup.tsx'),
             help: path.join(__dirname, srcDir + 'help/help.tsx'),
+            payment: path.join(__dirname, srcDir + 'help/payment.tsx'),
+            unactivatedWarning: path.join(__dirname, srcDir + 'unactivatedWarning.ts'),
         },
         output: {
             path: path.join(__dirname, '../dist/js'),

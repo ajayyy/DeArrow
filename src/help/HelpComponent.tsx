@@ -1,7 +1,5 @@
 import * as React from "react";
 import Config from "../config/config";
-import { showDonationLink } from "../utils/configUtils";
-import { isSafari } from "../../maze-utils/src/config";
 
 export const HelpComponent = () => {
 
@@ -21,44 +19,23 @@ export const HelpComponent = () => {
                     {chrome.i18n.getMessage("createdBy")}{" "}<a href="https://ajay.app">Ajay Ramachandran</a>
                 </p>
 
-                <p>
-                    {chrome.i18n.getMessage("thanksForTryingOutDeArrow")}!
-                </p>
-
                 {
-                    !isSafari() ?
-                    <>
-                        <p>
-                            {chrome.i18n.getMessage("deArrowBetaStatus")}{" "}
+                    Config.config!.showActivatedMessage &&
+                    <div className="payment-announcement-container payment-announcement center">
+                        {
+                            Config.config!.freeActivation &&
+                            <p>
+                                {chrome.i18n.getMessage("freeAccessComplete")}{" :)"}
+                            </p>
+                        }
 
-                            <a href="https://gist.github.com/ajayyy/36a96ffc786f4e518fb62cac8b9674aa" target="_blank" rel="noreferrer">
-                                {chrome.i18n.getMessage("LearnMore")}
-                            </a>
-                        </p>
-
-                        <p>
-                            {chrome.i18n.getMessage("deArrowTryingOut")} :)
-                        </p>
-                    </>
-                    : null
-                }
-
-                {
-                    showDonationLink() ? 
-                    <details>
-                        <summary className="selfpromo-text">
-                            {chrome.i18n.getMessage("category_selfpromo")}
-                        </summary>
-                        <p>
-                            {chrome.i18n.getMessage("discordPromotion").split("{discord}")[0]}
-                            <a href="https://discord.gg/SponsorBlock" target="_blank" rel="noreferrer">Discord</a>
-                            {chrome.i18n.getMessage("discordPromotion").split("{discord}")[1].split("{matrix}")[0]} 
-                            <a href="https://matrix.to/#/#sponsor:ajay.app?via=ajay.app&via=matrix.org&via=mozilla.org" target="_blank" rel="noreferrer">Matrix</a>.{" "}
-                            {chrome.i18n.getMessage("deArrowDonationText")}{" "}<a href="https://sponsor.ajay.app/donate" target="_blank" rel="noreferrer">$$$</a>
-                        </p>
-
-                    </details>
-                    : null
+                        {
+                            Config.config!.activated && !Config.config!.freeActivation &&
+                            <p>
+                                {chrome.i18n.getMessage("DeArrowIsActivated")}{" :)"}
+                            </p>
+                        }
+                    </div>
                 }
 
                 <p>

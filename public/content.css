@@ -376,6 +376,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 }
 
 .cbShowOriginal img.cbShowOriginalImage, .cbSubmitButton svg {
+    /* Max height also set in js  */
     height: 20px;
 }
 

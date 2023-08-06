@@ -14,9 +14,10 @@ import { localizeHtmlPage } from "../maze-utils/src/setup";
 import { StorageChangesObject } from "../maze-utils/src/config";
 import { getHash } from "../maze-utils/src/hash";
 import { isFirefoxOrSafari, waitFor } from "../maze-utils/src";
-import { sendRequestToServer } from "./dataFetching";
+import { sendRequestToServer } from "./utils/requests";
 import { logError } from "./utils/logger";
 import ChannelOverrides from "./options/ChannelOverrides";
+import { getLicenseKey, isActivated } from "./license/license";
 let embed = false;
 
 window.addEventListener('DOMContentLoaded', () => void init());
@@ -54,16 +55,37 @@ async function init() {
 
     await waitFor(() => Config.isReady());
 
+    if (!isActivated()) {
+        chrome.runtime.sendMessage({ message: "openPayment" }, () => window.close());
+        return;
+    }
+
     if (!Config.config!.darkMode) {
         document.documentElement.setAttribute("data-theme", "light");
     }
 
     const donate = document.getElementById("sbDonate");
     donate!.addEventListener("click", () => Config.config!.donateClicked = Config.config!.donateClicked + 1);
-    if (!showDonationLink()) {
-        donate!.classList.add("hidden");
+    if (showDonationLink()) {
+        donate!.classList.remove("hidden");
     }
 
+    const viewLicenseKey = document.getElementById("licenseKeyButton");
+    getLicenseKey().then((licenseKey) => {
+        if (licenseKey) {
+            const licenseKeyElement = document.getElementById("licenseKey");
+            licenseKeyElement!.innerText = licenseKey;
+
+            const sharingText = document.getElementById("sharingLicense");
+
+            viewLicenseKey!.classList.remove("hidden");
+            viewLicenseKey!.addEventListener("click", () => {
+                licenseKeyElement!.classList.toggle("hidden");
+                sharingText!.classList.toggle("hidden");
+            });
+        }
+    }).catch(console.error);
+    
     // Set all of the toggle options to the correct option
     const optionsContainer = document.getElementById("options")!;
     const optionsElements = optionsContainer!.querySelectorAll("*");
@@ -336,7 +358,8 @@ function createStickyHeader() {
  */
 async function shouldHideOption(element: Element): Promise<boolean> {
     return (element.getAttribute("data-private-only") === "true" && !(await isIncognitoAllowed()))
-            || (element.getAttribute("data-no-safari") === "true" && navigator.vendor === "Apple Computer, Inc.");
+            || (element.getAttribute("data-no-safari") === "true" && navigator.vendor === "Apple Computer, Inc.")
+            || (element.getAttribute("data-only-paid") === "true" && !Config.config!.freeActivation);
 }
 
 /**
@@ -545,6 +568,13 @@ async function setTextOption(option: string, element: HTMLElement, value: string
                 try {
                     const newConfig = JSON.parse(value);
                     for (const key in newConfig) {
+                        if (!CompileConfig.debug 
+                                && (key === "activated" 
+                                    || key === "freeTrialStart" 
+                                    || key === "freeAccessRequestStart")) {
+                            continue;
+                        }
+
                         Config.config![key] = newConfig[key];
                     }
 

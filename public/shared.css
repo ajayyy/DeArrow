@@ -279,3 +279,19 @@ input:checked + .sb-slider:before {
     display: flex;
     justify-content: center;
 }
+
+.license-key-button {
+    width: fit-content;
+    margin: auto;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.license-key-text {
+    font-size: 10px;
+    color: white;
+
+    width: fit-content;
+    margin: auto;
+}
