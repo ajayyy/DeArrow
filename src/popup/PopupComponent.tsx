@@ -5,7 +5,7 @@ import { YourWorkComponent } from "./YourWorkComponent";
 import { ToggleOptionComponent } from "./ToggleOptionComponent";
 import { FormattingOptionsComponent } from "./FormattingOptionsComponent";
 import { isSafari } from "../../maze-utils/src/config";
-import { isActivated } from "../license/license";
+import { freeTrialActive, isActivated } from "../license/license";
 import { LicenseComponent } from "../license/LicenseComponent";
 
 export const PopupComponent = () => {
@@ -21,11 +21,14 @@ export const PopupComponent = () => {
             </header>
 
             {
-                !isActivated() &&
+                (!isActivated() || freeTrialActive()) &&
                 <div className="activation-needed">
-                    <p>
-                        {chrome.i18n.getMessage("DeArrowNotActivated")}
-                    </p>
+                    {
+                        !isActivated() &&
+                        <p>
+                            {chrome.i18n.getMessage("DeArrowNotActivated")}
+                        </p>
+                    }
 
                     <div className="option-button"
                         onClick={() => {
