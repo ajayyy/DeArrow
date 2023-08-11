@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@types/chrome": "^0.0.243",
-    "@types/firefox-webext-browser": "^94.0.1",
+    "@types/firefox-webext-browser": "^111.0.1",
     "@types/jest": "^29.1.2",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",

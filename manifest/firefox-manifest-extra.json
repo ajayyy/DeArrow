@@ -21,5 +21,8 @@
         "content.css",
         "shared.css"
     ]
-  }]
+  }],
+  "background": {
+    "persistent": false
+  }
 }

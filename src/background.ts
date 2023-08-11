@@ -213,10 +213,19 @@ async function registerNeededContentScripts(activated?: boolean, forceUpdate?: b
     if (isSafari()) return;
 
     const contentScripts = getContentScripts(activated);
-    if (chrome.runtime.getManifest().manifest_version === 3) {
+    if ("scripting" in chrome && "getRegisteredContentScripts" in chrome.scripting) {
         Config.config!.firefoxOldContentScriptRegistration = false;
 
-        const existingRegistration = await chrome.scripting.getRegisteredContentScripts();
+        // Bug in Firefox where you need to use browser namespace for this call
+        const getContentScripts = async () => {
+            if (isFirefoxOrSafari()) {
+                return await browser.scripting.getRegisteredContentScripts();
+            } else {
+                return await chrome.scripting.getRegisteredContentScripts();
+            }
+        };
+
+        const existingRegistration = await getContentScripts();
         if (existingRegistration?.length > 0) {
             const registrationsToRemove = existingRegistration
                 .filter((script) => forceUpdate || !contentScripts.some((newScript) => newScript.id === script.id));
