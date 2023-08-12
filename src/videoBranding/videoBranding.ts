@@ -268,14 +268,17 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
 
     const result = await Promise.race(promises);
     if (result || (await Promise.all(promises)).some((r) => r)) {
-        const button = await findOrCreateShowOriginalButton(element, brandingLocation, videoID);
-        
         const title = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
         const originalTitle = getOriginalTitleElement(element, brandingLocation)?.textContent;
-
         const customTitle = title && !title.original 
             && (!originalTitle || (cleanResultingTitle(title.title)).toLowerCase() !== (cleanResultingTitle(originalTitle)).toLowerCase())
             && await shouldUseCrowdsourcedTitles(videoID);
+
+        if (!customTitle && !Config.config!.showIconForFormattedTitles) {
+            return;
+        }
+        
+        const button = await findOrCreateShowOriginalButton(element, brandingLocation, videoID);
         const image = button.querySelector("img") as HTMLImageElement;
         if (image) {
             if (!customTitle) {
@@ -393,7 +396,8 @@ export function setupOptionChangeListener(): void {
             "shouldCleanEmojis",
             "thumbnailFallback",
             "alwaysShowShowOriginalButton",
-            "channelOverrides"
+            "channelOverrides",
+            "showIconForFormattedTitles"
         ];
 
         if (settingsToReload.some((name) => (changes[name] && changes[name].newValue !== changes[name].oldValue))) {
