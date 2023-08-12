@@ -78,7 +78,7 @@ git submodule update --init --recursive
 
     - You can also run `npm run build` (for Chrome) or `npm run build:firefox` (for Firefox) to generate a production build.
 
-5. The built extension is now in `dist/`. You can load this folder directly in Chrome as an [unpacked extension](https://developer.chrome.com/docs/extensions/mv3/getstarted/#manifest), or convert it to a zip file to load it as a [temporary extension](https://developer.mozilla.org/en-US/docs/Tools/about:debugging#loading_a_temporary_extension) in Firefox.
+5. The built extension is now in `dist/`. You can load this folder directly in Chrome as an [unpacked extension](https://developer.chrome.com/docs/extensions/mv3/getstarted/#manifest), or convert it to a zip file to load it as a [temporary extension](https://developer.mozilla.org/en-US/docs/Tools/about:debugging#loading_a_temporary_extension) in Firefox. You may need to edit package.json and add the parameters directly there.
 
 ### Credit
 
