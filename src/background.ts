@@ -29,7 +29,9 @@ waitFor(() => Config.isReady()).then(() => {
     
             // If there is no userID, then it is the first install.
             if (!userID){
-                const paywallEnabled = !CompileConfig["freeAccess"] && await isPaywallEnabled();
+                const paywallEnabled = !CompileConfig["freeAccess"]
+                    && !navigator.userAgent.includes("Mobile;")
+                    && await isPaywallEnabled();
                 if (paywallEnabled) {
                     Config.config!.activated = false;
                     Config.config!.showActivatedMessage = true;
