@@ -72,6 +72,8 @@ export const PaymentComponent = () => {
                 applyChoices(e.data.choices);
             }
         });
+
+        setTimeout(() => setHideFrame(false), 300);
     }, []);
 
     return (
