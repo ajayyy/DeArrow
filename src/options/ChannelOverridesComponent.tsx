@@ -3,7 +3,7 @@ import { SelectOptionComponent } from "../popup/SelectOptionComponent";
 import Config, { ConfigurationID, CustomConfiguration } from "../config/config";
 import { generateUserID } from "../../maze-utils/src/setup";
 import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
-import { toFirstLetterUppercase, toLowerCase, toSentenceCase } from "../titles/titleFormatter";
+import { toFirstLetterUppercase, toLowerCaseTitle, toSentenceCase } from "../titles/titleFormatter";
 
 let forceUpdateConfigurationsTimeout: NodeJS.Timeout | null = null;
 let forceUpdateOverridesTimeout: NodeJS.Timeout | null = null;
@@ -48,7 +48,7 @@ export const ChannelOverridesComponent = () => {
     React.useEffect(() => {
         (async () => {
             setSentenceCaseText(await toSentenceCase(chrome.i18n.getMessage("SentenceCase"), false));
-            setLowerCaseText(await toLowerCase(chrome.i18n.getMessage("LowerCase")));
+            setLowerCaseText(await toLowerCaseTitle(chrome.i18n.getMessage("LowerCase")));
             setFirstLetterUppercaseText(await toFirstLetterUppercase(chrome.i18n.getMessage("FirstLetterUppercase")));
         })();
     }, []);

@@ -1,6 +1,6 @@
 import * as React from "react";
 import Config from "../config/config";
-import { toFirstLetterUppercase, toLowerCase, toSentenceCase } from "../titles/titleFormatter";
+import { toFirstLetterUppercase, toLowerCaseTitle, toSentenceCase } from "../titles/titleFormatter";
 import { SelectOptionComponent } from "./SelectOptionComponent";
 import { ToggleOptionComponent } from "./ToggleOptionComponent";
 
@@ -15,7 +15,7 @@ export const FormattingOptionsComponent = () => {
     React.useEffect(() => {
         (async () => {
             setSentenceCaseText(await toSentenceCase(chrome.i18n.getMessage("SentenceCase"), false));
-            setLowerCaseText(await toLowerCase(chrome.i18n.getMessage("LowerCase")));
+            setLowerCaseText(await toLowerCaseTitle(chrome.i18n.getMessage("LowerCase")));
             setFirstLetterUppercaseText(await toFirstLetterUppercase(chrome.i18n.getMessage("FirstLetterUppercase")));
         })();
     }, []);

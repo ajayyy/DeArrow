@@ -45,8 +45,8 @@ describe("Capitalize First Letter Tests", () => {
     ];
     for (const testCase of capitalizeFirstCases) {
         const [input, expected] = testCase;
-        it(input, () => {
-            expect(capitalizeFirstLetter(input)).toBe(expected);
+        it(input, async () => {
+            expect(await capitalizeFirstLetter(input, false)).toBe(expected);
         });
     }
 });
