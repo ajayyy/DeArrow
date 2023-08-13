@@ -46,14 +46,14 @@ export async function formatTitleInternal(title: string, isCustom: boolean, titl
 
 export async function toLowerCaseTitle(str: string): Promise<string> {
     const words = str.split(" ");
-    const { isGreek, isTurkish } = await getLangInfo(str);
+    const { isGreek, isTurkiq } = await getLangInfo(str);
 
     let result = "";
     for (const word of words) {
         if (forceKeepFormatting(word) || (!isGreek && await greekLetterAllowed(word))) {
             result += word + " ";
         } else {
-            result += await toLowerCase(word, isTurkish) + " ";
+            result += await toLowerCase(word, isTurkiq) + " ";
         }
     }
 
@@ -62,7 +62,7 @@ export async function toLowerCaseTitle(str: string): Promise<string> {
 
 export async function toFirstLetterUppercase(str: string): Promise<string> {
     const words = str.split(" ");
-    const { isGreek, isTurkish } = await getLangInfo(str);
+    const { isGreek, isTurkiq } = await getLangInfo(str);
 
     let result = "";
     let index = 0;
@@ -70,9 +70,9 @@ export async function toFirstLetterUppercase(str: string): Promise<string> {
         if (forceKeepFormatting(word) || (!isGreek && await greekLetterAllowed(word))) {
             result += word + " ";
         } else if (startOfSentence(index, words) && !isNumberThenLetter(word)) {
-            result += await capitalizeFirstLetter(word, isTurkish) + " ";
+            result += await capitalizeFirstLetter(word, isTurkiq) + " ";
         } else {
-            result += await toLowerCase(word, isTurkish) + " ";
+            result += await toLowerCase(word, isTurkiq) + " ";
         }
 
         index++;
@@ -85,7 +85,7 @@ export async function toSentenceCase(str: string, isCustom: boolean): Promise<st
     const words = str.split(" ");
     const inTitleCase = isInTitleCase(words);
     const mostlyAllCaps = isMostlyAllCaps(words);
-    const { isGreek, isTurkish } = await getLangInfo(str);
+    const { isGreek, isTurkiq } = await getLangInfo(str);
 
     let result = "";
     let index = 0;
@@ -93,7 +93,7 @@ export async function toSentenceCase(str: string, isCustom: boolean): Promise<st
         const trustCaps = shouldTrustCaps(mostlyAllCaps, words, index);
 
         if (word.match(/^[Ii]$|^[Ii]['’][\p{L}]{1,3}$/u)) {
-            result += await capitalizeFirstLetter(word, isTurkish) + " ";
+            result += await capitalizeFirstLetter(word, isTurkiq) + " ";
         } else if (forceKeepFormatting(word)
             || isAcronymStrict(word)
             || ((!inTitleCase || !isWordCapitalCase(word)) && trustCaps && isAcronym(word))
@@ -110,10 +110,10 @@ export async function toSentenceCase(str: string, isCustom: boolean): Promise<st
                 if (!isAllCaps(word) && isWordCustomCapitalization(word)) {
                     result += word + " ";
                 } else {
-                    result += await capitalizeFirstLetter(word, isTurkish) + " ";
+                    result += await capitalizeFirstLetter(word, isTurkiq) + " ";
                 }
             } else {
-                result += await toLowerCase(word, isTurkish) + " ";
+                result += await toLowerCase(word, isTurkiq) + " ";
             }
         }
 
@@ -126,7 +126,7 @@ export async function toSentenceCase(str: string, isCustom: boolean): Promise<st
 export async function toTitleCase(str: string, isCustom: boolean): Promise<string> {
     const words = str.split(" ");
     const mostlyAllCaps = isMostlyAllCaps(words);
-    const { isGreek, isTurkish } = await getLangInfo(str);
+    const { isGreek, isTurkiq } = await getLangInfo(str);
 
     let result = "";
     let index = 0;
@@ -143,13 +143,13 @@ export async function toTitleCase(str: string, isCustom: boolean): Promise<strin
             result += word + " ";
         } else if (!startOfSentence(index, words) && titleCaseNotCapitalized.has(word.toLowerCase())) {
             // Skip lowercase check for the first word
-            result += await toLowerCase(word, isTurkish) + " ";
+            result += await toLowerCase(word, isTurkiq) + " ";
         } else if (isFirstLetterCapital(word) &&
             ((trustCaps && isAcronym(word)) || isAcronymStrict(word))) {
             // Trust it with capitalization
             result += word + " ";
         } else {
-            result += await capitalizeFirstLetter(word, isTurkish) + " ";
+            result += await capitalizeFirstLetter(word, isTurkiq) + " ";
         }
 
         index++;
@@ -161,7 +161,7 @@ export async function toTitleCase(str: string, isCustom: boolean): Promise<strin
 export async function toCapitalizeCase(str: string, isCustom: boolean): Promise<string> {
     const words = str.split(" ");
     const mostlyAllCaps = isMostlyAllCaps(words);
-    const { isGreek, isTurkish } = await getLangInfo(str);
+    const { isGreek, isTurkiq } = await getLangInfo(str);
 
     let result = "";
     for (const word of words) {
@@ -177,7 +177,7 @@ export async function toCapitalizeCase(str: string, isCustom: boolean): Promise<
             // Trust it with capitalization
             result += word + " ";
         } else {
-            result += await capitalizeFirstLetter(word, isTurkish) + " ";
+            result += await capitalizeFirstLetter(word, isTurkiq) + " ";
         }
     }
 
@@ -228,19 +228,19 @@ function isAllCaps(word: string): boolean {
         && !word.match(/^[\p{L}]{1,3}[-~—]/u); // USB-C not all caps, HANDS-ON is
 }
 
-export async function capitalizeFirstLetter(word: string, isTurkish: boolean): Promise<string> {
+export async function capitalizeFirstLetter(word: string, isTurkiq: boolean): Promise<string> {
     const result: string[] = [];
 
     if (startsWithEmojiLetter(word)) {
         // Emoji letter is already "capitalized"
-        return await await toLowerCase(word, isTurkish);
+        return await await toLowerCase(word, isTurkiq);
     }
 
     for (const char of word) {
         if (char.match(/[\p{L}]/u)) {
             // converts to an array in order to slice by Unicode code points
             // (for Unicode characters outside the BMP)
-            result.push(await toUpperCase(char, isTurkish) + await toLowerCase([...word].slice(result.length + 1).join(""), isTurkish));
+            result.push(await toUpperCase(char, isTurkiq) + await toLowerCase([...word].slice(result.length + 1).join(""), isTurkiq));
             break;
         } else {
             result.push(char);
@@ -309,17 +309,17 @@ function greekLetterAllowed(word: string): boolean {
     return !!word.match(/[Ͱ-Ͽ]/);
 }
 
-async function toLowerCase(word: string, isTurkish: boolean): Promise<string> {
-    if (isTurkish || await checkLanguage(word, "tr", 10)) {
+async function toLowerCase(word: string, isTurkiq: boolean): Promise<string> {
+    if (isTurkiq || word.match(/ı|İ/u) || await checkAnyLanguage(word, ["tr", "az"], 10)) {
         return word.toLocaleLowerCase("tr-TR")
     } else {
         return word.toLowerCase();
     }
 }
 
-async function toUpperCase(word: string, isTurkish: boolean): Promise<string> {
-    if (isTurkish || word.match(/ı|İ/u) || await checkLanguage(word, "tr", 10)) {
-        return word.toLocaleUpperCase("tr-TR")
+async function toUpperCase(word: string, isTurkiq: boolean): Promise<string> {
+    if (isTurkiq || word.match(/ı|İ/u) || await checkAnyLanguage(word, ["tr", "az"], 10)) {
+        return word.toLocaleUpperCase("az-AZ")
     } else {
         return word.toUpperCase();
     }
@@ -327,18 +327,18 @@ async function toUpperCase(word: string, isTurkish: boolean): Promise<string> {
 
 async function getLangInfo(str: string): Promise<{
     isGreek: boolean;
-    isTurkish: boolean;
+    isTurkiq: boolean;
 }> {
-    const result = await checkLanguages(str, ["el", "tr"], 30);
+    const result = await checkLanguages(str, ["el", "tr", "az"], 30);
 
     return {
         isGreek: result[0],
-        isTurkish: result[1]
+        isTurkiq: result[1] || result[2]
     }
 }
 
-function checkLanguage(title: string, language: string, percentage: number): Promise<boolean> {
-    return checkLanguages(title, [language], percentage)[0];
+async function checkAnyLanguage(title: string, languages: string[], percentage: number): Promise<boolean> {
+    return (await checkLanguages(title, languages, percentage)).every((v) => v);
 }
 
 async function checkLanguages(title: string, languages: string[], percentage: number): Promise<boolean[]> {
