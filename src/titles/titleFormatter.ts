@@ -46,10 +46,11 @@ export async function formatTitleInternal(title: string, isCustom: boolean, titl
 
 export async function toLowerCase(str: string): Promise<string> {
     const words = str.split(" ");
+    const isGreek = await checkLanguage(str, "el");
 
     let result = "";
     for (const word of words) {
-        if (forceKeepFormatting(word) || await greekLetterAllowed(word, str)) {
+        if (forceKeepFormatting(word) || (!isGreek && await greekLetterAllowed(word))) {
             result += word + " ";
         } else {
             result += word.toLowerCase() + " ";
@@ -61,11 +62,12 @@ export async function toLowerCase(str: string): Promise<string> {
 
 export async function toFirstLetterUppercase(str: string): Promise<string> {
     const words = str.split(" ");
+    const isGreek = await checkLanguage(str, "el");
 
     let result = "";
     let index = 0;
     for (const word of words) {
-        if (forceKeepFormatting(word) || await greekLetterAllowed(word, str)) {
+        if (forceKeepFormatting(word) || (!isGreek && await greekLetterAllowed(word))) {
             result += word + " ";
         } else if (startOfSentence(index, words) && !isNumberThenLetter(word)) {
             result += capitalizeFirstLetter(word) + " ";
@@ -83,6 +85,7 @@ export async function toSentenceCase(str: string, isCustom: boolean): Promise<st
     const words = str.split(" ");
     const inTitleCase = isInTitleCase(words);
     const mostlyAllCaps = isMostlyAllCaps(words);
+    const isGreek = await checkLanguage(str, "el");
 
     let result = "";
     let index = 0;
@@ -97,7 +100,7 @@ export async function toSentenceCase(str: string, isCustom: boolean): Promise<st
             || (!inTitleCase && isWordCapitalCase(word))
             || (isCustom && isWordCustomCapitalization(word))
             || (!isAllCaps(word) && isWordCustomCapitalization(word))
-            || await greekLetterAllowed(word, str)) {
+            || (!isGreek && await greekLetterAllowed(word))) {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             // Trust it with capitalization
@@ -123,6 +126,7 @@ export async function toSentenceCase(str: string, isCustom: boolean): Promise<st
 export async function toTitleCase(str: string, isCustom: boolean): Promise<string> {
     const words = str.split(" ");
     const mostlyAllCaps = isMostlyAllCaps(words);
+    const isGreek = await checkLanguage(str, "el");
 
     let result = "";
     let index = 0;
@@ -133,7 +137,7 @@ export async function toTitleCase(str: string, isCustom: boolean): Promise<strin
             || (isCustom && isWordCustomCapitalization(word))
             || (!isAllCaps(word) && (isWordCustomCapitalization(word) || isNumberThenLetter(word)))
             || isYear(word)
-            || await greekLetterAllowed(word, str)) {
+            || (!isGreek && await greekLetterAllowed(word))) {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             result += word + " ";
@@ -157,6 +161,7 @@ export async function toTitleCase(str: string, isCustom: boolean): Promise<strin
 export async function toCapitalizeCase(str: string, isCustom: boolean): Promise<string> {
     const words = str.split(" ");
     const mostlyAllCaps = isMostlyAllCaps(words);
+    const isGreek = await checkLanguage(str, "el");
 
     let result = "";
     for (const word of words) {
@@ -166,7 +171,7 @@ export async function toCapitalizeCase(str: string, isCustom: boolean): Promise<
             || (isFirstLetterCapital(word) &&
                 ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word)))
             || isYear(word)
-            || await greekLetterAllowed(word, str)) {
+            || (!isGreek && await greekLetterAllowed(word))) {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             // Trust it with capitalization
@@ -298,14 +303,10 @@ function forceKeepFormatting(word: string, ignorePunctuation = true): boolean {
 }
 
 /**
- * Allow mathematical greek symbols without breaking greek
+ * Allow mathematical greek symbols
  */
-async function greekLetterAllowed(word: string, title: string): Promise<boolean> {
-    if (word.match(/[Ͱ-Ͽ]/)) {
-        return !await checkLanguage(title, "el")
-    }
-
-    return false;
+function greekLetterAllowed(word: string): boolean {
+    return !!word.match(/[Ͱ-Ͽ]/);
 }
 
 async function checkLanguage(title: string, language: string): Promise<boolean> {
