@@ -99,5 +99,12 @@ export function setupCBVideoModule(): void {
 
     if (onMobile()) {
         setupMobileAutoplayHandler().catch(logError);
+    } else {
+        document.addEventListener("fullscreenchange", () => {
+            // Fix title sometimes being the old title
+            setTimeout(() => {
+                replaceCurrentVideoBranding().catch(logError);
+            }, 100);
+        })
     }
 }
