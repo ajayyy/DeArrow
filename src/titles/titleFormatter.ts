@@ -2,6 +2,7 @@ import { VideoID } from "../../maze-utils/src/video";
 import Config, { TitleFormatting } from "../config/config";
 import { getTitleFormatting, shouldCleanEmojis } from "../config/channelOverrides";
 import { acronymBlocklist, allowlistedWords, titleCaseNotCapitalized } from "./titleFormatterData";
+import { chromeP } from "../../maze-utils/src/browserApi";
 
 /**
  * Useful regex expressions:
@@ -344,7 +345,7 @@ async function checkAnyLanguage(title: string, languages: string[], percentage: 
 async function checkLanguages(title: string, languages: string[], percentage: number): Promise<boolean[]> {
     if (typeof chrome === "undefined" || !("detectLanguage" in chrome.i18n)) return languages.map(() => false);
 
-    const detectedLanguages = await chrome.i18n.detectLanguage(title);
+    const detectedLanguages = await chromeP.i18n.detectLanguage(title);
 
     const result: boolean[] = [];
     for (const language of languages) {

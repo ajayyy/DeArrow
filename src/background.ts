@@ -9,6 +9,7 @@ import { logError } from "./utils/logger";
 import { injectUpdatedScripts } from "../maze-utils/src/cleanup";
 import { freeTrialActive, getContentScripts, getFreeAccessRequestTimeLeft, getFreeTrialTimeLeft, isActivated } from "./license/license";
 import { waitFor } from "../maze-utils/src";
+import { chromeP } from "../maze-utils/src/browserApi";
 
 let ranOnInstall = false;
 
@@ -218,22 +219,13 @@ async function registerNeededContentScripts(activated?: boolean, forceUpdate?: b
     if ("scripting" in chrome && "getRegisteredContentScripts" in chrome.scripting) {
         Config.config!.firefoxOldContentScriptRegistration = false;
 
-        // Bug in Firefox where you need to use browser namespace for this call
-        const getContentScripts = async () => {
-            if (isFirefoxOrSafari()) {
-                return await browser.scripting.getRegisteredContentScripts();
-            } else {
-                return await chrome.scripting.getRegisteredContentScripts();
-            }
-        };
-
-        const existingRegistration = await getContentScripts();
+        const existingRegistration = await chromeP.scripting.getRegisteredContentScripts();
         if (existingRegistration?.length > 0) {
             const registrationsToRemove = existingRegistration
                 .filter((script) => forceUpdate || !contentScripts.some((newScript) => newScript.id === script.id));
 
             if (registrationsToRemove.length > 0) {
-                await chrome.scripting.unregisterContentScripts({
+                await chromeP.scripting.unregisterContentScripts({
                     ids: registrationsToRemove.map((script) => script.id),
                 });
             }
@@ -242,7 +234,7 @@ async function registerNeededContentScripts(activated?: boolean, forceUpdate?: b
         let scriptsChanged = false;
         for (const script of contentScripts) {
             if (forceUpdate || !existingRegistration || !existingRegistration.some((existing) => existing.id === script.id)) {
-                await chrome.scripting.registerContentScripts([{
+                await chromeP.scripting.registerContentScripts([{
                     id: script.id,
                     runAt: script.runAt,
                     matches: script.matches,
