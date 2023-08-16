@@ -3,9 +3,8 @@ import Config, { TitleFormatting } from "../config/config";
 import { getTitleFormatting, shouldCleanEmojis } from "../config/channelOverrides";
 import { acronymBlocklist, allowlistedWords, titleCaseNotCapitalized } from "./titleFormatterData";
 import { chromeP } from "../../maze-utils/src/browserApi";
+import { isFirefoxOrSafari } from "../../maze-utils";
 import { loadModule } from 'cld3-asm';
-
-import { isFirefoxOrSafari } from "../../maze-utils/lib";
 
 const shouldUseCld = isFirefoxOrSafari() || typeof chrome === "undefined" || !("detectLanguage" in chrome.i18n);
 const cld = shouldUseCld ? loadModule().then((m) => m.create(0, 700)) : null;
