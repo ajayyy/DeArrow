@@ -69,7 +69,9 @@ waitFor(() => Config.isReady()).then(() => {
                     Config.config!.showUpsells = sponsorBlockConfig["showUpsells"];
                     Config.config!.darkMode = sponsorBlockConfig["darkMode"];
                     Config.config!.importedConfig = true;
-                } else {
+                }
+                
+                if (!Config.config!.userID) {
                     const newUserID = generateUserID();
                     Config.config!.userID = newUserID;
                 }
