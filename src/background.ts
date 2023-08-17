@@ -228,7 +228,8 @@ async function registerNeededContentScripts(activated?: boolean, forceUpdate?: b
     if (isSafari()) return;
 
     const contentScripts = getContentScripts(activated);
-    if ("scripting" in chrome && "getRegisteredContentScripts" in chrome.scripting) {
+    if ("scripting" in chrome && "getRegisteredContentScripts" in chrome.scripting 
+            && isPersistentContentScriptSupported()) {
         Config.config!.firefoxOldContentScriptRegistration = false;
 
         const existingRegistration = await chromeP.scripting.getRegisteredContentScripts();
@@ -298,6 +299,13 @@ async function registerNeededContentScripts(activated?: boolean, forceUpdate?: b
             await injectUpdatedScripts(contentScripts);
         }
     }
+}
+
+function isPersistentContentScriptSupported() {
+    if (!isFirefoxOrSafari() || isSafari()) return true;
+
+    const userAgentVersion = parseInt(navigator.userAgent.split("Firefox/")[1]);
+    return !isNaN(userAgentVersion) && userAgentVersion > 105;
 }
 
 function setupAlarms() {
