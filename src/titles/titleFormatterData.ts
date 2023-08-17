@@ -31,6 +31,7 @@ export const titleCaseNotCapitalized = new Set([
     "ft",
     "ft.",
     "feat",
+    "feat.",
     "etc.",
     "etc"
 ]);

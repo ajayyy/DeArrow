@@ -124,6 +124,8 @@ describe("toTitleCase", () => {
         ["Review of some product (1980s)", "Review of Some Product (1980s)"],
         ["The Collatz Conjecture... but in Binary", "The Collatz Conjecture... But in Binary"],
         ["The Collatz Conjecture.!! but in Binary", "The Collatz Conjecture. But in Binary"],
+        ["Zedd - Clarity (feat. Foxes)", "Zedd - Clarity (feat. Foxes)"],
+        ["Zedd - Clarity (Featuring Foxes)", "Zedd - Clarity (Featuring Foxes)"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -196,6 +198,7 @@ describe("toSentenceCase", () => {
         ["Some thing [TAS]", "Some thing [TAS]"],
         ["Some thing +HDDT", "Some thing +HDDT"],
         ["1st FC on Because Maybe // 996pp", "1st FC on because maybe // 996pp"],
+        ["[753] You’re Doing it Wrong... The REAL Double Wrench Method", "[753] You’re doing it wrong... The real double wrench method"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;

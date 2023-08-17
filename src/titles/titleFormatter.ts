@@ -150,7 +150,7 @@ export async function toTitleCase(str: string, isCustom: boolean): Promise<strin
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             result += word + " ";
-        } else if (!startOfSentence(index, words) && titleCaseNotCapitalized.has(word.toLowerCase())) {
+        } else if (!startOfSentence(index, words) && listHasWord(titleCaseNotCapitalized, word.toLowerCase())) {
             // Skip lowercase check for the first word
             result += await toLowerCase(word, isTurkiq) + " ";
         } else if (isFirstLetterCapital(word) &&
@@ -200,7 +200,7 @@ export function isInTitleCase(words: string[]): boolean {
         if (isWordCapitalCase(word)) {
             count++;
         } else if (!isWordAllLower(word) ||
-            titleCaseNotCapitalized.has(word.toLowerCase())) {
+                listHasWord(titleCaseNotCapitalized, word.toLowerCase())) {
             ignored++;
         }
     }
@@ -299,12 +299,12 @@ function isFirstLetterCapital(word: string): boolean {
 
 function forceKeepFormatting(word: string, ignorePunctuation = true): boolean {
     let result = !!word.match(/^>/)
-        || allowlistedWords.has(word);
+        || listHasWord(allowlistedWords, word);
 
     if (ignorePunctuation) {
         const withoutPunctuation = word.replace(/[:?.!+\]]+$|^[[+:/]+/, "");
         if (word !== withoutPunctuation) {
-            result ||= allowlistedWords.has(withoutPunctuation);
+            result ||= listHasWord(allowlistedWords, withoutPunctuation);
         }
     }
 
@@ -375,7 +375,7 @@ export function isAcronym(word: string): boolean {
     // U.S.A allowed
     // US allowed
     return ((word.length <= 3 || countLetters(word) <= 3)
-        && word.length > 1 && isAllCaps(word) && !acronymBlocklist.has(word.toLowerCase()))
+        && word.length > 1 && isAllCaps(word) && !listHasWord(acronymBlocklist, word.toLowerCase()))
         || isAcronymStrict(word);
 }
 
@@ -393,8 +393,9 @@ function startOfSentence(index: number, words: string[]): boolean {
 }
 
 function isDelimeter(word: string): boolean {
-    return word.match(/^[-:;~—|]$/) !== null || word.match(/[:?.!]$/) !== null
-        && !allowlistedWords.has(word);
+    return (word.match(/^[-:;~—|]$/) !== null 
+        || word.match(/[:?.!\]]$/) !== null)
+        && !listHasWord(allowlistedWords, word);
 }
 
 export function cleanResultingTitle(title: string): string {
@@ -481,4 +482,8 @@ export function cleanEmojis(title: string): string {
     } else {
         return title;
     }
+}
+
+function listHasWord(list: Set<string>, word: string): boolean {
+    return list.has(word.replace(/[[「〈《【〔⦗『〖〘<({:〙〗』⦘〕】》〉」)}\]]/g, ""))
 }
