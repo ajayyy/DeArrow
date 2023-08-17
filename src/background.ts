@@ -161,10 +161,6 @@ function onInstall() {
 
     waitFor(() => Config.isReady()).then(() => {
         Config.config!.lastVersion = chrome.runtime.getManifest().version;
-
-        if (Config.config!.userID && !Config.config!.firefoxOldContentScriptRegistration) {
-            registerNeededContentScripts(undefined, true).catch(logError);
-        }
     }).catch(logError);
 }
 
@@ -304,7 +300,7 @@ async function registerNeededContentScripts(activated?: boolean, forceUpdate?: b
 function isPersistentContentScriptSupported() {
     if (!isFirefoxOrSafari() || isSafari()) return true;
 
-    const userAgentVersion = parseInt(navigator.userAgent.split("Firefox/")[1]);
+    const userAgentVersion = parseInt(navigator.userAgent.match(/Firefox\/(\S+)/)?.[1] ?? "");
     return !isNaN(userAgentVersion) && userAgentVersion > 105;
 }
 
