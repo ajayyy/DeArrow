@@ -3,11 +3,14 @@ import Config, { TitleFormatting } from "../config/config";
 import { getTitleFormatting, shouldCleanEmojis } from "../config/channelOverrides";
 import { acronymBlocklist, allowlistedWords, titleCaseNotCapitalized } from "./titleFormatterData";
 import { chromeP } from "../../maze-utils/src/browserApi";
-import { isFirefoxOrSafari } from "../../maze-utils/src";
-import { loadModule } from 'cld3-asm';
+import type { LanguageIdentifier } from "cld3-asm";
 
-const shouldUseCld = isFirefoxOrSafari() || typeof chrome === "undefined" || !("detectLanguage" in chrome.i18n);
-const cld = shouldUseCld ? loadModule().then((m) => m.create(0, 700)) : null;
+declare const LOAD_CLD: boolean;
+let cld: Promise<LanguageIdentifier> | null = null;
+if (LOAD_CLD) {
+    const cldLib = import("cld3-asm");
+    cld = cldLib.then(({ loadModule }) => loadModule()).then((m) => m.create(0, 700))
+}
 
 /**
  * Useful regex expressions:
@@ -348,6 +351,8 @@ async function checkAnyLanguage(title: string, languages: string[], percentage: 
 }
 
 async function checkLanguages(title: string, languages: string[], percentage: number): Promise<boolean[]> {
+    if (!cld && (typeof chrome === "undefined" || !("detectLanguage" in chrome.i18n))) return languages.map(() => false);
+
     try {
         const detectedLanguages = cld 
             ? [(await (await cld).findLanguage(title))].map((l) => ({ language: l.language, percentage: l.probability * 100 }))

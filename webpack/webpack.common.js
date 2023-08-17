@@ -131,6 +131,9 @@ module.exports = env => {
             // fork TS checker
             new ForkTsCheckerWebpackPlugin(),
             // exclude locale files in moment
+            new webpack.DefinePlugin({
+                LOAD_CLD: JSON.stringify(["firefox", "safari"].includes(env.browser))
+            }),
             new CopyPlugin({
                 patterns: [
                     {
