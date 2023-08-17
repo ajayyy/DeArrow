@@ -17,9 +17,9 @@ setupTabUpdates(Config);
 setupBackgroundRequestProxy();
 
 waitFor(() => Config.isReady()).then(() => {
-    if (Config.config!.firefoxOldContentScriptRegistration) {
-        registerNeededContentScripts().catch(logError);
-    } else if (!isFirefoxOrSafari()) {
+    registerNeededContentScripts().catch(logError);
+
+    if (!isFirefoxOrSafari()) {
         // Chrome doesn't trigger onInstall when this happens, but they need to be
         // re-registered to apply to incognito tabs
         chrome.extension.isAllowedIncognitoAccess((isAllowedAccess) => {
