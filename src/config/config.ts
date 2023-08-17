@@ -100,6 +100,7 @@ interface SBConfig {
     freeTrialEnded: boolean;
     freeAccessRequestStart: number | null;
     firefoxOldContentScriptRegistration: boolean;
+    lastIncognitoStatus: boolean;
     showActivatedMessage: boolean;
     lastVersion: string;
 }
@@ -172,6 +173,7 @@ const syncDefaults = {
     freeTrialEnded: false,
     freeAccessRequestStart: null,
     firefoxOldContentScriptRegistration: false,
+    lastIncognitoStatus: false,
     showActivatedMessage: false,
     lastVersion: ""
 };
