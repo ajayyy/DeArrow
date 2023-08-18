@@ -11,25 +11,24 @@ import { freeTrialActive, getContentScripts, getFreeAccessRequestTimeLeft, getFr
 import { waitFor } from "../maze-utils/src";
 import { chromeP } from "../maze-utils/src/browserApi";
 
-let ranOnInstall = false;
-
 setupTabUpdates(Config);
 setupBackgroundRequestProxy();
 
 waitFor(() => Config.isReady()).then(() => {
-    registerNeededContentScripts().catch(logError);
+    registerNeededContentScripts().then(() => {
+        if (!isFirefoxOrSafari()) {
+            // Chrome doesn't trigger onInstall when this happens, but they need to be
+            // re-registered to apply to incognito tabs
+            chrome.extension.isAllowedIncognitoAccess((isAllowedAccess) => {
+                if (isAllowedAccess && !Config.config!.lastIncognitoStatus) {
+                    registerNeededContentScripts(undefined, true).catch(logError);
+                }
+    
+                Config.config!.lastIncognitoStatus = isAllowedAccess;
+            });
+        }
+    }).catch(logError);
 
-    if (!isFirefoxOrSafari()) {
-        // Chrome doesn't trigger onInstall when this happens, but they need to be
-        // re-registered to apply to incognito tabs
-        chrome.extension.isAllowedIncognitoAccess((isAllowedAccess) => {
-            if (isAllowedAccess && !Config.config!.lastIncognitoStatus && !ranOnInstall) {
-                onInstall();
-            }
-
-            Config.config!.lastIncognitoStatus = isAllowedAccess;
-        });
-    }
 
     setupAlarms();
 
@@ -104,15 +103,6 @@ waitFor(() => Config.isReady()).then(() => {
             waitFor(() => Config.isReady()).then(() => setupUserID()).catch(logError);
         }
     }
-
-    // Make sure on install actually gets run on updates
-    if (chrome.runtime.getManifest().version !== Config.config!.lastVersion && !ranOnInstall) {
-        setTimeout(() => {
-            if (!ranOnInstall) {
-                onInstall();
-            }
-        }, 2000);
-    }
 }).catch(logError);
 
 async function isPaywallEnabled(): Promise<boolean> {
@@ -154,18 +144,6 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) =>  {
     }
 
     return false;
-});
-
-function onInstall() {
-    ranOnInstall = true;
-
-    waitFor(() => Config.isReady()).then(() => {
-        Config.config!.lastVersion = chrome.runtime.getManifest().version;
-    }).catch(logError);
-}
-
-chrome.runtime.onInstalled.addListener(() => {
-    onInstall();
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {

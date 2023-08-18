@@ -102,7 +102,6 @@ interface SBConfig {
     firefoxOldContentScriptRegistration: boolean;
     lastIncognitoStatus: boolean;
     showActivatedMessage: boolean;
-    lastVersion: string;
 }
 
 interface SBStorage {
@@ -175,7 +174,6 @@ const syncDefaults = {
     firefoxOldContentScriptRegistration: false,
     lastIncognitoStatus: false,
     showActivatedMessage: false,
-    lastVersion: ""
 };
 
 const localDefaults = {
