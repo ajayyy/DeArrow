@@ -33,7 +33,8 @@ export const titleCaseNotCapitalized = new Set([
     "feat",
     "feat.",
     "etc.",
-    "etc"
+    "etc",
+    "its"
 ]);
 
 export const allowlistedWords = new Set([
