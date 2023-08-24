@@ -663,10 +663,15 @@ function copyDebugOutputToClipboard() {
 
     // Sanitise sensitive user config values
     delete output.config.userID;
+    delete output.config.licenseKey;
+    delete output.config.freeActivation;
+    delete output.config.freeTrialStart;
+    delete output.config.freeTrialEnded;
+    delete output.config.freeAccessRequestStart;
+
     output.config.serverAddress = (output.config.serverAddress === CompileConfig.serverAddress)
         ? "Default server address" : "Custom server address";
     output.config.invidiousInstances = output.config.invidiousInstances.length;
-    output.config.whitelistedChannels = output.config.whitelistedChannels.length;
 
     // Copy object to clipboard
     navigator.clipboard.writeText(JSON.stringify(output, null, 4))
