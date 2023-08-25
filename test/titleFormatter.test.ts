@@ -126,6 +126,7 @@ describe("toTitleCase", () => {
         ["The Collatz Conjecture.!! but in Binary", "The Collatz Conjecture. But in Binary"],
         ["Zedd - Clarity (feat. Foxes)", "Zedd - Clarity (feat. Foxes)"],
         ["Zedd - Clarity (Featuring Foxes)", "Zedd - Clarity (Featuring Foxes)"],
+        ["Some title #lowercasething", "Some Title #lowercasething"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;

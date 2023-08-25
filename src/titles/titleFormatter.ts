@@ -308,6 +308,11 @@ function forceKeepFormatting(word: string, ignorePunctuation = true): boolean {
         }
     }
 
+    // Allow hashtags
+    if (!isAllCaps(word) && word.startsWith("#")) {
+        return true;
+    }
+
     return result;
 }
 
