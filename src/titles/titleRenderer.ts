@@ -263,8 +263,7 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
 
         // To be able to show the show original button in the right place
         titleElement.parentElement!.style.display = "flex";
-        titleElement.parentElement!.style.alignItems = "center";
-        if (smallBrandingBox) titleElement.parentElement!.style.alignItems = "flex-start";
+        titleElement.parentElement!.style.alignItems = "flex-start";
         if (onMobile()) titleElement.parentElement!.style.alignItems = "normal";
         titleElement.parentElement!.style.justifyContent = "space-between";
         titleElement.parentElement!.style.width = "100%";
@@ -453,6 +452,11 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
 
         referenceNode?.prepend?.(buttonElement);
     } else {
+        const lineHeight = getComputedStyle(originalTitleElement).lineHeight;
+        if (lineHeight) {
+            buttonElement.style.height = lineHeight;
+        }
+
         // Verify again it doesn't already exist
         const existingButton = originalTitleElement.parentElement?.querySelector?.(".cbShowOriginal");
         if (existingButton) {
