@@ -13,6 +13,7 @@ import { handleOnboarding } from "./onboarding";
 import { cleanResultingTitle } from "../titles/titleFormatter";
 import { shouldDefaultToCustom, shouldDefaultToCustomFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { onMobile } from "../../maze-utils/src/pageInfo";
+import { addMaxTitleLinesCssToPage } from "../utils/cssInjector";
 
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
 
@@ -410,6 +411,11 @@ export function setupOptionChangeListener(): void {
                     updateBranding().catch(logError);
                 }
             }
+        }
+
+        if (changes.titleMaxLines 
+                && changes.titleMaxLines.newValue !== changes.titleMaxLines.oldValue) {
+            addMaxTitleLinesCssToPage();
         }
     });
 }

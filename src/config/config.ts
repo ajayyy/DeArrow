@@ -86,6 +86,7 @@ interface SBConfig {
     replaceTitles: boolean;
     replaceThumbnails: boolean;
     useCrowdsourcedTitles: boolean;
+    titleMaxLines: number;
     channelOverrides: Record<string, ConfigurationID>;
     customConfigurations: Record<ConfigurationID, CustomConfiguration>;
     showInfoAboutRandomThumbnails: boolean;
@@ -158,6 +159,7 @@ const syncDefaults = {
     replaceTitles: true,
     replaceThumbnails: true,
     useCrowdsourcedTitles: true,
+    titleMaxLines: 3,
     channelOverrides: {},
     customConfigurations: {},
     showInfoAboutRandomThumbnails: false,

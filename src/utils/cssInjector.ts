@@ -48,6 +48,23 @@ export function addCssToPage() {
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         window.addEventListener("DOMContentLoaded", onLoad);
     }
+
+    waitFor(() => Config.isReady()).then(() => addMaxTitleLinesCssToPage()).catch(logError);
+}
+
+export function addMaxTitleLinesCssToPage() {
+    const head = document.getElementsByTagName("head")[0] || document.documentElement;
+
+    const existingStyle = document.querySelector(".cb-title-lines");
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+
+    const style = document.createElement("style");
+    style.className = "cb-title-lines";
+    style.innerHTML = buildMaxLinesTitleCss();
+
+    head.appendChild(style);
 }
 
 function buildHideThumbnailCss(): string {
@@ -88,6 +105,20 @@ function buildHideTitleCss(): string {
     }
 
     return `${result.join(", ")} { display: none !important; }\n`;
+}
+
+function buildMaxLinesTitleCss(): string {
+    // For safety, ensure nothing can be injected
+    if (typeof (Config.config!.titleMaxLines) !== "number" || onMobile()) return "";
+
+    const result: string[] = [];
+    for (const start of brandingBoxSelector.split(", ")) {
+        if (!onMobile()) {
+            result.push(`${start} #video-title`);
+        }
+    }
+
+    return `${result.join(", ")} { -webkit-line-clamp: ${Config.config!.titleMaxLines} !important; max-height: unset !important; }\n`;
 }
 
 function injectMobileCss() {

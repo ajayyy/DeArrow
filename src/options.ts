@@ -286,7 +286,7 @@ async function init() {
                 }
 
                 numberInput!.addEventListener("input", () => {
-                    Config.config![option] = numberInput.value;
+                    Config.config![option] = parseFloat(numberInput.value);
                 });
 
                 break;

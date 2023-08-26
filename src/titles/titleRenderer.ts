@@ -8,7 +8,6 @@ import { formatTitle } from "./titleFormatter";
 import { setCurrentVideoTitle } from "./pageTitleHandler";
 import { shouldDefaultToCustom, shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { countTitleReplacement } from "../config/stats";
-import { isReduxInstalled } from "../utils/extensionCompatibility";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { isFirefoxOrSafari } from "../../maze-utils/src";
 import { isSafari } from "../../maze-utils/src/config";
@@ -133,11 +132,7 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
     const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
     
     titleElement.style.display = "none";
-    if (isReduxInstalled()) {
-        originalTitleElement.style.setProperty("display", "-webkit-box", "important");
-    } else {
-        originalTitleElement.style.setProperty("display", "inline", "important");
-    }
+    originalTitleElement.style.setProperty("display", "-webkit-box", "important");
 
     switch(brandingLocation) {
         case BrandingLocation.Watch: {
