@@ -39,12 +39,17 @@ waitFor(() => Config.isReady()).then(() => {
     
             // If there is no userID, then it is the first install.
             if (!userID){
+                const groupPolicyLicenseKey = await getGroupPolicyLicenseKey();
                 const paywallEnabled = !CompileConfig["freeAccess"]
                     && !navigator.userAgent.includes("Mobile;")
-                    && await isPaywallEnabled();
+                    && await isPaywallEnabled()
+                    && !groupPolicyLicenseKey;
                 if (paywallEnabled) {
                     Config.config!.activated = false;
                     Config.config!.showActivatedMessage = true;
+                    Config.config!.freeActivation = false;
+                } else if (groupPolicyLicenseKey) {
+                    Config.config!.licenseKey = groupPolicyLicenseKey;
                     Config.config!.freeActivation = false;
                 }
 
@@ -89,7 +94,7 @@ waitFor(() => Config.isReady()).then(() => {
     
                 if (paywallEnabled) {
                     setTimeout(() => void chrome.tabs.create({url: chrome.runtime.getURL("/payment.html")}), 100);
-                } else {
+                } else if (!groupPolicyLicenseKey) {
                     setTimeout(() => void chrome.tabs.create({url: chrome.runtime.getURL("/help.html")}), 100);
                 }
             }
@@ -119,6 +124,19 @@ async function isPaywallEnabled(): Promise<boolean> {
     }
 
     return false;
+}
+
+async function getGroupPolicyLicenseKey(): Promise<string | null> {
+    try {
+        if ("managed" in chrome.storage) {
+            const result = await chrome.storage.managed.get("licenseKey");
+            return result?.licenseKey || null;
+        }
+    } catch (e) {
+        // Managed storage not available on this browser
+    }
+
+    return null;
 }
 
 const existingRegistrations: { id: string; script: browser.contentScripts.RegisteredContentScript }[] = [];

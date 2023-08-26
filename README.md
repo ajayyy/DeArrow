@@ -52,6 +52,21 @@ Lastly, it adds a "show original" button if anything was changed, allowing you t
 | Thumbnail Cache Backend | https://github.com/ajayyy/DeArrowThumbnailCache |
 | Thumbnail Cache Kubernetes Manifests | https://github.com/ajayyy/k8s-thumbnail-cache |
 
+
+### Group Policy Options
+
+See the [Firefox Managed Storage](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/managed), [Chrome Admin Settings](https://www.chromium.org/administrators/configuring-policy-for-extensions/) and [Edge ExtensionSettings](https://learn.microsoft.com/en-us/deployedge/microsoft-edge-manage-extensions-ref-guide) pages for more info
+
+It is possible to inject a license key using group policy/managed storage to be able to have the extension auto-activated even when you reset the settings on each install.
+
+```json
+{
+  "licenseKey": "your license key here"
+}
+```
+
+This [uBlock Origin wiki page](https://github.com/gorhill/uBlock/wiki/Deploying-uBlock-Origin) might also help
+
 ### Building
 
 You must have [Node.js 16](https://nodejs.org/) and npm installed.
