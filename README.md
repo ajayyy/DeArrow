@@ -55,9 +55,9 @@ Lastly, it adds a "show original" button if anything was changed, allowing you t
 
 ### Group Policy Options
 
-See the [Firefox Managed Storage](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/managed), [Chrome Admin Settings](https://www.chromium.org/administrators/configuring-policy-for-extensions/) and [Edge ExtensionSettings](https://learn.microsoft.com/en-us/deployedge/microsoft-edge-manage-extensions-ref-guide) pages for more info
+See the [Firefox Managed Storage](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/managed), [Chrome Admin Settings](https://www.chromium.org/administrators/configuring-policy-for-extensions/) and [Edge ExtensionSettings](https://learn.microsoft.com/en-us/deployedge/microsoft-edge-manage-extensions-ref-guide) pages for more info. This [uBlock Origin wiki page](https://github.com/gorhill/uBlock/wiki/Deploying-uBlock-Origin) might also help.
 
-It is possible to inject a license key using group policy/managed storage to be able to have the extension auto-activated even when you reset the settings on each install. This [uBlock Origin wiki page](https://github.com/gorhill/uBlock/wiki/Deploying-uBlock-Origin) might also help
+It is possible to inject a license key using group policy/managed storage to be able to have the extension auto-activated even when you reset the settings on each install.
 
 ```json
 {
