@@ -3,7 +3,7 @@ import { sendRequestToServer } from "../utils/requests";
 import { askBackgroundToRegisterNeededContentScripts, askBackgroundToSetupAlarms, freeTrialActive, isFreeAccessRequestActive } from "../license/license";
 import Config from "../config/config";
 import { objectToURI } from "../../maze-utils/src";
-import { waitFor } from "../../maze-utils";
+import { waitFor } from "../../maze-utils/src";
 
 const websiteDomain = "https://dearrow.ajay.app"
 
