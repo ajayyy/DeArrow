@@ -3,6 +3,7 @@ import { sendRequestToServer } from "../utils/requests";
 import { askBackgroundToRegisterNeededContentScripts, askBackgroundToSetupAlarms, freeTrialActive, isFreeAccessRequestActive } from "../license/license";
 import Config from "../config/config";
 import { objectToURI } from "../../maze-utils/src";
+import { waitFor } from "../../maze-utils/lib";
 
 const websiteDomain = "https://dearrow.ajay.app"
 
@@ -17,14 +18,23 @@ enum PaymentResultMessageType {
     FreeAccess
 }
 
+waitFor(() => Config.isReady()).then(() => {
+    if (Config.config!.activated) {
+        chrome.runtime.sendMessage({ "message": "openHelp" }, () => window.close());
+    }
+});
+
 export const PaymentComponent = () => {
     const [paymentResult, setPaymentResult] = React.useState<PaymentResultMessageType | null>(isFreeAccessRequestActive() 
         ? PaymentResultMessageType.FreeAccess : (freeTrialActive() ? PaymentResultMessageType.FreeTrial : null));
     const [hideFrame, setHideFrame] = React.useState(true);
 
+    const [redeemEnabled, setRedeemEnabled] = React.useState(false);
+
     const iframeSource = React.useRef(`${websiteDomain}/payment#${objectToURI("", {
         hideFreeTrial: Config.config!.freeTrialStart !== null || Config.config!.freeTrialEnded,
-        hideRequestFreeAccessButton: Config.config!.freeAccessRequestStart !== null
+        hideRequestFreeAccessButton: Config.config!.freeAccessRequestStart !== null,
+        hideRedeem: true
     }, false)}`);
 
     const applyChoices = async (choices: PaymentComponentChoices) => {
@@ -93,6 +103,35 @@ export const PaymentComponent = () => {
                     <img src="https://ajay.app/newprofilepic.jpg" height="30" className="profilepiccircle" />
                     {chrome.i18n.getMessage("createdBy")}{" "}<a href="https://ajay.app">Ajay Ramachandran</a>
                 </p>
+
+                {
+                    !Config.config!.activated &&
+                    <div className="center row-item redeem-box">
+                        <input 
+                            id="redeemCodeInput" 
+                            className="option-text-box" 
+                            type="text" 
+                            placeholder="Enter license key"
+                            onChange={(e) => {
+                                setRedeemEnabled(e.target.value.length > 0);
+                            }}/>
+
+                        <a
+                            className="option-link" 
+                            target="_blank" 
+                            rel="noreferrer"
+                            onClick={() => {
+                                if (!redeemEnabled) return;
+                                applyChoices({
+                                    licenseKey: (document.getElementById("redeemCodeInput") as HTMLInputElement).value
+                                })
+                            }}>
+                            <div className={"option-button side-by-side inline" + (!redeemEnabled ? " disabled" : "")}>
+                                Redeem
+                            </div>
+                        </a>
+                    </div>
+                }
 
                 <div className="payment-announcement-container">
                     <div className="payment-announcement center">
@@ -163,7 +202,7 @@ export const PaymentComponent = () => {
                     style={{
                         border: "none",
                         width: "100%",
-                        height: "1400px"
+                        height: "1600px"
                     }}
                     onLoad={(e) => {
                         setHideFrame(false);

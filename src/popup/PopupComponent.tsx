@@ -5,7 +5,7 @@ import { YourWorkComponent } from "./YourWorkComponent";
 import { ToggleOptionComponent } from "./ToggleOptionComponent";
 import { FormattingOptionsComponent } from "./FormattingOptionsComponent";
 import { isSafari } from "../../maze-utils/src/config";
-import { freeTrialActive, isActivated } from "../license/license";
+import { isActivated } from "../license/license";
 import { LicenseComponent } from "../license/LicenseComponent";
 
 export const PopupComponent = () => {
@@ -21,7 +21,7 @@ export const PopupComponent = () => {
             </header>
 
             {
-                (!isActivated() || freeTrialActive()) &&
+                (!Config.config!.activated) &&
                 <div className="activation-needed">
                     {
                         !isActivated() &&

@@ -379,3 +379,22 @@ svg {
     margin-left: auto;
     margin-right: auto;
 }
+
+.option-text-box {
+    width: 300px;
+    font-size: 13px;
+
+    margin: 10px
+}
+
+.option-link {
+    text-decoration: none;
+}
+
+.option-link.side-by-side {
+    margin: 50px;
+}
+
+.redeem-box {
+    margin-bottom: 10px;
+}
