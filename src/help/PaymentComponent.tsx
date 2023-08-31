@@ -18,16 +18,19 @@ enum PaymentResultMessageType {
     FreeAccess
 }
 
+let openedTab = false;
 waitFor(() => Config.isReady()).then(() => {
-    if (Config.config!.activated) {
+    if (Config.config!.activated && !openedTab) {
+        openedTab = true;
         chrome.runtime.sendMessage({ "message": "openHelp" }, () => window.close());
     }
 });
 
 Config.configSyncListeners.push((changes) => {
-    if ((changes.activated && changes.activated.newValue)
-        || (changes.alreadyActivated && changes.alreadyActivated.newValue)) {
+    if (!openedTab && ((changes.activated && changes.activated.newValue)
+        || (changes.alreadyActivated && changes.alreadyActivated.newValue))) {
         Config.config!.activated = true;
+        openedTab = true;
 
         chrome.runtime.sendMessage({ "message": "openHelp" }, () => window.close());
     }
@@ -80,7 +83,8 @@ export const PaymentComponent = () => {
             setTimeout(() => void askBackgroundToSetupAlarms(), 2000);
         }
 
-        if (validLicenseKey) {
+        if (validLicenseKey && !openedTab) {
+            openedTab = true;
             chrome.runtime.sendMessage({ "message": "openHelp" }, () => window.close());
         }
     }
