@@ -227,7 +227,7 @@ export const PaymentComponent = () => {
 
 async function shouldAllowLicenseKey(licenseKey: string): Promise<boolean> {
     try {
-        const result = await sendRequestToServer("GET", `${websiteDomain}/api/verifyToken`, {
+        const result = await sendRequestToServer("GET", `/api/verifyToken`, {
             licenseKey: licenseKey
         });
 
