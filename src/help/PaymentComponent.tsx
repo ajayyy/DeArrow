@@ -24,6 +24,15 @@ waitFor(() => Config.isReady()).then(() => {
     }
 });
 
+Config.configSyncListeners.push((changes) => {
+    if ((changes.activated && changes.activated.newValue)
+        || (changes.alreadyActivated && changes.alreadyActivated.newValue)) {
+        Config.config!.activated = true;
+
+        chrome.runtime.sendMessage({ "message": "openHelp" }, () => window.close());
+    }
+});
+
 export const PaymentComponent = () => {
     const [paymentResult, setPaymentResult] = React.useState<PaymentResultMessageType | null>(isFreeAccessRequestActive() 
         ? PaymentResultMessageType.FreeAccess : (freeTrialActive() ? PaymentResultMessageType.FreeTrial : null));

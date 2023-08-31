@@ -15,6 +15,13 @@ setupTabUpdates(Config);
 setupBackgroundRequestProxy();
 
 waitFor(() => Config.isReady()).then(() => {
+    if (!Config.config!.activated && (Config.config!.alreadyActivated || Config.config!.licenseKey)) {
+        Config.config!.activated = true;
+    }
+    if (Config.config!.activated && Config.config!.userID) {
+        Config.config!.alreadyActivated = true;
+    }
+
     registerNeededContentScripts().then(() => {
         if (!isFirefoxOrSafari()) {
             // Chrome doesn't trigger onInstall when this happens, but they need to be
@@ -28,7 +35,6 @@ waitFor(() => Config.isReady()).then(() => {
             });
         }
     }).catch(logError);
-
 
     setupAlarms();
 
@@ -44,7 +50,8 @@ waitFor(() => Config.isReady()).then(() => {
                     && !navigator.userAgent.includes("Mobile;")
                     && await isPaywallEnabled()
                     && !groupPolicyLicenseKey
-                    && !Config.config!.licenseKey;
+                    && !Config.config!.licenseKey
+                    && !Config.config!.alreadyActivated;
                 if (paywallEnabled) {
                     Config.config!.activated = false;
                     Config.config!.showActivatedMessage = true;

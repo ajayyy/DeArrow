@@ -96,6 +96,7 @@ interface SBConfig {
     thumbnailReplacements: number;
     licenseKey: string | null;
     activated: boolean;
+    alreadyActivated: boolean;
     freeActivation: boolean;
     freeTrialStart: number | null;
     freeTrialEnded: boolean;
@@ -169,6 +170,7 @@ const syncDefaults = {
     thumbnailReplacements: 0,
     licenseKey: null,
     activated: true,
+    alreadyActivated: false,
     freeActivation: true,
     freeTrialStart: null,
     freeTrialEnded: false,
