@@ -39,7 +39,7 @@ export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLEleme
                 titleButtonContainer.classList.add("cbTitleButtonContainer");
             }
 
-            if (titleButtonContainer.parentElement !== referenceNode) {
+            if (!referenceNode.contains(titleButtonContainer)) {
                 referenceNode.appendChild(titleButtonContainer);
 
                 // Buttons on right
