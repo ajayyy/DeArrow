@@ -237,7 +237,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                     disabled={freeTrialActive()
                                 || currentlySubmitting 
                                 || (!selectedThumbnail.current && !selectedTitle) 
-                                || (!!selectedTitle && selectedTitle.title === chrome.i18n.getMessage("OriginalTitle"))}
+                                || (!!selectedTitle && selectedTitle.title.toLowerCase() === chrome.i18n.getMessage("OriginalTitle").toLowerCase())}
                     onClick={async () => {
                         setCurrentlySubmitting(true);
 
