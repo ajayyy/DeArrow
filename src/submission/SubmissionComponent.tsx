@@ -234,7 +234,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
             <div className="cbVoteButtonContainer">
                 <button className="cbNoticeButton cbVoteButton" 
-                    disabled={freeTrialActive()
+                    disabled={!Config.config!.activated
                                 || currentlySubmitting 
                                 || (!selectedThumbnail.current && !selectedTitle) 
                                 || (!!selectedTitle && selectedTitle.title.toLowerCase() === chrome.i18n.getMessage("OriginalTitle").toLowerCase())}
