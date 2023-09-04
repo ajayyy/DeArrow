@@ -51,6 +51,9 @@ export function getThumbnailFallbackOptionFastCheck(videoID: VideoID | null): Th
 }
 
 async function checkChannelOverrideOption<T>(videoID: VideoID | null, option: string): Promise<T> {
+    const fastCheck = fastChannelOverrideOption<T>(videoID, option);
+    if (fastCheck !== null) return fastCheck;
+
     if (videoID && Object.keys(Config.config!.channelOverrides).length > 0) {
         return checkChannelOverrideOptionBase(option, await getChannelID(videoID))
     }
@@ -92,7 +95,7 @@ function fastChannelOverrideOption<T>(videoID: VideoID | null, option: string): 
         }
 
         for (const [, config] of Object.entries(Config.config!.customConfigurations)) {
-            if (config && config[option] !== mainValue) {
+            if (config && config[option] !== null && config[option] !== mainValue) {
                 return null;
             }
         }
