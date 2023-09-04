@@ -571,7 +571,8 @@ async function setTextOption(option: string, element: HTMLElement, value: string
                         if (!CompileConfig.debug 
                                 && (key === "activated" 
                                     || key === "freeTrialStart" 
-                                    || key === "freeAccessRequestStart")) {
+                                    || key === "freeAccessRequestStart"
+                                    || key === "freeAccessWaitingPeriod")) {
                             continue;
                         }
 

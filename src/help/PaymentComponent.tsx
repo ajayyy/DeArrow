@@ -11,6 +11,7 @@ interface PaymentComponentChoices {
     freeTrial?: boolean;
     licenseKey?: string;
     freeAccess?: boolean;
+    freeAccessWaitingPeriod? : number;
 }
 
 enum PaymentResultMessageType {
@@ -62,6 +63,10 @@ export const PaymentComponent = () => {
 
         if (choices.freeAccess) {
             Config.config!.freeAccessRequestStart = Date.now();
+
+            if (choices.freeAccessWaitingPeriod) {
+                Config.config!.freeAccessWaitingPeriod = choices.freeAccessWaitingPeriod;
+            }
         }
 
         if (validLicenseKey) {

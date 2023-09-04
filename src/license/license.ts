@@ -21,9 +21,8 @@ export function isFreeAccessRequestActive() {
     return timeLeft !== null && timeLeft > 0;
 }
 
-const freeAccessWaitingPeriod = 1000 * 60 * 60 * 24 * 7 * 3;
 export function getFreeAccessRequestTimeLeft() {
-    return Config.config!.freeAccessRequestStart !== null ? freeAccessWaitingPeriod - (Date.now() - Config.config!.freeAccessRequestStart) : null;
+    return Config.config!.freeAccessRequestStart !== null ? Config.config!.freeAccessWaitingPeriod - (Date.now() - Config.config!.freeAccessRequestStart) : null;
 }
 
 export async function getLicenseKey(): Promise<string | null> {

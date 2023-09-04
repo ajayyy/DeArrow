@@ -102,6 +102,7 @@ interface SBConfig {
     freeTrialStart: number | null;
     freeTrialEnded: boolean;
     freeAccessRequestStart: number | null;
+    freeAccessWaitingPeriod: number;
     firefoxOldContentScriptRegistration: boolean;
     lastIncognitoStatus: boolean;
     showActivatedMessage: boolean;
@@ -177,6 +178,7 @@ const syncDefaults = {
     freeTrialStart: null,
     freeTrialEnded: false,
     freeAccessRequestStart: null,
+    freeAccessWaitingPeriod: 1000 * 60 * 60 * 24 * 3,
     firefoxOldContentScriptRegistration: false,
     lastIncognitoStatus: false,
     showActivatedMessage: false,
