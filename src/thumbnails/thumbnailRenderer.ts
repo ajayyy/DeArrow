@@ -525,6 +525,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
         // TODO: Add option not to hide all thumbnails by default
         image.style.display = "none";
         image.classList.remove("cb-visible");
+        resetBackgroundColor(image, brandingLocation);
 
         // Trigger a fetch to start, and display the original thumbnail if necessary
         getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation).then(async (thumbnail) => {
@@ -553,6 +554,11 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                 }
 
                 thumbnail!.style.removeProperty("display");
+                if (thumbnail.complete) {
+                    removeBackgroundColor(image, brandingLocation);
+                } else {
+                    thumbnail.addEventListener("load", () => removeBackgroundColor(image, brandingLocation), { once: true });
+                }
 
                 if (brandingLocation === BrandingLocation.Related) {
                     box.setAttribute("loaded", "");
@@ -666,6 +672,8 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
     if (brandingLocation === BrandingLocation.Watch) {
         resetMediaSessionThumbnail();
     }
+
+    resetBackgroundColor(image, brandingLocation);
 }
 
 function resetToBlankThumbnail(image: HTMLImageElement, brandingLocation: BrandingLocation) {
@@ -676,6 +684,28 @@ function resetToBlankThumbnail(image: HTMLImageElement, brandingLocation: Brandi
 
     if (brandingLocation === BrandingLocation.Watch) {
         setMediaSessionThumbnail("");
+    }
+
+    resetBackgroundColor(image, brandingLocation);
+}
+
+function resetBackgroundColor(image: HTMLImageElement, brandingLocation: BrandingLocation) {
+    if (brandingLocation === BrandingLocation.Related && !onMobile()) {
+        const thumbnailElement = image.closest(getThumbnailSelectors()) as HTMLElement;
+
+        if (thumbnailElement) {
+            thumbnailElement.classList.remove("thumbnailNoBackground");
+        }
+    }
+}
+
+function removeBackgroundColor(image: HTMLImageElement, brandingLocation: BrandingLocation) {
+    if (brandingLocation === BrandingLocation.Related && !onMobile()) {
+        const thumbnailElement = image.closest(getThumbnailSelectors()) as HTMLElement;
+
+        if (thumbnailElement) {
+            thumbnailElement.classList.add("thumbnailNoBackground");
+        }
     }
 }
 
