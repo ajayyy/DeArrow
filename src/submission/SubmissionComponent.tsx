@@ -21,7 +21,6 @@ import ExclamationIcon from "../svgIcons/exclamationIcon";
 import CursorIcon from "../svgIcons/cursorIcon";
 import FontIcon from "../svgIcons/fontIcon";
 import { Tooltip } from "../utils/tooltip";
-import { freeTrialActive } from "../license/license";
 import { LicenseComponent } from "../license/LicenseComponent";
 
 export interface SubmissionComponentProps {
