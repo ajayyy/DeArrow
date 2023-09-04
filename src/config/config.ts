@@ -82,6 +82,7 @@ interface SBConfig {
     extensionEnabled: boolean;
     defaultToCustom: boolean;
     alwaysShowShowOriginalButton: boolean;
+    showOriginalOnHover: boolean;
     importedConfig: boolean;
     replaceTitles: boolean;
     replaceThumbnails: boolean;
@@ -156,6 +157,7 @@ const syncDefaults = {
     extensionEnabled: true,
     defaultToCustom: true,
     alwaysShowShowOriginalButton: false,
+    showOriginalOnHover: false,
     importedConfig: false,
     replaceTitles: true,
     replaceThumbnails: true,
