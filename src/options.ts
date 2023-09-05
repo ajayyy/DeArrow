@@ -572,7 +572,8 @@ async function setTextOption(option: string, element: HTMLElement, value: string
                                 && (key === "activated" 
                                     || key === "freeTrialStart" 
                                     || key === "freeAccessRequestStart"
-                                    || key === "freeAccessWaitingPeriod")) {
+                                    || key === "freeAccessWaitingPeriod"
+                                    || (key === "userID" && newConfig[key] === ""))) {
                             continue;
                         }
 
@@ -590,6 +591,12 @@ async function setTextOption(option: string, element: HTMLElement, value: string
 
                 } catch (e) {
                     alert(chrome.i18n.getMessage("incorrectlyFormattedOptions"));
+                }
+
+                break;
+            case "userID":
+                if (value !== "") {
+                    Config.config![option] = value;
                 }
 
                 break;
