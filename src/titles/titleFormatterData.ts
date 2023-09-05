@@ -132,7 +132,18 @@ export const allowlistedWords = new Set([
     "WYSIWYG",
     "TAS",
     "USSR",
-    "Yu-Gi-Oh!"
+    "Yu-Gi-Oh!",
+    "II",
+    "III",
+    "IV",
+    "VI",
+    "VII",
+    "VIII",
+    "XIV",
+    "XV",
+    "XVI",
+    "XVII",
+    "XVIII",
 ]);
 
 export const acronymBlocklist = new Set([
