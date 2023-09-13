@@ -10,7 +10,7 @@ import Config, { ThumbnailCacheOption } from "../config/config";
 import { logError } from "../utils/logger";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { handleOnboarding } from "./onboarding";
-import { cleanResultingTitle } from "../titles/titleFormatter";
+import { cleanEmojis, cleanResultingTitle } from "../titles/titleFormatter";
 import { shouldDefaultToCustom, shouldDefaultToCustomFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { addMaxTitleLinesCssToPage } from "../utils/cssInjector";
@@ -272,7 +272,7 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
         const title = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
         const originalTitle = getOriginalTitleElement(element, brandingLocation)?.textContent;
         const customTitle = title && !title.original 
-            && (!originalTitle || (cleanResultingTitle(title.title)).toLowerCase() !== (cleanResultingTitle(originalTitle)).toLowerCase())
+            && (!originalTitle || (cleanResultingTitle(cleanEmojis(title.title))).toLowerCase() !== (cleanResultingTitle(cleanEmojis(originalTitle))).toLowerCase())
             && await shouldUseCrowdsourcedTitles(videoID);
 
         if (!customTitle && !Config.config!.showIconForFormattedTitles) {
