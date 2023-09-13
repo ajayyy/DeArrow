@@ -1,12 +1,12 @@
 import { VideoID, getVideoID } from "../../maze-utils/src/video";
-import Config from "../config/config";
+import Config, { TitleFormatting } from "../config/config";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
 import { MobileFix, addNodeToListenFor, getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { BrandingLocation, ShowCustomBrandingInfo, extractVideoIDFromElement, getActualShowCustomBranding, toggleShowCustom } from "../videoBranding/videoBranding";
-import { formatTitle } from "./titleFormatter";
+import { cleanEmojis, formatTitle } from "./titleFormatter";
 import { setCurrentVideoTitle } from "./pageTitleHandler";
-import { shouldDefaultToCustom, shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
+import { getTitleFormatting, shouldCleanEmojis, shouldDefaultToCustom, shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { countTitleReplacement } from "../config/stats";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { isFirefoxOrSafari } from "../../maze-utils/src";
@@ -53,7 +53,12 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
 
         const title = titleData?.title;
-        if (title && await shouldUseCrowdsourcedTitles(videoID)) {
+        const originalTitle = originalTitleElement?.textContent?.trim?.() ?? "";
+        if (title && await shouldUseCrowdsourcedTitles(videoID)
+                // If there are just formatting changes, and the user doesn't want those, don't replace
+                && (await getTitleFormatting(videoID) !== TitleFormatting.Disable || originalTitle.toLowerCase() !== title.toLowerCase())
+                && (await getTitleFormatting(videoID) !== TitleFormatting.Disable 
+                    || await shouldCleanEmojis(videoID) || cleanEmojis(originalTitle.toLowerCase()) !== cleanEmojis(title.toLowerCase()))) {
             const formattedTitle = await formatTitle(title, true, videoID);
             if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
 
