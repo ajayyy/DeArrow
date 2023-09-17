@@ -341,7 +341,7 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
                         return null;
                     }
     
-                    await setupPreRenderedThumbnail(videoID, timestamp, await request.blob());
+                    setupPreRenderedThumbnail(videoID, timestamp, await request.blob());
                     delete activeThumbnailCacheRequests[videoID];
     
                     return {
