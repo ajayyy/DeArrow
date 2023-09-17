@@ -278,7 +278,10 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
             // Move badges out of centered div
             const badges = titleElement.parentElement!.querySelectorAll("ytd-badge-supported-renderer");
             for (const badge of badges) {
-                badge.parentElement!.parentElement!.prepend(badge);
+                let parent = badge.parentElement!.parentElement!;
+                if (parent.id === "title-wrapper") parent = parent.parentElement!;
+
+                parent.prepend(badge);
             }
         }
 
