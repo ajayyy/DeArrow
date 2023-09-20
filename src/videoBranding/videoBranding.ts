@@ -48,7 +48,7 @@ export interface VideoBrandingInstance {
 }
 
 export const brandingBoxSelector = !onMobile() 
-    ? "ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer, ytd-compact-playlist-renderer, ytd-playlist-renderer, ytd-grid-playlist-renderer, ytd-grid-show-renderer"
+    ? "ytd-rich-grid-media, ytd-video-renderer, ytd-movie-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer, ytd-compact-playlist-renderer, ytd-playlist-renderer, ytd-grid-playlist-renderer, ytd-grid-show-renderer"
     : "ytm-video-with-context-renderer, ytm-compact-radio-renderer, ytm-reel-item-renderer, ytm-channel-featured-video-renderer, ytm-compact-video-renderer, ytm-playlist-video-renderer, .playlist-immersive-header-content, ytm-compact-playlist-renderer, ytm-video-card-renderer, ytm-vertical-list-renderer, ytm-playlist-panel-video-renderer";
 
 export const watchPageThumbnailSelector = ".ytp-cued-thumbnail-overlay";
@@ -154,6 +154,7 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
     if (link) {
         const videoID = await extractVideoID(link);
         const isPlaylistOrClipTitleStatus = isPlaylistOrClipTitle(link);
+        const isMovie = element.nodeName.includes("MOVIE");
 
         if (verifyVideoID && videoID !== verifyVideoID) {
             // Don't need this branding update anymore, it was trying to update for a different video
@@ -164,7 +165,10 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
             async () => { await replaceVideoCardBranding(element, brandingLocation, videoID); });
         const showCustomBranding = videoBrandingInstance.showCustomBranding;
 
-        const videoPromise = replaceThumbnail(element, videoID, brandingLocation, showCustomBranding);
+        const videoPromise = replaceThumbnail(element, videoID, brandingLocation, isMovie ? {
+            knownValue: false,
+            originalValue: false
+        } : showCustomBranding);
         const titlePromise = !isPlaylistOrClipTitleStatus 
             ? replaceTitle(element, videoID, showCustomBranding, brandingLocation) 
             : Promise.resolve(false);

@@ -212,6 +212,7 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
         case BrandingLocation.Related:
             return [
                 "#video-title",
+                "#movie-title", // Movies in related
                 ".details .media-item-headline .yt-core-attributed-string", // Mobile YouTube
                 ".reel-item-metadata h3 .yt-core-attributed-string", // Mobile YouTube Shorts
                 ".details > .yt-core-attributed-string", // Mobile YouTube Channel Feature
@@ -248,7 +249,8 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
 
     if (brandingLocation === BrandingLocation.EndRecommendations
             || brandingLocation === BrandingLocation.Autoplay
-            || brandingLocation === BrandingLocation.EmbedSuggestions) {
+            || brandingLocation === BrandingLocation.EmbedSuggestions
+            || originalTitleElement.id === "movie-title") {
         const container = document.createElement("div");
         container.appendChild(titleElement);
         originalTitleElement.parentElement?.prepend(container);
