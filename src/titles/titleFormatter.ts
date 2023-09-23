@@ -206,7 +206,7 @@ export function isInTitleCase(words: string[]): boolean {
     }
 
     const length = words.length - ignored;
-    return (length > 4 && count > length * 0.8) || count >= length;
+    return (length > 4 && count > Math.min(length - 1, length * 0.9)) || count >= length;
 }
 
 function shouldTrustCaps(mostlyAllCaps: boolean, words: string[], index: number): boolean {
