@@ -1,7 +1,7 @@
 import { VideoID } from "../../maze-utils/src/video";
 import Config, { TitleFormatting } from "../config/config";
 import { getTitleFormatting, shouldCleanEmojis } from "../config/channelOverrides";
-import { acronymBlocklist, allowlistedWords, titleCaseNotCapitalized } from "./titleFormatterData";
+import { acronymBlocklist, allowlistedWords, titleCaseDetectionNotCapitalized, titleCaseNotCapitalized } from "./titleFormatterData";
 import { chromeP } from "../../maze-utils/src/browserApi";
 import type { LanguageIdentifier } from "cld3-asm";
 
@@ -200,13 +200,13 @@ export function isInTitleCase(words: string[]): boolean {
         if (isWordCapitalCase(word)) {
             count++;
         } else if (!isWordAllLower(word) ||
-                listHasWord(titleCaseNotCapitalized, word.toLowerCase())) {
+                listHasWord(titleCaseDetectionNotCapitalized, word.toLowerCase())) {
             ignored++;
         }
     }
-
+    
     const length = words.length - ignored;
-    return (length > 4 && count > Math.min(length - 1, length * 0.9)) || count >= length;
+    return (length > 4 && count >= Math.min(length - 1, length * 0.9)) || count >= length;
 }
 
 function shouldTrustCaps(mostlyAllCaps: boolean, words: string[], index: number): boolean {

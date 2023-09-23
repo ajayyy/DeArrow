@@ -36,6 +36,11 @@ export const titleCaseNotCapitalized = new Set([
     "etc"
 ]);
 
+export const titleCaseDetectionNotCapitalized = new Set([
+    ...titleCaseNotCapitalized,
+    "it"
+]);
+
 export const allowlistedWords = new Set([
     "NASA",
     "osu!",
