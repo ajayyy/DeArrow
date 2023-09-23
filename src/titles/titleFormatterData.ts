@@ -149,6 +149,7 @@ export const allowlistedWords = new Set([
     "XVI",
     "XVII",
     "XVIII",
+    "VIA",
 ]);
 
 export const acronymBlocklist = new Set([

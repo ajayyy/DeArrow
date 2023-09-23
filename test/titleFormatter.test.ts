@@ -128,6 +128,7 @@ describe("toTitleCase", () => {
         ["Zedd - Clarity (Featuring Foxes)", "Zedd - Clarity (Featuring Foxes)"],
         ["Some title #lowercasething", "Some Title #lowercasething"],
         ["TWO WORLDS II (Zero Punctuation)", "Two Worlds II (Zero Punctuation)"],
+        ["Riding a VIA train", "Riding a VIA Train"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
