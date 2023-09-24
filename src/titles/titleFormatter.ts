@@ -400,7 +400,8 @@ function startOfSentence(index: number, words: string[]): boolean {
 function isDelimeter(word: string): boolean {
     return (word.match(/^[-:;~—|]$/) !== null 
         || word.match(/[:?.!\]]$/) !== null)
-        && !listHasWord(allowlistedWords, word);
+        && !listHasWord(allowlistedWords, word)
+        && (!isAcronymStrict(word) || !word.endsWith("."));
 }
 
 export function cleanResultingTitle(title: string): string {
@@ -413,7 +414,9 @@ function cleanUnformattedTitle(title: string): string {
 
 function cleanWordPunctuation(title: string): string {
     const words = title.trim().split(" ");
-    if (words.length > 0 && forceKeepFormatting(words[words.length - 1], false)) {
+    if (words.length > 0 
+            && (forceKeepFormatting(words[words.length - 1], false)
+                || (isAcronymStrict(words[words.length - 1]) && words[words.length - 1].endsWith(".")))) {
         return title;
     }
 

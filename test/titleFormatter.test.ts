@@ -202,6 +202,9 @@ describe("toSentenceCase", () => {
         ["Some thing +HDDT", "Some thing +HDDT"],
         ["1st FC on Because Maybe // 996pp", "1st FC on because maybe // 996pp"],
         ["[753] You’re Doing it Wrong... The REAL Double Wrench Method", "[753] You’re doing it wrong... The real double wrench method"],
+        ["I want to go to the U.S.", "I want to go to the U.S."],
+        ["I want to go to the U.S. to see a movie", "I want to go to the U.S. to see a movie"],
+        ["I want to go to the U.S! they have movies there", "I want to go to the U.S. They have movies there"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
