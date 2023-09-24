@@ -272,6 +272,12 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 
 }
 
+.cbNotice {
+    text-align: center;
+    margin-bottom: 5px;
+	font-size: 1.3em;
+}
+
 .cbVoteButtonContainer, .cbHelpButtonContainer {
     display: flex;
     justify-content: space-evenly;

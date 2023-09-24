@@ -255,6 +255,13 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             </div>
 
             {
+                !Config.config!.activated &&
+                <div className="cbNotice">
+                    {`${chrome.i18n.getMessage("youCannotVoteDuringTrial")}`}
+                </div>
+            }
+
+            {
                 Config.config!.showGuidelineHelp ? 
                 <>
                     <hr className="cbLine"/>
