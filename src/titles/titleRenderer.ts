@@ -272,7 +272,6 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
         titleElement.parentElement!.style.display = "flex";
         titleElement.parentElement!.style.alignItems = "flex-start";
         if (onMobile()) titleElement.parentElement!.style.alignItems = "normal";
-        if (brandingLocation === BrandingLocation.Endcards) titleElement.parentElement!.style.alignItems = "center";
         titleElement.parentElement!.style.justifyContent = "space-between";
         titleElement.parentElement!.style.width = "100%";
 
@@ -481,9 +480,14 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
 
         referenceNode?.prepend?.(buttonElement);
     } else {
-        const lineHeight = getComputedStyle(originalTitleElement).lineHeight;
+        const originalStyle = getComputedStyle(originalTitleElement);
+        const lineHeight = originalStyle.lineHeight;
         if (lineHeight) {
             buttonElement.style.height = lineHeight;
+        }
+
+        if (brandingLocation === BrandingLocation.Endcards) {
+            buttonElement.style.margin = originalStyle.margin;
         }
 
         // Verify again it doesn't already exist

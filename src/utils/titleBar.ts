@@ -45,6 +45,12 @@ export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLEleme
                 // Buttons on right
                 referenceNode.style.display = "flex";
                 referenceNode.style.justifyContent = "space-between";
+                referenceNode.style.alignItems = "flex-start";
+
+                const header = referenceNode.querySelector("h1");
+                if (header) {
+                    titleButtonContainer.style.height = getComputedStyle(header).lineHeight;
+                }
 
                 if (onMobile()) {
                     if (lastReferenceNode !== referenceNode) {
