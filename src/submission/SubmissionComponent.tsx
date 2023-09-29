@@ -270,8 +270,6 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                         {getTips()}
                     </div>
 
-                    <YourWorkComponent/>
-
                     <div className="cbHelpButtonContainer">
                         <a className="cbNoticeButton"
                             href="https://wiki.sponsor.ajay.app/w/DeArrow/Guidelines"
@@ -291,6 +289,8 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             {`${chrome.i18n.getMessage("askAQuestion")}`}
                         </a>
                     </div>
+
+                    <YourWorkComponent/>
 
                     <LicenseComponent/>
                 </>
