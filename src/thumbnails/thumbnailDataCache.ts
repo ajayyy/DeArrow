@@ -34,6 +34,8 @@ interface VideoMetadata {
     duration: number | null;
     channelID: string | null;
     author: string | null;
+    isLive: boolean | null;
+    isUpcoming: boolean | null;
 }
 
 export interface ThumbnailData {
@@ -63,7 +65,9 @@ export function setupCache(videoID: VideoID): ThumbnailData {
                 playbackUrls: [],
                 duration: null,
                 channelID: null,
-                author: null
+                author: null,
+                isLive: false,
+                isUpcoming: false
             },
             lastUsed: Date.now(),
             failures: [],

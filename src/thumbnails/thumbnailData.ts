@@ -42,6 +42,8 @@ interface InnerTubeMetadataBase {
     duration: number | null;
     channelID: string | null;
     author: string | null;
+    isLive: boolean | null;
+    isUpcoming: boolean | null;
 }
 
 interface InnerTubeMetadata extends InnerTubeMetadataBase {
@@ -94,6 +96,8 @@ export async function fetchVideoMetadata(videoID: VideoID, ignoreCache: boolean)
                 videoCache.metadata.duration = metadata.duration;
                 videoCache.metadata.channelID = metadata.channelID;
                 videoCache.metadata.author = metadata.author;
+                videoCache.metadata.isLive = metadata.isLive;
+                videoCache.metadata.isUpcoming = metadata.isUpcoming;
 
                 // Remove this from active requests after it's been dealt with in other places
                 setTimeout(() => delete activeRequests[videoID], 500);
@@ -112,7 +116,9 @@ export async function fetchVideoMetadata(videoID: VideoID, ignoreCache: boolean)
         duration: null,
         channelID: null,
         author: null,
-        playbackUrls: []
+        playbackUrls: [],
+        isLive: null,
+        isUpcoming: null
     };
 }
 
@@ -123,7 +129,7 @@ export async function fetchVideoDataAndroidClient(videoID: VideoID): Promise<Inn
         clientName: "3",
         androidVersion: "12"
     }
-    
+
     const context = {
         client: {
             clientName: "ANDROID",
@@ -174,20 +180,26 @@ export async function fetchVideoDataAndroidClient(videoID: VideoID): Promise<Inn
                     formats: [],
                     duration: null,
                     channelID: null,
-                    author: null
+                    author: null,
+                    isLive: null,
+                    isUpcoming: null
                 };
             }
-            
+
             const formats = response?.streamingData?.adaptiveFormats as InnerTubeFormat[];
             const duration = response?.videoDetails?.lengthSeconds ? parseInt(response.videoDetails.lengthSeconds) : null;
             const channelId = response?.videoDetails?.channelId ?? null;
             const author = response?.videoDetails?.author ?? null;
+            const isLive = response?.videoDetails?.isLive ?? null;
+            const isUpcoming = response?.videoDetails?.isUpcoming ?? null;
             if (formats) {
                 return {
                     formats,
                     duration,
                     channelID: channelId,
-                    author
+                    author,
+                    isLive,
+                    isUpcoming
                 };
             }
         }
@@ -198,7 +210,9 @@ export async function fetchVideoDataAndroidClient(videoID: VideoID): Promise<Inn
         formats: [],
         duration: null,
         channelID: null,
-        author: null
+        author: null,
+        isLive: null,
+        isUpcoming: null
     };
 }
 
@@ -231,7 +245,9 @@ export async function fetchVideoDataDesktopClient(videoID: VideoID): Promise<Inn
                     formats: [],
                     duration: null,
                     channelID: null,
-                    author: null
+                    author: null,
+                    isLive: null,
+                    isUpcoming: null
                 };
             }
 
@@ -239,12 +255,16 @@ export async function fetchVideoDataDesktopClient(videoID: VideoID): Promise<Inn
             const duration = response?.videoDetails?.lengthSeconds ? parseInt(response.videoDetails.lengthSeconds) : null;
             const channelId = response?.videoDetails?.channelId ?? null;
             const author = response?.videoDetails?.author ?? null;
+            const isLive = response?.videoDetails?.isLive ?? null;
+            const isUpcoming = response?.videoDetails?.isUpcoming ?? null;
             if (formats) {
                 return {
                     formats,
                     duration,
                     channelID: channelId,
-                    author
+                    author,
+                    isLive,
+                    isUpcoming
                 };
             }
         }
@@ -255,7 +275,9 @@ export async function fetchVideoDataDesktopClient(videoID: VideoID): Promise<Inn
         formats: [],
         duration: null,
         channelID: null,
-        author: null
+        author: null,
+        isLive: null,
+        isUpcoming: null
     };
 }
 
@@ -302,6 +324,15 @@ export function getChannelIDSync(videoID: VideoID): ChannelInfo | null {
             channelID: cachedData.metadata.channelID,
             author: cachedData.metadata.author
         };
+    }
+
+    return null;
+}
+
+export async function isLiveOrUpcoming(videoID: VideoID): Promise<boolean | null> {
+    const data = await fetchVideoMetadata(videoID, false);
+    if (data) {
+        return data.isLive || data.isUpcoming;
     }
 
     return null;
