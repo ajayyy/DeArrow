@@ -212,3 +212,10 @@ export const acronymBlocklist = new Set([
     "why",
     "did"
 ]);
+
+export const notStartOfSentence = new Set([
+    "v.s.",
+    "vs.",
+    "ft.",
+    "feat."
+]);

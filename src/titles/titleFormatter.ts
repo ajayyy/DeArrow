@@ -1,7 +1,7 @@
 import { VideoID } from "../../maze-utils/src/video";
 import Config, { TitleFormatting } from "../config/config";
 import { getTitleFormatting, shouldCleanEmojis } from "../config/channelOverrides";
-import { acronymBlocklist, allowlistedWords, titleCaseDetectionNotCapitalized, titleCaseNotCapitalized } from "./titleFormatterData";
+import { acronymBlocklist, allowlistedWords, notStartOfSentence, titleCaseDetectionNotCapitalized, titleCaseNotCapitalized } from "./titleFormatterData";
 import { chromeP } from "../../maze-utils/src/browserApi";
 import type { LanguageIdentifier } from "cld3-asm";
 
@@ -401,7 +401,7 @@ function isDelimeter(word: string): boolean {
     return (word.match(/^[-:;~—|]$/) !== null 
         || word.match(/[:?.!\]]$/) !== null)
         && !listHasWord(allowlistedWords, word)
-        && !listHasWord(titleCaseNotCapitalized, word) // vs. ft.
+        && !listHasWord(notStartOfSentence, word)
         && (!isAcronymStrict(word) || !word.endsWith("."));
 }
 
