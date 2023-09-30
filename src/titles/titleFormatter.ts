@@ -401,6 +401,7 @@ function isDelimeter(word: string): boolean {
     return (word.match(/^[-:;~—|]$/) !== null 
         || word.match(/[:?.!\]]$/) !== null)
         && !listHasWord(allowlistedWords, word)
+        && !listHasWord(titleCaseNotCapitalized, word) // vs. ft.
         && (!isAcronymStrict(word) || !word.endsWith("."));
 }
 

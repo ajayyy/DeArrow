@@ -204,6 +204,7 @@ describe("toSentenceCase", () => {
         ["I want to go to the U.S.", "I want to go to the U.S."],
         ["I want to go to the U.S. to see a movie", "I want to go to the U.S. to see a movie"],
         ["I want to go to the U.S! they have movies there", "I want to go to the U.S. They have movies there"],
+        ["Nose slice VFX - pracical vs. digital effect", "Nose slice VFX - Pracical vs. digital effect"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
