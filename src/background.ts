@@ -23,19 +23,7 @@ waitFor(() => Config.isReady()).then(() => {
     }
 
     if (Config.config!.userID) {
-        registerNeededContentScripts().then(() => {
-            if (!isFirefoxOrSafari()) {
-                // Chrome doesn't trigger onInstall when this happens, but they need to be
-                // re-registered to apply to incognito tabs
-                chrome.extension.isAllowedIncognitoAccess((isAllowedAccess) => {
-                    if (isAllowedAccess && !Config.config!.lastIncognitoStatus) {
-                        registerNeededContentScripts(undefined, true).catch(logError);
-                    }
-        
-                    Config.config!.lastIncognitoStatus = isAllowedAccess;
-                });
-            }
-        }).catch(logError);
+        registerNeededContentScripts().catch(logError);
     }
 
     setupAlarms();
