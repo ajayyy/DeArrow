@@ -17,6 +17,12 @@
     object-fit: cover;
 }
 
+/* Used to fix tooltips having the wrong offset since image is still displayed when YouTube calculates it's offset */
+/* Since tooltips have multiple uses, it becomes the play button tooltip */
+.ytp-tooltip:not(.ytp-text-detail) .cbCustomThumbnailCanvas {
+    display: none;
+}
+
 .cbThumbnail {
     position: relative;
     flex: 0 0 20%;

@@ -25,6 +25,8 @@ export async function replaceVideoPlayerSuggestionsBranding(): Promise<void> {
         replaceEmbedSuggestionsBranding().catch(logError);
     }
 
+    replaceUpNextButtonBranding().catch(logError);
+    
     const refNode = await waitForElement("#movie_player", true);
 
     if (!mutationObserver || observerElement !== refNode) {
@@ -98,6 +100,64 @@ async function replaceEmbedSuggestionsBranding(): Promise<void> {
         }
     }
 }
+
+/**
+ * Appears when hovering next button next to play button in player
+ */
+let upNextMutationObserver: MutationObserver | null = null;
+let observingElement: HTMLElement | null = null;
+async function replaceUpNextButtonBranding(element?: HTMLElement): Promise<void> {
+    const refNode = element ?? (await waitForElement(".ytp-tooltip-text-wrapper")).parentElement;
+    if (!refNode) return;
+
+    if (observingElement === refNode) return;
+    observingElement = refNode as HTMLElement;
+    
+    if (upNextMutationObserver) {
+        upNextMutationObserver.disconnect();
+    }
+
+    let tooltipModified = false;
+    const handleTooltipRemoved = () => {
+        if (tooltipModified) {
+            tooltipModified = false;
+            const elementsToDelete = refNode.querySelectorAll(".cbCustomTitle, .cbShowOriginal, .cbCustomThumbnailCanvas");
+            for (const element of elementsToDelete) {
+                element.remove();
+            }
+
+            const elementsToUnhide = refNode.querySelectorAll(".ytp-tooltip-text-no-title, .ytp-tooltip-bg") as NodeListOf<HTMLElement>;
+            for (const element of elementsToUnhide) {
+                element.style.removeProperty("display");
+            }
+        }
+    }
+
+    upNextMutationObserver = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            if (mutation.type === "attributes" && mutation.attributeName === "class") {
+                if (refNode.classList.contains("ytp-text-detail")) {
+                    tooltipModified = true;
+
+                    // The tooltip has become an up next preview (normally it is the hover preview for scrubbing the video)
+                    replaceVideoCardBranding(refNode as HTMLElement, BrandingLocation.UpNextPreview).catch(logError);
+                } else {
+                    handleTooltipRemoved();
+                }
+
+                break;
+            } else if (mutation.attributeName === "style" && refNode.style.display === "none") {
+                handleTooltipRemoved();
+                break;
+            }
+        }
+    });
+
+    upNextMutationObserver.observe(refNode, {
+        attributes: true
+    });
+}
+
 
 export function setupAutoplayObserver(element: HTMLElement): void {
     const refNode = element.querySelector(".ytp-autonav-endscreen-video-info") as HTMLElement;

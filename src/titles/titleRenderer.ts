@@ -229,6 +229,11 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
             return [".ytp-videowall-still-info-title"];
         case BrandingLocation.EmbedSuggestions:
             return [".ytp-suggestion-title"];
+        case  BrandingLocation.UpNextPreview:
+            return [
+                ".ytp-tooltip-text-no-title",
+                ".ytp-tooltip-text"
+            ];
         default:
             throw new Error("Invalid branding location");
     }
@@ -269,11 +274,13 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
         const smallBrandingBox = !!titleElement.closest("ytd-grid-video-renderer");
 
         // To be able to show the show original button in the right place
-        titleElement.parentElement!.style.display = "flex";
-        titleElement.parentElement!.style.alignItems = "flex-start";
-        if (onMobile()) titleElement.parentElement!.style.alignItems = "normal";
-        titleElement.parentElement!.style.justifyContent = "space-between";
-        titleElement.parentElement!.style.width = "100%";
+        if (brandingLocation !== BrandingLocation.UpNextPreview) {
+            titleElement.parentElement!.style.display = "flex";
+            titleElement.parentElement!.style.alignItems = "flex-start";
+            if (onMobile()) titleElement.parentElement!.style.alignItems = "normal";
+            titleElement.parentElement!.style.justifyContent = "space-between";
+            titleElement.parentElement!.style.width = "100%";
+        }
 
         if (brandingLocation === BrandingLocation.Related) {
             // Move badges out of centered div
@@ -373,6 +380,10 @@ export async function findOrCreateShowOriginalButton(element: HTMLElement, brand
 
     buttonElement.setAttribute("videoID", videoID);
     buttonElement.style.removeProperty("display");
+
+    if (brandingLocation === BrandingLocation.UpNextPreview) {
+        buttonElement.style.setProperty("display", "none", "important");
+    }
     return buttonElement;
 }
 

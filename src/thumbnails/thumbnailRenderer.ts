@@ -461,6 +461,8 @@ function getThumbnailSelector(brandingLocation: BrandingLocation): string {
             return ".ytp-suggestion-image";
         case BrandingLocation.Watch:
             return ".ytp-cued-thumbnail-overlay-image";
+        case  BrandingLocation.UpNextPreview:
+            return ".ytp-tooltip-bg";
         default:
             throw new Error("Invalid branding location");
     }
@@ -475,6 +477,7 @@ function getThumbnailBox(image: HTMLElement, brandingLocation: BrandingLocation)
                 return image;
             }
         case BrandingLocation.Autoplay:
+        case BrandingLocation.UpNextPreview:
             return image;
         default:
             return image.parentElement!;
@@ -630,11 +633,13 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                 thumbnail.style.marginRight = "auto";
             } else if (brandingLocation === BrandingLocation.Autoplay) {
                 thumbnail.classList.add("ytp-autonav-endscreen-upnext-thumbnail");
+            } else if (brandingLocation === BrandingLocation.UpNextPreview) {
+                thumbnail.classList.add("ytp-tooltip-bg");
             }
 
             thumbnail.style.height = "100%";
 
-            if (brandingLocation === BrandingLocation.EmbedSuggestions) {
+            if ([BrandingLocation.EmbedSuggestions, BrandingLocation.UpNextPreview].includes(brandingLocation)) {
                 thumbnail.style.width = image.style.width;
                 thumbnail.style.height = image.style.height;
             }

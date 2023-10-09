@@ -30,7 +30,8 @@ export enum BrandingLocation {
     Endcards,
     Autoplay,
     EndRecommendations,
-    EmbedSuggestions
+    EmbedSuggestions,
+    UpNextPreview
 }
 
 export type ShowCustomBrandingInfo = {
@@ -220,8 +221,8 @@ export function getLinkElement(element: HTMLElement, brandingLocation: BrandingL
         case BrandingLocation.Autoplay:
             return element.querySelector("a.ytp-autonav-endscreen-link-container") as HTMLAnchorElement;
         case BrandingLocation.EndRecommendations:
-            return element as HTMLAnchorElement;
         case BrandingLocation.EmbedSuggestions:
+        case BrandingLocation.UpNextPreview:
             return element as HTMLAnchorElement;
         default:
             throw new Error("Invalid branding location");
@@ -233,17 +234,25 @@ async function extractVideoID(link: HTMLAnchorElement) {
     let videoID = (videoIDRegex?.[1] || videoIDRegex?.[2]) as VideoID;
 
     if (!videoID) {
-        const image = link.querySelector("yt-image img, img.video-thumbnail-img") as HTMLImageElement;
-        if (image) {
-            let href = image.getAttribute("src");
-            if (!href) {
-                // wait source to be setup
-                await waitForImageSrc(image);
-                href = image.getAttribute("src");
-            }
-
+        const imgBackground = link.querySelector(".ytp-tooltip-bg") as HTMLElement;
+        if (imgBackground) {
+            const href = imgBackground.style.backgroundImage?.match(/url\("(.+)"\)/)?.[1];
             if (href) {
                 videoID = href.match(/\/vi\/(\S{11})/)?.[1] as VideoID;
+            }
+        } else {
+            const image = link.querySelector("yt-image img, img.video-thumbnail-img") as HTMLImageElement;
+            if (image) {
+                let href = image.getAttribute("src");
+                if (!href) {
+                    // wait source to be setup
+                    await waitForImageSrc(image);
+                    href = image.getAttribute("src");
+                }
+    
+                if (href) {
+                    videoID = href.match(/\/vi\/(\S{11})/)?.[1] as VideoID;
+                }
             }
         }
     }
