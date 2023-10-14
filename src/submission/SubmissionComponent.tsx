@@ -123,6 +123,9 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
     };
     const titleChangeListener = React.useRef<() => void>(() => videoChangeListener());
 
+    // Used to warn submitter to maybe not submit the original thumbnail
+    const isAbTestedThumbnail = React.useRef<boolean | null>(null);
+
     React.useEffect(() => {
         if (titleChangeListener.current) {
             removeTitleChangeListener(titleChangeListener.current);
@@ -191,6 +194,10 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                                     selectedIndex = defaultThumbnails.length + extraUnsubmitted;
                                 }
                             }
+                        }
+
+                        if (t.original) {
+                            handleAbTestedThumbnailWarning(props.videoID, isAbTestedThumbnail).catch(logError);
                         }
 
                         setSelectedThumbnailIndex(selectedIndex);
@@ -301,6 +308,17 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
         </div>
     );
 };
+
+async function handleAbTestedThumbnailWarning(videoID: string, isAbTestedThumbnail: React.MutableRefObject<boolean | null>) {
+    if (isAbTestedThumbnail.current === null) {
+        const request = await fetch(`https://i.ytimg.com/vi/${videoID}/mqdefault_custom_1.jpg`);
+        isAbTestedThumbnail.current = request.ok;
+    }
+
+    if (isAbTestedThumbnail.current) {
+        alert(chrome.i18n.getMessage("abThumbnailsWarning"));
+    }
+}
 
 function updateUnsubmitted(unsubmitted: UnsubmittedSubmission,
         setExtraUnsubmittedThumbnails: React.Dispatch<React.SetStateAction<RenderedThumbnailSubmission[]>>,
