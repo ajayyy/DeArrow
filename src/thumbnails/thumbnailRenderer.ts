@@ -722,6 +722,23 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
     }
 
     resetBackgroundColor(image, brandingLocation);
+
+    if (Config.config!.extensionEnabled 
+            && Config.config!.ignoreAbThumbnails) {
+        if (image.src) {
+            removeAbThumbnail(image);
+        } else {
+            waitFor(() => !!image.src, 500).then(() => {
+                removeAbThumbnail(image);
+            }).catch(logError);
+        }
+    }
+}
+
+function removeAbThumbnail(image: HTMLImageElement): void {
+    if (image.src?.includes?.("_custom_")) {
+        image.src = image.src.replace(/_custom_\d+/, "");
+    }
 }
 
 function resetToBlankThumbnail(image: HTMLImageElement, brandingLocation: BrandingLocation) {
