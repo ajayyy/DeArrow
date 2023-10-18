@@ -398,7 +398,7 @@ function startOfSentence(index: number, words: string[]): boolean {
 }
 
 function isDelimeter(word: string): boolean {
-    return (word.match(/^[-:;~—|]$/) !== null 
+    return (word.match(/^[-:;~—–|]$/) !== null 
         || word.match(/[:?.!\]]$/) !== null)
         && !listHasWord(allowlistedWords, word)
         && !listHasWord(notStartOfSentence, word)
