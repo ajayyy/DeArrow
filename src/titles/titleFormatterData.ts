@@ -183,6 +183,7 @@ export const allowlistedWords = new Set([
     "CSGO",
     "SCART",
     "ASMR",
+    "CNBC"
 ]);
 
 export const acronymBlocklist = new Set([
