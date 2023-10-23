@@ -66,7 +66,7 @@ describe("isMostlyAllCaps", () => {
 
 describe("isInTitleCase", () => {
     const inTitleCaseCases: [string[], boolean][] = [
-        [["Go", "on", "the", "Table", "With", "a", "Cat"], true],
+        [["Go", "on", "the", "Table", "with", "a", "Cat"], true],
         [["Go", "on", "the", "table", "with", "a", "cat"], false],
     ];
     for (const testCase of inTitleCaseCases) {
@@ -92,14 +92,14 @@ describe("toCapitalizeCase", () => {
 
 describe("toTitleCase", () => {
     const titleCases: [string, string][] = [
-        ["Go on the table with a cat", "Go on the Table With a Cat"],
-        ["Go On The Table With A Cat", "Go on the Table With a Cat"],
+        ["Go on the table with a cat", "Go on the Table with a Cat"],
+        ["Go On The Table With A Cat", "Go on the Table with a Cat"],
         ["5 Minute Timer [MOUSE MAZE] 🐭", "5 Minute Timer [Mouse Maze] 🐭"],
         ["AWESOME ART TRICKS and EASY DRAWING HACKS", "Awesome Art Tricks and Easy Drawing Hacks"],
         ["5 min countdown timer (roller coaster) 🎢", "5 Min Countdown Timer (Roller Coaster) 🎢"],
-        ["5 min COUNTDOWN timer from U.S.A (roller coaster) 🎢", "5 Min Countdown Timer From U.S.A (Roller Coaster) 🎢"],
+        ["5 min COUNTDOWN timer from U.S.A (roller coaster) 🎢", "5 Min Countdown Timer from U.S.A (Roller Coaster) 🎢"],
         ["Going somewhere [U.S.A is the place]", "Going Somewhere [U.S.A Is the Place]"],
-        ["The car is from the U.S.A", "The Car Is From the U.S.A"],
+        ["The car is from the U.S.A", "The Car Is from the U.S.A"],
         ["When I WENT TO The Store", "When I Went to the Store"],
         ["Something happened in the 2000s", "Something Happened in the 2000s"],
         ["USB-C AirPods Pro Kit - Assembly Guide", "USB-C AirPods Pro Kit - Assembly Guide"],
@@ -169,6 +169,7 @@ describe("toSentenceCase", () => {
         ["Go on the table with a cat", "Go on the table with a cat"],
         ["Go On The Table With A Cat", "Go on the table with a cat"],
         ["Go On The Table With A Cat From The U.S", "Go on the table with a cat from the U.S"],
+        ["Go on the Table with a Cat", "Go on the table with a cat"],
         ["Go on the table with a cat named Pat", "Go on the table with a cat named Pat"],
         ["Go on the table with a cat named Pat from the U.S", "Go on the table with a cat named Pat from the U.S"],
         ["5 Minute Spring Timer (2021)", "5 minute spring timer (2021)"],
