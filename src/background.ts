@@ -51,6 +51,7 @@ waitFor(() => Config.isReady()).then(() => {
                 const paywallEnabled = !CompileConfig["freeAccess"]
                     && !navigator.userAgent.includes("Mobile;")
                     && !navigator.userAgent.includes("iPhone;")
+                    && !navigator.userAgent.includes("iPad;")
                     && await isPaywallEnabled()
                     && !groupPolicyLicenseKey
                     && !Config.config!.licenseKey
