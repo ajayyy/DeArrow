@@ -16,8 +16,6 @@ export const titleCaseNotCapitalized = new Set([
     "to",
     "from",
     "into",
-    "like",
-    "over",
     "with",
     "w/",
     "upon",
