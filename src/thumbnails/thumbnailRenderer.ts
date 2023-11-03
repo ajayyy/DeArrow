@@ -730,7 +730,7 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
         } else {
             waitFor(() => !!image.src, 500).then(() => {
                 removeAbThumbnail(image);
-            }).catch(logError);
+            }).catch(() => ({}));
         }
     }
 }
