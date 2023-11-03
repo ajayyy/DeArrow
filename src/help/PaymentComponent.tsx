@@ -59,6 +59,8 @@ export const PaymentComponent = () => {
         const validLicenseKey = choices.licenseKey && await shouldAllowLicenseKey(choices.licenseKey);
         if (validLicenseKey) {
             Config.config!.licenseKey = choices.licenseKey!;
+        } else if (choices.licenseKey) {
+            alert(chrome.i18n.getMessage("redeemFailed"));
         }
 
         if (choices.freeAccess) {
