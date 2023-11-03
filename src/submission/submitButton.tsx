@@ -88,7 +88,7 @@ export class SubmitButton {
     }
 
     async openOrClose(): Promise<void> {
-        const referenceNode = await getOrCreateTitleButtonContainer();
+        const referenceNode = this.button?.parentElement ?? await getOrCreateTitleButtonContainer();
         if (!referenceNode) return;
 
         let popupNode = onMobile() 
