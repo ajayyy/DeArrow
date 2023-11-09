@@ -20,7 +20,7 @@
     "@types/wicg-mediasession": "^1.1.4",
     "@typescript-eslint/eslint-plugin": "^5.39.0",
     "@typescript-eslint/parser": "^5.39.0",
-    "chromedriver": "^106.0.1",
+    "chromedriver": "^119.0.1",
     "concurrently": "^7.4.0",
     "copy-webpack-plugin": "^11.0.0",
     "eslint": "^8.24.0",
