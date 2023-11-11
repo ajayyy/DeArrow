@@ -215,7 +215,8 @@ export const acronymBlocklist = new Set([
     "pro",
     "why",
     "did",
-    "now"
+    "now",
+    "too"
 ]);
 
 export const notStartOfSentence = new Set([
