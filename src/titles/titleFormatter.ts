@@ -275,7 +275,17 @@ function isWordCustomCapitalization(word: string): boolean {
     if (!capitalMatch) return false;
 
     const capitalNumber = capitalMatch.length;
-    return capitalNumber > 1 || (capitalNumber === 1 && !isFirstLetterCapital(word));
+    return capitalNumber > 1 || (capitalNumber === 1 && !isFirstLetterCapital(word) && !isHyphenatedFirstLetterCapital(word));
+}
+
+/**
+ * non-Newtonian
+ * Non-Newtonian
+ * 
+ * If the only capitals are after the dash
+ */
+function isHyphenatedFirstLetterCapital(word: string): boolean {
+    return !!word.match(/^[\p{L}]{2,}-[\p{Lu}][\p{Ll}]+$/u);
 }
 
 /**
