@@ -10,6 +10,7 @@
   <a href="https://addons.mozilla.org/en-US/firefox/addon/dearrow/">Firefox</a> |
   <a href="https://apps.apple.com/app/dearrow-for-youtube/id6451469297">Safari for MacOS and iOS</a> |
   <a href="https://github.com/ajayyy/DeArrow/wiki/Android">Android</a> |
+  <a href="https://dearrow.ajay.app/payment">Buy</a> |
   <a href="https://dearrow.ajay.app">Website</a> |
   <a href="https://dearrow.ajay.app/stats">Stats</a>
 </p>
