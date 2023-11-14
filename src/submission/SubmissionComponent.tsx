@@ -442,14 +442,14 @@ function createWarningTooltip(reason: string, name: ChatDisplayName) {
                         alert(`${chrome.i18n.getMessage("warningError")} ${result.status}`);
                     }
                 }
-        }, {
-            name: chrome.i18n.getMessage("questionButton"),
-            listener: () => window.open(`https://chat.sponsor.ajay.app/#${objectToURI("", {
-                displayName: getChatDisplayName(name),
-                customDescription: `${chrome.i18n.getMessage("chatboxDescription")}\n\nhttps://discord.gg/SponsorBlock\nhttps://matrix.to/#/#sponsor:ajay.app?via=matrix.org`,
-                bigDescription: true
-            }, false)}`)
-        }],
+            }, {
+                name: chrome.i18n.getMessage("questionButton"),
+                listener: () => window.open(`https://chat.sponsor.ajay.app/#${objectToURI("", {
+                    displayName: getChatDisplayName(name),
+                    customDescription: `${chrome.i18n.getMessage("chatboxDescription")}\n\nhttps://discord.gg/SponsorBlock\nhttps://matrix.to/#/#sponsor:ajay.app?via=matrix.org`,
+                    bigDescription: true
+                }, false)}`)
+            }],
         });
     }
 }
