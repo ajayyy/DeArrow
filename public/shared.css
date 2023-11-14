@@ -290,7 +290,6 @@ input:checked + .sb-slider:before {
 
 .license-key-text {
     font-size: 10px;
-    color: white;
 
     width: fit-content;
     margin: auto;
