@@ -217,6 +217,18 @@ describe("toSentenceCase", () => {
     }
 });
 
+describe("toSentenceCase cleanEmojis", () => {
+    const titleCases: [string, string][] = [
+        ["🚨 Announcement: New Series Coming!", "Announcement: New series coming"],
+    ];
+    for (const testCase of titleCases) {
+        const [input, expected] = testCase;
+        it(input, async () => {
+            expect(await formatTitleInternal(input, false, TitleFormatting.SentenceCase, true)).toBe(expected);
+        });
+    }
+});
+
 // Custom cases that should be retained as-is
 describe("titleFormatter custom cases", () => {
     // original, title, sentence
