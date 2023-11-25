@@ -49,7 +49,20 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     hideOriginalTitle(element, brandingLocation);
 
     try {
-        const titleData = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
+        const titleDataPromise = getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
+        // Wait for whatever is first
+        await Promise.race([
+            titleDataPromise,
+            shouldReplaceTitles(videoID)
+        ]);
+
+        if (shouldReplaceTitlesFastCheck(videoID) === false) {
+            showOriginalTitle(element, brandingLocation);
+            return false;
+        }
+
+        // Will keep waiting for the title if the channel check finished first
+        const titleData = await titleDataPromise;
         if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
 
         const title = titleData?.title;
