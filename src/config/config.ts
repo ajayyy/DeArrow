@@ -201,5 +201,5 @@ const localDefaults = {
     unsubmitted: {}
 };
 
-const Config = new ConfigClass(syncDefaults, localDefaults, migrateOldSyncFormats);
+const Config = new ConfigClass(syncDefaults, localDefaults, migrateOldSyncFormats, true);
 export default Config;
