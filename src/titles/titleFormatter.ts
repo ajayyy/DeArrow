@@ -59,7 +59,7 @@ export async function toLowerCaseTitle(str: string): Promise<string> {
 
     let result = "";
     for (const word of words) {
-        if (forceKeepFormatting(word) || (!isGreek && await greekLetterAllowed(word))) {
+        if (!isGreek && await greekLetterAllowed(word)) {
             result += word + " ";
         } else {
             result += await toLowerCase(word, isTurkiq) + " ";
@@ -76,7 +76,7 @@ export async function toFirstLetterUppercase(str: string): Promise<string> {
     let result = "";
     let index = 0;
     for (const word of words) {
-        if (forceKeepFormatting(word) || (!isGreek && await greekLetterAllowed(word))) {
+        if (!isGreek && await greekLetterAllowed(word)) {
             result += word + " ";
         } else if (startOfSentence(index, words) && !isNumberThenLetter(word)) {
             result += await capitalizeFirstLetter(word, isTurkiq) + " ";
