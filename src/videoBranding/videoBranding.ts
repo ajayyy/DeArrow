@@ -154,7 +154,7 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
 
     if (link) {
         const videoID = await extractVideoID(link);
-        const isPlaylistOrClipTitleStatus = isPlaylistOrClipTitle(link);
+        const isPlaylistOrClipTitleStatus = isPlaylistOrClipTitle(element, link);
         const isMovie = element.nodeName.includes("MOVIE");
 
         if (verifyVideoID && videoID !== verifyVideoID) {
@@ -269,8 +269,10 @@ export async function extractVideoIDFromElement(element: HTMLElement, brandingLo
     }
 }
 
-function isPlaylistOrClipTitle(link: HTMLAnchorElement) {
-    return (link.href?.match(/list=/)?.[0] !== undefined && link.href?.match(/index=/)?.[0] === undefined)
+function isPlaylistOrClipTitle(element: HTMLElement, link: HTMLAnchorElement) {
+    return (link.href?.match(/list=/)?.[0] !== undefined 
+            && link.href?.match(/index=/)?.[0] === undefined
+            && element.nodeName !== "YTD-RICH-GRID-MEDIA")
         || link.href?.match(/\/clip\//)?.[0] !== undefined;
 }
 
