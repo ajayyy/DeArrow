@@ -97,9 +97,14 @@ async function init() {
         if (dependentOn)
             isDependentOnReversed = dependentOn.getAttribute("data-toggle-type") === "reverse" || optionsElements[i].getAttribute("data-dependent-on-inverted") === "true";
 
-        if (await shouldHideOption(optionsElements[i]) || (dependentOn && (isDependentOnReversed ? Config.config![dependentOnName] : !Config.config![dependentOnName]))) {
+        const dependOnSelectorName = optionsElements[i].getAttribute("data-dependent-on-selector");
+        const dependOnSelectorValue = optionsElements[i].getAttribute("data-dependent-on-selector-value");
+
+        if (await shouldHideOption(optionsElements[i]) 
+                || (dependentOn && (isDependentOnReversed ? Config.config![dependentOnName] : !Config.config![dependentOnName]))
+                || (dependOnSelectorName && dependOnSelectorValue && String(Config.config![dependOnSelectorName]) !== dependOnSelectorValue)) {
             optionsElements[i].classList.add("hidden", "hiding");
-            if (!dependentOn)
+            if (!dependentOn && !dependOnSelectorName)
                 continue;
         }
 
@@ -296,11 +301,25 @@ async function init() {
                 const selectorElement = optionsElements[i].querySelector(".selector-element") as HTMLSelectElement;
                 selectorElement.value = configValue;
 
-                selectorElement.addEventListener("change", () => {
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                selectorElement.addEventListener("change", async () => {
                     let value: string | number = selectorElement.value;
                     if (!isNaN(Number(value))) value = Number(value);
 
                     Config.config![option] = value;
+
+                    // If other options depend on this, hide/show them
+                    const dependents = optionsContainer.querySelectorAll(`[data-dependent-on-selector='${option}']`);
+                    for (let j = 0; j < dependents.length; j++) {
+                        const dependOnValue = dependents[j].getAttribute("data-dependent-on-selector-value");
+                        if (!await shouldHideOption(dependents[j]) && String(value) === dependOnValue) {
+                            dependents[j].classList.remove("hidden");
+                            setTimeout(() => dependents[j].classList.remove("hiding"), 1);
+                        } else {
+                            dependents[j].classList.add("hiding");
+                            setTimeout(() => dependents[j].classList.add("hidden"), 400);
+                        }
+                    }
                 });
                 break;
             }

@@ -79,6 +79,7 @@ interface SBConfig {
     keepUnsubmittedInPrivate: boolean;
     titleFormatting: TitleFormatting;
     shouldCleanEmojis: boolean;
+    onlyTitleCaseInEnglish: boolean;
     serverAddress: string;
     thumbnailServerAddress: string;
     fetchTimeout: number;
@@ -157,6 +158,7 @@ const syncDefaults = {
     keepUnsubmittedInPrivate: false,
     titleFormatting: isEnglish ? TitleFormatting.TitleCase : TitleFormatting.Disable,
     shouldCleanEmojis: true,
+    onlyTitleCaseInEnglish: false,
     serverAddress: CompileConfig.serverAddress,
     thumbnailServerAddress: CompileConfig.thumbnailServerAddress,
     fetchTimeout: 7000,
