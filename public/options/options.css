@@ -800,3 +800,7 @@ svg {
 #licenseKeyButton {
     cursor: pointer;
 }
+
+.extra-top-padding {
+    padding-top: 20px;
+}
