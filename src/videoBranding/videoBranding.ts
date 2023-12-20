@@ -163,6 +163,8 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
             return [false, false];
         }
 
+        handleMixes(element, link);
+
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
             async () => { await replaceVideoCardBranding(element, brandingLocation, videoID); });
         const showCustomBranding = videoBrandingInstance.showCustomBranding;
@@ -275,6 +277,16 @@ function isPlaylistOrClipTitle(element: HTMLElement, link: HTMLAnchorElement) {
             && link.href?.match(/index=/)?.[0] === undefined
             && element.nodeName !== "YTD-RICH-GRID-MEDIA")
         || link.href?.match(/\/clip\//)?.[0] !== undefined;
+}
+
+function handleMixes(element: HTMLElement, link: HTMLAnchorElement): void {
+    const isMix = !!element.querySelector("yt-collections-stack");
+
+    if (isMix) {
+        link.classList.add("cbMixBg");
+    } else {
+        link.classList.remove("cbMixBg");
+    }
 }
 
 export async function handleShowOriginalButton(element: HTMLElement, videoID: VideoID,

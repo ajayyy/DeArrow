@@ -135,6 +135,11 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     cursor: pointer;
 }
 
+/* For mixes to have background as they have card stacks displying behind them */
+.cbMixBg {
+    background-color: black;
+}
+
 .cbBrandingPreview .cbThumbnailImg {
     cursor: default;
 }
