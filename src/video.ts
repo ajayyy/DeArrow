@@ -94,7 +94,8 @@ export function setupCBVideoModule(): void {
         resetValues,
         windowListenerHandler,
         newVideosLoaded,
-        documentScript: chrome.runtime.getManifest().manifest_version === 2 ? documentScript : undefined
+        documentScript: chrome.runtime.getManifest().manifest_version === 2 ? documentScript : undefined,
+        allowClipPage: true
     }, () => Config);
 
     if (onMobile()) {

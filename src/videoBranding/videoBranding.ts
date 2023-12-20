@@ -60,18 +60,19 @@ const threeRingLogo = chrome.runtime.getURL("icons/logo.svg");
 const videoBrandingInstances: Record<VideoID, VideoBrandingInstance> = {}
 
 export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]> {
-    const onWatchPage = document.URL.includes("/watch");
+    const onClipPage = document.URL.includes("/clip/");
+    const onWatchPage = document.URL.includes("/watch") || onClipPage;
     const onEmbedPage = document.URL.includes("/embed/");
     const possibleSelectors = getPossibleSelectors(onWatchPage, onEmbedPage);
 
     // Find first invisible one, or wait for the first one to be visible
     const mainTitle = possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility) as HTMLElement).filter((element) => isVisible(element))[0] || 
-        await waitForElement(possibleSelectors[0].selector, true) as HTMLElement;
-    const titles = (possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility)).filter((e) => !!e)) as HTMLElement[];
+        await waitForElement(possibleSelectors[0].selector, !onClipPage) as HTMLElement;
+    const titles = (possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility && !onClipPage)).filter((e) => !!e)) as HTMLElement[];
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
     const videoID = getVideoID();
 
-    if (videoID !== null && isVisible(mainTitle)) {
+    if (videoID !== null && (isVisible(mainTitle) || onClipPage)) {
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
             async () => { await replaceCurrentVideoBranding(); });
         const brandingLocation = BrandingLocation.Watch;
