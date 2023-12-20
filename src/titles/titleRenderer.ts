@@ -152,6 +152,12 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
     titleElement.style.display = "none";
     originalTitleElement.style.setProperty("display", "-webkit-box", "important");
 
+    if (Config.config!.showOriginalOnHover) {
+        findShowOriginalButton(originalTitleElement, brandingLocation).then((buttonElement) => {
+            buttonElement.title = originalTitleElement.textContent ?? "";
+        }).catch(logError);
+    }
+
     switch(brandingLocation) {
         case BrandingLocation.Watch: {
             if (originalTitleElement.classList.contains("ytd-miniplayer")) {
@@ -185,6 +191,12 @@ function showCustomTitle(element: HTMLElement, brandingLocation: BrandingLocatio
         if (href) {
             titleElement.setAttribute("href", href);
         }
+    }
+
+    if (Config.config!.showOriginalOnHover) {
+        findShowOriginalButton(originalTitleElement, brandingLocation).then((buttonElement) => {
+            buttonElement.title = titleElement.textContent ?? "";
+        }).catch(logError);
     }
 
     switch(brandingLocation) {
