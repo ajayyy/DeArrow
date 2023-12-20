@@ -150,7 +150,7 @@ export async function toTitleCase(str: string, isCustom: boolean): Promise<strin
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             result += word + " ";
-        } else if ((!Config.config!.onlyTitleCaseInEnglish || isEnglish)
+        } else if ((!Config.config?.onlyTitleCaseInEnglish || isEnglish)
                 && !startOfSentence(index, words) && listHasWord(titleCaseNotCapitalized, word.toLowerCase())) {
             // Skip lowercase check for the first word
             result += await toLowerCase(word, isTurkiq) + " ";
@@ -371,7 +371,7 @@ async function getLangInfo(str: string): Promise<{
         // Helps remove false positives
         isEnglish: !(!result.results[3] 
             && result.isReliable 
-            && Config.config!.onlyTitleCaseInEnglish // Only do further checks if enabled
+            && Config.config?.onlyTitleCaseInEnglish // Only do further checks if enabled
             && result.topLanguage === ((await checkLanguages(str.replace(/[^ ]+$/, ""), [], threshold)).topLanguage))
     }
 }
