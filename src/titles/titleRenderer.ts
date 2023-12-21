@@ -154,7 +154,9 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
 
     if (Config.config!.showOriginalOnHover) {
         findShowOriginalButton(originalTitleElement, brandingLocation).then((buttonElement) => {
-            buttonElement.title = originalTitleElement.textContent ?? "";
+            if (buttonElement) {
+                buttonElement.title = originalTitleElement.textContent ?? "";
+            }
         }).catch(logError);
     }
 
@@ -195,7 +197,9 @@ function showCustomTitle(element: HTMLElement, brandingLocation: BrandingLocatio
 
     if (Config.config!.showOriginalOnHover) {
         findShowOriginalButton(originalTitleElement, brandingLocation).then((buttonElement) => {
-            buttonElement.title = titleElement.textContent ?? "";
+            if (buttonElement) {
+                buttonElement.title = titleElement.textContent ?? "";
+            }
         }).catch(logError);
     }
 
