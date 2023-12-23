@@ -137,6 +137,10 @@ class ConfigClass extends ProtoConfig<SBConfig, SBStorage> {
             freeAccessRequestStart: this.config!.freeAccessRequestStart,
             firefoxOldContentScriptRegistration: this.config!.firefoxOldContentScriptRegistration
         }).catch(logError);
+
+        chrome.storage.local.set({
+            ...this.localDefaults,
+        }).catch(logError);
     }
 }
 
