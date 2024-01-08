@@ -1,5 +1,5 @@
 import { VideoID, getVideoID } from "../maze-utils/src/video";
-import { ThumbnailResult, ThumbnailSubmission, fetchVideoMetadata } from "./thumbnails/thumbnailData";
+import { ThumbnailSubmission, ThumbnailWithRandomTimeResult, fetchVideoMetadata } from "./thumbnails/thumbnailData";
 import { TitleResult, TitleSubmission } from "./titles/titleData";
 import { FetchResponse, sendRealRequestToCustomServer } from "../maze-utils/src/background-request-proxy";
 import { BrandingLocation, BrandingResult, updateBrandingForVideo } from "./videoBranding/videoBranding";
@@ -36,14 +36,15 @@ const activeRequests: Record<VideoID, Promise<Record<VideoID, BrandingResult> | 
 const activeThumbnailCacheRequests: Record<VideoID, ActiveThumbnailCacheRequestInfo> = {};
 
 export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, brandingLocation?: BrandingLocation,
-        returnRandomTime = true): Promise<ThumbnailResult | null> {
+        returnRandomTime = true): Promise<ThumbnailWithRandomTimeResult | null> {
     const unsubmitted = Config.local!.unsubmitted[videoID]?.thumbnails?.find(t => t.selected);
     if (unsubmitted) {
         return {
             ...unsubmitted,
             votes: 0,
             locked: false,
-            UUID: generateUserID() as BrandingUUID
+            UUID: generateUserID() as BrandingUUID,
+            isRandomTime: false
         };
     }
 
@@ -59,7 +60,8 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
                     votes: 0,
                     locked: false,
                     timestamp: timestamp,
-                    original: false
+                    original: false,
+                    isRandomTime: true
                 };
             } else {
                 return null;
@@ -68,7 +70,10 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
             return null;
         }
     } else {
-        return result;
+        return {
+            ...result,
+            isRandomTime: false
+        };
     }
 }
 
