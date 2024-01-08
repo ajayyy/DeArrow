@@ -38,12 +38,14 @@ interface InnerTubeFormat {
     mimeType: string;
 }
 
+
 interface InnerTubeMetadataBase {
     duration: number | null;
     channelID: string | null;
     author: string | null;
     isLive: boolean | null;
     isUpcoming: boolean | null;
+    playabilityStatus?: string;
 }
 
 interface InnerTubeMetadata extends InnerTubeMetadataBase {
@@ -71,9 +73,12 @@ export async function fetchVideoMetadata(videoID: VideoID, ignoreCache: boolean)
     try {
         const result = activeRequests[videoID] ?? (async () => {
             let metadata = await fetchVideoDataDesktopClient(videoID).catch(() => null);
-            if (!onMobile() && (!metadata || metadata.formats.length === 0)) metadata = await fetchVideoDataDesktopClient(videoID).catch(() => null);
 
-            if (metadata && metadata.formats.length > 0) {
+            // Don't retry for LOGIN_REQUIRED, they will never have urls
+            if (!onMobile() && (!metadata 
+                    || (metadata.formats.length === 0 && metadata.playabilityStatus !== "LOGIN_REQUIRED"))) metadata = await fetchVideoDataDesktopClient(videoID).catch(() => null);
+
+            if (metadata) {
                 let formats = metadata.formats;
                 if (isSafari()) {
                     formats = formats.filter((format) => format.mimeType.includes("avc"));
@@ -192,6 +197,7 @@ export async function fetchVideoDataAndroidClient(videoID: VideoID): Promise<Inn
             const author = response?.videoDetails?.author ?? null;
             const isLive = response?.videoDetails?.isLive ?? null;
             const isUpcoming = response?.videoDetails?.isUpcoming ?? null;
+            const playabilityStatus = response?.playabilityStatus?.status ?? null;
             if (formats) {
                 return {
                     formats,
@@ -199,7 +205,8 @@ export async function fetchVideoDataAndroidClient(videoID: VideoID): Promise<Inn
                     channelID: channelId,
                     author,
                     isLive,
-                    isUpcoming
+                    isUpcoming,
+                    playabilityStatus
                 };
             }
         }
@@ -251,22 +258,23 @@ export async function fetchVideoDataDesktopClient(videoID: VideoID): Promise<Inn
                 };
             }
 
-            const formats = response?.streamingData?.adaptiveFormats as InnerTubeFormat[];
+            const formats = response?.streamingData?.adaptiveFormats as InnerTubeFormat[] || [];
             const duration = response?.videoDetails?.lengthSeconds ? parseInt(response.videoDetails.lengthSeconds) : null;
             const channelId = response?.videoDetails?.channelId ?? null;
             const author = response?.videoDetails?.author ?? null;
             const isLive = response?.videoDetails?.isLive ?? null;
             const isUpcoming = response?.videoDetails?.isUpcoming ?? null;
-            if (formats) {
-                return {
-                    formats,
-                    duration,
-                    channelID: channelId,
-                    author,
-                    isLive,
-                    isUpcoming
-                };
-            }
+            const playabilityStatus = response?.playabilityStatus?.status ?? null;
+
+            return {
+                formats,
+                duration,
+                channelID: channelId,
+                author,
+                isLive,
+                isUpcoming,
+                playabilityStatus
+            };
         }
 
     } catch (e) { } //eslint-disable-line no-empty
