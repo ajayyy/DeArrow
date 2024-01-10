@@ -527,10 +527,10 @@ export function cleanEmojis(title: string): string {
 
     const cleaned = title
         // Clear extra spaces between emoji "words"
-        .replace(/ ((?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*)+(?= )/ug, "")
+        .replace(/ ((?=\p{Extended_Pictographic}|☆)(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*)+(?= )/ug, "")
         // Emojis in between letters should be spaces, varient selector is allowed before to allow B emoji
-        .replace(/(\p{L}|[\uFE0F\uFE0E🆎🆑])(?:(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*)+(\p{L}|[🅰🆎🅱🆑🅾])/ug, "$1 $2")
-        .replace(/(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*/ug, "")
+        .replace(/(\p{L}|[\uFE0F\uFE0E🆎🆑])(?:(?=\p{Extended_Pictographic}|☆)(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*)+(?=\p{L}|[🅰🆎🅱🆑🅾])/ug, "$1 ")
+        .replace(/(?=\p{Extended_Pictographic}|☆)(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*/ug, "")
         .trim();
 
     if (cleaned.length > 0) {
