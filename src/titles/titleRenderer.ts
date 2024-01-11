@@ -426,6 +426,12 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
     buttonElement.classList.add("cbShowOriginal");
     if (onMobile()) buttonElement.classList.add("cbMobileButton");
 
+    // Playlists and mixes on search page have extra margins that need to be applied to this new element
+    const originalMarginTop = getComputedStyle(originalTitleElement).marginTop;
+    if (originalMarginTop) {
+        buttonElement.style.marginTop = originalMarginTop;
+    }
+
     buttonElement.classList.add("cbButton");
     if (brandingLocation === BrandingLocation.Watch 
             || Config.config!.alwaysShowShowOriginalButton) {
