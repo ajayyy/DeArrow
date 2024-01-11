@@ -272,8 +272,7 @@ export async function extractVideoIDFromElement(element: HTMLElement, brandingLo
 
 function isPlaylistOrClipTitle(element: HTMLElement, link: HTMLAnchorElement) {
     return (link.href?.match(/list=/)?.[0] !== undefined 
-            && link.href?.match(/index=/)?.[0] === undefined
-            && element.nodeName !== "YTD-RICH-GRID-MEDIA")
+            && link.href?.match(/index=/)?.[0] === undefined)
         || link.href?.match(/\/clip\//)?.[0] !== undefined;
 }
 
