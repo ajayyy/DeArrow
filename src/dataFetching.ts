@@ -10,12 +10,12 @@ import { generateUserID } from "../maze-utils/src/setup";
 import { BrandingUUID } from "./videoBranding/videoBranding";
 import { objectToURI, timeoutPomise } from "../maze-utils/src";
 import { isCachedThumbnailLoaded, setupPreRenderedThumbnail, thumbnailCacheDownloaded } from "./thumbnails/thumbnailRenderer";
-import { setupCache } from "./thumbnails/thumbnailDataCache";
 import * as CompileConfig from "../config.json";
 import { alea } from "seedrandom";
 import { getThumbnailFallbackOption, getThumbnailFallbackOptionFastCheck, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "./config/channelOverrides";
 import { updateSubmitButton } from "./video";
 import { sendRequestToServer } from "./utils/requests";
+import { thumbnailDataCache } from "./thumbnails/thumbnailDataCache";
 
 interface VideoBrandingCacheRecord extends BrandingResult {
     lastUsed: number;
@@ -387,7 +387,7 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
         }
     
         if (time !== undefined && generateNow === true) {
-            const videoCache = setupCache(videoID);
+            const videoCache = thumbnailDataCache.setupCache(videoID);
             videoCache.thumbnailCachesFailed.add(time);
     
             // If the thumbs already failured rendering, send nulls

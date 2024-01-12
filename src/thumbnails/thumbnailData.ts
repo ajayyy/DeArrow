@@ -1,9 +1,10 @@
 import { BrandingUUID } from "../videoBranding/videoBranding";
-import { PlaybackUrl, cacheUsed, getFromCache, setupCache } from "./thumbnailDataCache";
 import { VideoID } from "../../maze-utils/src/video";
 import { log } from "../utils/logger";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { isSafari } from "../../maze-utils/src/config";
+import { ChannelData, PlaybackUrl, channelInfoCache, thumbnailDataCache } from "./thumbnailDataCache";
+import { ChannelID } from "../../maze-utils/lib/video";
 
 interface PartialThumbnailResult {
     votes: number;
@@ -44,7 +45,7 @@ interface InnerTubeFormat {
 
 interface InnerTubeMetadataBase {
     duration: number | null;
-    channelID: string | null;
+    channelID: ChannelID | null;
     author: string | null;
     isLive: boolean | null;
     isUpcoming: boolean | null;
@@ -66,7 +67,7 @@ export interface ChannelInfo {
 
 const activeRequests: Record<VideoID, Promise<VideoMetadata>> = {};
 export async function fetchVideoMetadata(videoID: VideoID, ignoreCache: boolean): Promise<VideoMetadata> {
-    const cachedData = getFromCache(videoID);
+    const cachedData = thumbnailDataCache.getFromCache(videoID);
     if (!ignoreCache && cachedData?.metadata && cachedData.metadata.duration !== null) {
         return cachedData.metadata;
     }
@@ -95,7 +96,7 @@ export async function fetchVideoMetadata(videoID: VideoID, ignoreCache: boolean)
                     .sort((a, b) => a?.width - b?.width);
 
                 log(videoID, (Date.now() - start) / 1000, "innerTube");
-                const videoCache = setupCache(videoID);
+                const videoCache = thumbnailDataCache.setupCache(videoID);
                 videoCache.metadata.playbackUrls = sorted.map((format) => ({
                     url: format.url,
                     width: format.width,
@@ -300,7 +301,7 @@ export async function getPlaybackFormats(videoID: VideoID,
         const bestFormat = formats?.playbackUrls?.find?.(f => f?.width >= width && f?.height >= height);
 
         if (bestFormat) {
-            cacheUsed(videoID);
+            thumbnailDataCache.cacheUsed(videoID);
 
             return bestFormat;
         }
@@ -328,7 +329,7 @@ export async function getChannelID(videoID: VideoID): Promise<ChannelInfo> {
 }
 
 export function getChannelIDSync(videoID: VideoID): ChannelInfo | null {
-    const cachedData = getFromCache(videoID);
+    const cachedData = thumbnailDataCache.getFromCache(videoID);
 
     if (cachedData?.metadata) {
         return {
@@ -347,4 +348,82 @@ export async function isLiveOrUpcoming(videoID: VideoID): Promise<boolean | null
     }
 
     return null;
+}
+
+const activeChannelRequests: Record<ChannelID, Promise<ChannelData>> = {};
+export async function fetchChannelnfo(channelID: ChannelID, ignoreCache: boolean): Promise<ChannelData> {
+    const cachedData = channelInfoCache.getFromCache(channelID);
+    if (!ignoreCache && cachedData?.avatarUrl) {
+        return cachedData;
+    }
+
+    try {
+        const result = activeChannelRequests[channelID] ?? (async () => {
+            const metadata = await fetchChannelDataDesktopClient(channelID).catch(() => null);
+            if (metadata) {
+                const channelInfo = channelInfoCache.setupCache(channelID);
+                channelInfo.avatarUrl = metadata.avatarUrl;
+
+                // Remove this from active requests after it's been dealt with in other places
+                setTimeout(() => delete activeChannelRequests[channelID], 500);
+
+                return channelInfo;
+            }
+
+            return [];
+        })();
+
+        activeChannelRequests[channelID] = result;
+        return await result;
+    } catch (e) { } //eslint-disable-line no-empty
+
+    return {
+        avatarUrl: null
+    };
+}
+
+export async function fetchChannelDataDesktopClient(channelID: ChannelID): Promise<ChannelData> {
+    const apiKey = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
+    const url = `https://www.youtube.com/youtubei/v1/browse?key=${apiKey}`;
+    const data = {
+        context: {
+            client: {
+                clientName: "WEB",
+                clientVersion: "2.20240111.00.00",
+                platform: "DESKTOP",
+            }
+        },
+        browseId: channelID,
+        params: "EgC4AQCSAwDyBgQKAjIA"
+    };
+
+    try {
+        const result = await fetch(url, {
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: "POST"
+        });
+
+        if (result.ok) {
+            const response = await result.json();
+            const newChannelID = response?.metadata?.channelMetadataRenderer?.externalId ?? null;
+            if (newChannelID !== channelID) {
+                return {
+                    avatarUrl: null
+                };
+            }
+
+            const avatarUrl = response?.metadata?.channelMetadataRenderer?.avatar?.thumbnails?.[0]?.url ?? null;
+            return {
+                avatarUrl
+            };
+        }
+
+    } catch (e) { } //eslint-disable-line no-empty
+
+    return {
+        avatarUrl: null
+    };
 }

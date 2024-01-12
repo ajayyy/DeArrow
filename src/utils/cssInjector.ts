@@ -85,7 +85,7 @@ function buildHideThumbnailCss(): string {
         }
     }
 
-    result.push(`${watchPageThumbnailSelector} div:not(.cb-visible)`);
+    result.push(`${watchPageThumbnailSelector} div:not(.cb-visible, .cbLiveCover)`);
 
     return `${result.join(", ")} { visibility: hidden !important; }\n`;
 }

@@ -99,10 +99,13 @@ async function init() {
 
         const dependOnSelectorName = optionsElements[i].getAttribute("data-dependent-on-selector");
         const dependOnSelectorValue = optionsElements[i].getAttribute("data-dependent-on-selector-value");
+        const dependOnSelectorValue2 = optionsElements[i].getAttribute("data-dependent-on-selector-value-2");
 
         if (await shouldHideOption(optionsElements[i]) 
                 || (dependentOn && (isDependentOnReversed ? Config.config![dependentOnName] : !Config.config![dependentOnName]))
-                || (dependOnSelectorName && dependOnSelectorValue && String(Config.config![dependOnSelectorName]) !== dependOnSelectorValue)) {
+                || (dependOnSelectorName && dependOnSelectorValue 
+                        && String(Config.config![dependOnSelectorName]) !== dependOnSelectorValue
+                        && (!dependOnSelectorValue2 || String(Config.config![dependOnSelectorName]) !== dependOnSelectorValue2))) {
             optionsElements[i].classList.add("hidden", "hiding");
             if (!dependentOn && !dependOnSelectorName)
                 continue;
@@ -312,7 +315,9 @@ async function init() {
                     const dependents = optionsContainer.querySelectorAll(`[data-dependent-on-selector='${option}']`);
                     for (let j = 0; j < dependents.length; j++) {
                         const dependOnValue = dependents[j].getAttribute("data-dependent-on-selector-value");
-                        if (!await shouldHideOption(dependents[j]) && String(value) === dependOnValue) {
+                        const dependOnValue2 = dependents[j].getAttribute("data-dependent-on-selector-value-2");
+                        if (!await shouldHideOption(dependents[j])
+                                && (String(value) === dependOnValue || (dependOnValue2 && String(value) === dependOnValue2))) {
                             dependents[j].classList.remove("hidden");
                             setTimeout(() => dependents[j].classList.remove("hiding"), 1);
                         } else {

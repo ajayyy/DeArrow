@@ -417,7 +417,8 @@ export function setupOptionChangeListener(): void {
             "channelOverrides",
             "showIconForFormattedTitles",
             "ignoreAbThumbnails",
-            "showOriginalOnHover"
+            "showOriginalOnHover",
+            "showLiveCover"
         ];
 
         if (settingsToReload.some((name) => (changes[name] && changes[name].newValue !== changes[name].oldValue))) {

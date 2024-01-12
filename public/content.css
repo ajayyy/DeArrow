@@ -17,6 +17,40 @@
     object-fit: cover;
 }
 
+/* Livestream avatar cover images */
+.cbCustomThumbnailCanvas.cbLiveCover {
+    display: flex !important;
+}
+.cbCustomThumbnailCanvas.cbLiveCover::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    filter: blur(50px);
+    margin: -50px;
+
+    background-color: black;
+    background-image: var(--cbThumbBackground);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+/* Livestream cover inner image */
+.cbLiveCover img {
+    height: 50%;
+
+    object-fit: cover;
+
+    position: relative;
+    border-radius: 100%;
+    top: 0;
+    left: 0;
+    margin: auto;
+}
+
 /* Used to fix tooltips having the wrong offset since image is still displayed when YouTube calculates it's offset */
 /* Since tooltips have multiple uses, it becomes the play button tooltip */
 .ytp-tooltip:not(.ytp-text-detail) .cbCustomThumbnailCanvas {

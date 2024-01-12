@@ -6,6 +6,7 @@ import { FormattingOptionsComponent } from "../popup/FormattingOptionsComponent"
 import { Tooltip } from "../utils/tooltip";
 import { BrandingLocation, ShowCustomBrandingInfo, getActualShowCustomBranding } from "./videoBranding";
 import * as CompileConfig from "../../config.json"
+import { isLiveOrUpcoming } from "../thumbnails/thumbnailData";
 
 export async function handleOnboarding(element: HTMLElement, videoID: VideoID,
         brandingLocation: BrandingLocation, showCustomBranding: ShowCustomBrandingInfo, result: [boolean, boolean]): Promise<void> {
@@ -19,7 +20,8 @@ export async function handleOnboarding(element: HTMLElement, videoID: VideoID,
         // Both title and thumbnail changed due to random time or title format
         // Ignore title changes if title formatting is disabled
         if (result[0] && !(await getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation, false))
-            && (ignoreTitleChange || (result[1] && !(await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation))))) {
+            && (ignoreTitleChange || (result[1] && !(await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation))))
+            && !await isLiveOrUpcoming(videoID)) {
             
             // Check if notice will be visible (since it appears to the left of the element)
             const box = element.closest("#contents");

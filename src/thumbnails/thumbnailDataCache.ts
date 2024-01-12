@@ -1,4 +1,6 @@
+import { ChannelID } from "../../maze-utils/lib/video";
 import { VideoID } from "../../maze-utils/src/video";
+import { DataCache } from "../utils/cache";
 
 export interface PlaybackUrl {
     url: string;
@@ -32,7 +34,7 @@ export interface FailInfo {
 interface VideoMetadata {
     playbackUrls: PlaybackUrl[];
     duration: number | null;
-    channelID: string | null;
+    channelID: ChannelID | null;
     author: string | null;
     isLive: boolean | null;
     isUpcoming: boolean | null;
@@ -45,46 +47,24 @@ export interface ThumbnailData {
     thumbnailCachesFailed: Set<number>;
 }
 
-interface ThumbnailDataCacheRecord extends ThumbnailData {
-    lastUsed: number;
+export const thumbnailDataCache = new DataCache<VideoID, ThumbnailData>(() => ({
+    video: [],
+    metadata: {
+        playbackUrls: [],
+        duration: null,
+        channelID: null,
+        author: null,
+        isLive: false,
+        isUpcoming: false
+    },
+    failures: [],
+    thumbnailCachesFailed: new Set()
+}));
+
+export interface ChannelData {
+    avatarUrl: string | null;
 }
 
-//todo: set a max size of this and delete some after a while
-const cache: Record<VideoID, ThumbnailDataCacheRecord> = {};
-const cacheLimit = 2000;
-
-export function getFromCache(videoID: VideoID): ThumbnailData | undefined {
-    return cache[videoID];
-}
-
-export function setupCache(videoID: VideoID): ThumbnailData {
-    if (!cache[videoID]) {
-        cache[videoID] = {
-            video: [],
-            metadata: {
-                playbackUrls: [],
-                duration: null,
-                channelID: null,
-                author: null,
-                isLive: false,
-                isUpcoming: false
-            },
-            lastUsed: Date.now(),
-            failures: [],
-            thumbnailCachesFailed: new Set()
-        };
-
-        if (Object.keys(cache).length > cacheLimit) {
-            const oldest = Object.entries(cache).reduce((a, b) => a[1].lastUsed < b[1].lastUsed ? a : b);
-            delete cache[oldest[0]];
-        }
-    }
-
-    return cache[videoID];
-}
-
-export function cacheUsed(videoID: VideoID): boolean {
-    if (cache[videoID]) cache[videoID].lastUsed = Date.now();
-
-    return !! cache[videoID];
-}
+export const channelInfoCache = new DataCache<ChannelID, ChannelData>(() => ({
+    avatarUrl: null
+}));
