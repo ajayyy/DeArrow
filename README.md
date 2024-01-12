@@ -96,6 +96,6 @@ git submodule update --init --recursive
 
 ### Credit
 
-Built on the base of [SponsorBlock](https://github.com/ajayyy/SponsorBlock) licensed under LGPL 3.0.
+Built on the base of [SponsorBlock](https://github.com/ajayyy/SponsorBlock) licensed under GPL 3.0.
 
 Logo based on Twemoji licensed under CC-BY 4.0.
