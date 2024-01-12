@@ -1,4 +1,4 @@
-import { ChannelID } from "../../maze-utils/lib/video";
+import { ChannelID } from "../../maze-utils/src/video";
 import { VideoID } from "../../maze-utils/src/video";
 import { DataCache } from "../utils/cache";
 

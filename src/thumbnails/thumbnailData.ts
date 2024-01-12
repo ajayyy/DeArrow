@@ -4,7 +4,7 @@ import { log } from "../utils/logger";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { isSafari } from "../../maze-utils/src/config";
 import { ChannelData, PlaybackUrl, channelInfoCache, thumbnailDataCache } from "./thumbnailDataCache";
-import { ChannelID } from "../../maze-utils/lib/video";
+import { ChannelID } from "../../maze-utils/src/video";
 
 interface PartialThumbnailResult {
     votes: number;
