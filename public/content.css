@@ -576,3 +576,8 @@ ytd-playlist-video-thumbnail-renderer {
 .video-preview-shim #player {
     z-index: 1;
 }
+
+/* Compatibility with Tube Achivist */
+#video-title.ytd-rich-grid-media.ta-title-container {
+    display: flex;
+}

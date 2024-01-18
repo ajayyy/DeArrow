@@ -150,7 +150,12 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
     const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
     
     titleElement.style.display = "none";
-    originalTitleElement.style.setProperty("display", "-webkit-box", "important");
+    if (!originalTitleElement.classList.contains("ta-title-container")) {
+        originalTitleElement.style.setProperty("display", "-webkit-box", "important");
+    } else {
+        // Compatibility with Tube Archivist
+        originalTitleElement.style.setProperty("display", "flex", "important");
+    }
 
     if (Config.config!.showOriginalOnHover) {
         findShowOriginalButton(originalTitleElement, brandingLocation).then((buttonElement) => {
@@ -214,7 +219,25 @@ function showCustomTitle(element: HTMLElement, brandingLocation: BrandingLocatio
 function setCustomTitle(title: string, element: HTMLElement, brandingLocation: BrandingLocation) {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
-    titleElement.innerText = title;
+
+    // To support extensions like Tube Archivist that add nodes
+    const children = titleElement.childNodes;
+    if (children.length > 1) {
+        let foundNode = false;
+        for (const child of children) {
+            if (child.nodeType === Node.TEXT_NODE) {
+                foundNode = true;
+                child.nodeValue = title;
+                break;
+            }
+        }
+
+        if (!foundNode) {
+            titleElement.prepend(document.createTextNode(title));
+        }
+    } else {
+        titleElement.innerText = title;
+    }
     titleElement.title = title;
 
     switch(brandingLocation) {

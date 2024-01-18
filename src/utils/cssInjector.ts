@@ -118,7 +118,8 @@ function buildMaxLinesTitleCss(): string {
     const result: string[] = [];
     for (const start of brandingBoxSelector.split(", ")) {
         if (!onMobile()) {
-            result.push(`${start} #video-title`);
+            // .ta-title-container for compatibility with Tube Archivist
+            result.push(`${start} #video-title:not(.ta-title-container)`);
         }
     }
 
