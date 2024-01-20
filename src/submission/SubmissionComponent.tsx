@@ -216,21 +216,32 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                         setSelectedTitleIndex(i);
                         setSelectedTitle(t);
 
-                        if (t.title !== originalTitle && t.title !== oldTitle) {
+                        if (t.title !== oldTitle) {
                             const unsubmitted = Config.local!.unsubmitted[props.videoID] ??= {
                                 thumbnails: [],
                                 titles: []
                             };
 
                             const existingSubmission = unsubmitted.titles.findIndex((s) => s.title === oldTitle);
-                            if (existingSubmission !== -1) {
-                                unsubmitted.titles[existingSubmission] = {
-                                    title: t.title
-                                };
-                            } else {
-                                unsubmitted.titles.push({
-                                    title: t.title
-                                });
+
+                            // If new title is an original title, remove it from unsubmitted
+                            if (t.title === ""
+                                    || t.title === originalTitle
+                                    || props.submissions.titles.findIndex((s) => s.title === t.title) !== -1) {
+                                if (existingSubmission !== -1) {
+                                    unsubmitted.titles.splice(existingSubmission, 1);
+                                }
+                            } else if (t.title !== originalTitle) {
+                                // Normal case
+                                if (existingSubmission !== -1) {
+                                    unsubmitted.titles[existingSubmission] = {
+                                        title: t.title
+                                    };
+                                } else {
+                                    unsubmitted.titles.push({
+                                        title: t.title
+                                    });
+                                }
                             }
 
                             Config.forceLocalUpdate("unsubmitted");
