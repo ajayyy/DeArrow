@@ -335,6 +335,7 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
                     if (activeThumbnailCacheRequests[videoID]
                         && activeThumbnailCacheRequests[videoID].shouldRerequest 
                         && activeThumbnailCacheRequests[videoID].time !== timestamp
+                        && activeThumbnailCacheRequests[videoID].time?.toFixed(3) !== timestamp.toFixed(3)
                         && tries < 2) {
                         // Stop and refetch with the proper timestamp
                         return handleThumbnailCacheRefetch(videoID, time, generateNow, tries + 1);

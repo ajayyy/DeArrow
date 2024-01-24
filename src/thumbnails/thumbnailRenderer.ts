@@ -257,7 +257,7 @@ function findBestVideo(videoID: VideoID, width: number, height: number, timestam
                 || (v.width >= width && v.height >= height))
             : existingCache.video).sort((a, b) => b.width - a.width).sort((a, b) => +b.rendered - +a.rendered);
 
-        const sameTimestamp = bestVideos.find(v => v.timestamp === timestamp);
+        const sameTimestamp = bestVideos.find(v => v.timestamp === timestamp || v.timestamp.toFixed(3) === timestamp.toFixed(3));
 
         if (sameTimestamp?.rendered) {
             return {
