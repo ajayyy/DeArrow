@@ -21,7 +21,9 @@ interface TimeRenderedThumbnailSubmission {
     type: ThumbnailType.SpecifiedTime;
 }
 
-export type RenderedThumbnailSubmission = (NoTimeRenderedThumbnailSubmission | TimeRenderedThumbnailSubmission);
+export type RenderedThumbnailSubmission = (NoTimeRenderedThumbnailSubmission | TimeRenderedThumbnailSubmission) & {
+    votable: boolean;
+};
 
 export const ThumbnailDrawerComponent = (props: ThumbnailDrawerComponentProps) => {
     return (
@@ -49,6 +51,7 @@ function getThumbnails(props: ThumbnailDrawerComponentProps,
                 type={props.existingSubmissions[i].type}
                 videoID={props.videoId}
                 time={time}
+                votable={props.existingSubmissions[i].votable}
                 key={time ? `T${time}` : `I${i}`}
             ></ThumbnailSelectionComponent>
         );

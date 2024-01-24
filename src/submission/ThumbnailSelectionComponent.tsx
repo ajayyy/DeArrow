@@ -4,6 +4,10 @@ import { VideoID } from "../../maze-utils/src/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { ThumbnailComponent, ThumbnailType } from "./ThumbnailComponent";
 import AddIcon from "../svgIcons/addIcon";
+import UpvoteIcon from "../svgIcons/upvoteIcon";
+import DownvoteIcon from "../svgIcons/downvoteIcon";
+import { submitVideoBrandingAndHandleErrors } from "../dataFetching";
+import { AnimationUtils } from "../../maze-utils/src/animationUtils";
 
 export interface ThumbnailSelectionComponentProps {
     video: HTMLVideoElement;
@@ -14,13 +18,24 @@ export interface ThumbnailSelectionComponentProps {
     hideTime?: boolean;
     time?: number;
     larger?: boolean;
+    votable?: boolean;
+    submission?: ThumbnailSubmission;
 }
 
 /**
  * The selector object for choosing a thumbnail
  */
 export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentProps) => {
-    const [error, setError] = React.useState("")
+    const [error, setError] = React.useState("");
+
+    function createThumbnailSubmission(): ThumbnailSubmission | null {
+        return props.type === ThumbnailType.Original ? {
+            original: true
+        } : {
+            original: false,
+            timestamp: props.time!
+        };
+    }
 
     return (
         <ThumbnailComponent
@@ -43,14 +58,42 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
                     </div> : null
             }
             {
-                !props.hideTime ?
+                !props.hideTime && props.type !== ThumbnailType.CurrentTime ?
+                <>
                     <div style={{ fontWeight: "bold", textAlign: "center", marginTop: "4px" }}>
                         {error ? <div>{error}</div> : null}
                         {getText(props.time, props.type)}
                     </div>
+
+                    <div className="cbVoteButtons"
+                            style={{ visibility: !props.selected && props.votable ? undefined : "hidden" }}>
+                        <button className="cbButton" 
+                            title={chrome.i18n.getMessage("upvote")}
+                            onClick={(e) => {
+                                e.stopPropagation();
+
+                                const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
+                                submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), false).then(stopAnimation);
+                            }}>
+                            <UpvoteIcon/>
+                        </button>
+
+                        <button className="cbButton" 
+                            title={chrome.i18n.getMessage("downvote")}
+                            onClick={(e) => {
+                                e.stopPropagation();
+
+                                const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
+                                submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), true).then(stopAnimation);
+                            }}>
+                            <DownvoteIcon/>
+                        </button>
+                    </div>
+                </>
                 : null
             }
-            
+
+
         </ThumbnailComponent>
     );
 };

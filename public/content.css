@@ -85,6 +85,18 @@
     padding-bottom: 0;
 }
 
+.cbThumbnail .cbVoteButtons {
+    display: flex;
+    justify-content: center;
+
+    margin-top: 4px;
+}
+
+.cbThumbnail .cbVoteButtons .cbButton {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
 /* For miniplayer */
 .ytd-miniplayer .cbCustomTitle {
     text-overflow: ellipsis;
@@ -286,6 +298,19 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 
 .cbTitleSelected svg.resetCustomTitle {
     height: 0.7em;
+}
+
+.cbTitle .cbVoteButtons {
+    width: max-content;
+    margin-left: auto;
+    display: flex;
+}
+
+.cbTitle .cbVoteButtons .cbButton {
+    margin-left: 5px;
+    margin-right: 5px;
+
+    height: 16px;
 }
 
 .cbBrandingPreview .cbTitle {
@@ -580,4 +605,9 @@ ytd-playlist-video-thumbnail-renderer {
 /* Compatibility with Tube Achivist */
 #video-title.ytd-rich-grid-media.ta-title-container {
     display: flex;
+}
+
+@keyframes rotate {
+	from { transform: rotate(0deg); }
+	  to { transform: rotate(360deg); }
 }

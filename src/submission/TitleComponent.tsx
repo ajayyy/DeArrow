@@ -2,6 +2,10 @@ import * as React from "react";
 import { RenderedTitleSubmission } from "./TitleDrawerComponent";
 import ResetIcon from "../svgIcons/resetIcon";
 import Config from "../config/config";
+import UpvoteIcon from "../svgIcons/upvoteIcon";
+import DownvoteIcon from "../svgIcons/downvoteIcon";
+import { submitVideoBrandingAndHandleErrors } from "../dataFetching";
+import { AnimationUtils } from "../../maze-utils/src/animationUtils";
 
 export interface TitleComponentProps {
     submission: RenderedTitleSubmission;
@@ -35,9 +39,9 @@ export const TitleComponent = (props: TitleComponentProps) => {
                 onClick={() => {
                     const title = titleRef.current!.innerText;
                     props.onSelectOrUpdate(title, title);
+                    setFocused(true);
 
                     if (document.activeElement !== titleRef.current) {
-                        setFocused(true);
                         setSelectionToEnd(titleRef.current!);
                     }
                 }}
@@ -94,8 +98,34 @@ export const TitleComponent = (props: TitleComponentProps) => {
                 }}>
             </span>
 
+            <div className="cbVoteButtons"
+                    style={{ display: !props.selected && !titleChanged && props.submission.votable ? undefined : "none" }}>
+                <button className="cbButton" 
+                    title={chrome.i18n.getMessage("upvote")}
+                    onClick={(e) => {
+                        e.stopPropagation();
+
+                        const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
+                        submitVideoBrandingAndHandleErrors(props.submission, null, false).then(stopAnimation);
+                    }}>
+                    <UpvoteIcon/>
+                </button>
+
+                <button className="cbButton" 
+                    title={chrome.i18n.getMessage("downvote")}
+                    onClick={(e) => {
+                        e.stopPropagation();
+
+                        const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
+                        submitVideoBrandingAndHandleErrors(props.submission, null, true).then(stopAnimation);
+                    }}>
+                    <DownvoteIcon/>
+                </button>
+            </div>
+
             <button className="resetCustomTitle cbButton" 
                 title={chrome.i18n.getMessage("resetCustomTitle")}
+                style={{ display: props.selected && titleChanged ? "block" : "none" }} 
                 onClick={(e) => {
                     e.stopPropagation();
 
@@ -111,7 +141,6 @@ export const TitleComponent = (props: TitleComponentProps) => {
                     }
                 }}>
                 <ResetIcon
-                    style={{ display: props.selected && titleChanged ? "block" : "none" }} 
                     className="resetCustomTitle"
                 />
             </button>

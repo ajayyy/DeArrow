@@ -80,27 +80,36 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             setOriginalTitle(originalTitle);
 
             setTitles([{
-                title: originalTitle
+                title: originalTitle,
+                original: true,
+                votable: true
             }, {
-                title: ""
+                title: "",
+                original: false,
+                votable: false
             }, ...props.submissions.titles
             .filter((s) => s.title !== originalTitle)
             .map((s) => ({
-                title: s.title
+                title: s.title,
+                original: s.original,
+                votable: true
             }))]);
         })();
     }, []);
 
     const defaultThumbnails: RenderedThumbnailSubmission[] = [{
-        type: ThumbnailType.Original
+        type: ThumbnailType.Original,
+        votable: true
     }, {
-        type: ThumbnailType.CurrentTime
+        type: ThumbnailType.CurrentTime,
+        votable: false
     }];
     const downloadedThumbnails: RenderedThumbnailSubmission[] = props.submissions.thumbnails
     .filter((s) => !s.original)
     .map((s: CustomThumbnailResult) => ({
         timestamp: s.timestamp,
-        type: ThumbnailType.SpecifiedTime
+        type: ThumbnailType.SpecifiedTime,
+        votable: true
     }));
     const thumbnails = defaultThumbnails.concat(downloadedThumbnails);
 
@@ -349,7 +358,8 @@ function updateUnsubmitted(unsubmitted: UnsubmittedSubmission,
                     || s.timestamp !== t.timestamp)))
                 .map((t) => ({
                 type: ThumbnailType.SpecifiedTime,
-                timestamp: (t as CustomThumbnailResult).timestamp
+                timestamp: (t as CustomThumbnailResult).timestamp,
+                votable: false
             }));
 
             setExtraUnsubmittedThumbnails(thumbnailsResult);
@@ -359,6 +369,11 @@ function updateUnsubmitted(unsubmitted: UnsubmittedSubmission,
         if (unsubmittedTitles) {
             titlesResult = unsubmittedTitles
                 .filter((t) => titles.every((s) => s.title !== t.title))
+                .map((t) => ({
+                    title: t.title,
+                    original: false,
+                    votable: false
+                }));
 
             setExtraUnsubmittedTitles?.(titlesResult);
         }

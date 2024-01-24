@@ -10,6 +10,8 @@ export interface TitleDrawerComponentProps {
 
 export interface RenderedTitleSubmission {
     title: string;
+    votable: boolean;
+    original: boolean;
 }
 
 export const TitleDrawerComponent = (props: TitleDrawerComponentProps) => {

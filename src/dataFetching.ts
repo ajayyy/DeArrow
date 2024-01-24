@@ -1,8 +1,8 @@
-import { VideoID, getVideoID } from "../maze-utils/src/video";
+import { VideoID, getVideoID, getYouTubeVideoID } from "../maze-utils/src/video";
 import { ThumbnailSubmission, ThumbnailWithRandomTimeResult, fetchVideoMetadata } from "./thumbnails/thumbnailData";
 import { TitleResult, TitleSubmission } from "./titles/titleData";
 import { FetchResponse, sendRealRequestToCustomServer } from "../maze-utils/src/background-request-proxy";
-import { BrandingLocation, BrandingResult, updateBrandingForVideo } from "./videoBranding/videoBranding";
+import { BrandingLocation, BrandingResult, replaceCurrentVideoBranding, updateBrandingForVideo } from "./videoBranding/videoBranding";
 import { logError } from "./utils/logger";
 import { getHash } from "../maze-utils/src/hash";
 import Config, { ThumbnailCacheOption, ThumbnailFallbackOption } from "./config/config";
@@ -471,16 +471,46 @@ export function clearCache(videoID: VideoID) {
     delete cache[videoID];
 }
 
-export async function submitVideoBranding(videoID: VideoID, title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null): Promise<FetchResponse> {
+export async function submitVideoBranding(videoID: VideoID, title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null, downvote = false): Promise<FetchResponse> {
     const result = await sendRequestToServer("POST", "/api/branding", {
         userID: Config.config!.userID,
         videoID,
         title,
-        thumbnail
+        thumbnail,
+        downvote
     });
 
     clearCache(videoID);
     return result;
+}
+
+/**
+ * Also does alerts
+ */
+export async function submitVideoBrandingAndHandleErrors(title: TitleSubmission | null,
+        thumbnail: ThumbnailSubmission | null, downvote: boolean): Promise<boolean> {
+    if (getVideoID() !== getYouTubeVideoID()) {
+        alert(chrome.i18n.getMessage("videoIDWrongWhenSubmittingError"));
+        return false;
+    }
+
+    const result = await submitVideoBranding(getVideoID()!, title, thumbnail, downvote);
+
+    if (result && result.ok) {
+        replaceCurrentVideoBranding().catch(logError);
+
+        return true;
+    } else {
+        const text = result.responseText;
+
+        if (text.includes("<head>")) {
+            alert(chrome.i18n.getMessage("502"));
+        } else {
+            alert(text);
+        }
+
+        return false;
+    }
 }
 
 export function sendRequestToThumbnailCache(videoID: string, time?: number, title?: string,
