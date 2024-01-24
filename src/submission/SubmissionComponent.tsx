@@ -277,7 +277,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             }
                         });
                     }}>
-                    {`${chrome.i18n.getMessage("Vote")}`}
+                    {`${chrome.i18n.getMessage("submit")}`}
                 </button>
             </div>
 
