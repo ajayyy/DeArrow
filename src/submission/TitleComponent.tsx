@@ -12,6 +12,7 @@ export interface TitleComponentProps {
     selected: boolean;
     onSelectOrUpdate: (title: string, oldTitle: string) => void;
     onDeselect: () => void;
+    actAsVip: boolean;
 }
 
 const maxTitleLength = 110;
@@ -106,7 +107,7 @@ export const TitleComponent = (props: TitleComponentProps) => {
                         e.stopPropagation();
 
                         const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
-                        submitVideoBrandingAndHandleErrors(props.submission, null, false).then(stopAnimation);
+                        submitVideoBrandingAndHandleErrors(props.submission, null, false, props.actAsVip).then(stopAnimation);
                     }}>
                     <UpvoteIcon/>
                 </button>
@@ -117,7 +118,7 @@ export const TitleComponent = (props: TitleComponentProps) => {
                         e.stopPropagation();
 
                         const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
-                        submitVideoBrandingAndHandleErrors(props.submission, null, true).then(stopAnimation);
+                        submitVideoBrandingAndHandleErrors(props.submission, null, true, props.actAsVip).then(stopAnimation);
                     }}>
                     <DownvoteIcon locked={ Config.config!.vip && props.submission.locked }/>
                 </button>

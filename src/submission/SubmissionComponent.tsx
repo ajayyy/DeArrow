@@ -176,6 +176,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                     videoId={props.videoID} 
                     existingSubmissions={thumbnailSubmissions}
                     selectedThumbnailIndex={selectedThumbnailIndex}
+                    actAsVip={actAsVip}
                     onSelect={(t, i) => {
                         let selectedIndex = i;
                         if (selectedThumbnailIndex === i) {
@@ -226,6 +227,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             <div>
                 <TitleDrawerComponent existingSubmissions={[...titles, ...extraUnsubmittedTitles]}
                     selectedTitleIndex={selectedTitleIndex}
+                    actAsVip={actAsVip}
                     onDeselect={() => {
                         setSelectedTitleIndex(-1);
                         setSelectedTitle(null);

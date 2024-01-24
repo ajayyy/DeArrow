@@ -22,6 +22,7 @@ export interface ThumbnailSelectionComponentProps {
     votable?: boolean;
     submission?: ThumbnailSubmission;
     locked?: boolean;
+    actAsVip?: boolean;
 }
 
 /**
@@ -75,7 +76,7 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
                                 e.stopPropagation();
 
                                 const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
-                                submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), false).then(stopAnimation);
+                                submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), false, props.actAsVip!).then(stopAnimation);
                             }}>
                             <UpvoteIcon/>
                         </button>
@@ -86,7 +87,7 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
                                 e.stopPropagation();
 
                                 const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
-                                submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), true).then(stopAnimation);
+                                submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), true, props.actAsVip!).then(stopAnimation);
                             }}>
                             <DownvoteIcon locked={ Config.config!.vip && props.locked }/>
                         </button>

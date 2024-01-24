@@ -491,13 +491,13 @@ export async function submitVideoBranding(videoID: VideoID, title: TitleSubmissi
  * Also does alerts
  */
 export async function submitVideoBrandingAndHandleErrors(title: TitleSubmission | null,
-        thumbnail: ThumbnailSubmission | null, downvote: boolean): Promise<boolean> {
+        thumbnail: ThumbnailSubmission | null, downvote: boolean, actAsVip: boolean): Promise<boolean> {
     if (getVideoID() !== getYouTubeVideoID()) {
         alert(chrome.i18n.getMessage("videoIDWrongWhenSubmittingError"));
         return false;
     }
 
-    const result = await submitVideoBranding(getVideoID()!, title, thumbnail, downvote);
+    const result = await submitVideoBranding(getVideoID()!, title, thumbnail, downvote, actAsVip);
 
     if (result && result.ok) {
         replaceCurrentVideoBranding().catch(logError);

@@ -10,6 +10,7 @@ export interface ThumbnailDrawerComponentProps {
     existingSubmissions: RenderedThumbnailSubmission[];
     selectedThumbnailIndex: number;
     onSelect: (submission: ThumbnailSubmission, index: number) => void;
+    actAsVip: boolean;
 }
 
 interface NoTimeRenderedThumbnailSubmission {
@@ -54,6 +55,7 @@ function getThumbnails(props: ThumbnailDrawerComponentProps,
                 time={time}
                 votable={props.existingSubmissions[i].votable}
                 locked={props.existingSubmissions[i].locked}
+                actAsVip={props.actAsVip}
                 key={time ? `T${time}` : `I${i}`}
             ></ThumbnailSelectionComponent>
         );
