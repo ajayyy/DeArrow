@@ -472,13 +472,15 @@ export function clearCache(videoID: VideoID) {
     delete cache[videoID];
 }
 
-export async function submitVideoBranding(videoID: VideoID, title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null, downvote = false): Promise<FetchResponse> {
+export async function submitVideoBranding(videoID: VideoID, title: TitleSubmission | null,
+        thumbnail: ThumbnailSubmission | null, downvote = false, actAsVip = false): Promise<FetchResponse> {
     const result = await sendRequestToServer("POST", "/api/branding", {
         userID: Config.config!.userID,
         videoID,
         title,
         thumbnail,
-        downvote
+        downvote,
+        autoLock: actAsVip
     });
 
     clearCache(videoID);

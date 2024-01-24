@@ -143,11 +143,16 @@ export class SubmitButton {
 
     render(): void {
         if (this.root) {
-            this.root?.render(<SubmissionComponent video={getVideo()!} videoID={getVideoID()!} submissions={this.submissions} submitClicked={(title, thumbnail) => this.submitPressed(title, thumbnail)} />);
+            this.root?.render(<SubmissionComponent
+                video={getVideo()!}
+                videoID={getVideoID()!}
+                submissions={this.submissions}
+                submitClicked={(title, thumbnail, actAsVip) => this.submitPressed(title, thumbnail, actAsVip)}
+            />);
         }
     }
 
-    private async submitPressed(title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null): Promise<boolean> {
+    private async submitPressed(title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null, actAsVip: boolean): Promise<boolean> {
         if (title) {
             title.title = title.title.trim();
 
@@ -161,7 +166,7 @@ export class SubmitButton {
             return false;
         }
         
-        const result = await submitVideoBranding(getVideoID()!, title, thumbnail);
+        const result = await submitVideoBranding(getVideoID()!, title, thumbnail, false, actAsVip);
 
         if (result && result.ok) {
             this.close();

@@ -313,6 +313,12 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     height: 16px;
 }
 
+.cbVipToggles {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
 .cbBrandingPreview .cbTitle {
     cursor: default !important;
 }

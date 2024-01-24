@@ -22,13 +22,14 @@ import CursorIcon from "../svgIcons/cursorIcon";
 import FontIcon from "../svgIcons/fontIcon";
 import { Tooltip } from "../utils/tooltip";
 import { LicenseComponent } from "../license/LicenseComponent";
+import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
     video: HTMLVideoElement;
     submissions: BrandingResult;
     
-    submitClicked: (title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null) => Promise<boolean>;
+    submitClicked: (title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null, actAsVip: boolean) => Promise<boolean>;
 }
 
 interface ChatDisplayName {
@@ -99,6 +100,8 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             }))]);
         })();
     }, []);
+
+    const [actAsVip, setActAsVip] = React.useState(true);
 
     const defaultThumbnails: RenderedThumbnailSubmission[] = [{
         type: ThumbnailType.Original,
@@ -264,6 +267,20 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                     }}></TitleDrawerComponent>
             </div>
 
+            {
+                Config.config!.vip &&
+                <div className="cbVipToggles">
+                    <ToggleOptionComponent
+                        id="actAsVip"
+                        onChange={(value) => {
+                            setActAsVip(value);
+                        }}
+                        value={actAsVip}
+                        label={chrome.i18n.getMessage("actAsVip")}
+                    />
+                </div>
+            }
+
             <div className="cbVoteButtonContainer">
                 <button className="cbNoticeButton cbVoteButton" 
                     disabled={!Config.config!.activated
@@ -277,7 +294,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             ...selectedTitle,
                             original: selectedTitle.title === getCurrentPageTitle()
                                         || (!!getCurrentPageTitle() && selectedTitle.title === await toSentenceCase(getCurrentPageTitle()!, false))
-                        } : null, selectedThumbnail.current).then((success) => {
+                        } : null, selectedThumbnail.current, actAsVip).then((success) => {
                             if (!success) {
                                 setCurrentlySubmitting(false);
                             }
