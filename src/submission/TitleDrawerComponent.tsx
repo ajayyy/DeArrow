@@ -12,6 +12,7 @@ export interface RenderedTitleSubmission {
     title: string;
     votable: boolean;
     original: boolean;
+    locked: boolean;
 }
 
 export const TitleDrawerComponent = (props: TitleDrawerComponentProps) => {

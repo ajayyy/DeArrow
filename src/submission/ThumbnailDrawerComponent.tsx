@@ -23,6 +23,7 @@ interface TimeRenderedThumbnailSubmission {
 
 export type RenderedThumbnailSubmission = (NoTimeRenderedThumbnailSubmission | TimeRenderedThumbnailSubmission) & {
     votable: boolean;
+    locked: boolean;
 };
 
 export const ThumbnailDrawerComponent = (props: ThumbnailDrawerComponentProps) => {
@@ -52,6 +53,7 @@ function getThumbnails(props: ThumbnailDrawerComponentProps,
                 videoID={props.videoId}
                 time={time}
                 votable={props.existingSubmissions[i].votable}
+                locked={props.existingSubmissions[i].locked}
                 key={time ? `T${time}` : `I${i}`}
             ></ThumbnailSelectionComponent>
         );

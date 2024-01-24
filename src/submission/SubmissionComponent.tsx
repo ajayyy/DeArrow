@@ -82,34 +82,40 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             setTitles([{
                 title: originalTitle,
                 original: true,
-                votable: true
+                votable: true,
+                locked: props.submissions.titles.some((s) => s.title === originalTitle && s.locked)
             }, {
                 title: "",
                 original: false,
-                votable: false
+                votable: false,
+                locked: false
             }, ...props.submissions.titles
             .filter((s) => s.title !== originalTitle)
             .map((s) => ({
                 title: s.title,
                 original: s.original,
-                votable: true
+                votable: true,
+                locked: s.locked
             }))]);
         })();
     }, []);
 
     const defaultThumbnails: RenderedThumbnailSubmission[] = [{
         type: ThumbnailType.Original,
-        votable: true
+        votable: true,
+        locked: props.submissions.thumbnails.some((s) => s.original && s.locked)
     }, {
         type: ThumbnailType.CurrentTime,
-        votable: false
+        votable: false,
+        locked: false
     }];
     const downloadedThumbnails: RenderedThumbnailSubmission[] = props.submissions.thumbnails
     .filter((s) => !s.original)
     .map((s: CustomThumbnailResult) => ({
         timestamp: s.timestamp,
         type: ThumbnailType.SpecifiedTime,
-        votable: true
+        votable: true,
+        locked: s.locked
     }));
     const thumbnails = defaultThumbnails.concat(downloadedThumbnails);
 
@@ -359,7 +365,8 @@ function updateUnsubmitted(unsubmitted: UnsubmittedSubmission,
                 .map((t) => ({
                 type: ThumbnailType.SpecifiedTime,
                 timestamp: (t as CustomThumbnailResult).timestamp,
-                votable: false
+                votable: false,
+                locked: false
             }));
 
             setExtraUnsubmittedThumbnails(thumbnailsResult);
@@ -372,7 +379,8 @@ function updateUnsubmitted(unsubmitted: UnsubmittedSubmission,
                 .map((t) => ({
                     title: t.title,
                     original: false,
-                    votable: false
+                    votable: false,
+                    locked: false
                 }));
 
             setExtraUnsubmittedTitles?.(titlesResult);

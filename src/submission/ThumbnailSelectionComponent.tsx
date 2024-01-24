@@ -8,6 +8,7 @@ import UpvoteIcon from "../svgIcons/upvoteIcon";
 import DownvoteIcon from "../svgIcons/downvoteIcon";
 import { submitVideoBrandingAndHandleErrors } from "../dataFetching";
 import { AnimationUtils } from "../../maze-utils/src/animationUtils";
+import Config from "../config/config";
 
 export interface ThumbnailSelectionComponentProps {
     video: HTMLVideoElement;
@@ -20,6 +21,7 @@ export interface ThumbnailSelectionComponentProps {
     larger?: boolean;
     votable?: boolean;
     submission?: ThumbnailSubmission;
+    locked?: boolean;
 }
 
 /**
@@ -86,7 +88,7 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
                                 const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
                                 submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), true).then(stopAnimation);
                             }}>
-                            <DownvoteIcon/>
+                            <DownvoteIcon locked={ Config.config!.vip && props.locked }/>
                         </button>
                     </div>
                 </>

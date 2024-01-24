@@ -119,7 +119,7 @@ export const TitleComponent = (props: TitleComponentProps) => {
                         const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
                         submitVideoBrandingAndHandleErrors(props.submission, null, true).then(stopAnimation);
                     }}>
-                    <DownvoteIcon/>
+                    <DownvoteIcon locked={ Config.config!.vip && props.submission.locked }/>
                 </button>
             </div>
 
