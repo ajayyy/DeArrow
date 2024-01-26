@@ -1,5 +1,5 @@
 import { VideoID, getVideoID, getYouTubeVideoID } from "../maze-utils/src/video";
-import { ThumbnailSubmission, ThumbnailWithRandomTimeResult, fetchVideoMetadata } from "./thumbnails/thumbnailData";
+import { ThumbnailSubmission, ThumbnailWithRandomTimeResult, fetchVideoMetadata, isLiveSync } from "./thumbnails/thumbnailData";
 import { TitleResult, TitleSubmission } from "./titles/titleData";
 import { FetchResponse, sendRealRequestToCustomServer } from "../maze-utils/src/background-request-proxy";
 import { BrandingLocation, BrandingResult, replaceCurrentVideoBranding, updateBrandingForVideo } from "./videoBranding/videoBranding";
@@ -81,10 +81,17 @@ async function getTimestampFromRandomTime(videoID: VideoID, brandingData: Brandi
         brandingLocation?: BrandingLocation): Promise<number | null> {
     const fastThumbnailOptionCheck = getThumbnailFallbackOptionFastCheck(videoID);
     if (fastThumbnailOptionCheck === null || fastThumbnailOptionCheck === ThumbnailFallbackOption.RandomTime) {
+        let timestamp: number | null = null;
         let videoDuration = brandingData?.videoDuration;
         if (!videoDuration) {
             const metadata = await fetchVideoMetadata(videoID, false);
-            if (metadata) videoDuration = metadata.duration;
+            if (metadata) {
+                videoDuration = metadata.duration;
+
+                if (metadata.isLive && !metadata.isUpcoming) {
+                    timestamp = 0;
+                }
+            }
         }
 
         if (videoDuration) {
@@ -106,7 +113,10 @@ async function getTimestampFromRandomTime(videoID: VideoID, brandingData: Brandi
                 }
             }
 
-            const timestamp = brandingData.randomTime * videoDuration;
+            timestamp = brandingData.randomTime * videoDuration;
+        }
+
+        if (timestamp !== null) {
             if (!isCachedThumbnailLoaded(videoID, timestamp)) {
                 // Only an official time for default server address
                 queueThumbnailCacheRequest(videoID, timestamp, undefined, isOfficialTime(),
@@ -117,11 +127,9 @@ async function getTimestampFromRandomTime(videoID: VideoID, brandingData: Brandi
             if (await getThumbnailFallbackOption(videoID) !== ThumbnailFallbackOption.RandomTime) {
                 return null;
             }
-
-            return timestamp;
-        } else {
-            return null;
         }
+
+        return timestamp;
     } else {
         return null;
     }
@@ -325,7 +333,9 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
 
     const result = (async () => {
         try {
-            const request = await sendRequestToThumbnailCache(videoID, time, title, officialImage, generateNow);
+            // Live videos have no backup, so try to generate it now
+            const isLive = !!isLiveSync(videoID);
+            const request = await sendRequestToThumbnailCache(videoID, time, title, officialImage, isLive, generateNow || isLive);
     
             if (request.status === 200) {
                 try {
@@ -517,11 +527,12 @@ export async function submitVideoBrandingAndHandleErrors(title: TitleSubmission 
 }
 
 export function sendRequestToThumbnailCache(videoID: string, time?: number, title?: string,
-        officialTime = false, generateNow = false): Promise<Response> {
+        officialTime = false, isLivestream = false, generateNow = false): Promise<Response> {
     const data = {
         videoID,
         officialTime,
-        generateNow
+        generateNow,
+        isLivestream
     };
 
     if (time != null) {

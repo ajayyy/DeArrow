@@ -350,6 +350,16 @@ export async function isLiveOrUpcoming(videoID: VideoID): Promise<boolean | null
     return null;
 }
 
+export function isLiveSync(videoID: VideoID): boolean | null {
+    const cachedData = thumbnailDataCache.getFromCache(videoID);
+
+    if (cachedData?.metadata) {
+        return cachedData.metadata.isLive && !cachedData.metadata.isUpcoming;
+    }
+
+    return null;
+}
+
 const activeChannelRequests: Record<ChannelID, Promise<ChannelData>> = {};
 export async function fetchChannelnfo(channelID: ChannelID, ignoreCache: boolean): Promise<ChannelData> {
     const cachedData = channelInfoCache.getFromCache(channelID);
