@@ -61,37 +61,41 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
                     </div> : null
             }
             {
-                !props.hideTime && props.type !== ThumbnailType.CurrentTime ?
+                !props.hideTime ?
                 <>
                     <div style={{ fontWeight: "bold", textAlign: "center", marginTop: "4px" }}>
                         {error ? <div>{error}</div> : null}
                         {getText(props.time, props.type)}
                     </div>
 
-                    <div className="cbVoteButtons"
-                            style={{ visibility: !props.selected && props.votable ? undefined : "hidden" }}>
-                        <button className="cbButton" 
-                            title={chrome.i18n.getMessage("upvote")}
-                            onClick={(e) => {
-                                e.stopPropagation();
+                    {
+                        props.type !== ThumbnailType.CurrentTime ?
+                        <div className="cbVoteButtons"
+                                style={{ visibility: !props.selected && props.votable ? undefined : "hidden" }}>
+                            <button className="cbButton" 
+                                title={chrome.i18n.getMessage("upvote")}
+                                onClick={(e) => {
+                                    e.stopPropagation();
 
-                                const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
-                                submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), false, props.actAsVip!).then(stopAnimation);
-                            }}>
-                            <UpvoteIcon/>
-                        </button>
+                                    const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
+                                    submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), false, props.actAsVip!).then(stopAnimation);
+                                }}>
+                                <UpvoteIcon/>
+                            </button>
 
-                        <button className="cbButton" 
-                            title={chrome.i18n.getMessage("downvote")}
-                            onClick={(e) => {
-                                e.stopPropagation();
+                            <button className="cbButton" 
+                                title={chrome.i18n.getMessage("downvote")}
+                                onClick={(e) => {
+                                    e.stopPropagation();
 
-                                const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
-                                submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), true, props.actAsVip!).then(stopAnimation);
-                            }}>
-                            <DownvoteIcon locked={ Config.config!.vip && props.locked }/>
-                        </button>
-                    </div>
+                                    const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
+                                    submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), true, props.actAsVip!).then(stopAnimation);
+                                }}>
+                                <DownvoteIcon locked={ Config.config!.vip && props.locked }/>
+                            </button>
+                        </div>
+                        : null
+                    }
                 </>
                 : null
             }
