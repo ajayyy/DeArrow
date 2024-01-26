@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CustomThumbnailResult, ThumbnailSubmission } from "../thumbnails/thumbnailData";
+import { CustomThumbnailResult, ThumbnailSubmission, isLiveSync } from "../thumbnails/thumbnailData";
 import { getCurrentPageTitle, TitleSubmission } from "../titles/titleData";
 import { BrandingResult } from "../videoBranding/videoBranding";
 import { ThumbnailType } from "./ThumbnailComponent";
@@ -107,11 +107,15 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
         type: ThumbnailType.Original,
         votable: true,
         locked: props.submissions.thumbnails.some((s) => s.original && s.locked)
-    }, {
-        type: ThumbnailType.CurrentTime,
-        votable: false,
-        locked: false
     }];
+    if (!isLiveSync(props.videoID)) {
+        defaultThumbnails.push({
+            type: ThumbnailType.CurrentTime,
+            votable: false,
+            locked: false
+        });
+    }
+
     const downloadedThumbnails: RenderedThumbnailSubmission[] = props.submissions.thumbnails
     .filter((s) => !s.original)
     .map((s: CustomThumbnailResult) => ({
