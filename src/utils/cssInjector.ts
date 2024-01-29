@@ -24,7 +24,7 @@ export function addCssToPage() {
         await waitFor(() => Config.isReady());
 
         const head = document.getElementsByTagName("head")[0];
-        if (!isFirefoxOrSafari() && Config.config!.invidiousInstances.includes(new URL(document.URL).host)) {
+        if (!isFirefoxOrSafari() && Config.config!.invidiousInstances?.includes(new URL(document.URL).host)) {
             for (const file of cssFiles) {
                 const fileref = document.createElement("link");
                 fileref.className = "cb-css";
