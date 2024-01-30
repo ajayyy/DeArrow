@@ -66,13 +66,13 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
     const possibleSelectors = getPossibleSelectors(onWatchPage, onEmbedPage);
 
     // Find first invisible one, or wait for the first one to be visible
-    const mainTitle = possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility) as HTMLElement).filter((element) => isVisible(element))[0] || 
-        await waitForElement(possibleSelectors[0].selector, !onClipPage) as HTMLElement;
-    const titles = (possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility && !onClipPage)).filter((e) => !!e)) as HTMLElement[];
+    const mainTitle = possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility, true) as HTMLElement).filter((element) => isVisible(element, true))[0] || 
+        await waitForElement(possibleSelectors[0].selector, !onClipPage, true) as HTMLElement;
+    const titles = (possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility && !onClipPage, true)).filter((e) => !!e)) as HTMLElement[];
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
     const videoID = getVideoID();
 
-    if (videoID !== null && (isVisible(mainTitle) || onClipPage)) {
+    if (videoID !== null && (isVisible(mainTitle, true) || onClipPage)) {
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
             async () => { await replaceCurrentVideoBranding(); });
         const brandingLocation = BrandingLocation.Watch;
