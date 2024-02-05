@@ -49,7 +49,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     hideOriginalTitle(element, brandingLocation);
 
     try {
-        if (!Config.config!.hideTitlesBeforeReplace) {
+        if (onMobile() === false && !Config.config!.hideTitlesBeforeReplace) {
             showOriginalTitle(element, brandingLocation);
         }
         
@@ -85,7 +85,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
                 return false;
             }
             
-            if (!Config.config!.hideTitlesBeforeReplace) {
+            if (onMobile() || !Config.config!.hideTitlesBeforeReplace) {
                 hideOriginalTitle(element, brandingLocation);
             }
             
