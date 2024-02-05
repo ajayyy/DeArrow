@@ -49,6 +49,10 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     hideOriginalTitle(element, brandingLocation);
 
     try {
+        if (!Config.config!.hideTitlesBeforeReplace) {
+            showOriginalTitle(element, brandingLocation);
+        }
+        
         const titleDataPromise = getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
         // Wait for whatever is first
         await Promise.race([
@@ -81,7 +85,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
                 return false;
             }
             
-            if (onMobile()) {
+            if (!Config.config!.hideTitlesBeforeReplace) {
                 hideOriginalTitle(element, brandingLocation);
             }
             
