@@ -1,5 +1,4 @@
-import { Format, getPlaybackFormats, isLiveOrUpcoming } from "./thumbnailData";
-import { getFromCache, RenderedThumbnailVideo, setupCache, ThumbnailVideo } from "./thumbnailDataCache";
+import { Format, fetchChannelnfo, fetchVideoMetadata, getPlaybackFormats, isLiveOrUpcoming } from "./thumbnailData";
 import { VideoID, getVideoID } from "../../maze-utils/src/video";
 import { getNumberOfThumbnailCacheRequests, getThumbnailUrl, getVideoThumbnailIncludingUnsubmitted, isFetchingFromThumbnailCache, queueThumbnailCacheRequest, waitForThumbnailCache } from "../dataFetching";
 import { log, logError } from "../utils/logger";
@@ -14,6 +13,7 @@ import { onMobile } from "../../maze-utils/src/pageInfo";
 import { MobileFix, addNodeToListenFor } from "../utils/titleBar";
 import { resetMediaSessionThumbnail, setMediaSessionThumbnail } from "../videoBranding/mediaSessionHandler";
 import { isSafari } from "../../maze-utils/src/config";
+import { RenderedThumbnailVideo, ThumbnailVideo, thumbnailDataCache } from "./thumbnailDataCache";
 
 const activeRendersMax = isFirefoxOrSafari() ? 3 : 6;
 const activeRenders: Record<VideoID, Promise<RenderedThumbnailVideo | null>> = {};
@@ -57,14 +57,28 @@ function addStopRenderingCallback(videoID: VideoID, callback: (error?: string) =
     thumbnailRendererControls[videoID].push(callback);
 }
 
+export class ThumbnailNotInCacheError extends Error {
+    constructor(videoID: VideoID) {
+        super(`Thumbnail not found in cache for ${videoID}`);
+    }
+}
+
 export async function renderThumbnail(videoID: VideoID, width: number,
-    height: number, saveVideo: boolean, timestamp: number): Promise<RenderedThumbnailVideo | null> {
+    height: number, saveVideo: boolean, timestamp: number, onlyFromThumbnailCache = false): Promise<RenderedThumbnailVideo | null> {
 
     const startTime = performance.now();
+
+    if (onlyFromThumbnailCache) {
+        await waitForThumbnailCache(videoID);
+    }
 
     let bestVideoData = await findBestVideo(videoID, width, height, timestamp);
     if (bestVideoData.renderedThumbnail) {
         return bestVideoData.renderedThumbnail;
+    }
+
+    if (onlyFromThumbnailCache) {
+        throw new ThumbnailNotInCacheError(videoID);
     }
     
     await Promise.race([
@@ -91,7 +105,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
             addStopRenderingCallback(videoID, resolve);
         });
         const format = await Promise.race([getPlaybackFormats(videoID, width, height), stopCallbackHandler]);
-        const videoCache = setupCache(videoID);
+        const videoCache = thumbnailDataCache.setupCache(videoID);
         if (!format || !(format as Format)?.url) {
             handleThumbnailRenderFailure(videoID, width, height, timestamp, resolve);
             return;
@@ -128,7 +142,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
         };
 
         const loadedData = async () => {
-            const betterVideo = getFromCache(videoID)?.video?.find(v => v.width >= width && v.height >= height
+            const betterVideo = thumbnailDataCache.getFromCache(videoID)?.video?.find(v => v.width >= width && v.height >= height
                 && v.timestamp === timestamp && v.rendered);
             if (betterVideo) {
                 video.remove();
@@ -174,7 +188,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
                 fromThumbnailCache: false
             };
 
-            const videoCache = setupCache(videoID);
+            const videoCache = thumbnailDataCache.setupCache(videoID);
             const currentVideoInfoIndex = videoCache.video.findIndex(v => v.width === video.videoWidth
                 && v.height === video.videoHeight && v.timestamp === timestamp);
             const currentVideoInfo = currentVideoInfoIndex !== -1 ? videoCache.video[currentVideoInfoIndex] : null;
@@ -236,14 +250,14 @@ interface BestVideoData {
 }
 
 function findBestVideo(videoID: VideoID, width: number, height: number, timestamp: number): BestVideoData {
-    const existingCache = getFromCache(videoID);
+    const existingCache = thumbnailDataCache.getFromCache(videoID);
 
     if (existingCache && existingCache?.video?.length > 0) {
         const bestVideos = ((width && height) ? existingCache.video.filter(v => (v.rendered && v.fromThumbnailCache)
                 || (v.width >= width && v.height >= height))
             : existingCache.video).sort((a, b) => b.width - a.width).sort((a, b) => +b.rendered - +a.rendered);
 
-        const sameTimestamp = bestVideos.find(v => v.timestamp === timestamp);
+        const sameTimestamp = bestVideos.find(v => v.timestamp === timestamp || v.timestamp.toFixed(3) === timestamp.toFixed(3));
 
         if (sameTimestamp?.rendered) {
             return {
@@ -269,7 +283,7 @@ function findBestVideo(videoID: VideoID, width: number, height: number, timestam
 
 function handleThumbnailRenderFailure(videoID: VideoID, width: number, height: number,
         timestamp: number, resolve: (video: RenderedThumbnailVideo | null) => void): void {
-    const videoCache = setupCache(videoID);
+    const videoCache = thumbnailDataCache.setupCache(videoID);
     const thumbnailFailed = !!videoCache.thumbnailCachesFailed?.has?.(timestamp);
     const listeners = [resolve];
 
@@ -338,18 +352,35 @@ function renderToBlob(surface: HTMLVideoElement | HTMLCanvasElement): Promise<Bl
 export async function createThumbnailImageElement(existingElement: HTMLImageElement | null, videoID: VideoID, width: number,
     height: number, brandingLocation: BrandingLocation, forcedTimestamp: number | null,
     saveVideo: boolean, stillValid: () => Promise<boolean>, ready: (image: HTMLImageElement, url: string, timestamp: number) => unknown,
-    failure: () => unknown): Promise<HTMLImageElement | null> {
+    failure: () => unknown, showOriginal: () => unknown): Promise<HTMLImageElement | null> {
 
     const image = existingElement ?? document.createElement("img");
     image.style.display = "none";
 
     let timestamp = forcedTimestamp as number;
+    let isRandomTime = false;
     if (timestamp === null) {
         try {
-            const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation);
+            const thumbnailPromise = getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation);
+            // Wait for whatever is first
+            await Promise.race([
+                thumbnailPromise,
+                shouldReplaceThumbnails(videoID)
+            ]);
+
+            if (shouldReplaceThumbnailsFastCheck(videoID) === false) {
+                showOriginal();
+                return null;
+            }
+
+            // Will keep waiting for the thumbnail if the channel check finished first
+            const thumbnail = await thumbnailPromise;
             if (thumbnail && !thumbnail.original) {
                 timestamp = thumbnail.timestamp;
-            } else if (await getThumbnailFallbackOption(videoID) === ThumbnailFallbackOption.AutoGenerated) {
+                isRandomTime = thumbnail.isRandomTime;
+            } else if (!thumbnail
+                    && [ThumbnailFallbackOption.AutoGenerated, ThumbnailFallbackOption.RandomTime].includes(await getThumbnailFallbackOption(videoID))) {
+                failure();
                 return image;
             } else {
                 // Original thumbnail will be shown automatically
@@ -411,14 +442,20 @@ export async function createThumbnailImageElement(existingElement: HTMLImageElem
         ready(image, url, timestamp);
     }
 
-    const activeRender = activeRenders[videoID] ?? renderThumbnail(videoID, width, height, saveVideo, timestamp);
+    const activeRender = activeRenders[videoID] ?? renderThumbnail(videoID, width, height, saveVideo, timestamp, isRandomTime);
     activeRenders[videoID] = activeRender;
     
-    activeRender.then(result).catch(() => {
-        // Try again with lower resolution
-        renderThumbnail(videoID, 0, 0, saveVideo, timestamp).then(result).catch(() => {
-            logError(`Failed to render thumbnail for ${videoID}`);
-        });
+    activeRender.then(result).catch((e) => {
+        if (e instanceof ThumbnailNotInCacheError) {
+            failure();
+        } else {
+            // Try again with lower resolution
+            renderThumbnail(videoID, 0, 0, saveVideo, timestamp, isRandomTime).then(result).catch((e) => {
+                log(`Failed to render thumbnail for ${videoID} due to ${e}`);
+    
+                failure();
+            });
+        }
     });
 
     return image;
@@ -498,8 +535,9 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
 
         if (Config.config!.extensionEnabled && await shouldReplaceThumbnails(videoID)) {
             // Still check if the thumbnail is supposed to be changed or not
+            // If showing a live cover, it will be replaced even with no random timestamp stored
             const thumbnail = await getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation);
-            return !!thumbnail && !thumbnail.original;
+            return (!!thumbnail && !thumbnail.original) || !!await shouldShowLiveCover(videoID);
         } else {
             return false;
         }
@@ -531,15 +569,15 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
         image.classList.remove("cb-visible");
         resetBackgroundColor(image, brandingLocation);
 
-        const displayThumbnail = async (thumbnail: HTMLImageElement, blobUrl: string, remoteUrl: string, removeWidth: boolean) => {
-            thumbnail.src = blobUrl;
+        const displayThumbnail = async (thumbnail: HTMLImageElement | HTMLElement, blobUrl: string | null, remoteUrl: string, removeWidth: boolean) => {
+            if (blobUrl && thumbnail instanceof HTMLImageElement) thumbnail.src = blobUrl;
 
             if (!await getActualShowCustomBranding(showCustomBranding)) {
                 return;
             }
 
             thumbnail!.style.removeProperty("display");
-            if (thumbnail.complete) {
+            if (!(thumbnail instanceof HTMLImageElement) || thumbnail.complete) {
                 if (removeWidth) thumbnail!.style.removeProperty("width");
                 removeBackgroundColor(image, brandingLocation);
             } else {
@@ -561,7 +599,12 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
             countThumbnailReplacement(videoID);
         }
 
-        const existingImageElement = image.parentElement?.querySelector(".cbCustomThumbnailCanvas") as HTMLImageElement | null;
+        let existingImageElement = image.parentElement?.querySelector(".cbCustomThumbnailCanvas") as HTMLImageElement | null;
+        if (existingImageElement && existingImageElement.nodeName === "DIV") {
+            // Get rid of it, this is a live cover
+            existingImageElement.remove();
+            existingImageElement = null;
+        }
 
         try {
             const thumbnail = await createThumbnailImageElement(existingImageElement, videoID, width, height, brandingLocation, timestamp ?? null, false, async () => {
@@ -570,11 +613,16 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
             }, async (thumbnail, url, timestamp) => {
                 await displayThumbnail(thumbnail, url, getThumbnailUrl(videoID, timestamp), true);
             }, async () => {
-                if (!await isLiveOrUpcoming(videoID) && await getThumbnailFallbackOption(videoID) === ThumbnailFallbackOption.RandomTime) {
+                if (!await isLiveOrUpcoming(videoID) 
+                        && [ThumbnailFallbackOption.RandomTime, ThumbnailFallbackOption.AutoGenerated].includes(await getThumbnailFallbackOption(videoID))) {
                     await resetToShowAutogenerated(videoID, thumbnail!, image, brandingLocation, displayThumbnail);
+                } else if (await shouldShowLiveCover(videoID)) {
+                    await resetToShowLiveCover(videoID, thumbnail!, image, brandingLocation, displayThumbnail);
                 } else {
                     resetToShowOriginalThumbnail(image, brandingLocation);
                 }
+            }, () => {
+                resetToShowOriginalThumbnail(image, brandingLocation);
             });
 
             getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation).then(async (thumbnailData) => {
@@ -588,7 +636,8 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                     } else if (!thumbnailData && await getThumbnailFallbackOption(videoID) === ThumbnailFallbackOption.AutoGenerated
                             && !await isLiveOrUpcoming(videoID)) {
                         await resetToShowAutogenerated(videoID, thumbnail!, image, brandingLocation, displayThumbnail);
-                    } else {
+                    } else if (thumbnailData?.original || !await shouldShowLiveCover(videoID)) {
+                        // Will only get here if it did not create a random time thumbnail (such as innertube failing)
                         resetToShowOriginalThumbnail(image, brandingLocation);
                     }
                 }
@@ -681,6 +730,12 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
     return !!image;
 }
 
+async function shouldShowLiveCover(videoID: VideoID) {
+    return await isLiveOrUpcoming(videoID)
+        && [ThumbnailFallbackOption.RandomTime, ThumbnailFallbackOption.AutoGenerated].includes(await getThumbnailFallbackOption(videoID))
+        && Config.config!.showLiveCover;
+}
+
 async function resetToShowAutogenerated(videoID: VideoID, thumbnail: HTMLImageElement,
         image: HTMLImageElement, brandingLocation: BrandingLocation,
         displayThumbnail: (thumbnail: HTMLImageElement, blobUrl: string, remoteUrl: string, removeWidth: boolean) => Promise<void>) {
@@ -705,6 +760,49 @@ async function resetToShowAutogenerated(videoID: VideoID, thumbnail: HTMLImageEl
     await displayThumbnail(thumbnail, url, url, false);
 }
 
+async function resetToShowLiveCover(videoID: VideoID, thumbnail: HTMLElement,
+        image: HTMLImageElement, brandingLocation: BrandingLocation,
+        displayThumbnail: (thumbnail: HTMLElement, blobUrl: string | null, remoteUrl: string, removeWidth: boolean) => Promise<void>) {
+    
+    const videoMetadata = await fetchVideoMetadata(videoID, false);
+    if (!videoMetadata.channelID) {
+        resetToShowOriginalThumbnail(image, brandingLocation);
+        return;
+    }
+
+    const url = (await fetchChannelnfo(videoMetadata.channelID, false)).avatarUrl
+    if (!url) {
+        resetToShowOriginalThumbnail(image, brandingLocation);
+        return;
+    }
+
+    if (thumbnail.nodeName === "IMG") {
+        const newThumbnail = document.createElement("div");
+        newThumbnail.className = thumbnail.className;
+        newThumbnail.classList.add("cbLiveCover");
+        newThumbnail.style.cssText = thumbnail.style.cssText;
+
+        thumbnail.replaceWith(newThumbnail);
+        thumbnail.remove();
+        thumbnail = newThumbnail;
+    }
+
+    const innerImage = document.createElement("img");
+    innerImage.classList.add("cb-visible");
+    thumbnail.appendChild(innerImage);
+
+    // Ensure errors default back to the original thumbnail
+    const onError = () => {
+        thumbnail.style.display = "none";
+        resetToShowOriginalThumbnail(image, brandingLocation);
+    };
+    innerImage.addEventListener("error", onError, { once: true });
+
+    innerImage.src = url;
+    thumbnail.style.setProperty("--cbThumbBackground", `url("${url}")`);
+    await displayThumbnail(thumbnail, null, url, false);
+}
+
 function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation: BrandingLocation) {
     image.classList.add("cb-visible");
     image.style.removeProperty("display");
@@ -713,7 +811,8 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
             || brandingLocation === BrandingLocation.Autoplay
             || brandingLocation === BrandingLocation.EmbedSuggestions
             || BrandingLocation.Related
-            || !!image.closest("ytd-grid-playlist-renderer")) {
+            || !!image.closest("ytd-grid-playlist-renderer")
+            || isLiveCover(image)) {
         hideCanvas(image);
     }
 
@@ -777,12 +876,16 @@ function removeBackgroundColor(image: HTMLImageElement, brandingLocation: Brandi
 function hideCanvas(image: HTMLElement) {
     const canvas = image.parentElement?.querySelector(".cbCustomThumbnailCanvas") as HTMLCanvasElement | null;
     if (canvas) {
-        canvas.style.display = "none";
+        canvas.style.setProperty("display", "none", "important");
     }
 }
 
+function isLiveCover(image: HTMLElement) {
+    return !!image.parentElement?.querySelector(".cbLiveCover");
+}
+
 export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, blob: Blob) {
-    const videoCache = setupCache(videoID);
+    const videoCache = thumbnailDataCache.setupCache(videoID);
     const videoObject: RenderedThumbnailVideo = {
         video: null,
         width: 1280, // Can use arbitrary values, since the blob's image bitmap is actually used to render
@@ -821,7 +924,7 @@ export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, b
 }
 
 export function isCachedThumbnailLoaded(videoID: VideoID, timestamp: number): boolean {
-    const videoCache = getFromCache(videoID);
+    const videoCache = thumbnailDataCache.getFromCache(videoID);
     return videoCache?.video?.some(v => v.timestamp === timestamp && v.rendered && v.fromThumbnailCache) ?? false;
 }
 

@@ -49,7 +49,20 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     hideOriginalTitle(element, brandingLocation);
 
     try {
-        const titleData = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
+        const titleDataPromise = getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
+        // Wait for whatever is first
+        await Promise.race([
+            titleDataPromise,
+            shouldReplaceTitles(videoID)
+        ]);
+
+        if (shouldReplaceTitlesFastCheck(videoID) === false) {
+            showOriginalTitle(element, brandingLocation);
+            return false;
+        }
+
+        // Will keep waiting for the title if the channel check finished first
+        const titleData = await titleDataPromise;
         if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
 
         const title = titleData?.title;
@@ -137,7 +150,20 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
     const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
     
     titleElement.style.display = "none";
-    originalTitleElement.style.setProperty("display", "-webkit-box", "important");
+    if (!originalTitleElement.classList.contains("ta-title-container")) {
+        originalTitleElement.style.setProperty("display", "-webkit-box", "important");
+    } else {
+        // Compatibility with Tube Archivist
+        originalTitleElement.style.setProperty("display", "flex", "important");
+    }
+
+    if (Config.config!.showOriginalOnHover) {
+        findShowOriginalButton(originalTitleElement, brandingLocation).then((buttonElement) => {
+            if (buttonElement) {
+                buttonElement.title = originalTitleElement.textContent ?? "";
+            }
+        }).catch(logError);
+    }
 
     switch(brandingLocation) {
         case BrandingLocation.Watch: {
@@ -174,6 +200,14 @@ function showCustomTitle(element: HTMLElement, brandingLocation: BrandingLocatio
         }
     }
 
+    if (Config.config!.showOriginalOnHover) {
+        findShowOriginalButton(originalTitleElement, brandingLocation).then((buttonElement) => {
+            if (buttonElement) {
+                buttonElement.title = titleElement.textContent ?? "";
+            }
+        }).catch(logError);
+    }
+
     switch(brandingLocation) {
         case BrandingLocation.Watch: {
             setCurrentVideoTitle(titleElement.textContent ?? "");
@@ -185,7 +219,25 @@ function showCustomTitle(element: HTMLElement, brandingLocation: BrandingLocatio
 function setCustomTitle(title: string, element: HTMLElement, brandingLocation: BrandingLocation) {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
-    titleElement.innerText = title;
+
+    // To support extensions like Tube Archivist that add nodes
+    const children = titleElement.childNodes;
+    if (children.length > 1) {
+        let foundNode = false;
+        for (const child of children) {
+            if (child.nodeType === Node.TEXT_NODE) {
+                foundNode = true;
+                child.nodeValue = title;
+                break;
+            }
+        }
+
+        if (!foundNode) {
+            titleElement.prepend(document.createTextNode(title));
+        }
+    } else {
+        titleElement.innerText = title;
+    }
     titleElement.title = title;
 
     switch(brandingLocation) {
@@ -213,6 +265,7 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
             return [
                 "#video-title",
                 "#movie-title", // Movies in related
+                "#description #title", // Related videos in description
                 ".details .media-item-headline .yt-core-attributed-string", // Mobile YouTube
                 ".reel-item-metadata h3 .yt-core-attributed-string", // Mobile YouTube Shorts
                 ".details > .yt-core-attributed-string", // Mobile YouTube Channel Feature
@@ -255,7 +308,8 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
     if (brandingLocation === BrandingLocation.EndRecommendations
             || brandingLocation === BrandingLocation.Autoplay
             || brandingLocation === BrandingLocation.EmbedSuggestions
-            || originalTitleElement.id === "movie-title") {
+            || originalTitleElement.id === "movie-title"
+            || (originalTitleElement.id === "title" && originalTitleElement.parentElement?.id === "description")) {
         const container = document.createElement("div");
         container.appendChild(titleElement);
         originalTitleElement.parentElement?.prepend(container);
@@ -396,6 +450,12 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
 
     buttonElement.classList.add("cbShowOriginal");
     if (onMobile()) buttonElement.classList.add("cbMobileButton");
+
+    // Playlists and mixes on search page have extra margins that need to be applied to this new element
+    const originalMarginTop = getComputedStyle(originalTitleElement).marginTop;
+    if (originalMarginTop) {
+        buttonElement.style.marginTop = originalMarginTop;
+    }
 
     buttonElement.classList.add("cbButton");
     if (brandingLocation === BrandingLocation.Watch 

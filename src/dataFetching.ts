@@ -1,8 +1,8 @@
-import { VideoID, getVideoID } from "../maze-utils/src/video";
-import { ThumbnailResult, ThumbnailSubmission, fetchVideoMetadata } from "./thumbnails/thumbnailData";
+import { VideoID, getVideoID, getYouTubeVideoID } from "../maze-utils/src/video";
+import { ThumbnailSubmission, ThumbnailWithRandomTimeResult, fetchVideoMetadata, isLiveSync } from "./thumbnails/thumbnailData";
 import { TitleResult, TitleSubmission } from "./titles/titleData";
 import { FetchResponse, sendRealRequestToCustomServer } from "../maze-utils/src/background-request-proxy";
-import { BrandingLocation, BrandingResult, updateBrandingForVideo } from "./videoBranding/videoBranding";
+import { BrandingLocation, BrandingResult, replaceCurrentVideoBranding, updateBrandingForVideo } from "./videoBranding/videoBranding";
 import { logError } from "./utils/logger";
 import { getHash } from "../maze-utils/src/hash";
 import Config, { ThumbnailCacheOption, ThumbnailFallbackOption } from "./config/config";
@@ -10,12 +10,12 @@ import { generateUserID } from "../maze-utils/src/setup";
 import { BrandingUUID } from "./videoBranding/videoBranding";
 import { objectToURI, timeoutPomise } from "../maze-utils/src";
 import { isCachedThumbnailLoaded, setupPreRenderedThumbnail, thumbnailCacheDownloaded } from "./thumbnails/thumbnailRenderer";
-import { setupCache } from "./thumbnails/thumbnailDataCache";
 import * as CompileConfig from "../config.json";
 import { alea } from "seedrandom";
 import { getThumbnailFallbackOption, getThumbnailFallbackOptionFastCheck, shouldReplaceThumbnails, shouldReplaceThumbnailsFastCheck } from "./config/channelOverrides";
 import { updateSubmitButton } from "./video";
 import { sendRequestToServer } from "./utils/requests";
+import { thumbnailDataCache } from "./thumbnails/thumbnailDataCache";
 
 interface VideoBrandingCacheRecord extends BrandingResult {
     lastUsed: number;
@@ -36,14 +36,15 @@ const activeRequests: Record<VideoID, Promise<Record<VideoID, BrandingResult> | 
 const activeThumbnailCacheRequests: Record<VideoID, ActiveThumbnailCacheRequestInfo> = {};
 
 export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, brandingLocation?: BrandingLocation,
-        returnRandomTime = true): Promise<ThumbnailResult | null> {
+        returnRandomTime = true): Promise<ThumbnailWithRandomTimeResult | null> {
     const unsubmitted = Config.local!.unsubmitted[videoID]?.thumbnails?.find(t => t.selected);
     if (unsubmitted) {
         return {
             ...unsubmitted,
             votes: 0,
             locked: false,
-            UUID: generateUserID() as BrandingUUID
+            UUID: generateUserID() as BrandingUUID,
+            isRandomTime: false
         };
     }
 
@@ -59,7 +60,8 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
                     votes: 0,
                     locked: false,
                     timestamp: timestamp,
-                    original: false
+                    original: false,
+                    isRandomTime: true
                 };
             } else {
                 return null;
@@ -68,7 +70,10 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
             return null;
         }
     } else {
-        return result;
+        return {
+            ...result,
+            isRandomTime: false
+        };
     }
 }
 
@@ -76,10 +81,17 @@ async function getTimestampFromRandomTime(videoID: VideoID, brandingData: Brandi
         brandingLocation?: BrandingLocation): Promise<number | null> {
     const fastThumbnailOptionCheck = getThumbnailFallbackOptionFastCheck(videoID);
     if (fastThumbnailOptionCheck === null || fastThumbnailOptionCheck === ThumbnailFallbackOption.RandomTime) {
+        let timestamp: number | null = null;
         let videoDuration = brandingData?.videoDuration;
         if (!videoDuration) {
             const metadata = await fetchVideoMetadata(videoID, false);
-            if (metadata) videoDuration = metadata.duration;
+            if (metadata) {
+                videoDuration = metadata.duration;
+
+                if (metadata.isLive && !metadata.isUpcoming) {
+                    timestamp = 0;
+                }
+            }
         }
 
         if (videoDuration) {
@@ -101,7 +113,10 @@ async function getTimestampFromRandomTime(videoID: VideoID, brandingData: Brandi
                 }
             }
 
-            const timestamp = brandingData.randomTime * videoDuration;
+            timestamp = brandingData.randomTime * videoDuration;
+        }
+
+        if (timestamp !== null) {
             if (!isCachedThumbnailLoaded(videoID, timestamp)) {
                 // Only an official time for default server address
                 queueThumbnailCacheRequest(videoID, timestamp, undefined, isOfficialTime(),
@@ -112,11 +127,9 @@ async function getTimestampFromRandomTime(videoID: VideoID, brandingData: Brandi
             if (await getThumbnailFallbackOption(videoID) !== ThumbnailFallbackOption.RandomTime) {
                 return null;
             }
-
-            return timestamp;
-        } else {
-            return null;
         }
+
+        return timestamp;
     } else {
         return null;
     }
@@ -320,7 +333,9 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
 
     const result = (async () => {
         try {
-            const request = await sendRequestToThumbnailCache(videoID, time, title, officialImage, generateNow);
+            // Live videos have no backup, so try to generate it now
+            const isLive = !!isLiveSync(videoID);
+            const request = await sendRequestToThumbnailCache(videoID, time, title, officialImage, isLive, generateNow || isLive);
     
             if (request.status === 200) {
                 try {
@@ -330,6 +345,7 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
                     if (activeThumbnailCacheRequests[videoID]
                         && activeThumbnailCacheRequests[videoID].shouldRerequest 
                         && activeThumbnailCacheRequests[videoID].time !== timestamp
+                        && activeThumbnailCacheRequests[videoID].time?.toFixed(3) !== timestamp.toFixed(3)
                         && tries < 2) {
                         // Stop and refetch with the proper timestamp
                         return handleThumbnailCacheRefetch(videoID, time, generateNow, tries + 1);
@@ -382,7 +398,7 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
         }
     
         if (time !== undefined && generateNow === true) {
-            const videoCache = setupCache(videoID);
+            const videoCache = thumbnailDataCache.setupCache(videoID);
             videoCache.thumbnailCachesFailed.add(time);
     
             // If the thumbs already failured rendering, send nulls
@@ -466,24 +482,57 @@ export function clearCache(videoID: VideoID) {
     delete cache[videoID];
 }
 
-export async function submitVideoBranding(videoID: VideoID, title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null): Promise<FetchResponse> {
+export async function submitVideoBranding(videoID: VideoID, title: TitleSubmission | null,
+        thumbnail: ThumbnailSubmission | null, downvote = false, actAsVip = false): Promise<FetchResponse> {
     const result = await sendRequestToServer("POST", "/api/branding", {
         userID: Config.config!.userID,
         videoID,
         title,
-        thumbnail
+        thumbnail,
+        downvote,
+        autoLock: actAsVip
     });
 
     clearCache(videoID);
     return result;
 }
 
+/**
+ * Also does alerts
+ */
+export async function submitVideoBrandingAndHandleErrors(title: TitleSubmission | null,
+        thumbnail: ThumbnailSubmission | null, downvote: boolean, actAsVip: boolean): Promise<boolean> {
+    if (getVideoID() !== getYouTubeVideoID()) {
+        alert(chrome.i18n.getMessage("videoIDWrongWhenSubmittingError"));
+        return false;
+    }
+
+    const result = await submitVideoBranding(getVideoID()!, title, thumbnail, downvote, actAsVip);
+
+    if (result && result.ok) {
+        replaceCurrentVideoBranding().catch(logError);
+
+        return true;
+    } else {
+        const text = result.responseText;
+
+        if (text.includes("<head>")) {
+            alert(chrome.i18n.getMessage("502"));
+        } else {
+            alert(text);
+        }
+
+        return false;
+    }
+}
+
 export function sendRequestToThumbnailCache(videoID: string, time?: number, title?: string,
-        officialTime = false, generateNow = false): Promise<Response> {
+        officialTime = false, isLivestream = false, generateNow = false): Promise<Response> {
     const data = {
         videoID,
         officialTime,
-        generateNow
+        generateNow,
+        isLivestream
     };
 
     if (time != null) {

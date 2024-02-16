@@ -11,7 +11,7 @@ export function freeTrialActive() {
     return timeLeft !== null && timeLeft > 0 && !Config.config!.freeTrialEnded;
 }
 
-const freeTrialDuration = 1000 * 60 * 60;
+const freeTrialDuration = 1000 * 60 * 60 * 6;
 export function getFreeTrialTimeLeft() {
     return Config.config!.freeTrialStart !== null ? freeTrialDuration - (Date.now() - Config.config!.freeTrialStart) : null;
 }

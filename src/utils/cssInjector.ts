@@ -24,7 +24,7 @@ export function addCssToPage() {
         await waitFor(() => Config.isReady());
 
         const head = document.getElementsByTagName("head")[0];
-        if (!isFirefoxOrSafari() && Config.config!.invidiousInstances.includes(new URL(document.URL).host)) {
+        if (!isFirefoxOrSafari() && Config.config!.invidiousInstances?.includes(new URL(document.URL).host)) {
             for (const file of cssFiles) {
                 const fileref = document.createElement("link");
                 fileref.className = "cb-css";
@@ -85,7 +85,7 @@ function buildHideThumbnailCss(): string {
         }
     }
 
-    result.push(`${watchPageThumbnailSelector} div:not(.cb-visible)`);
+    result.push(`${watchPageThumbnailSelector} div:not(.cb-visible, .cbLiveCover)`);
 
     return `${result.join(", ")} { visibility: hidden !important; }\n`;
 }
@@ -118,7 +118,8 @@ function buildMaxLinesTitleCss(): string {
     const result: string[] = [];
     for (const start of brandingBoxSelector.split(", ")) {
         if (!onMobile()) {
-            result.push(`${start} #video-title`);
+            // .ta-title-container for compatibility with Tube Archivist
+            result.push(`${start} #video-title:not(.ta-title-container)`);
         }
     }
 

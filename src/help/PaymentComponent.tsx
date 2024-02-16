@@ -45,14 +45,14 @@ export const PaymentComponent = () => {
     const [redeemEnabled, setRedeemEnabled] = React.useState(false);
 
     const iframeSource = React.useRef(`${websiteDomain}/payment#${objectToURI("", {
-        hideFreeTrial: Config.config!.freeTrialStart !== null || Config.config!.freeTrialEnded,
+        hideFreeTrial: Config.config!.freeTrialStart !== null && !Config.config!.freeTrialEnded,
         hideRequestFreeAccessButton: Config.config!.freeAccessRequestStart !== null,
         hideRedeem: true
     }, false)}`);
 
     const applyChoices = async (choices: PaymentComponentChoices) => {
-        if (Config.config!.freeTrialStart) {
-            // Can't have two trials
+        if (Config.config!.freeTrialStart && !Config.config!.freeTrialEnded) {
+            // Can't have two trials at once
             choices.freeTrial = false;
         }
 

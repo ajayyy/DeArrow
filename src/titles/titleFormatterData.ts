@@ -36,7 +36,9 @@ export const titleCaseNotCapitalized = new Set([
 
 export const titleCaseDetectionNotCapitalized = new Set([
     ...titleCaseNotCapitalized,
-    "it"
+    "it",
+    "is",
+    "my"
 ]);
 
 export const allowlistedWords = new Set([
@@ -215,7 +217,12 @@ export const acronymBlocklist = new Set([
     "pro",
     "why",
     "did",
-    "now"
+    "now",
+    "too",
+    "bad",
+    "big",
+    "all",
+    "old"
 ]);
 
 export const notStartOfSentence = new Set([

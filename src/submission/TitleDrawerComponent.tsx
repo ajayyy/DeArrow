@@ -6,10 +6,14 @@ export interface TitleDrawerComponentProps {
     onSelectOrUpdate: (title: RenderedTitleSubmission, oldTitle: string, index: number) => void;
     onDeselect: (index: number) => void;
     selectedTitleIndex: number;
+    actAsVip: boolean;
 }
 
 export interface RenderedTitleSubmission {
     title: string;
+    votable: boolean;
+    original: boolean;
+    locked: boolean;
 }
 
 export const TitleDrawerComponent = (props: TitleDrawerComponentProps) => {
@@ -36,6 +40,7 @@ function getTitles(props: TitleDrawerComponentProps,
                 onDeselect={() => {
                     props.onDeselect(i);
                 }}
+                actAsVip={props.actAsVip}
                 key={i}
                 submission={props.existingSubmissions[i]}
             ></TitleComponent>

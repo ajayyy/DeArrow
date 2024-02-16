@@ -59,7 +59,7 @@ export async function toLowerCaseTitle(str: string): Promise<string> {
 
     let result = "";
     for (const word of words) {
-        if (forceKeepFormatting(word) || (!isGreek && await greekLetterAllowed(word))) {
+        if (!isGreek && await greekLetterAllowed(word)) {
             result += word + " ";
         } else {
             result += await toLowerCase(word, isTurkiq) + " ";
@@ -76,7 +76,7 @@ export async function toFirstLetterUppercase(str: string): Promise<string> {
     let result = "";
     let index = 0;
     for (const word of words) {
-        if (forceKeepFormatting(word) || (!isGreek && await greekLetterAllowed(word))) {
+        if (!isGreek && await greekLetterAllowed(word)) {
             result += word + " ";
         } else if (startOfSentence(index, words) && !isNumberThenLetter(word)) {
             result += await capitalizeFirstLetter(word, isTurkiq) + " ";
@@ -135,7 +135,7 @@ export async function toSentenceCase(str: string, isCustom: boolean): Promise<st
 export async function toTitleCase(str: string, isCustom: boolean): Promise<string> {
     const words = str.split(" ");
     const mostlyAllCaps = isMostlyAllCaps(words);
-    const { isGreek, isTurkiq } = await getLangInfo(str);
+    const { isGreek, isTurkiq, isEnglish } = await getLangInfo(str);
 
     let result = "";
     let index = 0;
@@ -150,7 +150,8 @@ export async function toTitleCase(str: string, isCustom: boolean): Promise<strin
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             result += word + " ";
-        } else if (!startOfSentence(index, words) && listHasWord(titleCaseNotCapitalized, word.toLowerCase())) {
+        } else if ((!Config.config?.onlyTitleCaseInEnglish || isEnglish)
+                && !startOfSentence(index, words) && listHasWord(titleCaseNotCapitalized, word.toLowerCase())) {
             // Skip lowercase check for the first word
             result += await toLowerCase(word, isTurkiq) + " ";
         } else if (isFirstLetterCapital(word) &&
@@ -275,7 +276,17 @@ function isWordCustomCapitalization(word: string): boolean {
     if (!capitalMatch) return false;
 
     const capitalNumber = capitalMatch.length;
-    return capitalNumber > 1 || (capitalNumber === 1 && !isFirstLetterCapital(word));
+    return capitalNumber > 1 || (capitalNumber === 1 && !isFirstLetterCapital(word) && !isHyphenatedFirstLetterCapital(word));
+}
+
+/**
+ * non-Newtonian
+ * Non-Newtonian
+ * 
+ * If the only capitals are after the dash
+ */
+function isHyphenatedFirstLetterCapital(word: string): boolean {
+    return !!word.match(/^[\p{L}]{2,}-[\p{Lu}][\p{Ll}]+$/u);
 }
 
 /**
@@ -342,26 +353,55 @@ async function toUpperCase(word: string, isTurkiq: boolean): Promise<string> {
 async function getLangInfo(str: string): Promise<{
     isGreek: boolean;
     isTurkiq: boolean;
+    isEnglish: boolean;
 }> {
-    const result = await checkLanguages(str, ["el", "tr", "az"], 30);
+    if (str.split(" ").length > 1) {
+        // Remove hashtags
+        str = str.replace(/#[^\s]+/g, "").trim();
+    }
+
+    const threshold = 30;
+    const result = await checkLanguages(str, ["el", "tr", "az", "en"], threshold);
 
     return {
-        isGreek: result[0],
-        isTurkiq: result[1] || result[2]
+        isGreek: result.results[0],
+        isTurkiq: result.results[1] || result.results[2],
+
+        // Not english if it detects no english, it is reliable, and the top language is the same when one word is removed
+        // Helps remove false positives
+        isEnglish: !(!result.results[3] 
+            && result.isReliable 
+            && Config.config?.onlyTitleCaseInEnglish // Only do further checks if enabled
+            && result.topLanguage === ((await checkLanguages(str.replace(/[^ ]+$/, ""), [], threshold)).topLanguage))
     }
 }
 
 async function checkAnyLanguage(title: string, languages: string[], percentage: number): Promise<boolean> {
-    return (await checkLanguages(title, languages, percentage)).every((v) => v);
+    return (await checkLanguages(title, languages, percentage)).results.every((v) => v);
 }
 
-async function checkLanguages(title: string, languages: string[], percentage: number): Promise<boolean[]> {
-    if (!cld && (typeof chrome === "undefined" || !("detectLanguage" in chrome.i18n))) return languages.map(() => false);
+async function checkLanguages(title: string, languages: string[], percentage: number): Promise<{
+    results: boolean[];
+    topLanguage?: string | null;
+    isReliable: boolean;
+}> {
+    if (!cld && (typeof chrome === "undefined" || !("detectLanguage" in chrome.i18n))) {
+        return {
+            results: languages.map(() => false),
+            isReliable: false
+        };
+    }
 
     try {
+        const getLanguageFromBrowserApi = async (title: string) => {
+            const result = await chromeP.i18n.detectLanguage(title);
+            return result.languages.map((l) => ({...l, isReliable: result.isReliable}));
+        };
+
         const detectedLanguages = cld 
-            ? [(await (await cld).findLanguage(title))].map((l) => ({ language: l.language, percentage: l.probability * 100 }))
-            : (await chromeP.i18n.detectLanguage(title)).languages;
+            ? [(await (await cld).findLanguage(title))].map((l) => ({ language: l.language,
+                    percentage: l.probability * 100, isReliable: l.is_reliable }))
+            : await getLanguageFromBrowserApi(title);
 
         const result: boolean[] = [];
         for (const language of languages) {
@@ -369,9 +409,16 @@ async function checkLanguages(title: string, languages: string[], percentage: nu
             result.push(!!matchingLanguage && matchingLanguage.percentage > percentage);
         }
     
-        return result;
+        return {
+            results: result,
+            topLanguage: detectedLanguages[0]?.language,
+            isReliable: detectedLanguages.some((l) => l.isReliable)
+        };
     } catch (e) {
-        return languages.map(() => false);
+        return {
+            results: languages.map(() => false),
+            isReliable: false
+        };
     }
 }
 
@@ -480,10 +527,10 @@ export function cleanEmojis(title: string): string {
 
     const cleaned = title
         // Clear extra spaces between emoji "words"
-        .replace(/ ((?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*)+(?= )/ug, "")
+        .replace(/ ((?=\p{Extended_Pictographic}|☆)(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*)+(?= )/ug, "")
         // Emojis in between letters should be spaces, varient selector is allowed before to allow B emoji
-        .replace(/(\p{L}|[\uFE0F\uFE0E🆎🆑])(?:(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*)+(\p{L}|[🅰🆎🅱🆑🅾])/ug, "$1 $2")
-        .replace(/(?=\p{Extended_Pictographic})(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*/ug, "")
+        .replace(/(\p{L}|[\uFE0F\uFE0E🆎🆑])(?:(?=\p{Extended_Pictographic}|☆)(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*)+(?=\p{L}|[🅰🆎🅱🆑🅾])/ug, "$1 ")
+        .replace(/(?=\p{Extended_Pictographic}|☆)(?=[^🅰🆎🅱🆑🅾])\S(?:\uFE0F?\uFE0E?\p{Emoji_Modifier}?\u200D?)*/ug, "")
         .trim();
 
     if (cleaned.length > 0) {

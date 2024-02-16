@@ -155,6 +155,7 @@ describe("toTitleCase cleanEmojis", () => {
         ["5 min countdown 👷🏾‍♀️👷🏾‍♀️👷🏾‍♀️ timer (roller👷🏾‍♀️👷🏾‍♀️👷🏾‍♀️coaster) 👷🏾‍♀️", "5 Min Countdown Timer (Roller Coaster)"],
         ["5 min countdown 👩🏽‍👨🏽‍👦🏽‍👦🏽 timer (roller👩🏽‍👨🏽‍👦🏽‍👦🏽👩🏽‍👨🏽‍👦🏽‍👦🏽coaster) 👩🏽‍👨🏽‍👦🏽‍👦🏽👩🏽‍👨🏽‍👦🏽‍👦🏽", "5 Min Countdown Timer (Roller Coaster)"],
         ["😀︎😀︎😀︎ 5 min countdown timer😀︎ 😀︎😀︎😀︎ (roller😀︎😀︎😀︎coaster) 😀︎", "5 Min Countdown Timer (Roller Coaster)"],
+        ["STAR☆T☆RAIN -New Arrange Ver.-", "Star T Rain -New Arrange Ver.-"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -206,11 +207,26 @@ describe("toSentenceCase", () => {
         ["I want to go to the U.S. to see a movie", "I want to go to the U.S. to see a movie"],
         ["I want to go to the U.S! they have movies there", "I want to go to the U.S. They have movies there"],
         ["Nose slice VFX - pracical vs. digital effect", "Nose slice VFX - Pracical vs. digital effect"],
+        ["One thing: then another thing", "One thing: Then another thing"],
+        ["One thing: but-then another thing", "One thing: But-then another thing"],
+        ["Why I Won't Buy Into The Tesla Cybertruck Hype When my Alternative is Much More Fun", "Why I won't buy into the tesla cybertruck hype when my alternative is much more fun"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
         it(input, async () => {
             expect(await toSentenceCase(input, false)).toBe(expected);
+        });
+    }
+});
+
+describe("toSentenceCase cleanEmojis", () => {
+    const titleCases: [string, string][] = [
+        ["🚨 Announcement: New Series Coming!", "Announcement: New series coming"],
+    ];
+    for (const testCase of titleCases) {
+        const [input, expected] = testCase;
+        it(input, async () => {
+            expect(await formatTitleInternal(input, false, TitleFormatting.SentenceCase, true)).toBe(expected);
         });
     }
 });
@@ -255,6 +271,9 @@ describe("titleFormatter custom cases", () => {
         ["Announcements at >Google I/O 2023", "Announcements at Google I/O 2023", "Announcements at Google I/O 2023"], // Google sould be capitalized
         ["WWDC 2022 - iOS 16 announcement", "WWDC 2022 - iOS 16 Announcement", "WWDC 2022 - iOS 16 announcement"], // iOS should NOT be capitalized
         [`My thoughts on GM and Ford's move to abandon the CCS connector in favor of "NACS"`, `My Thoughts on GM and Ford's Move to Abandon the CCS Connector in Favor of "NACS"`, `My thoughts on GM and Ford's move to abandon the CCS connector in favor of "NACS"`],
+        ["One thing: then another thing", "One Thing: Then Another Thing", "One thing: Then another thing"],
+        ["One thing: but-then another thing", "One Thing: But-then Another Thing", "One thing: But-then another thing"],
+        ["One thing: but-Then another thing", "One Thing: But-then Another Thing", "One thing: But-then another thing"],
     ];
     for (const testCase of customTitles) {
         const [input, title, sentence] = testCase;
