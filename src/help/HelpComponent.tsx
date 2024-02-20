@@ -73,7 +73,7 @@ export const HelpComponent = () => {
                 </h1>
 
                 <p>
-                    Thanks to all <a href="https://github.com/ajayyy/SponsorBlock/graphs/contributors" target="_blank" rel="noreferrer">DeArrow contributors</a>,{" "}
+                    Thanks to all <a href="https://github.com/ajayyy/DeArrow/graphs/contributors" target="_blank" rel="noreferrer">DeArrow contributors</a>,{" "}
                     <a href="https://github.com/ajayyy/SponsorBlock/graphs/contributors" target="_blank" rel="noreferrer">SponsorBlock contributors</a>,{" "}
                     <a href="https://github.com/ajayyy/SponsorBlockServer/graphs/contributors" target="_blank" rel="noreferrer">SponsorBlockServer contributors</a> and{" "}
                     <a href="https://github.com/ajayyy/SponsorBlockSite/graphs/contributors" target="_blank" rel="noreferrer">SponsorBlockSite contributors</a> such{" "}
