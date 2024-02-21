@@ -1,8 +1,9 @@
 import * as React from "react";
-import { drawCenteredToCanvas, renderThumbnail } from "../thumbnails/thumbnailRenderer";
+import { drawCenteredToCanvas, renderThumbnail, setupPreRenderedThumbnail } from "../thumbnails/thumbnailRenderer";
 import { waitFor } from "../../maze-utils/src"
 import { VideoID } from "../../maze-utils/src/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
+import { logError } from "../utils/logger";
 
 export enum ThumbnailType {
     CurrentTime,
@@ -45,18 +46,18 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
         const video = props.video;
 
         if (props.type === ThumbnailType.CurrentTime) {
-            const playListener = () => renderCurrentFrame(props, canvasRef, inRenderingLoop, true);
+            const playListener = () => renderCurrentFrame(props, canvasRef, inRenderingLoop, true, false);
             const seekedListener = () => () => {
                 // If playing, it's already waiting for the next frame from the other listener
                 if (video.paused) {
-                    renderCurrentFrame(props, canvasRef, inRenderingLoop, false);
+                    renderCurrentFrame(props, canvasRef, inRenderingLoop, false, false);
                 }
             };
 
             video.addEventListener("playing", playListener);
             video.addEventListener("seeked", seekedListener);
 
-            renderCurrentFrame(props, canvasRef, inRenderingLoop, !video.paused);
+            renderCurrentFrame(props, canvasRef, inRenderingLoop, !video.paused, false);
 
             return () => {
                 video.removeEventListener("playing", playListener);
@@ -79,7 +80,7 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                 canvasRef.current?.getContext("2d")?.clearRect(0, 0, canvasRef.current?.width, canvasRef.current?.height);
                 if (props.video.paused && props.time === props.video.currentTime) {
                     // Skip rendering and just use existing video frame
-                    renderCurrentFrame(props, canvasRef, inRenderingLoop, false);
+                    renderCurrentFrame(props, canvasRef, inRenderingLoop, false, true);
                 } else {
                     renderThumbnail(props.videoID, canvasWidth, canvasHeight, false, props.time!).then((rendered) => {
                         waitFor(() => canvasRef?.current).then(async () => {
@@ -169,7 +170,8 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
 async function renderCurrentFrame(props: ThumbnailComponentProps,
         canvasRef: React.RefObject<HTMLCanvasElement>,
         inRenderingLoop: React.MutableRefObject<boolean>,
-        waitForNextFrame: boolean): Promise<void> {
+        waitForNextFrame: boolean,
+        cacheThumbnail: boolean): Promise<void> {
     try {
         await waitFor(() => canvasRef?.current && props.video.duration > 0 && props.video.readyState > 2);
 
@@ -177,11 +179,21 @@ async function renderCurrentFrame(props: ThumbnailComponentProps,
         canvasRef.current!.getContext("2d")!.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
         drawCenteredToCanvas(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height, props.video.videoWidth, props.video.videoHeight, props.video);
 
+        if (cacheThumbnail) {
+            canvasRef.current!.toBlob((blob) => {
+                if (blob) {
+                    setupPreRenderedThumbnail(props.videoID, props.time!, blob);
+                } else {
+                    logError(`Failed to cache thumbnail for ${props.videoID} at ${props.time}`);
+                }
+            })
+        }
+
         if (waitForNextFrame && !props.video.paused && !inRenderingLoop.current) {
             inRenderingLoop.current = true;
             const nextLoop = () => {
                 inRenderingLoop.current = false;
-                renderCurrentFrame(props, canvasRef, inRenderingLoop, true);
+                renderCurrentFrame(props, canvasRef, inRenderingLoop, true, cacheThumbnail);
             };
 
             if (props.video.requestVideoFrameCallback) {

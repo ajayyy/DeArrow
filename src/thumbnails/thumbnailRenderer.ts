@@ -884,7 +884,7 @@ function isLiveCover(image: HTMLElement) {
     return !!image.parentElement?.querySelector(".cbLiveCover");
 }
 
-export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, blob: Blob) {
+export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, blob: Blob, notifyStopRender = true) {
     const videoCache = thumbnailDataCache.setupCache(videoID);
     const videoObject: RenderedThumbnailVideo = {
         video: null,
@@ -898,7 +898,9 @@ export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, b
     }
     videoCache.video.push(videoObject);
 
-    stopRendering(videoID, "Pre-rendered thumbnail");
+    if (notifyStopRender) {
+        stopRendering(videoID, "Pre-rendered thumbnail");
+    }
     
     const unrendered = videoCache.video.filter(v => v.timestamp === timestamp && !v.rendered);
     if (unrendered.length > 0) {
