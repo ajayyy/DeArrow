@@ -105,17 +105,33 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
     return (
         <div className={`cbThumbnail${props.selected ? " cbThumbnailSelected" : ""}`}
                 onClick={() => {
+                    let submitted = false;
+                    const submit = () => {
+                        if (submitted) return;
+                        submitted = true;
+
+                        props.onClick?.(props.type === ThumbnailType.Original ? {
+                            original: true
+                        } : {
+                            original: false,
+                            timestamp: props.type === ThumbnailType.CurrentTime ? props.video.currentTime : props.time!
+                        });
+                    }
+
                     if (props.type === ThumbnailType.CurrentTime && props.video.paused) {
                         // Ensure video is showing correct frame (destructive, will affect visible video)
                         props.video.currentTime = props.video.currentTime;
-                    }
 
-                    props.onClick?.(props.type === ThumbnailType.Original ? {
-                        original: true
-                    } : {
-                        original: false,
-                        timestamp: props.type === ThumbnailType.CurrentTime ? props.video.currentTime : props.time!
-                    });
+                        // Wait for video to update
+                        props.video.addEventListener("seeked", submit, { once: true });
+                        // Fallback
+                        setTimeout(() => {
+                            props.video.removeEventListener("seeked", submit);
+                            submit();
+                        }, 1000);
+                    } else {
+                        submit();
+                    }
                 }}>
             {
                 props.type === ThumbnailType.Original ?
