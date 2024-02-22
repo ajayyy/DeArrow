@@ -64,7 +64,7 @@ export class ThumbnailNotInCacheError extends Error {
 }
 
 export async function renderThumbnail(videoID: VideoID, width: number,
-    height: number, saveVideo: boolean, timestamp: number, onlyFromThumbnailCache = false): Promise<RenderedThumbnailVideo | null> {
+    height: number, saveVideo: boolean, timestamp: number, onlyFromThumbnailCache = false, ignoreTimeout = false): Promise<RenderedThumbnailVideo | null> {
 
     const startTime = performance.now();
 
@@ -87,7 +87,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
     ]);
     delete renderQueueCallbacks[videoID];
 
-    if (performance.now() - startTime > Config.config!.renderTimeout
+    if (!ignoreTimeout && performance.now() - startTime > Config.config!.renderTimeout
             && !isCachedThumbnailLoaded(videoID, timestamp)) {
         return null;
     }
@@ -239,7 +239,10 @@ export async function renderThumbnail(videoID: VideoID, width: number,
             resolved = true;
             clearVideo(false);
 
-            reject("Stopped while waiting for video to load");
+            bestVideoData = findBestVideo(videoID, width, height, timestamp);
+            if (bestVideoData.renderedThumbnail) {
+                resolve(bestVideoData.renderedThumbnail);
+            }
         });
     });
 }

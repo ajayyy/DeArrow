@@ -39,7 +39,7 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
     const inRenderingLoop = React.useRef(false);
     const [defaultThumbnailOption, setDefaultThumbnailOption] = React.useState(0);
 
-    const canvasWidth = Math.ceil(calculateCanvasWidth(props.larger ?? false));
+    const canvasWidth = Math.ceil(calculateCanvasWidth());
     const canvasHeight = Math.ceil(canvasWidth / aspectRatio);
 
     React.useEffect(() => {
@@ -73,6 +73,7 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
     }, [props.videoID]);
 
     React.useEffect(() => {
+        let cancelled = false;
         if (props.time !== lastTime.current) {
             lastTime.current = props.time ?? null;
 
@@ -82,9 +83,9 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                     // Skip rendering and just use existing video frame
                     renderCurrentFrame(props, canvasRef, inRenderingLoop, false, true);
                 } else {
-                    renderThumbnail(props.videoID, canvasWidth, canvasHeight, false, props.time!).then((rendered) => {
+                    renderThumbnail(props.videoID, canvasWidth, canvasHeight, false, props.time!, false, true).then((rendered) => {
                         waitFor(() => canvasRef?.current).then(async () => {
-                            if (rendered) {
+                            if (rendered && !cancelled) {
                                 const imageBitmap = await createImageBitmap(rendered.blob);
 
                                 drawCenteredToCanvas(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height,
@@ -101,6 +102,8 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                 }
             }
         }
+
+        return () => void(cancelled = true);
     }, [props.time]);
 
     return (
@@ -207,8 +210,8 @@ async function renderCurrentFrame(props: ThumbnailComponentProps,
     }
 }
 
-function calculateCanvasWidth(larger: boolean): number {
-    const fallback = larger ? 720 : 100;
+function calculateCanvasWidth(): number {
+    const fallback = 720;
 
     const watchFlexy = document.querySelector("ytd-watch-flexy");
     if (!watchFlexy) return fallback;
@@ -216,7 +219,7 @@ function calculateCanvasWidth(larger: boolean): number {
     const containerWidth = parseFloat(getComputedStyle(watchFlexy)
         .getPropertyValue("--ytd-watch-flexy-sidebar-width")?.replace("px", ""));
 
-    const factor = larger ? 1 : 0.2;
+    const factor = 1;
     if (containerWidth && !isNaN(containerWidth)) {
         return containerWidth * window.devicePixelRatio * factor;
     } else {
