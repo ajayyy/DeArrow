@@ -235,6 +235,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     position: absolute;
     margin-top: 3em;
 	background-color: rgba(28, 28, 28, 0.9);
+    backdrop-filter: blur(10px);
     --yt-spec-text-primary: white;
 
     width: var(--ytd-watch-flexy-sidebar-width);
