@@ -26,10 +26,14 @@ let lastReferenceNode: HTMLElement | null = null;
 export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLElement): Promise<HTMLElement | null> {
     const titleNode = forceTitleNode ?? await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
 
+    // Experimental YouTube layout with description on right
+    const isOnDescriptionOnRightLayout = titleNode?.parentElement?.querySelector("#description");
+
     // First case is for "proper description" userscript
     const referenceNode = titleNode?.classList?.contains?.("ytd-video-primary-info-renderer")
-            || titleNode?.classList?.contains?.("slim-video-information-title") ? 
-        titleNode : titleNode?.parentElement;
+            || titleNode?.classList?.contains?.("slim-video-information-title")
+            || isOnDescriptionOnRightLayout 
+        ? titleNode : titleNode?.parentElement;
 
     if (referenceNode) {
         if (!titleButtonContainer || titleButtonContainer.parentElement !== referenceNode) {

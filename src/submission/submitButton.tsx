@@ -91,10 +91,13 @@ export class SubmitButton {
         const referenceNode = this.button?.parentElement ?? await getOrCreateTitleButtonContainer();
         if (!referenceNode) return;
 
-        let popupNode = onMobile() 
+        // Experimental YouTube layout with description on right
+        const isOnDescriptionOnRightLayout = document.querySelector("#title #description");
+
+        let popupNode = onMobile()
             ? document.querySelector(".watch-below-the-player") 
             : document.querySelector("#secondary-inner");
-        if (!popupNode || popupNode.childElementCount < 2) {
+        if (!popupNode || popupNode.childElementCount < 2 || isOnDescriptionOnRightLayout) {
             popupNode = referenceNode.parentElement;
         }
 
