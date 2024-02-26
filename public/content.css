@@ -240,6 +240,9 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     width: var(--ytd-watch-flexy-sidebar-width);
     margin-left: auto;
     right: 0;
+
+    /* Undo bolding */
+    font-weight: normal;
 }
 
 #cbSubmitMenu {
