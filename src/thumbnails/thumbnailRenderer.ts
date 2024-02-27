@@ -153,7 +153,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
             }
 
             log(videoID, "videoLoaded", video.currentTime, video.readyState, video.seeking, format)
-            if (video.readyState < 2 || video.seeking) {
+            if (video.readyState < 2 || video.seeking || video.currentTime !== timestamp) {
                 if (videoLoadedTimeout) clearTimeout(videoLoadedTimeout);
 
                 if (video.seeking) {
@@ -479,10 +479,18 @@ function createVideo(existingVideo: HTMLVideoElement | null, url: string, timest
     video.crossOrigin = "anonymous";
     // https://stackoverflow.com/a/69074004
     if (!existingVideo) video.src = `${url}#t=${timestamp}-${timestamp + 0.001}`;
-    video.currentTime = timestamp;
     video.controls = false;
-    video.pause();
     video.volume = 0;
+    if (isFirefoxOrSafari() && !isSafari()) {
+        // Firefox has a bug where video will report as black until played at least once
+        void video.play().then(() => {
+            video.pause();
+            video.currentTime = timestamp;
+        });
+    } else {
+        video.pause();
+        video.currentTime = timestamp;
+    }
 
     return video;
 }

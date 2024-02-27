@@ -4,6 +4,7 @@ import { waitFor } from "../../maze-utils/src"
 import { VideoID } from "../../maze-utils/src/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { logError } from "../utils/logger";
+import { isFirefoxOrSafari } from "../../maze-utils/lib";
 
 export enum ThumbnailType {
     CurrentTime,
@@ -39,7 +40,7 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
     const inRenderingLoop = React.useRef(false);
     const [defaultThumbnailOption, setDefaultThumbnailOption] = React.useState(0);
 
-    const canvasWidth = Math.ceil(calculateCanvasWidth());
+    const canvasWidth = Math.ceil(calculateCanvasWidth(props.larger ?? false));
     const canvasHeight = Math.ceil(canvasWidth / aspectRatio);
 
     React.useEffect(() => {
@@ -210,7 +211,7 @@ async function renderCurrentFrame(props: ThumbnailComponentProps,
     }
 }
 
-function calculateCanvasWidth(): number {
+function calculateCanvasWidth(larger: boolean): number {
     const fallback = 720;
 
     const watchFlexy = document.querySelector("ytd-watch-flexy");
@@ -219,7 +220,7 @@ function calculateCanvasWidth(): number {
     const containerWidth = parseFloat(getComputedStyle(watchFlexy)
         .getPropertyValue("--ytd-watch-flexy-sidebar-width")?.replace("px", ""));
 
-    const factor = 1;
+    const factor = larger || !isFirefoxOrSafari() ? 1 : 0.2;
     if (containerWidth && !isNaN(containerWidth)) {
         return containerWidth * window.devicePixelRatio * factor;
     } else {
