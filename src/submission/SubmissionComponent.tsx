@@ -360,8 +360,12 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
 async function handleAbTestedThumbnailWarning(videoID: string, isAbTestedThumbnail: React.MutableRefObject<boolean | null>) {
     if (isAbTestedThumbnail.current === null) {
-        const request = await fetch(`https://i.ytimg.com/vi/${videoID}/mqdefault_custom_1.jpg`);
-        isAbTestedThumbnail.current = request.ok;
+        try {
+            const request = await fetch(`https://i.ytimg.com/vi/${videoID}/mqdefault_custom_1.jpg`);
+            isAbTestedThumbnail.current = request.ok;
+        } catch {
+            isAbTestedThumbnail.current = false;
+        }
     }
 
     if (isAbTestedThumbnail.current) {
