@@ -4,7 +4,7 @@ import { waitFor } from "../../maze-utils/src"
 import { VideoID } from "../../maze-utils/src/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { logError } from "../utils/logger";
-import { isFirefoxOrSafari } from "../../maze-utils/lib";
+import { isFirefoxOrSafari } from "../../maze-utils/src";
 
 export enum ThumbnailType {
     CurrentTime,
