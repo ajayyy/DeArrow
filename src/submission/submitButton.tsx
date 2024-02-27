@@ -106,6 +106,10 @@ export class SubmitButton {
                 this.container = document.createElement('span');
                 this.container.id = "cbSubmitMenu";
 
+                if (isOnDescriptionOnRightLayout) {
+                    this.container.style.marginTop = referenceNode.parentElement?.offsetHeight + "px";
+                }
+
                 this.root = createRoot(this.container);
                 this.render();
             }
