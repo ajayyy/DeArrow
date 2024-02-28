@@ -114,6 +114,10 @@ function getPossibleSelectors(onWatchPage: boolean, onEmbedPage: boolean) {
                 {
                     selector: ".ytp-title-text",
                     checkVisibility: false
+                },
+                {
+                    selector: "ytd-video-description-header-renderer #shorts-title",
+                    checkVisibility: false
                 }
             ];
         } else {

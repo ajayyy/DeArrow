@@ -1,7 +1,7 @@
 import { getYouTubeTitleNodeSelector } from "../../maze-utils/src/elements";
 import { getOriginalTitleElement } from "../titles/titleRenderer";
 import { BrandingLocation, replaceCurrentVideoBranding } from "../videoBranding/videoBranding";
-import { waitForElement } from "../../maze-utils/src/dom";
+import { isVisible, waitForElement } from "../../maze-utils/src/dom";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { logError } from "./logger";
 import { waitFor } from "../../maze-utils/src";
@@ -56,25 +56,26 @@ export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLEleme
                     titleButtonContainer.style.height = getComputedStyle(header).lineHeight;
                 }
 
-                if (onMobile()) {
+                if (onMobile() || isOnDescriptionOnRightLayout) {
                     if (lastReferenceNode !== referenceNode) {
-                        if (lastReferenceNode) {
-                            removeNodeToListenFor(lastReferenceNode);
+                        if (onMobile()) {
+                            if (lastReferenceNode) {
+                                removeNodeToListenFor(lastReferenceNode);
+                            }
+
+                            addNodeToListenFor(titleButtonContainer, MobileFix.Replace);
                         }
 
                         lastReferenceNode = referenceNode;
-
-                        nodesToListenFor
-                        addNodeToListenFor(titleButtonContainer, MobileFix.Replace);
 
                         referenceNode.parentElement!.addEventListener("click", () => {
                             if (!chrome.runtime?.id) return; // Extension context invalidated
 
                             // Now the description with a second title element will be shown
-                            const selector = ".primary-info .title";
+                            const selector = ".primary-info .title, ytd-video-description-header-renderer #shorts-title";
 
-                            // If it already exists, this menu is about to be closed
-                            if (!document.querySelector(selector)) {
+                            // If it already exists, this menu is about to be closed on mobile
+                            if (!onMobile() || !document.querySelector(selector)) {
                                 waitForElement(selector).then((element) => {
                                     if (element) {
                                         replaceCurrentVideoBranding().catch(logError);
