@@ -1,7 +1,4 @@
 {
-    "optional_permissions": [
-        "declarativeContent"
-    ],
     "permissions": [
         "scripting"
     ],
