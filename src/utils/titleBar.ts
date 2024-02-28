@@ -1,7 +1,7 @@
 import { getYouTubeTitleNodeSelector } from "../../maze-utils/src/elements";
 import { getOriginalTitleElement } from "../titles/titleRenderer";
 import { BrandingLocation, replaceCurrentVideoBranding } from "../videoBranding/videoBranding";
-import { isVisible, waitForElement } from "../../maze-utils/src/dom";
+import { waitForElement } from "../../maze-utils/src/dom";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { logError } from "./logger";
 import { waitFor } from "../../maze-utils/src";
