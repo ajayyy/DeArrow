@@ -255,6 +255,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     width: 100%;
     border-radius: 5px;
     line-height: normal;
+    cursor: default;
 }
 
 .submissionMenuInner {

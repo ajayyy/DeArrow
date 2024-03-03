@@ -80,6 +80,16 @@ export class SubmitButton {
 
     close(): void {
         if (this.container) {
+            // Experimental YouTube layout with description on right
+            const isOnDescriptionOnRightLayout = document.querySelector("#title #description");
+            if (isOnDescriptionOnRightLayout) {
+                // Undo preventing color from changing on hover
+                const title = document.querySelector("#above-the-fold #title") as HTMLElement | null;
+                if (title) {
+                    title.style.removeProperty("background");
+                }
+            }
+            
             this.root?.unmount?.();
             this.root = null;
             this.container.remove();
@@ -108,6 +118,9 @@ export class SubmitButton {
 
                 if (isOnDescriptionOnRightLayout) {
                     this.container.style.marginTop = referenceNode.parentElement?.offsetHeight + "px";
+
+                    // Prevent color from changing on hover
+                    referenceNode.parentElement!.parentElement!.style.background = "transparent";
                 }
 
                 this.root = createRoot(this.container);

@@ -160,7 +160,9 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
     const thumbnailSubmissions = [...defaultThumbnails, ...extraUnsubmittedThumbnails, ...downloadedThumbnails];
     return (
-        <div className="submissionMenuInner">
+        <div className="submissionMenuInner"
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}>
             <BrandingPreviewComponent
                 submissions={props.submissions}
                 titles={titles}
