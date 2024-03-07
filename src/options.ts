@@ -267,7 +267,7 @@ async function init() {
                             break;
                         case "resetToDefault":
                             Config.resetToDefault();
-                            window.location.reload();
+                            setTimeout(() => window.location.reload(), 200);
                             break;
                     }
                 });
@@ -621,8 +621,7 @@ async function setTextOption(option: string, element: HTMLElement, value: string
                         await invidiousOnClick(checkbox, "supportInvidious");
                     }
 
-                    window.location.reload();
-
+                    setTimeout(() => window.location.reload(), 200);
                 } catch (e) {
                     alert(chrome.i18n.getMessage("incorrectlyFormattedOptions"));
                 }
