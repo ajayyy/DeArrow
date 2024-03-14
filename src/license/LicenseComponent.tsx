@@ -1,7 +1,13 @@
 import * as React from "react";
 import { getLicenseKey } from "./license";
+import { FormattedText } from "../popup/FormattedTextComponent";
+import { TitleFormatting } from "../config/config";
 
-export const LicenseComponent = () => {
+interface LicenseComponentProps {
+    titleFormatting?: TitleFormatting;
+}
+
+export const LicenseComponent = ({ titleFormatting }: LicenseComponentProps) => {
     const [showLicenseKey, setShowLicenseKey] = React.useState(false);
     const [licenseKey, setLicenseKey] = React.useState<string | null>(null);
 
@@ -19,7 +25,10 @@ export const LicenseComponent = () => {
                     onClick={() => {
                         setShowLicenseKey(!showLicenseKey);
                     }}>
-                    {chrome.i18n.getMessage("ViewLicenseKey")}
+                    <FormattedText
+                        langKey="ViewLicenseKey"
+                        titleFormatting={titleFormatting}
+                    />
                 </div>
             }
 
@@ -30,7 +39,10 @@ export const LicenseComponent = () => {
                         {licenseKey}
                     </div>
                     <div className="license-key-text">
-                        ({chrome.i18n.getMessage("SharingIsCaring")})
+                        <FormattedText
+                            langKey="SharingIsCaring"
+                            titleFormatting={titleFormatting}
+                        />
                     </div>
                 </>
             }

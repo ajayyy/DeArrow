@@ -9,6 +9,7 @@ import DownvoteIcon from "../svgIcons/downvoteIcon";
 import { submitVideoBrandingAndHandleErrors } from "../dataFetching";
 import { AnimationUtils } from "../../maze-utils/src/animationUtils";
 import Config from "../config/config";
+import { FormattedText } from "../popup/FormattedTextComponent";
 
 export interface ThumbnailSelectionComponentProps {
     video: HTMLVideoElement;
@@ -65,7 +66,10 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
                 <>
                     <div style={{ fontWeight: "bold", textAlign: "center", marginTop: "4px" }}>
                         {error ? <div>{error}</div> : null}
-                        {getText(props.time, props.type)}
+                        <FormattedText
+                            text={getText(props.time, props.type)}
+                            titleFormatting={Config.config!.titleFormatting}
+                        />
                     </div>
 
                     {
@@ -111,7 +115,7 @@ function getText(time: number | undefined, type: ThumbnailType) {
     } else if (type === ThumbnailType.CurrentTime) {
         return chrome.i18n.getMessage("CurrentTime");
     } else if (time != null) {
-        return getFormattedTime(time);
+        return getFormattedTime(time) || "";
     } else {
         return "";
     }

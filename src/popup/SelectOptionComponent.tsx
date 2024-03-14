@@ -1,5 +1,8 @@
 import * as React from "react";
 import ResetIcon from "../svgIcons/resetIcon";
+import { TitleFormatting } from "../config/config";
+import { formatTitleInternal } from "../titles/titleFormatter";
+import { FormattedText } from "./FormattedTextComponent";
 
 export interface SelectOption {
     value: string;
@@ -16,14 +19,37 @@ export interface SelectOptionComponentProps {
     className?: string;
     showResetButton?: boolean;
     onReset?: () => void;
+    titleFormatting?: TitleFormatting;
+    applyFormattingToOptions?: boolean;
 }
 
 export const SelectOptionComponent = (props: SelectOptionComponentProps) => {
+    const [options, setOptions] = React.useState(props.options);
+
+    React.useEffect(() => {
+        if (props.applyFormattingToOptions) {
+            (async () => {
+                const formattedOptions = await Promise.all(props.options.map(async (option) => {
+                    return {
+                        value: option.value,
+                        label: await formatTitleInternal(option.label, false, props.titleFormatting!, false)
+                    };
+                }));
+
+                setOptions(formattedOptions);
+            })();
+        } else {
+            setOptions(props.options);
+        }
+    }, [props.options, props.applyFormattingToOptions, props.titleFormatting!]);
+
     return (
         <div className={`sb-optionContainer ${props.className ?? ""}`} style={props.style}>
             {
                 props.label &&
-                    <label className="sb-optionLabel" htmlFor={props.id}>{props.label}</label>
+                    <label className="sb-optionLabel" htmlFor={props.id}>
+                        <FormattedText text={props.label} titleFormatting={props.titleFormatting}/>
+                    </label>
             }
             <select id={props.id}
                 className="sb-selector-element sb-optionsSelector"
@@ -31,7 +57,7 @@ export const SelectOptionComponent = (props: SelectOptionComponentProps) => {
                 onChange={(e) => {
                     props.onChange(e.target.value);
                 }}>
-                {getOptions(props.options)}
+                {getOptions(options)}
             </select>
 
             {

@@ -10,7 +10,6 @@ window["CB"] = Config;
 
 import KeybindComponent from "./options/KeybindComponent";
 import { showDonationLink } from "./utils/configUtils";
-import { localizeHtmlPage } from "../maze-utils/src/setup";
 import { StorageChangesObject } from "../maze-utils/src/config";
 import { getHash } from "../maze-utils/src/hash";
 import { isFirefoxOrSafari, waitFor } from "../maze-utils/src";
@@ -18,13 +17,12 @@ import { sendRequestToServer } from "./utils/requests";
 import { logError } from "./utils/logger";
 import ChannelOverrides from "./options/ChannelOverrides";
 import { getLicenseKey, isActivated } from "./license/license";
+import { localizeHtmlPageWithFormatting } from "./titles/titleFormatter";
 let embed = false;
 
 window.addEventListener('DOMContentLoaded', () => void init());
 
 async function init() {
-    localizeHtmlPage();
-
     // selected tab
     if (location.hash != "") {
         const substr = location.hash.slice(1);
@@ -53,7 +51,8 @@ async function init() {
         Config.configSyncListeners.push(optionsConfigUpdateListener);
     }
 
-    await waitFor(() => Config.isReady());
+    await waitFor(() => Config.isReady(), 1000, 1);
+    await localizeHtmlPageWithFormatting();
 
     if (!isActivated()) {
         chrome.runtime.sendMessage({ message: "openPayment" }, () => window.close());

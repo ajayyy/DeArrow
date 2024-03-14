@@ -23,6 +23,7 @@ import FontIcon from "../svgIcons/fontIcon";
 import { Tooltip } from "../utils/tooltip";
 import { LicenseComponent } from "../license/LicenseComponent";
 import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
+import { FormattedText } from "../popup/FormattedTextComponent";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -158,6 +159,8 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
         videoChangeListener();
     }, [props.videoID]);
 
+    const titleFormatting = Config.config!.titleFormatting;
+
     const thumbnailSubmissions = [...defaultThumbnails, ...extraUnsubmittedThumbnails, ...downloadedThumbnails];
     return (
         <div className="submissionMenuInner"
@@ -285,6 +288,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                         }}
                         value={actAsVip}
                         label={chrome.i18n.getMessage("actAsVip")}
+                        titleFormatting={titleFormatting}
                     />
                 </div>
             }
@@ -308,14 +312,20 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             }
                         });
                     }}>
-                    {`${chrome.i18n.getMessage("submit")}`}
+                    <FormattedText
+                        langKey="submit"
+                        titleFormatting={titleFormatting}
+                    />
                 </button>
             </div>
 
             {
                 !Config.config!.activated &&
                 <div className="cbNotice">
-                    {`${chrome.i18n.getMessage("youCannotVoteDuringTrial")}`}
+                    <FormattedText
+                        langKey="youCannotVoteDuringTrial"
+                        titleFormatting={titleFormatting}
+                    />
                 </div>
             }
 
@@ -333,7 +343,10 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             href="https://wiki.sponsor.ajay.app/w/DeArrow/Guidelines"
                             target="_blank"
                             rel="noreferrer">
-                            {`${chrome.i18n.getMessage("Guidelines")}`}
+                            <FormattedText
+                                langKey="Guidelines"
+                                titleFormatting={titleFormatting}
+                            />
                         </a>
 
                         <a className="cbNoticeButton"
@@ -344,13 +357,16 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             }, false)}`}
                             target="_blank"
                             rel="noreferrer">
-                            {`${chrome.i18n.getMessage("askAQuestion")}`}
+                            <FormattedText
+                                langKey="askAQuestion"
+                                titleFormatting={titleFormatting}
+                            />
                         </a>
                     </div>
 
-                    <YourWorkComponent/>
+                    <YourWorkComponent titleFormatting={titleFormatting} />
 
-                    <LicenseComponent/>
+                    <LicenseComponent titleFormatting={titleFormatting} />
                 </>
                 : null
             }
@@ -465,7 +481,12 @@ function getTips(): React.ReactElement[] {
     return tipInfo.map((tip, i) => (
         <div className="cbTip" key={i}>
             <tip.icon className="cbTipIcon"/>
-            <span className="cbTipText">{tip.text}</span>
+            <span className="cbTipText">
+                <FormattedText
+                    text={tip.text}
+                    titleFormatting={Config.config!.titleFormatting}
+                />
+            </span>
         </div>
     ));
 }

@@ -1,13 +1,18 @@
 import * as React from "react";
-import Config from "../config/config";
+import Config, { TitleFormatting } from "../config/config";
 import { sendRequestToServer } from "../utils/requests";
 import { getHash } from "../../maze-utils/src/hash";
 import { getErrorMessage } from "../../maze-utils/src/formating";
 import PencilIcon from "../svgIcons/pencilIcon";
 import ClipboardIcon from "../svgIcons/clipboardIcon";
 import CheckIcon from "../svgIcons/checkIcon";
+import { FormattedText } from "./FormattedTextComponent";
 
-export const YourWorkComponent = () => {
+interface YourWorkComponentProps {
+    titleFormatting?: TitleFormatting;
+}
+
+export const YourWorkComponent = ({ titleFormatting }: YourWorkComponentProps) => {
     const [isSettingUsername, setIsSettingUsername] = React.useState(false);
     const [username, setUsername] = React.useState("");
     const [newUsername, setNewUsername] = React.useState("");
@@ -37,12 +42,19 @@ export const YourWorkComponent = () => {
     return (
         <div className="sbYourWorkBox">
             <h2 className="sbHeader" style={{ "padding": "8px 15px" }}>
-            {chrome.i18n.getMessage("yourWork")}
+                <FormattedText
+                    langKey="yourWork"
+                    titleFormatting={titleFormatting}
+                />
             </h2>
             <div className="sbYourWorkCols">
                 {/* Username */}
                 <div id="cbUsernameElement">
-                    <p className="u-mZ cb-grey-text">{chrome.i18n.getMessage("Username")}:
+                    <p className="u-mZ cb-grey-text">
+                        <FormattedText
+                            langKey="Username"
+                            titleFormatting={titleFormatting}
+                        />:
                         {/* loading/errors */}
                         <span id="setUsernameStatus" 
                             className={`u-mZ cb-white-text${!usernameSubmissionStatus ? " hidden" : ""}`}>
@@ -98,11 +110,21 @@ export const YourWorkComponent = () => {
                 </div>
                 {/* Submissions */}
                 <div id="sponsorTimesContributionsContainer" className={isSettingUsername ? " hidden" : ""}>
-                    <p className="u-mZ cb-grey-text">{chrome.i18n.getMessage("Titles")}:</p>
+                    <p className="u-mZ cb-grey-text">
+                        <FormattedText
+                            langKey="Titles"
+                            titleFormatting={titleFormatting}
+                        />:
+                    </p>
                     <p id="sponsorTimesContributionsDisplay" className="u-mZ">{titleSubmissionCount}</p>
                 </div>
                 <div id="sponsorTimesContributionsContainer" className={isSettingUsername ? " hidden" : ""}>
-                    <p className="u-mZ cb-grey-text">{chrome.i18n.getMessage("Thumbnails")}:</p>
+                    <p className="u-mZ cb-grey-text">
+                        <FormattedText
+                            langKey="Thumbnails"
+                            titleFormatting={titleFormatting}
+                        />:
+                    </p>
                     <p id="sponsorTimesContributionsDisplay" className="u-mZ">{thumbnailSubmissionCount}</p>
                 </div>
             </div>
