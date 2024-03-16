@@ -51,7 +51,7 @@ export const PaymentComponent = () => {
     }, false)}`);
 
     const applyChoices = async (choices: PaymentComponentChoices) => {
-        if (Config.config!.freeTrialStart && !Config.config!.freeTrialEnded) {
+        if (freeTrialActive()) {
             // Can't have two trials at once
             choices.freeTrial = false;
         }
