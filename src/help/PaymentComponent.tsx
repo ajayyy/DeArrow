@@ -51,7 +51,7 @@ export const PaymentComponent = () => {
     }, false)}`);
 
     const applyChoices = async (choices: PaymentComponentChoices) => {
-        if (freeTrialActive()) {
+        if (Config.config!.freeTrialStart && !Config.config!.freeTrialEnded) {
             // Can't have two trials at once
             choices.freeTrial = false;
         }
@@ -79,6 +79,7 @@ export const PaymentComponent = () => {
             } else if (choices.freeTrial) {
                 setPaymentResult(PaymentResultMessageType.FreeTrial)
                 Config.config!.freeTrialStart = Date.now();
+                Config.config!.freeTrialEnded = false;
             }
 
             window.scrollTo(0, 0);
