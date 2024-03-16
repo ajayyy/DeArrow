@@ -46,7 +46,7 @@ export const PaymentComponent = () => {
 
     const iframeSource = React.useRef(`${websiteDomain}/payment#${objectToURI("", {
         hideFreeTrial: Config.config!.freeTrialStart !== null && !Config.config!.freeTrialEnded,
-        hideRequestFreeAccessButton: freeTrialActive(),
+        hideRequestFreeAccessButton: Config.config!.freeAccessRequestStart !== null,
         hideRedeem: true
     }, false)}`);
 
