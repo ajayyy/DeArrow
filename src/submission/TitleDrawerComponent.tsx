@@ -1,5 +1,6 @@
 import * as React from "react";
 import { TitleComponent } from "./TitleComponent";
+import { VideoID } from "../../maze-utils/src/video";
 
 export interface TitleDrawerComponentProps {
     existingSubmissions: RenderedTitleSubmission[];
@@ -7,6 +8,7 @@ export interface TitleDrawerComponentProps {
     onDeselect: (index: number) => void;
     selectedTitleIndex: number;
     actAsVip: boolean;
+    videoID: VideoID;
 }
 
 export interface RenderedTitleSubmission {
@@ -43,6 +45,7 @@ function getTitles(props: TitleDrawerComponentProps,
                 actAsVip={props.actAsVip}
                 key={i}
                 submission={props.existingSubmissions[i]}
+                videoID={props.videoID}
             ></TitleComponent>
         );
     }

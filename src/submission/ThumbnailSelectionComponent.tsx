@@ -94,6 +94,15 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
 
                                     const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
                                     submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), true, props.actAsVip!).then(stopAnimation);
+
+                                    const unsubmitted = Config.local!.unsubmitted[props.videoID];
+                                    if (unsubmitted) {
+                                        const unsubmittedThumbnail = unsubmitted.thumbnails.find((t) => !t.original && t.timestamp === props.time);
+                                        if (unsubmittedThumbnail) {
+                                            unsubmitted.thumbnails.splice(unsubmitted.thumbnails.indexOf(unsubmittedThumbnail), 1);
+                                            Config.forceLocalUpdate("unsubmitted");
+                                        }
+                                    }
                                 }}>
                                 <DownvoteIcon locked={ Config.config!.vip && props.locked }/>
                             </button>

@@ -6,6 +6,7 @@ import UpvoteIcon from "../svgIcons/upvoteIcon";
 import DownvoteIcon from "../svgIcons/downvoteIcon";
 import { submitVideoBrandingAndHandleErrors } from "../dataFetching";
 import { AnimationUtils } from "../../maze-utils/src/animationUtils";
+import { VideoID } from "../../maze-utils/src/video";
 
 export interface TitleComponentProps {
     submission: RenderedTitleSubmission;
@@ -13,6 +14,7 @@ export interface TitleComponentProps {
     onSelectOrUpdate: (title: string, oldTitle: string) => void;
     onDeselect: () => void;
     actAsVip: boolean;
+    videoID: VideoID;
 }
 
 const maxTitleLength = 110;
@@ -108,6 +110,15 @@ export const TitleComponent = (props: TitleComponentProps) => {
 
                         const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
                         submitVideoBrandingAndHandleErrors(props.submission, null, false, props.actAsVip).then(stopAnimation);
+
+                        const unsubmitted = Config.local!.unsubmitted[props.videoID];
+                        if (unsubmitted) {
+                            const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === props.submission.title);
+                            if (unsubmittedTitle) {
+                                unsubmitted.titles.splice(unsubmitted.titles.indexOf(unsubmittedTitle), 1);
+                                Config.forceLocalUpdate("unsubmitted");
+                            }
+                        }
                     }}>
                     <UpvoteIcon/>
                 </button>

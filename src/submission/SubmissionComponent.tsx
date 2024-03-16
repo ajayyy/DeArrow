@@ -237,6 +237,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                 <TitleDrawerComponent existingSubmissions={[...titles, ...extraUnsubmittedTitles]}
                     selectedTitleIndex={selectedTitleIndex}
                     actAsVip={actAsVip}
+                    videoID={props.videoID}
                     onDeselect={() => {
                         setSelectedTitleIndex(-1);
                         setSelectedTitle(null);
