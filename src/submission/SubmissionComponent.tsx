@@ -296,8 +296,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
             <div className="cbVoteButtonContainer">
                 <button className="cbNoticeButton cbVoteButton" 
-                    disabled={!Config.config!.activated
-                                || currentlySubmitting 
+                    disabled={currentlySubmitting 
                                 || (!selectedThumbnail.current && !selectedTitle) 
                                 || (!!selectedTitle && selectedTitle.title.toLowerCase() === chrome.i18n.getMessage("OriginalTitle").toLowerCase())}
                     onClick={async () => {
@@ -319,16 +318,6 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                     />
                 </button>
             </div>
-
-            {
-                !Config.config!.activated &&
-                <div className="cbNotice">
-                    <FormattedText
-                        langKey="youCannotVoteDuringTrial"
-                        titleFormatting={titleFormatting}
-                    />
-                </div>
-            }
 
             {
                 Config.config!.showGuidelineHelp ? 
