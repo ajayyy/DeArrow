@@ -93,7 +93,7 @@ export const PaymentComponent = () => {
 
         if (validLicenseKey && !openedTab) {
             openedTab = true;
-            chrome.runtime.sendMessage({ "message": "openHelp" }, () => window.close());
+            setTimeout(() => chrome.runtime.sendMessage({ "message": "openHelp" }, () => window.close()), 200);
         }
     }
 
