@@ -189,7 +189,7 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
             titleElement.style.setProperty("display", "none", "important");
         }
 
-        const promises = [videoPromise, titlePromise] as [Promise<boolean>, Promise<boolean>];
+        const promises = [titlePromise, videoPromise] as [Promise<boolean>, Promise<boolean>];
 
         void handleShowOriginalButton(element, videoID, brandingLocation, showCustomBranding, promises);
 
@@ -294,7 +294,7 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
             && (!originalTitle || (cleanResultingTitle(cleanEmojis(title.title))).toLowerCase() !== (cleanResultingTitle(cleanEmojis(originalTitle))).toLowerCase())
             && await shouldUseCrowdsourcedTitles(videoID);
 
-        if (!customTitle && !Config.config!.showIconForFormattedTitles) {
+        if (!customTitle && !Config.config!.showIconForFormattedTitles && !await promises[1]) {
             return;
         }
         
