@@ -151,7 +151,8 @@ export async function toTitleCase(str: string, isCustom: boolean): Promise<strin
             // For non-custom, allow any that isn't all caps
             result += word + " ";
         } else if ((!Config.config?.onlyTitleCaseInEnglish || isEnglish)
-                && !startOfSentence(index, words) && listHasWord(titleCaseNotCapitalized, word.toLowerCase())) {
+                && !startOfSentence(index, words) && !endOfSentence(index, words)
+                    && listHasWord(titleCaseNotCapitalized, word.toLowerCase())) {
             // Skip lowercase check for the first word
             result += await toLowerCase(word, isTurkiq) + " ";
         } else if (isFirstLetterCapital(word) &&
@@ -447,8 +448,18 @@ function startOfSentence(index: number, words: string[]): boolean {
     return index === 0 || isDelimeter(words[index - 1]);
 }
 
+function endOfSentence(index: number, words: string[]): boolean {
+    return index === words.length - 1 
+        || isDelimeter(words[index]) // "word!" counts as delimeter
+        || (!!words[index + 1] && isEntirelyDelimeter(words[index + 1]));
+}
+
+function isEntirelyDelimeter(word: string): boolean {
+    return word.match(/^[-:;~—–|]$/) !== null;
+}
+
 function isDelimeter(word: string): boolean {
-    return (word.match(/^[-:;~—–|]$/) !== null 
+    return (isEntirelyDelimeter(word)
         || word.match(/[:?.!\]]$/) !== null)
         && !listHasWord(allowlistedWords, word)
         && !listHasWord(notStartOfSentence, word)
