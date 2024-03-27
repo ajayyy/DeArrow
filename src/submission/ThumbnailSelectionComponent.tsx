@@ -83,6 +83,16 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
 
                                     const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
                                     submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), false, props.actAsVip!).then(stopAnimation);
+
+                                    const unsubmitted = Config.local!.unsubmitted[props.videoID];
+                                    if (unsubmitted) {
+                                        const unsubmittedThumbnail = unsubmitted.thumbnails.find((t) => !t.original && t.timestamp === props.time);
+                                        if (unsubmittedThumbnail) {
+                                            unsubmitted.thumbnails.forEach((t) => t.selected = false);
+                                            unsubmittedThumbnail.selected = true;
+                                            Config.forceLocalUpdate("unsubmitted");
+                                        }
+                                    }
                                 }}>
                                 <UpvoteIcon/>
                             </button>

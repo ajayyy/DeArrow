@@ -115,7 +115,8 @@ export const TitleComponent = (props: TitleComponentProps) => {
                         if (unsubmitted) {
                             const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === props.submission.title);
                             if (unsubmittedTitle) {
-                                unsubmitted.titles.splice(unsubmitted.titles.indexOf(unsubmittedTitle), 1);
+                                unsubmitted.titles.forEach((t) => t.selected = false);
+                                unsubmittedTitle.selected = true;
                                 Config.forceLocalUpdate("unsubmitted");
                             }
                         }
@@ -130,6 +131,15 @@ export const TitleComponent = (props: TitleComponentProps) => {
 
                         const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
                         submitVideoBrandingAndHandleErrors(props.submission, null, true, props.actAsVip).then(stopAnimation);
+
+                        const unsubmitted = Config.local!.unsubmitted[props.videoID];
+                        if (unsubmitted) {
+                            const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === props.submission.title);
+                            if (unsubmittedTitle) {
+                                unsubmitted.titles.splice(unsubmitted.titles.indexOf(unsubmittedTitle), 1);
+                                Config.forceLocalUpdate("unsubmitted");
+                            }
+                        }
                     }}>
                     <DownvoteIcon locked={ Config.config!.vip && props.submission.locked }/>
                 </button>
