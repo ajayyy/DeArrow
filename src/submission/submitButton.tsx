@@ -205,7 +205,7 @@ export class SubmitButton {
                     unsubmitted.thumbnails.forEach((t) => t.selected = false);
 
                     if (title) {
-                        const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === title!.title);
+                        const unsubmittedTitle = unsubmitted.titles.find((t) => t.title.trim() === title!.title);
                         if (unsubmittedTitle) unsubmittedTitle.selected = true;
                     }
                     
