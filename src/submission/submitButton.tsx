@@ -228,7 +228,7 @@ export class SubmitButton {
                 Config.forceLocalUpdate("unsubmitted");
             }
 
-            replaceCurrentVideoBranding().catch(logError);
+            setTimeout(() => replaceCurrentVideoBranding().catch(logError), 1100);
 
             return true;
         } else {
