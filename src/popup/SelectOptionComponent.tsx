@@ -1,8 +1,8 @@
 import * as React from "react";
 import ResetIcon from "../svgIcons/resetIcon";
-import { TitleFormatting } from "../config/config";
-import { formatTitleInternal } from "../titles/titleFormatter";
+import { TitleFormatting, formatTitle } from "../../maze-utils/src/titleFormatter";
 import { FormattedText } from "./FormattedTextComponent";
+import Config from '../config/config'
 
 export interface SelectOption {
     value: string;
@@ -32,7 +32,7 @@ export const SelectOptionComponent = (props: SelectOptionComponentProps) => {
                 const formattedOptions = await Promise.all(props.options.map(async (option) => {
                     return {
                         value: option.value,
-                        label: await formatTitleInternal(option.label, false, props.titleFormatting!, false)
+                        label: await formatTitle(option.label, false, props.titleFormatting!, false, Config.config!.onlyTitleCaseInEnglish)
                     };
                 }));
 

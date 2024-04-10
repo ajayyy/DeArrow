@@ -1,7 +1,8 @@
 import * as React from "react";
-import Config, { TitleFormatting } from "../config/config";
+import Config from "../config/config";
 import { getVideoThumbnailIncludingUnsubmitted, getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { VideoID } from "../../maze-utils/src/video";
+import { TitleFormatting } from "../../maze-utils/src/titleFormatter";
 import { FormattingOptionsComponent } from "../popup/FormattingOptionsComponent";
 import { Tooltip } from "../utils/tooltip";
 import { BrandingLocation, ShowCustomBrandingInfo, getActualShowCustomBranding } from "./videoBranding";
@@ -14,7 +15,7 @@ export async function handleOnboarding(element: HTMLElement, videoID: VideoID,
     if (Config.config!.showInfoAboutRandomThumbnails && await getActualShowCustomBranding(showCustomBranding) && element && videoID
             && brandingLocation === BrandingLocation.Related && document.URL === "https://www.youtube.com/"
             && !CompileConfig.debug) {
-        
+
         const ignoreTitleChange = Config.config!.titleFormatting === TitleFormatting.Disable;
 
         // Both title and thumbnail changed due to random time or title format
@@ -22,7 +23,7 @@ export async function handleOnboarding(element: HTMLElement, videoID: VideoID,
         if (result[0] && !(await getVideoThumbnailIncludingUnsubmitted(videoID, brandingLocation, false))
             && (ignoreTitleChange || (result[1] && !(await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation))))
             && !await isLiveOrUpcoming(videoID)) {
-            
+
             // Check if notice will be visible (since it appears to the left of the element)
             const box = element.closest("#contents");
             const boundingRect = element.getBoundingClientRect();

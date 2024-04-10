@@ -1,6 +1,7 @@
 import * as React from "react";
-import Config, { ThumbnailFallbackOption, TitleFormatting } from "../config/config";
-import { toFirstLetterUppercase, toLowerCaseTitle, toSentenceCase } from "../titles/titleFormatter";
+import Config, { ThumbnailFallbackOption } from "../config/config";
+import { TitleFormatting } from "../../maze-utils/src/titleFormatter";
+import { toFirstLetterUppercase, toLowerCaseTitle, toSentenceCase } from "../../maze-utils/src/titleFormatter/formatters";
 import { SelectOptionComponent } from "./SelectOptionComponent";
 import { ToggleOptionComponent } from "./ToggleOptionComponent";
 

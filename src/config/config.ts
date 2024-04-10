@@ -1,5 +1,6 @@
 import { ProtoConfig } from "../../maze-utils/src/config";
 import { VideoID } from "../../maze-utils/src/video";
+import { TitleFormatting } from '../../maze-utils/src/titleFormatter';
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { logError } from "../utils/logger";
 import * as CompileConfig from "../../config.json";
@@ -20,15 +21,6 @@ export interface UnsubmittedTitleSubmission {
 export interface UnsubmittedSubmission {
     thumbnails: UnsubmittedThumbnailSubmission[];
     titles: UnsubmittedTitleSubmission[];
-}
-
-export enum TitleFormatting {
-    Disable = -1,
-    CapitalizeWords,
-    TitleCase,
-    SentenceCase,
-    LowerCase,
-    FirstLetterUppercase
 }
 
 export enum ThumbnailCacheOption {
@@ -147,7 +139,7 @@ class ConfigClass extends ProtoConfig<SBConfig, SBStorage> {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
 function migrateOldSyncFormats(config: SBConfig) {
-    
+
 }
 
 const syncDefaults = {

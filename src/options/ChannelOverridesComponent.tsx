@@ -3,7 +3,7 @@ import { SelectOptionComponent } from "../popup/SelectOptionComponent";
 import Config, { ConfigurationID, CustomConfiguration, ThumbnailFallbackOption } from "../config/config";
 import { generateUserID } from "../../maze-utils/src/setup";
 import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
-import { toFirstLetterUppercase, toLowerCaseTitle, toSentenceCase } from "../titles/titleFormatter";
+import { toFirstLetterUppercase, toLowerCaseTitle, toSentenceCase } from "../../maze-utils/src/titleFormatter/formatters";
 
 let forceUpdateConfigurationsTimeout: NodeJS.Timeout | null = null;
 let forceUpdateOverridesTimeout: NodeJS.Timeout | null = null;
@@ -72,7 +72,7 @@ export const ChannelOverridesComponent = () => {
                     }))}
                 />
 
-                <div 
+                <div
                     className="option-button trigger-button"
                     onClick={() => {
                         const newID = generateUserID();
@@ -103,7 +103,7 @@ export const ChannelOverridesComponent = () => {
             {
                 selectedConfigurationID != null &&
                 <>
-                    <input 
+                    <input
                         type="text"
                         id="configurationName"
                         value={configurationName}
@@ -120,10 +120,10 @@ export const ChannelOverridesComponent = () => {
                     <div>
                         {chrome.i18n.getMessage("ChannelListInstructions")}
                     </div>
-                
-                    <textarea 
-                        className="option-text-box" 
-                        rows={10} 
+
+                    <textarea
+                        className="option-text-box"
+                        rows={10}
                         value={channelListText}
                         onChange={(e) => {
                             const newText = e.target.value;
@@ -193,7 +193,7 @@ export const ChannelOverridesComponent = () => {
                         }}
                         value={getValueWithDefault(useCrowdsourcedTitles, "useCrowdsourcedTitles")}
                         label={chrome.i18n.getMessage("useCrowdsourcedTitles")}
-                        className={getClassNames(useCrowdsourcedTitles) 
+                        className={getClassNames(useCrowdsourcedTitles)
                             + (!getValueWithDefault(replaceTitles, "replaceTitles") ? " hiding" : "")
                             + (hideUseCrowdsourcedTitles ? " hidden" : "")}
                         showResetButton={shouldShowResetButton(useCrowdsourcedTitles)}
@@ -292,7 +292,7 @@ export const ChannelOverridesComponent = () => {
                         />
                     }
 
-                    <div 
+                    <div
                         className="option-button trigger-button"
                         onClick={() => {
                             if (confirm(chrome.i18n.getMessage("areYouSureDeleteConfig"))) {

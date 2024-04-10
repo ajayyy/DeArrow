@@ -1,5 +1,6 @@
 import * as React from "react";
-import Config, { TitleFormatting } from "../config/config";
+import Config from "../config/config";
+import { TitleFormatting } from "../../maze-utils/src/titleFormatter";
 import { sendRequestToServer } from "../utils/requests";
 import { getHash } from "../../maze-utils/src/hash";
 import { getErrorMessage } from "../../maze-utils/src/formating";
@@ -56,14 +57,14 @@ export const YourWorkComponent = ({ titleFormatting }: YourWorkComponentProps) =
                             titleFormatting={titleFormatting}
                         />:
                         {/* loading/errors */}
-                        <span id="setUsernameStatus" 
+                        <span id="setUsernameStatus"
                             className={`u-mZ cb-white-text${!usernameSubmissionStatus ? " hidden" : ""}`}>
                             {usernameSubmissionStatus}
                         </span>
                     </p>
                     <div id="setUsernameContainer" className={isSettingUsername ? " hidden" : ""}>
                         <p id="usernameValue">{username}</p>
-                        <button id="setUsernameButton" 
+                        <button id="setUsernameButton"
                             title={chrome.i18n.getMessage("setUsername")}
                             onClick={() => {
                                 setNewUsername(username);
@@ -71,7 +72,7 @@ export const YourWorkComponent = ({ titleFormatting }: YourWorkComponentProps) =
                             }}>
                             <PencilIcon id="sbPopupIconEdit" className="cbPopupButton" />
                         </button>
-                        <button id="copyUserID" 
+                        <button id="copyUserID"
                             title={chrome.i18n.getMessage("copyPublicID")}
                             onClick={async () => {
                                 window.navigator.clipboard.writeText(await getHash(Config.config!.userID!));
@@ -80,7 +81,7 @@ export const YourWorkComponent = ({ titleFormatting }: YourWorkComponentProps) =
                         </button>
                     </div>
                     <div id="setUsername" className={!isSettingUsername ? " hidden" : " SBExpanded"}>
-                        <input id="usernameInput" 
+                        <input id="usernameInput"
                             placeholder={chrome.i18n.getMessage("Username")}
                             value={newUsername}
                             onChange={(e) => {
@@ -133,7 +134,7 @@ export const YourWorkComponent = ({ titleFormatting }: YourWorkComponentProps) =
                 Config.config!.countReplacements && getReplacementsMessage()
             }
 
-            
+
         </div>
     );
 };
@@ -166,5 +167,5 @@ function getReplacementsMessage(): JSX.Element {
 
             {messageParts[1]}
         </p>
-    )  
+    )
 }

@@ -1,10 +1,12 @@
 import { VideoID, getVideoID } from "../../maze-utils/src/video";
-import Config, { TitleFormatting } from "../config/config";
+import Config from "../config/config";
+import { TitleFormatting } from "../../maze-utils/src/titleFormatter";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
 import { MobileFix, addNodeToListenFor, getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { BrandingLocation, ShowCustomBrandingInfo, extractVideoIDFromElement, getActualShowCustomBranding, toggleShowCustom } from "../videoBranding/videoBranding";
-import { cleanEmojis, formatTitle } from "./titleFormatter";
+import { formatTitle } from "./titleFormatter";
+import { cleanEmojis } from "../../maze-utils/src/titleFormatter/helpers";
 import { setCurrentVideoTitle } from "./pageTitleHandler";
 import { getTitleFormatting, shouldCleanEmojis, shouldDefaultToCustom, shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { countTitleReplacement } from "../config/stats";
@@ -28,11 +30,11 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         showOriginalTitle(element, brandingLocation);
         return false;
     }
-    
+
     if (brandingLocation === BrandingLocation.Watch) {
         const currentWatchPageType = document.URL.includes("watch") ? WatchPageType.Video : WatchPageType.Miniplayer;
 
-        if (lastWatchVideoID && originalTitleElement?.textContent 
+        if (lastWatchVideoID && originalTitleElement?.textContent
                 && videoID !== lastWatchVideoID && originalTitleElement.textContent === lastWatchTitle
                 && lastUrlWatchPageType === currentWatchPageType) {
             // Don't reset it if it hasn't changed videos yet, will be handled by title change listener
@@ -70,21 +72,21 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         if (title && await shouldUseCrowdsourcedTitles(videoID)
                 // If there are just formatting changes, and the user doesn't want those, don't replace
                 && (await getTitleFormatting(videoID) !== TitleFormatting.Disable || originalTitle.toLowerCase() !== title.toLowerCase())
-                && (await getTitleFormatting(videoID) !== TitleFormatting.Disable 
+                && (await getTitleFormatting(videoID) !== TitleFormatting.Disable
                     || await shouldCleanEmojis(videoID) || cleanEmojis(originalTitle.toLowerCase()) !== cleanEmojis(title.toLowerCase()))) {
             const formattedTitle = await formatTitle(title, true, videoID);
             if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
 
-            if (originalTitleElement?.textContent 
+            if (originalTitleElement?.textContent
                     && originalTitleElement.textContent.trim() === formattedTitle) {
                 showOriginalTitle(element, brandingLocation);
                 return false;
             }
-            
+
             if (onMobile()) {
                 hideOriginalTitle(element, brandingLocation);
             }
-            
+
             setCustomTitle(formattedTitle, element, brandingLocation);
             countTitleReplacement(videoID);
         } else if (originalTitleElement?.textContent) {
@@ -129,7 +131,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
 }
 
 async function isOnCorrectVideo(element: HTMLElement, brandingLocation: BrandingLocation, videoID: VideoID): Promise<boolean> {
-    return brandingLocation === BrandingLocation.Watch ? getVideoID() === videoID 
+    return brandingLocation === BrandingLocation.Watch ? getVideoID() === videoID
         : await extractVideoIDFromElement(element, brandingLocation) === videoID;
 }
 
@@ -148,7 +150,7 @@ function hideOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
 function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocation) {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
-    
+
     titleElement.style.display = "none";
     if (!originalTitleElement.classList.contains("ta-title-container")) {
         originalTitleElement.style.setProperty("display", "-webkit-box", "important");
@@ -257,7 +259,7 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
     switch (brandingLocation) {
         case BrandingLocation.Watch:
             return [
-                "yt-formatted-string", 
+                "yt-formatted-string",
                 ".ytp-title-link.yt-uix-sessionlink",
                 ".yt-core-attributed-string"
             ];
@@ -293,15 +295,15 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
 }
 
 export function getOrCreateTitleElement(element: HTMLElement, brandingLocation: BrandingLocation, originalTitleElement?: HTMLElement): HTMLElement {
-    return element.querySelector(".cbCustomTitle") as HTMLElement ?? 
+    return element.querySelector(".cbCustomTitle") as HTMLElement ??
         createTitleElement(element, originalTitleElement ?? getOriginalTitleElement(element, brandingLocation), brandingLocation);
 }
 
 function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): HTMLElement {
-    const titleElement = brandingLocation !== BrandingLocation.Watch 
+    const titleElement = brandingLocation !== BrandingLocation.Watch
             || originalTitleElement.classList.contains("miniplayer-title")
             || originalTitleElement.classList.contains("ytp-title-link")
-        ? originalTitleElement.cloneNode() as HTMLElement 
+        ? originalTitleElement.cloneNode() as HTMLElement
         : document.createElement("span");
     titleElement.classList.add("cbCustomTitle");
 
@@ -405,7 +407,7 @@ export async function hideAndUpdateShowOriginalButton(element: HTMLElement, bran
                 buttonElement.title = chrome.i18n.getMessage("ShowModified");
             }
 
-            const isDefault = showCustomBranding.knownValue === null 
+            const isDefault = showCustomBranding.knownValue === null
                 || showCustomBranding.knownValue === showCustomBranding.originalValue;
             if (isDefault
                     && brandingLocation !== BrandingLocation.Watch
@@ -421,7 +423,7 @@ export async function hideAndUpdateShowOriginalButton(element: HTMLElement, bran
 }
 
 export async function findShowOriginalButton(originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): Promise<HTMLElement> {
-    const referenceNode = brandingLocation === BrandingLocation.Watch 
+    const referenceNode = brandingLocation === BrandingLocation.Watch
         ? (await getOrCreateTitleButtonContainer()) : originalTitleElement.parentElement;
     return referenceNode?.querySelector?.(".cbShowOriginal") as HTMLElement;
 }
@@ -429,7 +431,7 @@ export async function findShowOriginalButton(originalTitleElement: HTMLElement, 
 export async function findOrCreateShowOriginalButton(element: HTMLElement, brandingLocation: BrandingLocation,
         videoID: VideoID): Promise<HTMLElement> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
-    const buttonElement = await findShowOriginalButton(originalTitleElement, brandingLocation) 
+    const buttonElement = await findShowOriginalButton(originalTitleElement, brandingLocation)
         ?? await createShowOriginalButton(originalTitleElement, brandingLocation, videoID);
 
     buttonElement.setAttribute("videoID", videoID);
@@ -458,7 +460,7 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
     }
 
     buttonElement.classList.add("cbButton");
-    if (brandingLocation === BrandingLocation.Watch 
+    if (brandingLocation === BrandingLocation.Watch
             || Config.config!.alwaysShowShowOriginalButton) {
         buttonElement.classList.add("cbDontHide");
     }
@@ -541,7 +543,7 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
 
     if (brandingLocation === BrandingLocation.Watch) {
         const referenceNode = await getOrCreateTitleButtonContainer();
-        
+
         // Verify again it doesn't already exist
         const existingButton = referenceNode?.querySelector?.(".cbShowOriginal");
         if (existingButton) {
