@@ -77,6 +77,12 @@ interface SBConfig {
     invidiousInstances: string[];
     keepUnsubmitted: boolean;
     keepUnsubmittedInPrivate: boolean;
+    /**
+     * The level of desaturation applied to thumbnails (0 - 100).
+     *
+     * @type {number}
+     */
+    thumbnailDesaturationLevel: number;
     titleFormatting: TitleFormatting;
     shouldCleanEmojis: boolean;
     onlyTitleCaseInEnglish: boolean;
@@ -161,6 +167,7 @@ const syncDefaults = {
     invidiousInstances: [],
     keepUnsubmitted: true,
     keepUnsubmittedInPrivate: false,
+    thumbnailDesaturationLevel: 0,
     titleFormatting: isEnglish ? TitleFormatting.TitleCase : TitleFormatting.Disable,
     shouldCleanEmojis: true,
     onlyTitleCaseInEnglish: false,
