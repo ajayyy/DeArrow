@@ -8,7 +8,7 @@ import { RenderedTitleSubmission, TitleDrawerComponent } from "./TitleDrawerComp
 import { VideoID } from "../../maze-utils/src/video";
 import Config, { UnsubmittedSubmission } from "../config/config";
 import { addTitleChangeListener, removeTitleChangeListener } from "../utils/titleBar";
-import { toSentenceCase } from "../../maze-utils/src/titleFormatter/formatters/sentenceCase";
+import { toSentenceCase } from "../../title-formatting/src/formatters/sentenceCase";
 import { BrandingPreviewComponent } from "./BrandingPreviewComponent";
 import { getHash } from "../../maze-utils/src/hash";
 import { sendRequestToServer } from "../utils/requests";

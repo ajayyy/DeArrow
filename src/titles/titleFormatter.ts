@@ -1,7 +1,7 @@
 import { VideoID } from "../../maze-utils/src/video";
 import Config from "../config/config";
 import { getTitleFormatting, shouldCleanEmojis } from "../config/channelOverrides";
-import { TitleFormatting, formatTitle as formatTitleInternal } from '../../maze-utils/src/titleFormatter'
+import { TitleFormatting, formatTitle as formatTitleInternal } from '../../title-formatting/src'
 
 
 export async function formatTitle(title: string, isCustom: boolean, videoID: VideoID | null): Promise<string> {

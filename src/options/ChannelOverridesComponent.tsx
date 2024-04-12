@@ -3,7 +3,7 @@ import { SelectOptionComponent } from "../popup/SelectOptionComponent";
 import Config, { ConfigurationID, CustomConfiguration, ThumbnailFallbackOption } from "../config/config";
 import { generateUserID } from "../../maze-utils/src/setup";
 import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
-import { toFirstLetterUppercase, toLowerCaseTitle, toSentenceCase } from "../../maze-utils/src/titleFormatter/formatters";
+import { toFirstLetterUppercase, toLowerCaseTitle, toSentenceCase } from "../../title-formatting/src/formatters";
 
 let forceUpdateConfigurationsTimeout: NodeJS.Timeout | null = null;
 let forceUpdateOverridesTimeout: NodeJS.Timeout | null = null;

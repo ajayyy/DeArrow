@@ -1,12 +1,12 @@
 import { VideoID, getVideoID } from "../../maze-utils/src/video";
 import Config from "../config/config";
-import { TitleFormatting } from "../../maze-utils/src/titleFormatter";
+import { TitleFormatting } from "../../title-formatting/src";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
 import { MobileFix, addNodeToListenFor, getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { BrandingLocation, ShowCustomBrandingInfo, extractVideoIDFromElement, getActualShowCustomBranding, toggleShowCustom } from "../videoBranding/videoBranding";
 import { formatTitle } from "./titleFormatter";
-import { cleanEmojis } from "../../maze-utils/src/titleFormatter/helpers";
+import { cleanEmojis } from "../../title-formatting/src/helpers";
 import { setCurrentVideoTitle } from "./pageTitleHandler";
 import { getTitleFormatting, shouldCleanEmojis, shouldDefaultToCustom, shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { countTitleReplacement } from "../config/stats";

@@ -1,6 +1,6 @@
 import * as React from "react";
 import ResetIcon from "../svgIcons/resetIcon";
-import { TitleFormatting } from "../../maze-utils/src/titleFormatter";
+import { TitleFormatting } from "../../title-formatting/src";
 import { FormattedText } from "./FormattedTextComponent";
 
 export interface SelectOption {

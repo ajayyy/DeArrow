@@ -2,7 +2,7 @@ import * as React from "react";
 import Config from "../config/config";
 import { getVideoThumbnailIncludingUnsubmitted, getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { VideoID } from "../../maze-utils/src/video";
-import { TitleFormatting } from "../../maze-utils/src/titleFormatter";
+import { TitleFormatting } from "../../title-formatting/src";
 import { FormattingOptionsComponent } from "../popup/FormattingOptionsComponent";
 import { Tooltip } from "../utils/tooltip";
 import { BrandingLocation, ShowCustomBrandingInfo, getActualShowCustomBranding } from "./videoBranding";

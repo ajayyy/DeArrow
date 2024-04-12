@@ -1,6 +1,6 @@
 import * as React from "react";
 import Config from "../config/config";
-import { TitleFormatting } from "../../maze-utils/src/titleFormatter";
+import { TitleFormatting } from "../../title-formatting/src";
 import { sendRequestToServer } from "../utils/requests";
 import { getHash } from "../../maze-utils/src/hash";
 import { getErrorMessage } from "../../maze-utils/src/formating";

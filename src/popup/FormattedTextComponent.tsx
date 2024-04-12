@@ -1,5 +1,5 @@
 import * as React from "react";
-import { TitleFormatting, formatTitle } from "../../maze-utils/src/titleFormatter";
+import { TitleFormatting, formatTitle } from "../../title-formatting/src";
 import Config from "../config/config";
 
 type FormattedTextProps = {
