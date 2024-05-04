@@ -108,9 +108,7 @@ async function getTimestampFromRandomTime(videoID: VideoID, brandingData: Brandi
 
                 brandingData.randomTime = alea(videoID)();
                 // Don't allow random times past 90% of the video, only gets here if there were no segments
-                if (brandingData.randomTime > 0.9) {
-                    brandingData.randomTime -= 0.9;
-                }
+                brandingData.randomTime *= 0.9;
             }
 
             timestamp = brandingData.randomTime * videoDuration;
