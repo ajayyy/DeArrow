@@ -227,6 +227,7 @@ export const allowlistedWords = new Set([
     "mmHg",
     "torr",
     "GPA",
+    "ABC"
 ]);
 
 export const acronymBlocklist = new Set([
