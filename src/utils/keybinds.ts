@@ -22,7 +22,7 @@ function hotkeyListener(e: KeyboardEvent): void {
     if (keybindEquals(key, Config.config!.openMenuKey)) {
         submitButton.openOrClose().catch(logError);
         return;
-    } else if (keybindEquals(key, Config.config!.enableDeArrowKey)) {
+    } else if (keybindEquals(key, Config.config!.enableExtensionKey)) {
         Config.config!.extensionEnabled = !Config.config!.extensionEnabled;
         return;
     }

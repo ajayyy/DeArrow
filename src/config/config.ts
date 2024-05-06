@@ -119,7 +119,7 @@ interface SBConfig {
     lastIncognitoStatus: boolean;
     showActivatedMessage: boolean;
     openMenuKey: Keybind;
-    enableDeArrowKey: Keybind;
+    enableExtensionKey: Keybind;
 }
 
 interface SBStorage {
@@ -205,7 +205,7 @@ const syncDefaults = {
     lastIncognitoStatus: false,
     showActivatedMessage: false,
     openMenuKey: { key: "d", shift: true },
-    enableDeArrowKey: { key: "e", shift: true }
+    enableExtensionKey: { key: "e", shift: true }
 };
 
 const localDefaults = {
