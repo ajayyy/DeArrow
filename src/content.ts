@@ -7,6 +7,7 @@ import { runCompatibilityFunctions } from "./utils/extensionCompatibility";
 import { cleanPage } from "./utils/pageCleaner";
 import { setupPageTitleHandler } from "./titles/pageTitleHandler";
 import { setupWatchPageBrandingCleanup } from "./videoBranding/watchPageBrandingHandler";
+import { addHotkeyListener } from "./utils/keybinds";
 
 cleanPage();
 addCssToPage();
@@ -19,6 +20,7 @@ listenForMiniPlayerTitleChange().catch(logError);
 addTitleChangeListener(() => void replaceCurrentVideoBranding().catch(logError));
 setupOptionChangeListener();
 setupPageTitleHandler();
+addHotkeyListener();
 
 setupTitlebarCleanup();
 setupWatchPageBrandingCleanup();
