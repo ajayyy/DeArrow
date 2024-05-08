@@ -1,4 +1,4 @@
-import { ProtoConfig } from "../../maze-utils/src/config";
+import { Keybind, ProtoConfig } from "../../maze-utils/src/config";
 import { VideoID } from "../../maze-utils/src/video";
 import { TitleFormatting } from '../../title-formatting/src';
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
@@ -110,6 +110,8 @@ interface SBConfig {
     firefoxOldContentScriptRegistration: boolean;
     lastIncognitoStatus: boolean;
     showActivatedMessage: boolean;
+    openMenuKey: Keybind;
+    enableExtensionKey: Keybind;
 }
 
 interface SBStorage {
@@ -194,6 +196,8 @@ const syncDefaults = {
     firefoxOldContentScriptRegistration: false,
     lastIncognitoStatus: false,
     showActivatedMessage: false,
+    openMenuKey: { key: "d", shift: true },
+    enableExtensionKey: { key: "e", shift: true }
 };
 
 const localDefaults = {
