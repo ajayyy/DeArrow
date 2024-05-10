@@ -24,7 +24,6 @@ import { Tooltip } from "../utils/tooltip";
 import { LicenseComponent } from "../license/LicenseComponent";
 import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
 import { FormattedText } from "../popup/FormattedTextComponent";
-import { shouldStoreVotes } from "../utils/configUtils";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
