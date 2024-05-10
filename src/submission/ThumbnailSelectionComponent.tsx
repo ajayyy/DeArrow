@@ -17,7 +17,7 @@ export interface ThumbnailSelectionComponentProps {
     selected?: boolean;
     upvoted?: boolean;
     onClick?: (thumbnail: ThumbnailSubmission) => void;
-    onUpvote: () => void;
+    onUpvote?: () => void;
     type: ThumbnailType;
     videoID: VideoID;
     hideTime?: boolean;
@@ -90,7 +90,7 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
                                         stopAnimation();
                                         setDownvoted(false);
 
-                                        props.onUpvote();
+                                        props.onUpvote?.();
                                     });
 
                                     if (shouldStoreVotes()) {
