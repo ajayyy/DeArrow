@@ -24,6 +24,7 @@ import { Tooltip } from "../utils/tooltip";
 import { LicenseComponent } from "../license/LicenseComponent";
 import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
 import { FormattedText } from "../popup/FormattedTextComponent";
+import { shouldStoreVotes } from "../utils/configUtils";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -81,7 +82,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             const originalTitle = await toSentenceCase(getCurrentPageTitle() || chrome.i18n.getMessage("OriginalTitle"), false);
             setOriginalTitle(originalTitle);
 
-            setTitles([{
+            const newTitles = [{
                 title: originalTitle,
                 original: true,
                 votable: true,
@@ -98,7 +99,12 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                 original: s.original,
                 votable: true,
                 locked: s.locked
-            }))]);
+            }))];
+
+            setTitles(newTitles);
+
+            const unsubmitted = Config.local!.unsubmitted[props.videoID];
+            updateUnsubmitted(unsubmitted, setExtraUnsubmittedThumbnails, setExtraUnsubmittedTitles, thumbnails, newTitles);
         })();
     }, []);
 
@@ -130,7 +136,31 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
     const [selectedTitle, setSelectedTitle] = React.useState<RenderedTitleSubmission | null>(null);
     const selectedThumbnail = React.useRef<ThumbnailSubmission | null>(null);
     const [selectedTitleIndex, setSelectedTitleIndex] = React.useState(-1);
+    const [upvotedTitleIndex, setUpvotedTitleIndex] = React.useState(-1);
     const [selectedThumbnailIndex, setSelectedThumbnailIndex] = React.useState(-1);
+    const [upvotedThumbnailIndex, setUpvotedThumbnailIndex] = React.useState(-1);
+
+    React.useEffect(() => {
+        const unsubmitted = Config.local!.unsubmitted[props.videoID];
+        if (unsubmitted) {
+            const upvotedTitle = unsubmitted.titles.find((t) => t.selected);
+            if (upvotedTitle) {
+                const upvotedTitleIndex = titles.findIndex((t) => t.title === upvotedTitle.title);
+                if (upvotedTitleIndex !== -1) {
+                    setUpvotedTitleIndex(upvotedTitleIndex);
+                }
+            }
+
+            const upvotedThumbnail = unsubmitted.thumbnails.find((t) => t.selected);
+            if (upvotedThumbnail) {
+                const upvotedThumbnailIndex = thumbnails.findIndex((t) => (t.type === ThumbnailType.Original && upvotedThumbnail.original) 
+                    || (t.type === ThumbnailType.SpecifiedTime && !upvotedThumbnail.original && t.timestamp === upvotedThumbnail.timestamp));
+                if (upvotedThumbnailIndex !== -1) {
+                    setUpvotedThumbnailIndex(upvotedThumbnailIndex);
+                }
+            }
+        }
+    }, [titles]);
 
     // Load existing unsubmitted thumbnails whenever a videoID change happens
     const [extraUnsubmittedThumbnails, setExtraUnsubmittedThumbnails] = React.useState<RenderedThumbnailSubmission[]>([]);
@@ -185,6 +215,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                     videoId={props.videoID} 
                     existingSubmissions={thumbnailSubmissions}
                     selectedThumbnailIndex={selectedThumbnailIndex}
+                    upvotedThumbnailIndex={upvotedThumbnailIndex}
                     actAsVip={actAsVip}
                     onSelect={(t, i) => {
                         let selectedIndex = i;
@@ -195,7 +226,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             return;
                         }
 
-                        if (!t.original) {
+                        if (!t.original && shouldStoreVotes()) {
                             const unsubmitted = Config.local!.unsubmitted[props.videoID] ??= {
                                 thumbnails: [],
                                 titles: []
@@ -230,12 +261,16 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
                         setSelectedThumbnailIndex(selectedIndex);
                         selectedThumbnail.current = t;
+                    }}
+                    onUpvote={(index) => {
+                        setUpvotedThumbnailIndex(index);
                     }}></ThumbnailDrawerComponent>
             </div>
 
             <div>
                 <TitleDrawerComponent existingSubmissions={[...titles, ...extraUnsubmittedTitles]}
                     selectedTitleIndex={selectedTitleIndex}
+                    upvotedTitleIndex={upvotedTitleIndex}
                     actAsVip={actAsVip}
                     videoID={props.videoID}
                     onDeselect={() => {
@@ -246,7 +281,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                         setSelectedTitleIndex(i);
                         setSelectedTitle(t);
 
-                        if (t.title !== oldTitle) {
+                        if (t.title !== oldTitle && shouldStoreVotes()) {
                             const unsubmitted = Config.local!.unsubmitted[props.videoID] ??= {
                                 thumbnails: [],
                                 titles: []
@@ -276,6 +311,9 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
                             Config.forceLocalUpdate("unsubmitted");
                         }
+                    }}
+                    onUpvote={(index) => {
+                        setUpvotedTitleIndex(index);
                     }}></TitleDrawerComponent>
             </div>
 

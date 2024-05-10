@@ -275,6 +275,10 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     cursor: pointer;
 }
 
+.cbButton path {
+    transition: fill 0.5s;
+}
+
 .cbButton img {
     height: 60%;
 	top: 0;

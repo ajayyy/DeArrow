@@ -6,7 +6,9 @@ export interface TitleDrawerComponentProps {
     existingSubmissions: RenderedTitleSubmission[];
     onSelectOrUpdate: (title: RenderedTitleSubmission, oldTitle: string, index: number) => void;
     onDeselect: (index: number) => void;
+    onUpvote: (index: number) => void;
     selectedTitleIndex: number;
+    upvotedTitleIndex: number;
     actAsVip: boolean;
     videoID: VideoID;
 }
@@ -33,6 +35,7 @@ function getTitles(props: TitleDrawerComponentProps,
         titles.push(
             <TitleComponent
                 selected={selectedTitle === i}
+                upvoted={props.upvotedTitleIndex === i}
                 onSelectOrUpdate={(title, oldTitle) => {
                     props.onSelectOrUpdate({
                         ...props.existingSubmissions[i],
@@ -41,6 +44,9 @@ function getTitles(props: TitleDrawerComponentProps,
                 }}
                 onDeselect={() => {
                     props.onDeselect(i);
+                }}
+                onUpvote={() => {
+                    props.onUpvote(i);
                 }}
                 actAsVip={props.actAsVip}
                 key={i}

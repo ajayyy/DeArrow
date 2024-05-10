@@ -9,7 +9,9 @@ export interface ThumbnailDrawerComponentProps {
     videoId: VideoID;
     existingSubmissions: RenderedThumbnailSubmission[];
     selectedThumbnailIndex: number;
+    upvotedThumbnailIndex: number;
     onSelect: (submission: ThumbnailSubmission, index: number) => void;
+    onUpvote: (index: number) => void;
     actAsVip: boolean;
 }
 
@@ -47,8 +49,12 @@ function getThumbnails(props: ThumbnailDrawerComponentProps,
             <ThumbnailSelectionComponent
                 video={props.video}
                 selected={selectedThumbnail === i}
+                upvoted={props.upvotedThumbnailIndex === i}
                 onClick={(submission) => {
                     props.onSelect(submission, i);
+                }}
+                onUpvote={() => {
+                    props.onUpvote(i);
                 }}
                 type={props.existingSubmissions[i].type}
                 videoID={props.videoId}

@@ -10,11 +10,14 @@ import { submitVideoBrandingAndHandleErrors } from "../dataFetching";
 import { AnimationUtils } from "../../maze-utils/src/animationUtils";
 import Config from "../config/config";
 import { FormattedText } from "../popup/FormattedTextComponent";
+import { shouldStoreVotes } from "../utils/configUtils";
 
 export interface ThumbnailSelectionComponentProps {
     video: HTMLVideoElement;
     selected?: boolean;
+    upvoted?: boolean;
     onClick?: (thumbnail: ThumbnailSubmission) => void;
+    onUpvote: () => void;
     type: ThumbnailType;
     videoID: VideoID;
     hideTime?: boolean;
@@ -31,6 +34,7 @@ export interface ThumbnailSelectionComponentProps {
  */
 export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentProps) => {
     const [error, setError] = React.useState("");
+    const [downvoted, setDownvoted] = React.useState(false);
 
     function createThumbnailSubmission(): ThumbnailSubmission | null {
         return props.type === ThumbnailType.Original ? {
@@ -82,19 +86,43 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
                                     e.stopPropagation();
 
                                     const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
-                                    submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), false, props.actAsVip!).then(stopAnimation);
+                                    submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), false, props.actAsVip!).then(() => {
+                                        stopAnimation();
+                                        setDownvoted(false);
 
-                                    const unsubmitted = Config.local!.unsubmitted[props.videoID];
-                                    if (unsubmitted) {
-                                        const unsubmittedThumbnail = unsubmitted.thumbnails.find((t) => !t.original && t.timestamp === props.time);
+                                        props.onUpvote();
+                                    });
+
+                                    if (shouldStoreVotes()) {
+                                        const unsubmitted = Config.local!.unsubmitted[props.videoID] ??= {
+                                            thumbnails: [],
+                                            titles: []
+                                        };
+                                        unsubmitted.thumbnails.forEach((t) => t.selected = false);
+    
+                                        const unsubmittedThumbnail = unsubmitted.thumbnails.find((t) =>(t.original && props.type === ThumbnailType.Original)
+                                            || (!t.original && t.timestamp === props.time));
                                         if (unsubmittedThumbnail) {
-                                            unsubmitted.thumbnails.forEach((t) => t.selected = false);
                                             unsubmittedThumbnail.selected = true;
-                                            Config.forceLocalUpdate("unsubmitted");
+                                        } else {
+                                            if (props.type === ThumbnailType.Original) {
+                                                unsubmitted.thumbnails.push({
+                                                    original: true,
+                                                    selected: true
+                                                });
+                                            } else {
+                                                unsubmitted.thumbnails.push({
+                                                    original: false,
+                                                    timestamp: props.time!,
+                                                    selected: true
+                                                });
+                                            }
                                         }
+    
+                                        Config.forceLocalUpdate("unsubmitted");
                                     }
                                 }}>
-                                <UpvoteIcon/>
+                                <UpvoteIcon selected={props.upvoted}/>
                             </button>
 
                             <button className="cbButton" 
@@ -103,18 +131,26 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
                                     e.stopPropagation();
 
                                     const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
-                                    submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), true, props.actAsVip!).then(stopAnimation);
+                                    submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), true, props.actAsVip!).then(() => {
+                                        stopAnimation();
+                                        setDownvoted(true);
+                                    });
 
                                     const unsubmitted = Config.local!.unsubmitted[props.videoID];
                                     if (unsubmitted) {
                                         const unsubmittedThumbnail = unsubmitted.thumbnails.find((t) => !t.original && t.timestamp === props.time);
                                         if (unsubmittedThumbnail) {
                                             unsubmitted.thumbnails.splice(unsubmitted.thumbnails.indexOf(unsubmittedThumbnail), 1);
+
+                                            if (unsubmitted.titles.length === 0 && unsubmitted.thumbnails.length === 0) {
+                                                delete Config.local!.unsubmitted[props.videoID];
+                                            }
+
                                             Config.forceLocalUpdate("unsubmitted");
                                         }
                                     }
                                 }}>
-                                <DownvoteIcon locked={ Config.config!.vip && props.locked }/>
+                                <DownvoteIcon selected={downvoted} locked={ Config.config!.vip && props.locked }/>
                             </button>
                         </div>
                         : null
