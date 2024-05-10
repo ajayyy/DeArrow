@@ -226,7 +226,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             return;
                         }
 
-                        if (!t.original && shouldStoreVotes()) {
+                        if (!t.original) {
                             const unsubmitted = Config.local!.unsubmitted[props.videoID] ??= {
                                 thumbnails: [],
                                 titles: []
@@ -281,7 +281,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                         setSelectedTitleIndex(i);
                         setSelectedTitle(t);
 
-                        if (t.title !== oldTitle && shouldStoreVotes()) {
+                        if (t.title !== oldTitle) {
                             const unsubmitted = Config.local!.unsubmitted[props.videoID] ??= {
                                 thumbnails: [],
                                 titles: []
@@ -307,6 +307,10 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                                         title: t.title
                                     });
                                 }
+                            }
+
+                            if (unsubmitted.titles.length === 0 && unsubmitted.thumbnails.length === 0) {
+                                delete Config.local!.unsubmitted[props.videoID];
                             }
 
                             Config.forceLocalUpdate("unsubmitted");
