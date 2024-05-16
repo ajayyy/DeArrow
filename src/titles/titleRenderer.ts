@@ -9,7 +9,7 @@ import { setCurrentVideoTitle } from "./pageTitleHandler";
 import { getTitleFormatting, shouldCleanEmojis, shouldDefaultToCustom, shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { countTitleReplacement } from "../config/stats";
 import { onMobile } from "../../maze-utils/src/pageInfo";
-import { isFirefoxOrSafari, timeoutPomise } from "../../maze-utils/src";
+import { isFirefoxOrSafari } from "../../maze-utils/src";
 import { isSafari } from "../../maze-utils/src/config";
 
 enum WatchPageType {
