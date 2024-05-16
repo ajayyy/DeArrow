@@ -11,6 +11,7 @@ import Config from "../config/config";
 import { addTitleChangeListener, getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { addCleanupListener } from "../../maze-utils/src/cleanup";
+import { shouldStoreVotes } from "../utils/configUtils";
 
 const submitButtonIcon = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -80,6 +81,16 @@ export class SubmitButton {
 
     close(): void {
         if (this.container) {
+            // Experimental YouTube layout with description on right
+            const isOnDescriptionOnRightLayout = document.querySelector("#title #description");
+            if (isOnDescriptionOnRightLayout) {
+                // Undo preventing color from changing on hover
+                const title = document.querySelector("#above-the-fold #title") as HTMLElement | null;
+                if (title) {
+                    title.style.removeProperty("background");
+                }
+            }
+            
             this.root?.unmount?.();
             this.root = null;
             this.container.remove();
@@ -91,10 +102,13 @@ export class SubmitButton {
         const referenceNode = this.button?.parentElement ?? await getOrCreateTitleButtonContainer();
         if (!referenceNode) return;
 
-        let popupNode = onMobile() 
+        // Experimental YouTube layout with description on right
+        const isOnDescriptionOnRightLayout = document.querySelector("#title #description");
+
+        let popupNode = onMobile()
             ? document.querySelector(".watch-below-the-player") 
             : document.querySelector("#secondary-inner");
-        if (!popupNode || popupNode.childElementCount < 2) {
+        if (!popupNode || popupNode.childElementCount < 2 || isOnDescriptionOnRightLayout) {
             popupNode = referenceNode.parentElement;
         }
 
@@ -102,6 +116,13 @@ export class SubmitButton {
             if (!this.container) {
                 this.container = document.createElement('span');
                 this.container.id = "cbSubmitMenu";
+
+                if (isOnDescriptionOnRightLayout) {
+                    this.container.style.marginTop = referenceNode.parentElement?.offsetHeight + "px";
+
+                    // Prevent color from changing on hover
+                    referenceNode.parentElement!.parentElement!.style.background = "transparent";
+                }
 
                 this.root = createRoot(this.container);
                 this.render();
@@ -177,38 +198,61 @@ export class SubmitButton {
             }
 
             // Set the unsubmitted as selected
-            const unsubmitted = Config.local!.unsubmitted[getVideoID()!];
-            if (unsubmitted) {
-                if (Config.config!.keepUnsubmitted 
-                        && (!chrome.extension.inIncognitoContext || Config.config!.keepUnsubmittedInPrivate)) {
-                    unsubmitted.titles.forEach((t) => t.selected = false);
-                    unsubmitted.thumbnails.forEach((t) => t.selected = false);
+            if (shouldStoreVotes()) {
+                const unsubmitted = Config.local!.unsubmitted[getVideoID()!] ??= {
+                    titles: [],
+                    thumbnails: []
+                };
 
-                    if (title) {
-                        const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === title!.title);
-                        if (unsubmittedTitle) unsubmittedTitle.selected = true;
+                unsubmitted.titles.forEach((t) => t.selected = false);
+                unsubmitted.thumbnails.forEach((t) => t.selected = false);
+
+                if (title) {
+                    const unsubmittedTitle = unsubmitted.titles.find((t) => t.title.trim() === title!.title);
+                    if (unsubmittedTitle) {
+                        unsubmittedTitle.selected = true;
+                    } else {
+                        unsubmitted.titles.push({
+                            title: title.title,
+                            selected: true
+                        });
                     }
-                    
-                    if (thumbnail) {
-                        if (thumbnail.original && !unsubmitted.thumbnails.find((t) => t.original)) {
-                            unsubmitted.thumbnails.push({
-                                original: true,
-                                selected: true
-                            });
+                }
+                
+                if (thumbnail) {
+                    if (thumbnail.original && !unsubmitted.thumbnails.find((t) => t.original)) {
+                        unsubmitted.thumbnails.push({
+                            original: true,
+                            selected: true
+                        });
+                    } else {
+                        const unsubmittedThumbnail = unsubmitted.thumbnails.find((t) => (t.original && thumbnail.original) 
+                            || (!t.original && !thumbnail.original && t.timestamp === thumbnail.timestamp))
+                        if (unsubmittedThumbnail) {
+                            unsubmittedThumbnail.selected = true;
                         } else {
-                            const unsubmittedThumbnail = unsubmitted.thumbnails.find((t) => (t.original && thumbnail.original) 
-                                || (!t.original && !thumbnail.original && t.timestamp === thumbnail.timestamp))
-                            if (unsubmittedThumbnail) unsubmittedThumbnail.selected = true;
+                            if (thumbnail.original) {
+                                unsubmitted.thumbnails.push({
+                                    original: true,
+                                    selected: true
+                                });
+                            } else {
+                                unsubmitted.thumbnails.push({
+                                    original: false,
+                                    timestamp: thumbnail.timestamp,
+                                    selected: true
+                                });
+                            }
                         }
                     }
-                } else {
-                    delete Config.local!.unsubmitted[getVideoID()!];
                 }
-
-                Config.forceLocalUpdate("unsubmitted");
+            } else {
+                delete Config.local!.unsubmitted[getVideoID()!];
             }
 
-            replaceCurrentVideoBranding().catch(logError);
+            Config.forceLocalUpdate("unsubmitted");
+
+            setTimeout(() => replaceCurrentVideoBranding().catch(logError), 1100);
 
             return true;
         } else {

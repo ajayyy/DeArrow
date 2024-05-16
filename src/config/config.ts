@@ -1,4 +1,4 @@
-import { ProtoConfig } from "../../maze-utils/src/config";
+import { Keybind, ProtoConfig } from "../../maze-utils/src/config";
 import { VideoID } from "../../maze-utils/src/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { logError } from "../utils/logger";
@@ -77,6 +77,12 @@ interface SBConfig {
     invidiousInstances: string[];
     keepUnsubmitted: boolean;
     keepUnsubmittedInPrivate: boolean;
+    /**
+     * The level of desaturation applied to thumbnails (0 - 100).
+     *
+     * @type {number}
+     */
+    thumbnailSaturationLevel: number;
     titleFormatting: TitleFormatting;
     shouldCleanEmojis: boolean;
     onlyTitleCaseInEnglish: boolean;
@@ -119,6 +125,8 @@ interface SBConfig {
     firefoxOldContentScriptRegistration: boolean;
     lastIncognitoStatus: boolean;
     showActivatedMessage: boolean;
+    openMenuKey: Keybind;
+    enableExtensionKey: Keybind;
 }
 
 interface SBStorage {
@@ -162,6 +170,7 @@ const syncDefaults = {
     invidiousInstances: [],
     keepUnsubmitted: true,
     keepUnsubmittedInPrivate: false,
+    thumbnailSaturationLevel: 100,
     titleFormatting: isEnglish ? TitleFormatting.TitleCase : TitleFormatting.Disable,
     shouldCleanEmojis: true,
     onlyTitleCaseInEnglish: false,
@@ -204,6 +213,8 @@ const syncDefaults = {
     firefoxOldContentScriptRegistration: false,
     lastIncognitoStatus: false,
     showActivatedMessage: false,
+    openMenuKey: { key: "d", shift: true },
+    enableExtensionKey: { key: "e", shift: true }
 };
 
 const localDefaults = {

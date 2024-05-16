@@ -1,8 +1,10 @@
 import * as React from "react";
-import { drawCenteredToCanvas, renderThumbnail } from "../thumbnails/thumbnailRenderer";
+import { drawCenteredToCanvas, renderThumbnail, setupPreRenderedThumbnail } from "../thumbnails/thumbnailRenderer";
 import { waitFor } from "../../maze-utils/src"
 import { VideoID } from "../../maze-utils/src/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
+import { logError } from "../utils/logger";
+import { isFirefoxOrSafari } from "../../maze-utils/src";
 
 export enum ThumbnailType {
     CurrentTime,
@@ -45,18 +47,18 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
         const video = props.video;
 
         if (props.type === ThumbnailType.CurrentTime) {
-            const playListener = () => renderCurrentFrame(props, canvasRef, inRenderingLoop, true);
+            const playListener = () => renderCurrentFrame(props, canvasRef, inRenderingLoop, true, false);
             const seekedListener = () => () => {
                 // If playing, it's already waiting for the next frame from the other listener
                 if (video.paused) {
-                    renderCurrentFrame(props, canvasRef, inRenderingLoop, false);
+                    renderCurrentFrame(props, canvasRef, inRenderingLoop, false, false);
                 }
             };
 
             video.addEventListener("playing", playListener);
             video.addEventListener("seeked", seekedListener);
 
-            renderCurrentFrame(props, canvasRef, inRenderingLoop, !video.paused);
+            renderCurrentFrame(props, canvasRef, inRenderingLoop, !video.paused, false);
 
             return () => {
                 video.removeEventListener("playing", playListener);
@@ -72,6 +74,7 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
     }, [props.videoID]);
 
     React.useEffect(() => {
+        let cancelled = false;
         if (props.time !== lastTime.current) {
             lastTime.current = props.time ?? null;
 
@@ -79,11 +82,11 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                 canvasRef.current?.getContext("2d")?.clearRect(0, 0, canvasRef.current?.width, canvasRef.current?.height);
                 if (props.video.paused && props.time === props.video.currentTime) {
                     // Skip rendering and just use existing video frame
-                    renderCurrentFrame(props, canvasRef, inRenderingLoop, false);
+                    renderCurrentFrame(props, canvasRef, inRenderingLoop, false, true);
                 } else {
-                    renderThumbnail(props.videoID, canvasWidth, canvasHeight, false, props.time!).then((rendered) => {
+                    renderThumbnail(props.videoID, canvasWidth, canvasHeight, false, props.time!, false, true).then((rendered) => {
                         waitFor(() => canvasRef?.current).then(async () => {
-                            if (rendered) {
+                            if (rendered && !cancelled) {
                                 const imageBitmap = await createImageBitmap(rendered.blob);
 
                                 drawCenteredToCanvas(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height,
@@ -100,22 +103,40 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
                 }
             }
         }
+
+        return () => void(cancelled = true);
     }, [props.time]);
 
     return (
         <div className={`cbThumbnail${props.selected ? " cbThumbnailSelected" : ""}`}
                 onClick={() => {
+                    let submitted = false;
+                    const submit = () => {
+                        if (submitted) return;
+                        submitted = true;
+
+                        props.onClick?.(props.type === ThumbnailType.Original ? {
+                            original: true
+                        } : {
+                            original: false,
+                            timestamp: props.type === ThumbnailType.CurrentTime ? props.video.currentTime : props.time!
+                        });
+                    }
+
                     if (props.type === ThumbnailType.CurrentTime && props.video.paused) {
                         // Ensure video is showing correct frame (destructive, will affect visible video)
                         props.video.currentTime = props.video.currentTime;
-                    }
 
-                    props.onClick?.(props.type === ThumbnailType.Original ? {
-                        original: true
-                    } : {
-                        original: false,
-                        timestamp: props.type === ThumbnailType.CurrentTime ? props.video.currentTime : props.time!
-                    });
+                        // Wait for video to update
+                        props.video.addEventListener("seeked", submit, { once: true });
+                        // Fallback
+                        setTimeout(() => {
+                            props.video.removeEventListener("seeked", submit);
+                            submit();
+                        }, 1000);
+                    } else {
+                        submit();
+                    }
                 }}>
             {
                 props.type === ThumbnailType.Original ?
@@ -153,7 +174,8 @@ export const ThumbnailComponent = (props: ThumbnailComponentProps) => {
 async function renderCurrentFrame(props: ThumbnailComponentProps,
         canvasRef: React.RefObject<HTMLCanvasElement>,
         inRenderingLoop: React.MutableRefObject<boolean>,
-        waitForNextFrame: boolean): Promise<void> {
+        waitForNextFrame: boolean,
+        cacheThumbnail: boolean): Promise<void> {
     try {
         await waitFor(() => canvasRef?.current && props.video.duration > 0 && props.video.readyState > 2);
 
@@ -161,11 +183,21 @@ async function renderCurrentFrame(props: ThumbnailComponentProps,
         canvasRef.current!.getContext("2d")!.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
         drawCenteredToCanvas(canvasRef.current!, canvasRef.current!.width, canvasRef.current!.height, props.video.videoWidth, props.video.videoHeight, props.video);
 
+        if (cacheThumbnail) {
+            canvasRef.current!.toBlob((blob) => {
+                if (blob) {
+                    setupPreRenderedThumbnail(props.videoID, props.time!, blob);
+                } else {
+                    logError(`Failed to cache thumbnail for ${props.videoID} at ${props.time}`);
+                }
+            })
+        }
+
         if (waitForNextFrame && !props.video.paused && !inRenderingLoop.current) {
             inRenderingLoop.current = true;
             const nextLoop = () => {
                 inRenderingLoop.current = false;
-                renderCurrentFrame(props, canvasRef, inRenderingLoop, true);
+                renderCurrentFrame(props, canvasRef, inRenderingLoop, true, cacheThumbnail);
             };
 
             if (props.video.requestVideoFrameCallback) {
@@ -180,7 +212,7 @@ async function renderCurrentFrame(props: ThumbnailComponentProps,
 }
 
 function calculateCanvasWidth(larger: boolean): number {
-    const fallback = larger ? 720 : 100;
+    const fallback = 720;
 
     const watchFlexy = document.querySelector("ytd-watch-flexy");
     if (!watchFlexy) return fallback;
@@ -188,7 +220,7 @@ function calculateCanvasWidth(larger: boolean): number {
     const containerWidth = parseFloat(getComputedStyle(watchFlexy)
         .getPropertyValue("--ytd-watch-flexy-sidebar-width")?.replace("px", ""));
 
-    const factor = larger ? 1 : 0.2;
+    const factor = larger || !isFirefoxOrSafari() ? 1 : 0.2;
     if (containerWidth && !isNaN(containerWidth)) {
         return containerWidth * window.devicePixelRatio * factor;
     } else {

@@ -23,6 +23,7 @@ import FontIcon from "../svgIcons/fontIcon";
 import { Tooltip } from "../utils/tooltip";
 import { LicenseComponent } from "../license/LicenseComponent";
 import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
+import { FormattedText } from "../popup/FormattedTextComponent";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -80,7 +81,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             const originalTitle = await toSentenceCase(getCurrentPageTitle() || chrome.i18n.getMessage("OriginalTitle"), false);
             setOriginalTitle(originalTitle);
 
-            setTitles([{
+            const newTitles = [{
                 title: originalTitle,
                 original: true,
                 votable: true,
@@ -97,7 +98,12 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                 original: s.original,
                 votable: true,
                 locked: s.locked
-            }))]);
+            }))];
+
+            setTitles(newTitles);
+
+            const unsubmitted = Config.local!.unsubmitted[props.videoID];
+            updateUnsubmitted(unsubmitted, setExtraUnsubmittedThumbnails, setExtraUnsubmittedTitles, thumbnails, newTitles);
         })();
     }, []);
 
@@ -129,7 +135,31 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
     const [selectedTitle, setSelectedTitle] = React.useState<RenderedTitleSubmission | null>(null);
     const selectedThumbnail = React.useRef<ThumbnailSubmission | null>(null);
     const [selectedTitleIndex, setSelectedTitleIndex] = React.useState(-1);
+    const [upvotedTitleIndex, setUpvotedTitleIndex] = React.useState(-1);
     const [selectedThumbnailIndex, setSelectedThumbnailIndex] = React.useState(-1);
+    const [upvotedThumbnailIndex, setUpvotedThumbnailIndex] = React.useState(-1);
+
+    React.useEffect(() => {
+        const unsubmitted = Config.local!.unsubmitted[props.videoID];
+        if (unsubmitted) {
+            const upvotedTitle = unsubmitted.titles.find((t) => t.selected);
+            if (upvotedTitle) {
+                const upvotedTitleIndex = titles.findIndex((t) => t.title === upvotedTitle.title);
+                if (upvotedTitleIndex !== -1) {
+                    setUpvotedTitleIndex(upvotedTitleIndex);
+                }
+            }
+
+            const upvotedThumbnail = unsubmitted.thumbnails.find((t) => t.selected);
+            if (upvotedThumbnail) {
+                const upvotedThumbnailIndex = thumbnails.findIndex((t) => (t.type === ThumbnailType.Original && upvotedThumbnail.original) 
+                    || (t.type === ThumbnailType.SpecifiedTime && !upvotedThumbnail.original && t.timestamp === upvotedThumbnail.timestamp));
+                if (upvotedThumbnailIndex !== -1) {
+                    setUpvotedThumbnailIndex(upvotedThumbnailIndex);
+                }
+            }
+        }
+    }, [titles]);
 
     // Load existing unsubmitted thumbnails whenever a videoID change happens
     const [extraUnsubmittedThumbnails, setExtraUnsubmittedThumbnails] = React.useState<RenderedThumbnailSubmission[]>([]);
@@ -158,9 +188,13 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
         videoChangeListener();
     }, [props.videoID]);
 
+    const titleFormatting = Config.config!.titleFormatting;
+
     const thumbnailSubmissions = [...defaultThumbnails, ...extraUnsubmittedThumbnails, ...downloadedThumbnails];
     return (
-        <div className="submissionMenuInner">
+        <div className="submissionMenuInner"
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}>
             <BrandingPreviewComponent
                 submissions={props.submissions}
                 titles={titles}
@@ -180,6 +214,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                     videoId={props.videoID} 
                     existingSubmissions={thumbnailSubmissions}
                     selectedThumbnailIndex={selectedThumbnailIndex}
+                    upvotedThumbnailIndex={upvotedThumbnailIndex}
                     actAsVip={actAsVip}
                     onSelect={(t, i) => {
                         let selectedIndex = i;
@@ -225,13 +260,18 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
                         setSelectedThumbnailIndex(selectedIndex);
                         selectedThumbnail.current = t;
+                    }}
+                    onUpvote={(index) => {
+                        setUpvotedThumbnailIndex(index);
                     }}></ThumbnailDrawerComponent>
             </div>
 
             <div>
                 <TitleDrawerComponent existingSubmissions={[...titles, ...extraUnsubmittedTitles]}
                     selectedTitleIndex={selectedTitleIndex}
+                    upvotedTitleIndex={upvotedTitleIndex}
                     actAsVip={actAsVip}
+                    videoID={props.videoID}
                     onDeselect={() => {
                         setSelectedTitleIndex(-1);
                         setSelectedTitle(null);
@@ -268,8 +308,15 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                                 }
                             }
 
+                            if (unsubmitted.titles.length === 0 && unsubmitted.thumbnails.length === 0) {
+                                delete Config.local!.unsubmitted[props.videoID];
+                            }
+
                             Config.forceLocalUpdate("unsubmitted");
                         }
+                    }}
+                    onUpvote={(index) => {
+                        setUpvotedTitleIndex(index);
                     }}></TitleDrawerComponent>
             </div>
 
@@ -283,14 +330,14 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                         }}
                         value={actAsVip}
                         label={chrome.i18n.getMessage("actAsVip")}
+                        titleFormatting={titleFormatting}
                     />
                 </div>
             }
 
             <div className="cbVoteButtonContainer">
                 <button className="cbNoticeButton cbVoteButton" 
-                    disabled={!Config.config!.activated
-                                || currentlySubmitting 
+                    disabled={currentlySubmitting 
                                 || (!selectedThumbnail.current && !selectedTitle) 
                                 || (!!selectedTitle && selectedTitle.title.toLowerCase() === chrome.i18n.getMessage("OriginalTitle").toLowerCase())}
                     onClick={async () => {
@@ -306,16 +353,12 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             }
                         });
                     }}>
-                    {`${chrome.i18n.getMessage("submit")}`}
+                    <FormattedText
+                        langKey="submit"
+                        titleFormatting={titleFormatting}
+                    />
                 </button>
             </div>
-
-            {
-                !Config.config!.activated &&
-                <div className="cbNotice">
-                    {`${chrome.i18n.getMessage("youCannotVoteDuringTrial")}`}
-                </div>
-            }
 
             {
                 Config.config!.showGuidelineHelp ? 
@@ -331,7 +374,10 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             href="https://wiki.sponsor.ajay.app/w/DeArrow/Guidelines"
                             target="_blank"
                             rel="noreferrer">
-                            {`${chrome.i18n.getMessage("Guidelines")}`}
+                            <FormattedText
+                                langKey="Guidelines"
+                                titleFormatting={titleFormatting}
+                            />
                         </a>
 
                         <a className="cbNoticeButton"
@@ -342,13 +388,16 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                             }, false)}`}
                             target="_blank"
                             rel="noreferrer">
-                            {`${chrome.i18n.getMessage("askAQuestion")}`}
+                            <FormattedText
+                                langKey="askAQuestion"
+                                titleFormatting={titleFormatting}
+                            />
                         </a>
                     </div>
 
-                    <YourWorkComponent/>
+                    <YourWorkComponent titleFormatting={titleFormatting} />
 
-                    <LicenseComponent/>
+                    <LicenseComponent titleFormatting={titleFormatting} />
                 </>
                 : null
             }
@@ -360,8 +409,12 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
 
 async function handleAbTestedThumbnailWarning(videoID: string, isAbTestedThumbnail: React.MutableRefObject<boolean | null>) {
     if (isAbTestedThumbnail.current === null) {
-        const request = await fetch(`https://i.ytimg.com/vi/${videoID}/mqdefault_custom_1.jpg`);
-        isAbTestedThumbnail.current = request.ok;
+        try {
+            const request = await fetch(`https://i.ytimg.com/vi/${videoID}/mqdefault_custom_1.jpg`);
+            isAbTestedThumbnail.current = request.ok;
+        } catch {
+            isAbTestedThumbnail.current = false;
+        }
     }
 
     if (isAbTestedThumbnail.current) {
@@ -459,7 +512,12 @@ function getTips(): React.ReactElement[] {
     return tipInfo.map((tip, i) => (
         <div className="cbTip" key={i}>
             <tip.icon className="cbTipIcon"/>
-            <span className="cbTipText">{tip.text}</span>
+            <span className="cbTipText">
+                <FormattedText
+                    text={tip.text}
+                    titleFormatting={Config.config!.titleFormatting}
+                />
+            </span>
         </div>
     ));
 }

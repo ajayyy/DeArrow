@@ -7,17 +7,24 @@ import { FormattingOptionsComponent } from "./FormattingOptionsComponent";
 import { isSafari } from "../../maze-utils/src/config";
 import { isActivated } from "../license/license";
 import { LicenseComponent } from "../license/LicenseComponent";
+import { FormattedText } from "./FormattedTextComponent";
 
 export const PopupComponent = () => {
     const [extensionEnabled, setExtensionEnabled] = React.useState(Config.config!.extensionEnabled);
     const [replaceTitles, setReplaceTitles] = React.useState(Config.config!.replaceTitles);
     const [replaceThumbnails, setReplaceThumbnails] = React.useState(Config.config!.replaceThumbnails);
+    const [titleFormatting, setTitleFormatting] = React.useState(Config.config!.titleFormatting);
 
     return (
         <>
             <header className="sbPopupLogo">
                 <img src="icons/logo.svg" alt="DeArrow Logo" width="40" height="40" id="dearrowPopupLogo"/>
-                <p className="u-mZ">DeArrow</p>
+                <p className="u-mZ">
+                    <FormattedText
+                        text="DeArrow"
+                        titleFormatting={titleFormatting}
+                    />
+                </p>
             </header>
 
             {
@@ -60,8 +67,18 @@ export const PopupComponent = () => {
                             <span className="switchBg blue"></span>
                             <span className="switchDot"></span>
                         </span>
-                        <span id="disableSkipping" className={extensionEnabled ? " hidden" : ""}>{chrome.i18n.getMessage("disable")}</span>
-                        <span id="enableSkipping" className={!extensionEnabled ? " hidden" : ""}>{chrome.i18n.getMessage("Enable")}</span>
+                        <span id="disableSkipping" className={extensionEnabled ? " hidden" : ""}>
+                            <FormattedText
+                                langKey="disable"
+                                titleFormatting={titleFormatting}
+                            />
+                        </span>
+                        <span id="enableSkipping" className={!extensionEnabled ? " hidden" : ""}>
+                            <FormattedText
+                                langKey="Enable"
+                                titleFormatting={titleFormatting}
+                            />
+                        </span>
                         </label>
                         <button id="optionsButton" 
                             className="sbControlsMenu-item" 
@@ -70,7 +87,10 @@ export const PopupComponent = () => {
                                 chrome.runtime.sendMessage({ "message": "openConfig" });
                             }}>
                         <img src="/icons/settings.svg" alt="Settings icon" width="23" height="23" className="sbControlsMenu-itemIcon" id="sbPopupIconSettings" />
-                            {chrome.i18n.getMessage("Options")}
+                            <FormattedText
+                                langKey="Options"
+                                titleFormatting={titleFormatting}
+                            />
                         </button>
                     </div>
 
@@ -83,6 +103,7 @@ export const PopupComponent = () => {
                         }}
                         value={replaceTitles}
                         label={chrome.i18n.getMessage("replaceTitles")}
+                        titleFormatting={titleFormatting}
                     />
 
                     <ToggleOptionComponent
@@ -96,12 +117,16 @@ export const PopupComponent = () => {
                         }}
                         value={replaceThumbnails}
                         label={chrome.i18n.getMessage("replaceThumbnails")}
+                        titleFormatting={titleFormatting}
                     />
 
-                    <FormattingOptionsComponent/>
+                    <FormattingOptionsComponent
+                        titleFormatting={titleFormatting}
+                        setTitleFormatting={setTitleFormatting}
+                    />
 
                     {/* Your Work box */}
-                    <YourWorkComponent/>
+                    <YourWorkComponent titleFormatting={titleFormatting}/>
                 </>
             }
 
@@ -113,21 +138,52 @@ export const PopupComponent = () => {
                         onClick={() => {
                             chrome.runtime.sendMessage({ "message": "openHelp" });
                         }}>
-                            {chrome.i18n.getMessage("help")}
+                            <FormattedText
+                                langKey="help"
+                                titleFormatting={titleFormatting}
+                            />
                     </a>
                 }
-                <a href="https://dearrow.ajay.app" target="_blank" rel="noreferrer">{chrome.i18n.getMessage("website")}</a>
-                <a href="https://dearrow.ajay.app/stats" target="_blank" rel="noreferrer" className={isSafari() ? " hidden" : ""}>{chrome.i18n.getMessage("viewLeaderboard")}</a>
+                <a href="https://dearrow.ajay.app" target="_blank" rel="noreferrer">
+                    <FormattedText
+                        langKey="website"
+                        titleFormatting={titleFormatting}
+                    />
+                </a>
+                <a href="https://dearrow.ajay.app/stats" target="_blank" rel="noreferrer" className={isSafari() ? " hidden" : ""}>
+                    <FormattedText
+                        langKey="viewLeaderboard"
+                        titleFormatting={titleFormatting}
+                    />
+                </a>
                 <a href="https://dearrow.ajay.app/donate" target="_blank" rel="noreferrer" className={!showDonationLink() ? " hidden" : ""}>
-                    {chrome.i18n.getMessage("Donate")}
+                    <FormattedText
+                        langKey="Donate"
+                        titleFormatting={titleFormatting}
+                    />
                 </a>
                 <br />
-                <a href="https://github.com/ajayyy/DeArrow" target="_blank" rel="noreferrer">GitHub</a>
-                <a href="https://discord.gg/SponsorBlock" target="_blank" rel="noreferrer">Discord</a>
-                <a href="https://matrix.to/#/#sponsor:ajay.app?via=ajay.app&via=matrix.org&via=mozilla.org" target="_blank" rel="noreferrer">Matrix</a>
+                <a href="https://github.com/ajayyy/DeArrow" target="_blank" rel="noreferrer">
+                    <FormattedText
+                        text="GitHub"
+                        titleFormatting={titleFormatting}
+                    />
+                </a>
+                <a href="https://discord.gg/SponsorBlock" target="_blank" rel="noreferrer">
+                    <FormattedText
+                        text="Discord"
+                        titleFormatting={titleFormatting}
+                    />
+                </a>
+                <a href="https://matrix.to/#/#sponsor:ajay.app?via=ajay.app&via=matrix.org&via=mozilla.org" target="_blank" rel="noreferrer">
+                    <FormattedText
+                        text="Matrix"
+                        titleFormatting={titleFormatting}
+                    />
+                </a>
             </footer>
 
-            <LicenseComponent/>
+            <LicenseComponent titleFormatting={titleFormatting} />
         </>
     );
 };

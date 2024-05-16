@@ -64,7 +64,7 @@ export class ThumbnailNotInCacheError extends Error {
 }
 
 export async function renderThumbnail(videoID: VideoID, width: number,
-    height: number, saveVideo: boolean, timestamp: number, onlyFromThumbnailCache = false): Promise<RenderedThumbnailVideo | null> {
+    height: number, saveVideo: boolean, timestamp: number, onlyFromThumbnailCache = false, ignoreTimeout = false): Promise<RenderedThumbnailVideo | null> {
 
     const startTime = performance.now();
 
@@ -87,7 +87,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
     ]);
     delete renderQueueCallbacks[videoID];
 
-    if (performance.now() - startTime > Config.config!.renderTimeout
+    if (!ignoreTimeout && performance.now() - startTime > Config.config!.renderTimeout
             && !isCachedThumbnailLoaded(videoID, timestamp)) {
         return null;
     }
@@ -153,7 +153,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
             }
 
             log(videoID, "videoLoaded", video.currentTime, video.readyState, video.seeking, format)
-            if (video.readyState < 2 || video.seeking) {
+            if (video.readyState < 2 || video.seeking || video.currentTime !== timestamp) {
                 if (videoLoadedTimeout) clearTimeout(videoLoadedTimeout);
 
                 if (video.seeking) {
@@ -239,7 +239,10 @@ export async function renderThumbnail(videoID: VideoID, width: number,
             resolved = true;
             clearVideo(false);
 
-            reject("Stopped while waiting for video to load");
+            bestVideoData = findBestVideo(videoID, width, height, timestamp);
+            if (bestVideoData.renderedThumbnail) {
+                resolve(bestVideoData.renderedThumbnail);
+            }
         });
     });
 }
@@ -476,10 +479,18 @@ function createVideo(existingVideo: HTMLVideoElement | null, url: string, timest
     video.crossOrigin = "anonymous";
     // https://stackoverflow.com/a/69074004
     if (!existingVideo) video.src = `${url}#t=${timestamp}-${timestamp + 0.001}`;
-    video.currentTime = timestamp;
     video.controls = false;
-    video.pause();
     video.volume = 0;
+    if (isFirefoxOrSafari() && !isSafari()) {
+        // Firefox has a bug where video will report as black until played at least once
+        void video.play().then(() => {
+            video.pause();
+            video.currentTime = timestamp;
+        });
+    } else {
+        video.pause();
+        video.currentTime = timestamp;
+    }
 
     return video;
 }
@@ -521,6 +532,15 @@ function getThumbnailBox(image: HTMLElement, brandingLocation: BrandingLocation)
     }
 }
 
+/**
+ * Applies desaturation effect to the supplied thumbnail.
+ *
+ * @param {HTMLImageElement | HTMLElement} thumbnail - The HTML image element or HTML element representing the thumbnail.
+ */
+function applyThumbnailDesaturation(thumbnail: HTMLImageElement | HTMLElement) {
+    thumbnail.style.filter = `grayscale(${((100 - Config.config!.thumbnailSaturationLevel) / 100)})`;
+}
+
 export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation,
         showCustomBranding: ShowCustomBrandingInfo, timestamp?: number): Promise<boolean> {
     const thumbnailSelector = getThumbnailSelector(brandingLocation);
@@ -528,6 +548,12 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
         ? element.querySelector(thumbnailSelector) as HTMLImageElement
         : await waitFor(() => element.querySelector(thumbnailSelector) as HTMLImageElement);
     const box = getThumbnailBox(image, brandingLocation);
+
+    if (Config.config!.extensionEnabled) {
+        applyThumbnailDesaturation(image)
+    } else {
+        image.style.removeProperty("filter")
+    }
 
     if (showCustomBranding.knownValue === false || !Config.config!.extensionEnabled 
             || shouldReplaceThumbnailsFastCheck(videoID) === false) {
@@ -577,6 +603,11 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
             }
 
             thumbnail!.style.removeProperty("display");
+            if (Config.config!.extensionEnabled) {
+                applyThumbnailDesaturation(thumbnail);
+            } else {
+                thumbnail.style.removeProperty("filter");
+            }
             if (!(thumbnail instanceof HTMLImageElement) || thumbnail.complete) {
                 if (removeWidth) thumbnail!.style.removeProperty("width");
                 removeBackgroundColor(image, brandingLocation);
@@ -884,7 +915,7 @@ function isLiveCover(image: HTMLElement) {
     return !!image.parentElement?.querySelector(".cbLiveCover");
 }
 
-export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, blob: Blob) {
+export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, blob: Blob, notifyStopRender = true) {
     const videoCache = thumbnailDataCache.setupCache(videoID);
     const videoObject: RenderedThumbnailVideo = {
         video: null,
@@ -898,7 +929,9 @@ export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, b
     }
     videoCache.video.push(videoObject);
 
-    stopRendering(videoID, "Pre-rendered thumbnail");
+    if (notifyStopRender) {
+        stopRendering(videoID, "Pre-rendered thumbnail");
+    }
     
     const unrendered = videoCache.video.filter(v => v.timestamp === timestamp && !v.rendered);
     if (unrendered.length > 0) {

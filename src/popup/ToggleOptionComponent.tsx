@@ -1,5 +1,7 @@
 import * as React from "react";
 import ResetIcon from "../svgIcons/resetIcon";
+import { TitleFormatting } from "../config/config";
+import { FormattedText } from "./FormattedTextComponent";
 
 export interface SelectOption {
     value: string;
@@ -15,6 +17,7 @@ export interface ToggleOptionComponentProps {
     className?: string;
     showResetButton?: boolean;
     onReset?: () => void;
+    titleFormatting?: TitleFormatting;
 }
 
 export const ToggleOptionComponent = (props: ToggleOptionComponentProps) => {
@@ -31,7 +34,7 @@ export const ToggleOptionComponent = (props: ToggleOptionComponentProps) => {
                     <span className="sb-slider sb-round"></span>
                 </label>
                 <label className="sb-switch-label" htmlFor={props.id}>
-                    {props.label}
+                    <FormattedText text={props.label} titleFormatting={props.titleFormatting}/>
                 </label>
 
                 {

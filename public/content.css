@@ -235,11 +235,15 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     position: absolute;
     margin-top: 3em;
 	background-color: rgba(28, 28, 28, 0.9);
+    backdrop-filter: blur(10px);
     --yt-spec-text-primary: white;
 
     width: var(--ytd-watch-flexy-sidebar-width);
     margin-left: auto;
     right: 0;
+
+    /* Undo bolding */
+    font-weight: normal;
 }
 
 #cbSubmitMenu {
@@ -251,6 +255,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     width: 100%;
     border-radius: 5px;
     line-height: normal;
+    cursor: default;
 }
 
 .submissionMenuInner {
@@ -268,6 +273,10 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     margin-right: 10px;
 
     cursor: pointer;
+}
+
+.cbButton path {
+    transition: fill 0.5s;
 }
 
 .cbButton img {

@@ -79,6 +79,7 @@ export const PaymentComponent = () => {
             } else if (choices.freeTrial) {
                 setPaymentResult(PaymentResultMessageType.FreeTrial)
                 Config.config!.freeTrialStart = Date.now();
+                Config.config!.freeTrialEnded = false;
             }
 
             window.scrollTo(0, 0);
@@ -92,7 +93,7 @@ export const PaymentComponent = () => {
 
         if (validLicenseKey && !openedTab) {
             openedTab = true;
-            chrome.runtime.sendMessage({ "message": "openHelp" }, () => window.close());
+            setTimeout(() => chrome.runtime.sendMessage({ "message": "openHelp" }, () => window.close()), 200);
         }
     }
 

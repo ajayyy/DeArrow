@@ -129,6 +129,11 @@ describe("toTitleCase", () => {
         ["Some title #lowercasething", "Some Title #lowercasething"],
         ["TWO WORLDS II (Zero Punctuation)", "Two Worlds II (Zero Punctuation)"],
         ["Riding a VIA train", "Riding a VIA Train"],
+        ["Pandora Hearts pocket watch of real life with lacie melody edited of", "Pandora Hearts Pocket Watch of Real Life with Lacie Melody Edited Of"],
+        ["Pandora Hearts pocket watch of real life with lacie melody edited of!!!!", "Pandora Hearts Pocket Watch of Real Life with Lacie Melody Edited Of"],
+        ["Pandora Hearts pocket watch of real life with lacie melody edited of - an important thing", "Pandora Hearts Pocket Watch of Real Life with Lacie Melody Edited Of - An Important Thing"],
+        // in is inch so is allowlisted unless manually capitalized
+        ["Pandora Hearts pocket watch in real life with lacie melody edited In", "Pandora Hearts Pocket Watch in Real Life with Lacie Melody Edited In"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;

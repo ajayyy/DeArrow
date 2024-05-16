@@ -1,6 +1,6 @@
 import { ChannelID } from "../../maze-utils/src/video";
 import { VideoID } from "../../maze-utils/src/video";
-import { DataCache } from "../utils/cache";
+import { DataCache } from "../../maze-utils/src/cache";
 
 export interface PlaybackUrl {
     url: string;

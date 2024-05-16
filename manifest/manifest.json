@@ -1,7 +1,7 @@
 {
     "name": "__MSG_deArrowFullName__",
     "short_name": "DeArrow",
-    "version": "1.5.2",
+    "version": "1.5.11",
     "default_locale": "en",
     "description": "__MSG_deArrowDescription__",
     "homepage_url": "https://dearrow.ajay.app",

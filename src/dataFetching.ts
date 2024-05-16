@@ -311,7 +311,8 @@ async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Re
         }
     } else {
         const request = await sendRequestToServer("GET", "/api/branding", {
-            videoID
+            videoID,
+            fetchAll: true
         });
 
         if (request.ok || request.status === 404) {

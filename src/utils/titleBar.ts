@@ -26,10 +26,14 @@ let lastReferenceNode: HTMLElement | null = null;
 export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLElement): Promise<HTMLElement | null> {
     const titleNode = forceTitleNode ?? await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
 
+    // Experimental YouTube layout with description on right
+    const isOnDescriptionOnRightLayout = titleNode?.parentElement?.querySelector("#description");
+
     // First case is for "proper description" userscript
     const referenceNode = titleNode?.classList?.contains?.("ytd-video-primary-info-renderer")
-            || titleNode?.classList?.contains?.("slim-video-information-title") ? 
-        titleNode : titleNode?.parentElement;
+            || titleNode?.classList?.contains?.("slim-video-information-title")
+            || isOnDescriptionOnRightLayout 
+        ? titleNode : titleNode?.parentElement;
 
     if (referenceNode) {
         if (!titleButtonContainer || titleButtonContainer.parentElement !== referenceNode) {
@@ -52,25 +56,26 @@ export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLEleme
                     titleButtonContainer.style.height = getComputedStyle(header).lineHeight;
                 }
 
-                if (onMobile()) {
+                if (onMobile() || isOnDescriptionOnRightLayout) {
                     if (lastReferenceNode !== referenceNode) {
-                        if (lastReferenceNode) {
-                            removeNodeToListenFor(lastReferenceNode);
+                        if (onMobile()) {
+                            if (lastReferenceNode) {
+                                removeNodeToListenFor(lastReferenceNode);
+                            }
+
+                            addNodeToListenFor(titleButtonContainer, MobileFix.Replace);
                         }
 
                         lastReferenceNode = referenceNode;
-
-                        nodesToListenFor
-                        addNodeToListenFor(titleButtonContainer, MobileFix.Replace);
 
                         referenceNode.parentElement!.addEventListener("click", () => {
                             if (!chrome.runtime?.id) return; // Extension context invalidated
 
                             // Now the description with a second title element will be shown
-                            const selector = ".primary-info .title";
+                            const selector = ".primary-info .title, ytd-video-description-header-renderer #shorts-title";
 
-                            // If it already exists, this menu is about to be closed
-                            if (!document.querySelector(selector)) {
+                            // If it already exists, this menu is about to be closed on mobile
+                            if (!onMobile() || !document.querySelector(selector)) {
                                 waitForElement(selector).then((element) => {
                                     if (element) {
                                         replaceCurrentVideoBranding().catch(logError);
