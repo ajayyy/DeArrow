@@ -7,11 +7,14 @@ import DownvoteIcon from "../svgIcons/downvoteIcon";
 import { submitVideoBrandingAndHandleErrors } from "../dataFetching";
 import { AnimationUtils } from "../../maze-utils/src/animationUtils";
 import { VideoID } from "../../maze-utils/src/video";
+import { shouldStoreVotes } from "../utils/configUtils";
 
 export interface TitleComponentProps {
     submission: RenderedTitleSubmission;
     selected: boolean;
+    upvoted: boolean;
     onSelectOrUpdate: (title: string, oldTitle: string) => void;
+    onUpvote: () => void;
     onDeselect: () => void;
     actAsVip: boolean;
     videoID: VideoID;
@@ -24,6 +27,7 @@ export const TitleComponent = (props: TitleComponentProps) => {
     const title = React.useRef(props.submission.title);
     const [titleChanged, setTitleChanged] = React.useState(false);
     const [focused, setFocused] = React.useState(false);
+    const [downvoted, setDownvoted] = React.useState(false);
 
     React.useEffect(() => {
         if (focused && title.current === "") {
@@ -109,19 +113,34 @@ export const TitleComponent = (props: TitleComponentProps) => {
                         e.stopPropagation();
 
                         const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
-                        submitVideoBrandingAndHandleErrors(props.submission, null, false, props.actAsVip).then(stopAnimation);
+                        submitVideoBrandingAndHandleErrors(props.submission, null, false, props.actAsVip).then(() => {
+                            stopAnimation();
+                            setDownvoted(false);
 
-                        const unsubmitted = Config.local!.unsubmitted[props.videoID];
-                        if (unsubmitted) {
+                            props.onUpvote();
+                        });
+
+                        if (shouldStoreVotes()) {
+                            const unsubmitted = Config.local!.unsubmitted[props.videoID] ??= {
+                                thumbnails: [],
+                                titles: []
+                            };
+                            unsubmitted.titles.forEach((t) => t.selected = false);
+
                             const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === props.submission.title);
                             if (unsubmittedTitle) {
-                                unsubmitted.titles.forEach((t) => t.selected = false);
                                 unsubmittedTitle.selected = true;
-                                Config.forceLocalUpdate("unsubmitted");
+                            } else {
+                                unsubmitted.titles.push({
+                                    title: props.submission.title,
+                                    selected: true
+                                })
                             }
+
+                            Config.forceLocalUpdate("unsubmitted");
                         }
                     }}>
-                    <UpvoteIcon/>
+                    <UpvoteIcon selected={props.upvoted} />
                 </button>
 
                 <button className="cbButton" 
@@ -130,18 +149,26 @@ export const TitleComponent = (props: TitleComponentProps) => {
                         e.stopPropagation();
 
                         const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
-                        submitVideoBrandingAndHandleErrors(props.submission, null, true, props.actAsVip).then(stopAnimation);
+                        submitVideoBrandingAndHandleErrors(props.submission, null, true, props.actAsVip).then(() => {
+                            stopAnimation();
+                            setDownvoted(true);
+                        });
 
                         const unsubmitted = Config.local!.unsubmitted[props.videoID];
                         if (unsubmitted) {
                             const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === props.submission.title);
                             if (unsubmittedTitle) {
                                 unsubmitted.titles.splice(unsubmitted.titles.indexOf(unsubmittedTitle), 1);
+
+                                if (unsubmitted.titles.length === 0 && unsubmitted.thumbnails.length === 0) {
+                                    delete Config.local!.unsubmitted[props.videoID];
+                                }
+
                                 Config.forceLocalUpdate("unsubmitted");
                             }
                         }
                     }}>
-                    <DownvoteIcon locked={ Config.config!.vip && props.submission.locked }/>
+                    <DownvoteIcon selected={downvoted} locked={ Config.config!.vip && props.submission.locked }/>
                 </button>
             </div>
 

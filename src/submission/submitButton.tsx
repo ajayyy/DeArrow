@@ -11,6 +11,7 @@ import Config from "../config/config";
 import { addTitleChangeListener, getOrCreateTitleButtonContainer } from "../utils/titleBar";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { addCleanupListener } from "../../maze-utils/src/cleanup";
+import { shouldStoreVotes } from "../utils/configUtils";
 
 const submitButtonIcon = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -197,36 +198,59 @@ export class SubmitButton {
             }
 
             // Set the unsubmitted as selected
-            const unsubmitted = Config.local!.unsubmitted[getVideoID()!];
-            if (unsubmitted) {
-                if (Config.config!.keepUnsubmitted 
-                        && (!chrome.extension.inIncognitoContext || Config.config!.keepUnsubmittedInPrivate)) {
-                    unsubmitted.titles.forEach((t) => t.selected = false);
-                    unsubmitted.thumbnails.forEach((t) => t.selected = false);
+            if (shouldStoreVotes()) {
+                const unsubmitted = Config.local!.unsubmitted[getVideoID()!] ??= {
+                    titles: [],
+                    thumbnails: []
+                };
 
-                    if (title) {
-                        const unsubmittedTitle = unsubmitted.titles.find((t) => t.title.trim() === title!.title);
-                        if (unsubmittedTitle) unsubmittedTitle.selected = true;
+                unsubmitted.titles.forEach((t) => t.selected = false);
+                unsubmitted.thumbnails.forEach((t) => t.selected = false);
+
+                if (title) {
+                    const unsubmittedTitle = unsubmitted.titles.find((t) => t.title.trim() === title!.title);
+                    if (unsubmittedTitle) {
+                        unsubmittedTitle.selected = true;
+                    } else {
+                        unsubmitted.titles.push({
+                            title: title.title,
+                            selected: true
+                        });
                     }
-                    
-                    if (thumbnail) {
-                        if (thumbnail.original && !unsubmitted.thumbnails.find((t) => t.original)) {
-                            unsubmitted.thumbnails.push({
-                                original: true,
-                                selected: true
-                            });
+                }
+                
+                if (thumbnail) {
+                    if (thumbnail.original && !unsubmitted.thumbnails.find((t) => t.original)) {
+                        unsubmitted.thumbnails.push({
+                            original: true,
+                            selected: true
+                        });
+                    } else {
+                        const unsubmittedThumbnail = unsubmitted.thumbnails.find((t) => (t.original && thumbnail.original) 
+                            || (!t.original && !thumbnail.original && t.timestamp === thumbnail.timestamp))
+                        if (unsubmittedThumbnail) {
+                            unsubmittedThumbnail.selected = true;
                         } else {
-                            const unsubmittedThumbnail = unsubmitted.thumbnails.find((t) => (t.original && thumbnail.original) 
-                                || (!t.original && !thumbnail.original && t.timestamp === thumbnail.timestamp))
-                            if (unsubmittedThumbnail) unsubmittedThumbnail.selected = true;
+                            if (thumbnail.original) {
+                                unsubmitted.thumbnails.push({
+                                    original: true,
+                                    selected: true
+                                });
+                            } else {
+                                unsubmitted.thumbnails.push({
+                                    original: false,
+                                    timestamp: thumbnail.timestamp,
+                                    selected: true
+                                });
+                            }
                         }
                     }
-                } else {
-                    delete Config.local!.unsubmitted[getVideoID()!];
                 }
-
-                Config.forceLocalUpdate("unsubmitted");
+            } else {
+                delete Config.local!.unsubmitted[getVideoID()!];
             }
+
+            Config.forceLocalUpdate("unsubmitted");
 
             setTimeout(() => replaceCurrentVideoBranding().catch(logError), 1100);
 
