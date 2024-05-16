@@ -82,7 +82,7 @@ interface SBConfig {
      *
      * @type {number}
      */
-    thumbnailDesaturationLevel: number;
+    thumbnailSaturationLevel: number;
     titleFormatting: TitleFormatting;
     shouldCleanEmojis: boolean;
     onlyTitleCaseInEnglish: boolean;
@@ -167,7 +167,7 @@ const syncDefaults = {
     invidiousInstances: [],
     keepUnsubmitted: true,
     keepUnsubmittedInPrivate: false,
-    thumbnailDesaturationLevel: 0,
+    thumbnailSaturationLevel: 100,
     titleFormatting: isEnglish ? TitleFormatting.TitleCase : TitleFormatting.Disable,
     shouldCleanEmojis: true,
     onlyTitleCaseInEnglish: false,

@@ -538,7 +538,7 @@ function getThumbnailBox(image: HTMLElement, brandingLocation: BrandingLocation)
  * @param {HTMLImageElement | HTMLElement} thumbnail - The HTML image element or HTML element representing the thumbnail.
  */
 function applyThumbnailDesaturation(thumbnail: HTMLImageElement | HTMLElement) {
-    thumbnail.style.filter = `grayscale(${(Config.config!.thumbnailDesaturationLevel / 100)})`;
+    thumbnail.style.filter = `grayscale(${((100 - Config.config!.thumbnailSaturationLevel) / 100)})`;
 }
 
 export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation,
@@ -552,8 +552,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
     if (Config.config!.extensionEnabled) {
         applyThumbnailDesaturation(image)
     } else {
-        // Reset back to normal
-        image.style.filter = `grayscale(0)`;
+        image.style.removeProperty("filter")
     }
 
     if (showCustomBranding.knownValue === false || !Config.config!.extensionEnabled 
@@ -607,8 +606,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
             if (Config.config!.extensionEnabled) {
                 applyThumbnailDesaturation(thumbnail);
             } else {
-                // Reset back to normal
-                thumbnail.style.filter = "grayscale(0)";
+                thumbnail.style.removeProperty("filter");
             }
             if (!(thumbnail instanceof HTMLImageElement) || thumbnail.complete) {
                 if (removeWidth) thumbnail!.style.removeProperty("width");
