@@ -590,10 +590,13 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
         const width = objectWidth * window.devicePixelRatio;
         const height = objectHeight * window.devicePixelRatio;
 
-        // TODO: Add option not to hide all thumbnails by default
-        image.style.display = "none";
-        image.classList.remove("cb-visible");
-        resetBackgroundColor(image, brandingLocation);
+        if (Config.config!.hideDetailsWhileFetching) {
+            image.style.display = "none";
+            image.classList.remove("cb-visible");
+            resetBackgroundColor(image, brandingLocation);
+        } else {
+            resetToShowOriginalThumbnail(image, brandingLocation);
+        }
 
         const displayThumbnail = async (thumbnail: HTMLImageElement | HTMLElement, blobUrl: string | null, remoteUrl: string, removeWidth: boolean) => {
             if (blobUrl && thumbnail instanceof HTMLImageElement) thumbnail.src = blobUrl;

@@ -44,9 +44,13 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         lastUrlWatchPageType = currentWatchPageType;
     }
 
-    //todo: add an option to not hide title
-    hideCustomTitle(element, brandingLocation);
-    hideOriginalTitle(element, brandingLocation);
+    if (Config.config!.hideDetailsWhileFetching) {
+        hideCustomTitle(element, brandingLocation);
+        hideOriginalTitle(element, brandingLocation);
+    } else {
+        showOriginalTitle(element, brandingLocation);
+        hideCustomTitle(element, brandingLocation);
+    }
 
     try {
         const titleDataPromise = getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
@@ -106,6 +110,10 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         if (originalTitleElement.parentElement?.title) {
             // Inside element should handle title fine
             originalTitleElement.parentElement.title = "";
+        }
+
+        if (!Config.config!.hideDetailsWhileFetching) {
+            hideOriginalTitle(element, brandingLocation);
         }
 
         showCustomTitle(element, brandingLocation);
