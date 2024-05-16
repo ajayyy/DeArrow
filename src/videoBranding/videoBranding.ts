@@ -297,8 +297,7 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
     if (result || (await Promise.all(promises)).some((r) => r)) {
         const title = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
         const originalTitle = getOriginalTitleElement(element, brandingLocation)?.textContent;
-        const customTitle = title && !title.original 
-            && (!originalTitle || (cleanResultingTitle(cleanEmojis(title.title))).toLowerCase() !== (cleanResultingTitle(cleanEmojis(originalTitle))).toLowerCase())
+        const customTitle = title && !title.original
             && await shouldUseCrowdsourcedTitles(videoID);
 
         if (!customTitle && !Config.config!.showIconForFormattedTitles && !await promises[1]) {
