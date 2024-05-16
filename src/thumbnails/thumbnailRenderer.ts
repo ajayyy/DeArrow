@@ -532,6 +532,15 @@ function getThumbnailBox(image: HTMLElement, brandingLocation: BrandingLocation)
     }
 }
 
+/**
+ * Applies desaturation effect to the supplied thumbnail.
+ *
+ * @param {HTMLImageElement | HTMLElement} thumbnail - The HTML image element or HTML element representing the thumbnail.
+ */
+function applyThumbnailDesaturation(thumbnail: HTMLImageElement | HTMLElement) {
+    thumbnail.style.filter = `grayscale(${((100 - Config.config!.thumbnailSaturationLevel) / 100)})`;
+}
+
 export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation,
         showCustomBranding: ShowCustomBrandingInfo, timestamp?: number): Promise<boolean> {
     const thumbnailSelector = getThumbnailSelector(brandingLocation);
@@ -539,6 +548,12 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
         ? element.querySelector(thumbnailSelector) as HTMLImageElement
         : await waitFor(() => element.querySelector(thumbnailSelector) as HTMLImageElement);
     const box = getThumbnailBox(image, brandingLocation);
+
+    if (Config.config!.extensionEnabled) {
+        applyThumbnailDesaturation(image)
+    } else {
+        image.style.removeProperty("filter")
+    }
 
     if (showCustomBranding.knownValue === false || !Config.config!.extensionEnabled 
             || shouldReplaceThumbnailsFastCheck(videoID) === false) {
@@ -588,6 +603,11 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
             }
 
             thumbnail!.style.removeProperty("display");
+            if (Config.config!.extensionEnabled) {
+                applyThumbnailDesaturation(thumbnail);
+            } else {
+                thumbnail.style.removeProperty("filter");
+            }
             if (!(thumbnail instanceof HTMLImageElement) || thumbnail.complete) {
                 if (removeWidth) thumbnail!.style.removeProperty("width");
                 removeBackgroundColor(image, brandingLocation);
