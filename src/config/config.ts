@@ -78,7 +78,7 @@ interface SBConfig {
     keepUnsubmitted: boolean;
     keepUnsubmittedInPrivate: boolean;
     /**
-     * The level of desaturation applied to thumbnails (0 - 100).
+     * The level of saturation applied to thumbnails (0 - 100).
      *
      * @type {number}
      */
