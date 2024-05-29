@@ -8,7 +8,7 @@ import { RenderedTitleSubmission, TitleDrawerComponent } from "./TitleDrawerComp
 import { VideoID } from "../../maze-utils/src/video";
 import Config, { UnsubmittedSubmission } from "../config/config";
 import { addTitleChangeListener, removeTitleChangeListener } from "../utils/titleBar";
-import { toSentenceCase } from "../titles/titleFormatter";
+import { toSentenceCase } from "../../title-formatting/src/formatters/sentenceCase";
 import { BrandingPreviewComponent } from "./BrandingPreviewComponent";
 import { getHash } from "../../maze-utils/src/hash";
 import { sendRequestToServer } from "../utils/requests";
@@ -29,7 +29,7 @@ export interface SubmissionComponentProps {
     videoID: VideoID;
     video: HTMLVideoElement;
     submissions: BrandingResult;
-    
+
     submitClicked: (title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null, actAsVip: boolean) => Promise<boolean>;
 }
 
@@ -184,7 +184,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             titleChangeListener.current = () => videoChangeListener();
         }
         addTitleChangeListener(titleChangeListener.current);
-    
+
         videoChangeListener();
     }, [props.videoID]);
 
@@ -209,9 +209,9 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             <hr className="cbLine"/>
 
             <div className="cbThumbnailDrawer">
-                <ThumbnailDrawerComponent 
-                    video={props.video} 
-                    videoId={props.videoID} 
+                <ThumbnailDrawerComponent
+                    video={props.video}
+                    videoId={props.videoID}
                     existingSubmissions={thumbnailSubmissions}
                     selectedThumbnailIndex={selectedThumbnailIndex}
                     upvotedThumbnailIndex={upvotedThumbnailIndex}
@@ -336,9 +336,9 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             }
 
             <div className="cbVoteButtonContainer">
-                <button className="cbNoticeButton cbVoteButton" 
-                    disabled={currentlySubmitting 
-                                || (!selectedThumbnail.current && !selectedTitle) 
+                <button className="cbNoticeButton cbVoteButton"
+                    disabled={currentlySubmitting
+                                || (!selectedThumbnail.current && !selectedTitle)
                                 || (!!selectedTitle && selectedTitle.title.toLowerCase() === chrome.i18n.getMessage("OriginalTitle").toLowerCase())}
                     onClick={async () => {
                         setCurrentlySubmitting(true);
@@ -361,7 +361,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             </div>
 
             {
-                Config.config!.showGuidelineHelp ? 
+                Config.config!.showGuidelineHelp ?
                 <>
                     <hr className="cbLine"/>
 
@@ -402,7 +402,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                 : null
             }
 
-            
+
         </div>
     );
 };

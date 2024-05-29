@@ -5,8 +5,5 @@ module.exports = {
     "transform": {
         "^.+\\.ts$": "ts-jest"
     },
-    "reporters": ["default", "github-actions"],
-    "globals": {
-        "LOAD_CLD": false
-    }
-}; 
+    "reporters": ["default", "github-actions"]
+};

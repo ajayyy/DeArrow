@@ -4,3 +4,6 @@
 [submodule "maze-utils"]
 	path = maze-utils
 	url = https://github.com/ajayyy/maze-utils
+[submodule "title-formatting"]
+	path = title-formatting
+	url = https://github.com/ajayyy/DeArrowFormatting.git

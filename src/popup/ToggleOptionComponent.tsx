@@ -1,6 +1,6 @@
 import * as React from "react";
 import ResetIcon from "../svgIcons/resetIcon";
-import { TitleFormatting } from "../config/config";
+import { TitleFormatting } from "../../title-formatting/src";
 import { FormattedText } from "./FormattedTextComponent";
 
 export interface SelectOption {
@@ -25,8 +25,8 @@ export const ToggleOptionComponent = (props: ToggleOptionComponentProps) => {
         <div className={`sb-switch-container-container ${props.className ?? ""}`} style={props.style}>
             <div className="sb-switch-container sb-animated">
                 <label className="sb-switch">
-                    <input id={props.id} 
-                        type="checkbox" 
+                    <input id={props.id}
+                        type="checkbox"
                         checked={props.value}
                         onChange={(e) => {
                             props.onChange((e.target as HTMLInputElement).checked);

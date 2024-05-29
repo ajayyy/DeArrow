@@ -1,7 +1,7 @@
 import * as React from "react";
 import { getLicenseKey } from "./license";
 import { FormattedText } from "../popup/FormattedTextComponent";
-import { TitleFormatting } from "../config/config";
+import { TitleFormatting } from "../../title-formatting/src";
 
 interface LicenseComponentProps {
     titleFormatting?: TitleFormatting;
@@ -46,7 +46,7 @@ export const LicenseComponent = ({ titleFormatting }: LicenseComponentProps) => 
                     </div>
                 </>
             }
-    
+
         </div>
     );
 };
