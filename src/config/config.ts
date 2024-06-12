@@ -77,11 +77,6 @@ interface SBConfig {
     invidiousInstances: string[];
     keepUnsubmitted: boolean;
     keepUnsubmittedInPrivate: boolean;
-    /**
-     * The level of desaturation applied to thumbnails (0 - 100).
-     *
-     * @type {number}
-     */
     thumbnailSaturationLevel: number;
     titleFormatting: TitleFormatting;
     shouldCleanEmojis: boolean;
