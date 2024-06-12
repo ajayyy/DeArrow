@@ -520,7 +520,10 @@ function getThumbnailBox(image: HTMLElement, brandingLocation: BrandingLocation)
     switch (brandingLocation) {
         case BrandingLocation.Related:
             if (!onMobile()) {
-                return image.closest(getThumbnailSelectors(":not([hidden])")) as HTMLElement;
+                return image.closest([
+                    getThumbnailSelectors(":not([hidden])"),
+                    "ytd-hero-playlist-thumbnail-renderer"]
+                .join(", ")) as HTMLElement;
             } else {
                 return image;
             }

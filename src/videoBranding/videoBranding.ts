@@ -49,7 +49,7 @@ export interface VideoBrandingInstance {
 }
 
 export const brandingBoxSelector = !onMobile() 
-    ? "ytd-rich-grid-media, ytd-video-renderer, ytd-movie-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer, ytd-compact-playlist-renderer, ytd-playlist-renderer, ytd-grid-playlist-renderer, ytd-grid-show-renderer, ytd-structured-description-video-lockup-renderer"
+    ? "ytd-rich-grid-media, ytd-video-renderer, ytd-movie-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer, ytd-compact-playlist-renderer, ytd-playlist-renderer, ytd-grid-playlist-renderer, ytd-grid-show-renderer, ytd-structured-description-video-lockup-renderer, ytd-hero-playlist-thumbnail-renderer"
     : "ytm-video-with-context-renderer, ytm-compact-radio-renderer, ytm-reel-item-renderer, ytm-channel-featured-video-renderer, ytm-compact-video-renderer, ytm-playlist-video-renderer, .playlist-immersive-header-content, ytm-compact-playlist-renderer, ytm-video-card-renderer, ytm-vertical-list-renderer, ytm-playlist-panel-video-renderer";
 
 export const watchPageThumbnailSelector = ".ytp-cued-thumbnail-overlay";
@@ -212,11 +212,18 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
     return [false, false];
 }
 
-export function getLinkElement(element: HTMLElement, brandingLocation: BrandingLocation): HTMLAnchorElement {
+export function getLinkElement(element: HTMLElement, brandingLocation: BrandingLocation): HTMLAnchorElement | null {
     switch (brandingLocation) {
         case BrandingLocation.Related:
             if (!onMobile()) {
-                return element.querySelector("a#thumbnail") as HTMLAnchorElement;
+                const link = element.querySelector("a#thumbnail") as HTMLAnchorElement;
+                if (link) {
+                    return link;
+                } else if (element.nodeName === "YTD-HERO-PLAYLIST-THUMBNAIL-RENDERER") {
+                    return element.closest("a") as HTMLAnchorElement;
+                } else {
+                    return null;
+                }
             } else {
                 // Big thumbnails, compact thumbnails, shorts, channel feature, playlist header
                 return element.querySelector("a.media-item-thumbnail-container, a.compact-media-item-image, a.reel-item-endpoint, :scope > a, .amsterdam-playlist-thumbnail-wrapper > a") as HTMLAnchorElement;
@@ -246,7 +253,7 @@ async function extractVideoID(link: HTMLAnchorElement) {
                 videoID = href.match(/\/vi\/(\S{11})/)?.[1] as VideoID;
             }
         } else {
-            const image = link.querySelector("yt-image img, img.video-thumbnail-img") as HTMLImageElement;
+            const image = link.querySelector("yt-image img, img.video-thumbnail-img, yt-img-shadow img") as HTMLImageElement;
             if (image) {
                 let href = image.getAttribute("src");
                 if (!href) {
