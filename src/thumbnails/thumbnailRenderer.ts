@@ -873,7 +873,7 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
 
 function removeAbThumbnail(image: HTMLImageElement): void {
     if (image.src?.includes?.("_custom_")) {
-        image.src = image.src.replace(/_custom_\d+/, "");
+        image.src = image.src.replace(/_custom_\d+/, "").replace(/\?.+/, "");
     }
 }
 
