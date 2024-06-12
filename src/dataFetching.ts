@@ -1,4 +1,4 @@
-import { VideoID, getVideoID, getYouTubeVideoID } from "../maze-utils/src/video";
+import { VideoID, getVideo, getVideoID, getYouTubeVideoID } from "../maze-utils/src/video";
 import { ThumbnailSubmission, ThumbnailWithRandomTimeResult, fetchVideoMetadata, isLiveSync } from "./thumbnails/thumbnailData";
 import { TitleResult, TitleSubmission } from "./titles/titleData";
 import { FetchResponse, sendRealRequestToCustomServer } from "../maze-utils/src/background-request-proxy";
@@ -491,7 +491,8 @@ export async function submitVideoBranding(videoID: VideoID, title: TitleSubmissi
         title,
         thumbnail,
         downvote,
-        autoLock: actAsVip
+        autoLock: actAsVip,
+        videoDuration: getVideo()?.duration
     });
 
     clearCache(videoID);
