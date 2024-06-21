@@ -873,7 +873,28 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
 
 function removeAbThumbnail(image: HTMLImageElement): void {
     if (image.src?.includes?.("_custom_")) {
-        image.src = image.src.replace(/_custom_\d+/, "").replace(/\?.+/, "");
+        const originalSource = image.src;
+        const newSource = image.src
+            .replace(/_custom_\d+/, "")
+            .replace(/\?.+/, "")
+            .replace(/\/\/[^/]+\//, "//i.ytimg.com/");
+
+        const onError = () => {
+            if (image.src === newSource) {
+                // Reset back to original if it failed
+                image.src = originalSource;
+            }
+        };
+        image.addEventListener("error", onError, { once: true });
+        image.addEventListener("load", (e) => {
+            if ((e.target as HTMLImageElement).naturalWidth === 120) {
+                onError();
+            }
+    
+            image.removeEventListener("error", onError);
+        }, { once: true });
+
+        image.src = newSource;
     }
 }
 
