@@ -11,6 +11,7 @@ interface PaymentComponentChoices {
     freeTrial?: boolean;
     licenseKey?: string;
     freeAccess?: boolean;
+    freeInstantAccess?: boolean;
     freeAccessWaitingPeriod? : number;
 }
 
@@ -64,10 +65,15 @@ export const PaymentComponent = () => {
         }
 
         if (choices.freeAccess) {
-            Config.config!.freeAccessRequestStart = Date.now();
-
-            if (choices.freeAccessWaitingPeriod) {
-                Config.config!.freeAccessWaitingPeriod = choices.freeAccessWaitingPeriod;
+            if (choices.freeInstantAccess) {
+                Config.config!.activated = true;
+                Config.config!.freeActivation = true;
+            } else {
+                Config.config!.freeAccessRequestStart = Date.now();
+    
+                if (choices.freeAccessWaitingPeriod) {
+                    Config.config!.freeAccessWaitingPeriod = choices.freeAccessWaitingPeriod;
+                }
             }
         }
 
@@ -85,7 +91,7 @@ export const PaymentComponent = () => {
             window.scrollTo(0, 0);
         }
 
-        if (validLicenseKey || choices.freeTrial) {
+        if (validLicenseKey || choices.freeTrial || Config.config!.activated) {
             await askBackgroundToRegisterNeededContentScripts(true);
         } else if (choices.freeAccess) {
             setTimeout(() => void askBackgroundToSetupAlarms(), 2000);
