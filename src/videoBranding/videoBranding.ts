@@ -14,6 +14,7 @@ import { cleanEmojis, cleanResultingTitle } from "../titles/titleFormatter";
 import { shouldDefaultToCustom, shouldDefaultToCustomFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { addMaxTitleLinesCssToPage } from "../utils/cssInjector";
+import { submitButton } from "../video";
 
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
 
@@ -442,6 +443,10 @@ export function setupOptionChangeListener(): void {
                 for (const updateBranding of updateBrandingCallbacks) {
                     updateBranding().catch(logError);
                 }
+            }
+
+            if (changes["extensionEnabled"]) {
+                submitButton.updateIcon();
             }
         }
 
