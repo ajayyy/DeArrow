@@ -209,7 +209,7 @@ const syncDefaults = {
     lastIncognitoStatus: false,
     showActivatedMessage: false,
     openMenuKey: { key: "d", shift: true },
-    enableExtensionKey: { key: "e", shift: true }
+    enableExtensionKey: { key: "e", ctrl: true }
 };
 
 const localDefaults = {
