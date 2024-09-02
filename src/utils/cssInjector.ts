@@ -81,7 +81,7 @@ function buildHideThumbnailCss(): string {
         const thumbnailTypes = getThumbnailElements();
 
         for (const thumbnailType of thumbnailTypes) {
-            result.push(`${start} ${thumbnailType} img:not(.cb-visible, ytd-moving-thumbnail-renderer img, .cbCustomThumbnailCanvas)`);
+            result.push(`${start} ${thumbnailType} img:not(.cb-visible, ytd-moving-thumbnail-renderer img, .cbCustomThumbnailCanvas, .yt-spec-avatar-shape__image)`);
         }
     }
 
