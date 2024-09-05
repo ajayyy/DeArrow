@@ -8,7 +8,7 @@ import UpvoteIcon from "../svgIcons/upvoteIcon";
 import DownvoteIcon from "../svgIcons/downvoteIcon";
 import { submitVideoBrandingAndHandleErrors } from "../dataFetching";
 import { AnimationUtils } from "../../maze-utils/src/animationUtils";
-import Config from "../config/config";
+import Config, { ThumbnailFallbackOption } from "../config/config";
 import { FormattedText } from "../popup/FormattedTextComponent";
 import { shouldStoreVotes } from "../utils/configUtils";
 
@@ -85,8 +85,15 @@ export const ThumbnailSelectionComponent = (props: ThumbnailSelectionComponentPr
                                 onClick={(e) => {
                                     e.stopPropagation();
 
+                                    const submission = createThumbnailSubmission();
+                                    if (submission?.original 
+                                        && !Config.config!.vip
+                                        && !Config.config!.firstThumbnailSubmitted
+                                        && Config.config!.thumbnailFallback === ThumbnailFallbackOption.RandomTime
+                                        && !confirm(chrome.i18n.getMessage("areYouSureOriginalVote"))) return;
+
                                     const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
-                                    submitVideoBrandingAndHandleErrors(null, createThumbnailSubmission(), false, props.actAsVip!).then(() => {
+                                    submitVideoBrandingAndHandleErrors(null, submission, false, props.actAsVip!).then(() => {
                                         stopAnimation();
                                         setDownvoted(false);
 

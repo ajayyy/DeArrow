@@ -485,6 +485,11 @@ export function clearCache(videoID: VideoID) {
 
 export async function submitVideoBranding(videoID: VideoID, title: TitleSubmission | null,
         thumbnail: ThumbnailSubmission | null, downvote = false, actAsVip = false): Promise<FetchResponse> {
+
+    if (thumbnail && !downvote && !Config.config!.firstThumbnailSubmitted) {
+        Config.config!.firstThumbnailSubmitted = true;
+    }
+
     const result = await sendRequestToServer("POST", "/api/branding", {
         userID: Config.config!.userID,
         videoID,

@@ -109,6 +109,7 @@ interface SBConfig {
     thumbnailReplacements: number;
     ignoreAbThumbnails: boolean;
     hideDetailsWhileFetching: boolean;
+    firstThumbnailSubmitted: boolean;
     licenseKey: string | null;
     activated: boolean;
     alreadyActivated: boolean;
@@ -197,6 +198,7 @@ const syncDefaults = {
     thumbnailReplacements: 0,
     ignoreAbThumbnails: true,
     hideDetailsWhileFetching: true,
+    firstThumbnailSubmitted: false,
     licenseKey: null,
     activated: true,
     alreadyActivated: false,
