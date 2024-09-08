@@ -10,7 +10,6 @@ import Config, { ThumbnailCacheOption } from "../config/config";
 import { logError } from "../utils/logger";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { handleOnboarding } from "./onboarding";
-import { cleanEmojis, cleanResultingTitle } from "../titles/titleFormatter";
 import { shouldDefaultToCustom, shouldDefaultToCustomFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { addMaxTitleLinesCssToPage } from "../utils/cssInjector";
@@ -89,7 +88,7 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
         const showCustomBranding = videoBrandingInstance.showCustomBranding;
 
         // Replace each title and return true only if all true
-        promises[0] = Promise.all(titles.map((title) => 
+        promises[0] = Promise.all(titles.map((title) =>
             replaceTitle(title, videoID, showCustomBranding, brandingLocation)))
         .then((results) => results.every((result) => result));
 
@@ -197,8 +196,8 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
             knownValue: false,
             originalValue: false
         } : showCustomBranding);
-        const titlePromise = !isPlaylistOrClipTitleStatus 
-            ? replaceTitle(element, videoID, showCustomBranding, brandingLocation) 
+        const titlePromise = !isPlaylistOrClipTitleStatus
+            ? replaceTitle(element, videoID, showCustomBranding, brandingLocation)
             : Promise.resolve(false);
 
         if (isPlaylistOrClipTitleStatus) {
@@ -283,7 +282,7 @@ async function extractVideoID(link: HTMLAnchorElement) {
                     await waitForImageSrc(image);
                     href = image.getAttribute("src");
                 }
-    
+
                 if (href) {
                     videoID = href.match(/\/vi\/(\S{11})/)?.[1] as VideoID;
                 }
@@ -296,7 +295,7 @@ async function extractVideoID(link: HTMLAnchorElement) {
 
 export async function extractVideoIDFromElement(element: HTMLElement, brandingLocation: BrandingLocation): Promise<VideoID | null> {
     const link = getLinkElement(element, brandingLocation);
-    if (link) { 
+    if (link) {
         return await extractVideoID(link);
     } else {
         return null;
@@ -304,7 +303,7 @@ export async function extractVideoIDFromElement(element: HTMLElement, brandingLo
 }
 
 function isPlaylistOrClipTitle(element: HTMLElement, link: HTMLAnchorElement) {
-    return (link.href?.match(/list=/)?.[0] !== undefined 
+    return (link.href?.match(/list=/)?.[0] !== undefined
             && link.href?.match(/index=/)?.[0] === undefined)
         || link.href?.match(/\/clip\//)?.[0] !== undefined;
 }
@@ -318,15 +317,13 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
     const result = await Promise.race(promises);
     if (result || (await Promise.all(promises)).some((r) => r)) {
         const title = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
-        const originalTitle = getOriginalTitleElement(element, brandingLocation)?.textContent;
-        const customTitle = title && !title.original 
-            && (!originalTitle || (cleanResultingTitle(cleanEmojis(title.title))).toLowerCase() !== (cleanResultingTitle(cleanEmojis(originalTitle))).toLowerCase())
+        const customTitle = title && !title.original
             && await shouldUseCrowdsourcedTitles(videoID);
 
         if (!customTitle && !Config.config!.showIconForFormattedTitles && !await promises[1]) {
             return;
         }
-        
+
         const button = await findOrCreateShowOriginalButton(element, brandingLocation, videoID);
         const image = button.querySelector("img") as HTMLImageElement;
         if (image) {
@@ -383,7 +380,7 @@ export async function setShowCustom(videoID: VideoID, value: boolean): Promise<v
  * If a video is currently at the default state, it will be updated to it's newest state
  */
 async function updateCurrentlyDefaultShowCustom(videoID: VideoID): Promise<void> {
-    if (videoBrandingInstances[videoID] 
+    if (videoBrandingInstances[videoID]
             && [null, videoBrandingInstances[videoID].showCustomBranding.originalValue]
                     .includes(videoBrandingInstances[videoID].showCustomBranding.knownValue)) {
 
@@ -471,7 +468,7 @@ export function setupOptionChangeListener(): void {
             }
         }
 
-        if (changes.titleMaxLines 
+        if (changes.titleMaxLines
                 && changes.titleMaxLines.newValue !== changes.titleMaxLines.oldValue) {
             addMaxTitleLinesCssToPage();
         }
@@ -510,7 +507,7 @@ function waitForImageSrc(image: HTMLImageElement): Promise<void> {
 }
 
 export function getActualShowCustomBranding(showCustomBranding: ShowCustomBrandingInfo): Promise<boolean> {
-    return showCustomBranding.knownValue === null 
+    return showCustomBranding.knownValue === null
         ? showCustomBranding.actualValue
         : Promise.resolve(showCustomBranding.knownValue);
 }
