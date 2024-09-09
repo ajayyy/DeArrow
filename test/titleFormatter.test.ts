@@ -228,7 +228,8 @@ describe("toSentenceCase", () => {
 describe("toSentenceCase cleanEmojis", () => {
     const titleCases: [string, string][] = [
         ["🚨 Announcement: New Series Coming!", "Announcement: New series coming"],
-        ["𝐆𝐀𝐋𝐓 𝐒𝐔𝐁 𝐓𝐑𝐀𝐈𝐍𝐒 Railfan Mini-Meetup at Leaside", "Galt sub trains railfan Mini-Meetup at leaside"]
+        ["𝐆𝐀𝐋𝐓 𝐒𝐔𝐁 𝐓𝐑𝐀𝐈𝐍𝐒 Railfan Mini-Meetup at Leaside", "Galt sub trains railfan Mini-Meetup at leaside"],
+        ["The country of 🇨🇦 exists", "The country of 🇨🇦 exists"]
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
