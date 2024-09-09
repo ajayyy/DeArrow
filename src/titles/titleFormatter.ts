@@ -1,7 +1,7 @@
 import { VideoID } from "../../maze-utils/src/video";
 import Config, { TitleFormatting } from "../config/config";
 import { getTitleFormatting, shouldCleanEmojis } from "../config/channelOverrides";
-import { acronymBlocklist, allowlistedWords, notStartOfSentence, titleCaseDetectionNotCapitalized, titleCaseNotCapitalized } from "./titleFormatterData";
+import { acronymBlocklist, allowlistedWords, fancyTextConversions, notStartOfSentence, titleCaseDetectionNotCapitalized, titleCaseNotCapitalized } from "./titleFormatterData";
 import { chromeP } from "../../maze-utils/src/browserApi";
 import type { LanguageIdentifier } from "cld3-asm";
 
@@ -33,7 +33,7 @@ export async function formatTitleDefaultSettings(title: string, isCustom: boolea
 
 export async function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: TitleFormatting, shouldCleanEmojis: boolean): Promise<string> {
     if (shouldCleanEmojis) {
-        title = cleanEmojis(title);
+        title = cleanFancyText(cleanEmojis(title));
     }
 
     switch (titleFormatting) {
@@ -552,6 +552,25 @@ export function cleanEmojis(title: string): string {
     } else {
         return title;
     }
+}
+
+export function cleanFancyText(title: string): string {
+    const replacementsNeeded = new Set<[string, string]>();
+    for (const character of title) {
+        const match = fancyTextConversions.get(character);
+        if (match) {
+            replacementsNeeded.add([character, match]);
+        }
+    }
+
+    for (const replacement of replacementsNeeded) {
+        // Allow emoji variation selectors on either side of the replacement character
+        // Supports emojis such as 🅱️
+        title = title.replace(new RegExp(`[\u{fe00}-\u{fe0f}\u{e0100}-\u{e01ef}]?${replacement[0]}[\u{fe00}-\u{fe0f}\u{e0100}-\u{e01ef}]?`
+            , "ug"), replacement[1]);
+    }
+
+    return title.trim();
 }
 
 function listHasWord(list: Set<string>, word: string): boolean {

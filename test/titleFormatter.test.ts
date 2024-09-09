@@ -151,16 +151,17 @@ describe("toTitleCase cleanEmojis", () => {
         ["5 min countdown timer (roller🎢🎢🎢coaster) 🎢", "5 Min Countdown Timer (Roller Coaster)"],
         ["5 min countdown timer (roller🎢🛠️🎢coaster) 🎢", "5 Min Countdown Timer (Roller Coaster)"],
         [" 🎢  🎢🎢 🎢🎢\t🎢", "🎢 🎢🎢 🎢🎢\t🎢"], // Leave emojis when there is no text
-        ["Rush 🅱️", "Rush 🅱️"],
-        ["5 min countdown timer (roller🎢🅱️oaster) 🎢", "5 Min Countdown Timer (Roller 🅱️oaster)"],
-        ["5 min countdown 🎢🅱️🎢🎢 timer (roller coaster) 🎢", "5 Min Countdown 🅱️ Timer (Roller Coaster)"],
-        ["🎢🅱️🎢🎢 5 min countdown timer (roller coaster) 🎢", "🅱️ 5 Min Countdown Timer (Roller Coaster)"],
+        ["Rush 🅱️", "Rush B"],
+        ["5 min countdown timer (roller🎢🅱️oaster) 🎢", "5 Min Countdown Timer (Roller Boaster)"],
+        ["5 min countdown 🎢🅱️🎢🎢 timer (roller coaster) 🎢", "5 Min Countdown B Timer (Roller Coaster)"],
+        ["🎢🅱️🎢🎢 5 min countdown timer (roller coaster) 🎢", "B 5 Min Countdown Timer (Roller Coaster)"],
         ["🛠️ How You Can Repair Your Things", "How You Can Repair Your Things"],
         ["🏳️‍🌈🏳️‍🌈🏳️‍🌈 5 min countdown timer🏳️‍🌈 🏳️‍🌈🏳️‍🌈🏳️‍🌈 (roller🏳️‍🌈🏳️‍🌈🏳️‍🌈coaster) 🏳️‍🌈", "5 Min Countdown Timer (Roller Coaster)"],
         ["5 min countdown 👷🏾‍♀️👷🏾‍♀️👷🏾‍♀️ timer (roller👷🏾‍♀️👷🏾‍♀️👷🏾‍♀️coaster) 👷🏾‍♀️", "5 Min Countdown Timer (Roller Coaster)"],
         ["5 min countdown 👩🏽‍👨🏽‍👦🏽‍👦🏽 timer (roller👩🏽‍👨🏽‍👦🏽‍👦🏽👩🏽‍👨🏽‍👦🏽‍👦🏽coaster) 👩🏽‍👨🏽‍👦🏽‍👦🏽👩🏽‍👨🏽‍👦🏽‍👦🏽", "5 Min Countdown Timer (Roller Coaster)"],
         ["😀︎😀︎😀︎ 5 min countdown timer😀︎ 😀︎😀︎😀︎ (roller😀︎😀︎😀︎coaster) 😀︎", "5 Min Countdown Timer (Roller Coaster)"],
         ["STAR☆T☆RAIN -New Arrange Ver.-", "Star T Rain -New Arrange Ver.-"],
+        ["𝐆𝐀𝐋𝐓 𝐒𝐔𝐁 𝐓𝐑𝐀𝐈𝐍𝐒 Railfan Mini-Meetup at Leaside", "Galt Sub Trains Railfan Mini-Meetup at Leaside"]
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -227,6 +228,7 @@ describe("toSentenceCase", () => {
 describe("toSentenceCase cleanEmojis", () => {
     const titleCases: [string, string][] = [
         ["🚨 Announcement: New Series Coming!", "Announcement: New series coming"],
+        ["𝐆𝐀𝐋𝐓 𝐒𝐔𝐁 𝐓𝐑𝐀𝐈𝐍𝐒 Railfan Mini-Meetup at Leaside", "Galt sub trains railfan Mini-Meetup at leaside"]
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
