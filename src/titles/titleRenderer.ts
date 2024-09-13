@@ -32,8 +32,6 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     if (brandingLocation === BrandingLocation.Watch) {
         const currentWatchPageType = document.URL.includes("watch") ? WatchPageType.Video : WatchPageType.Miniplayer;
 
-        console.log("replacing", videoID, lastWatchVideoID, originalTitleElement.textContent, lastWatchTitle, currentWatchPageType, lastUrlWatchPageType, element)
-
         if (lastWatchVideoID && originalTitleElement?.textContent 
                 && videoID !== lastWatchVideoID && originalTitleElement.textContent === lastWatchTitle
                 && lastUrlWatchPageType === currentWatchPageType) {
