@@ -1,7 +1,7 @@
 import { getYouTubeTitleNodeSelector } from "../../maze-utils/src/elements";
 import { getOriginalTitleElement } from "../titles/titleRenderer";
 import { BrandingLocation, replaceCurrentVideoBranding } from "../videoBranding/videoBranding";
-import { waitForElement } from "../../maze-utils/src/dom";
+import { isVisible, waitForElement } from "../../maze-utils/src/dom";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { logError } from "./logger";
 import { waitFor } from "../../maze-utils/src";
@@ -24,6 +24,10 @@ let titleButtonContainer: HTMLElement | null = null;
 let lastReferenceNode: HTMLElement | null = null;
 
 export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLElement): Promise<HTMLElement | null> {
+    if (titleButtonContainer && isVisible(titleButtonContainer)) {
+        return titleButtonContainer;
+    }
+
     const titleNode = forceTitleNode ?? await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
 
     // Experimental YouTube layout with description on right
