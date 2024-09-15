@@ -276,6 +276,7 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
                 "#video-title",
                 "#movie-title", // Movies in related
                 "#description #title", // Related videos in description
+                ".ShortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
                 ".details .media-item-headline .yt-core-attributed-string", // Mobile YouTube
                 ".reel-item-metadata h3 .yt-core-attributed-string", // Mobile YouTube Shorts
                 ".details > .yt-core-attributed-string", // Mobile YouTube Channel Feature

@@ -710,6 +710,11 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                 thumbnail.className = image.className;
             }
 
+            // New shorts UI
+            if (image.classList.contains("ShortsLockupViewModelHostThumbnail")) {
+                thumbnail.classList.add("ShortsLockupViewModelHostThumbnail");
+            }
+
             thumbnail.classList.add("cbCustomThumbnailCanvas");
             thumbnail.style.removeProperty("display");
 
@@ -847,7 +852,7 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
     if (onMobile()
             || brandingLocation === BrandingLocation.Autoplay
             || brandingLocation === BrandingLocation.EmbedSuggestions
-            || BrandingLocation.Related
+            || brandingLocation === BrandingLocation.Related
             || !!image.closest("ytd-grid-playlist-renderer")
             || isLiveCover(image)) {
         hideCanvas(image);
