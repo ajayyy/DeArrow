@@ -9,6 +9,7 @@ const websiteDomain = "https://dearrow.ajay.app"
 
 interface PaymentComponentChoices {
     freeTrial?: boolean;
+    freeTrialDuration? : number;
     licenseKey?: string;
     freeAccess?: boolean;
     freeInstantAccess?: boolean;
@@ -86,6 +87,10 @@ export const PaymentComponent = () => {
                 setPaymentResult(PaymentResultMessageType.FreeTrial)
                 Config.config!.freeTrialStart = Date.now();
                 Config.config!.freeTrialEnded = false;
+
+                if (choices.freeTrialDuration) {
+                    Config.config!.freeTrialDuration = choices.freeTrialDuration;
+                }
             }
 
             window.scrollTo(0, 0);
