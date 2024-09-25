@@ -1,5 +1,5 @@
 import { getYouTubeTitleNodeSelector } from "../../maze-utils/src/elements";
-import { getVideoID, VideoID } from "../../maze-utils/src/video";
+import { getVideoID, isOnChannelPage, VideoID } from "../../maze-utils/src/video";
 import { getElement, isVisible, waitForElement } from "../../maze-utils/src/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
@@ -15,6 +15,7 @@ import { shouldDefaultToCustom, shouldDefaultToCustomFastCheck, shouldUseCrowdso
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { addMaxTitleLinesCssToPage } from "../utils/cssInjector";
 import { submitButton } from "../video";
+import { waitFor } from "../../maze-utils/src";
 
 export type BrandingUUID = string & { readonly __brandingUUID: unique symbol };
 
@@ -28,6 +29,7 @@ export interface BrandingResult {
 export enum BrandingLocation {
     Related,
     Watch,
+    ChannelTrailer,
     Endcards,
     Autoplay,
     EndRecommendations,
@@ -63,12 +65,19 @@ const videoBrandingInstances: Record<VideoID, VideoBrandingInstance> = {}
 export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]> {
     const onClipPage = document.URL.includes("/clip/");
     const onWatchPage = document.URL.includes("/watch") || onClipPage;
+    const onChannelPage = isOnChannelPage();
     const onEmbedPage = document.URL.includes("/embed/");
-    const possibleSelectors = getPossibleSelectors(onWatchPage, onEmbedPage);
+    const possibleSelectors = getPossibleSelectors(onWatchPage, onEmbedPage, onChannelPage);
 
     // Find first invisible one, or wait for the first one to be visible
-    const mainTitle = possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility, true) as HTMLElement).filter((element) => isVisible(element, true))[0] || 
-        await waitForElement(possibleSelectors[0].selector, !onClipPage, true) as HTMLElement;
+    const mainTitle = await (async () => {
+        if (!onChannelPage) {
+            const firstVisible = possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility, true) as HTMLElement).filter((element) => isVisible(element, true))[0];
+            if (firstVisible) return firstVisible;
+        }
+
+        return await waitForElement(possibleSelectors[0].selector, !onClipPage, true) as HTMLElement;
+    })();
     const titles = (possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility && !onClipPage, true)).filter((e) => !!e)) as HTMLElement[];
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
     const videoID = getVideoID();
@@ -76,7 +85,7 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
     if (videoID !== null && (isVisible(mainTitle, true) || onClipPage)) {
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
             async () => { await replaceCurrentVideoBranding(); });
-        const brandingLocation = BrandingLocation.Watch;
+        const brandingLocation = onWatchPage ? BrandingLocation.Watch : BrandingLocation.ChannelTrailer;
         const showCustomBranding = videoBrandingInstance.showCustomBranding;
 
         // Replace each title and return true only if all true
@@ -84,19 +93,20 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
             replaceTitle(title, videoID, showCustomBranding, brandingLocation)))
         .then((results) => results.every((result) => result));
 
-        const thumbnailElement = document.querySelector(watchPageThumbnailSelector) as HTMLElement;
-        if (thumbnailElement) {
-            const childElement = thumbnailElement.querySelector("div");
-            if (Config.config!.thumbnailCacheUse > ThumbnailCacheOption.OnAllPagesExceptWatch) {
-                if (childElement) childElement.style.removeProperty("visibility");
-                promises[1] = replaceThumbnail(thumbnailElement, videoID, brandingLocation, showCustomBranding);
-            } else {
-                if (childElement) childElement.style.setProperty("visibility", "visible", "important");
+        waitFor(() => document.querySelector(watchPageThumbnailSelector) as HTMLElement).catch(() => null).then((thumbnailElement) => {
+            if (thumbnailElement) {
+                const childElement = thumbnailElement.querySelector("div");
+                if (Config.config!.thumbnailCacheUse > ThumbnailCacheOption.OnAllPagesExceptWatch) {
+                    if (childElement) childElement.style.removeProperty("visibility");
+                    promises[1] = replaceThumbnail(thumbnailElement, videoID, brandingLocation, showCustomBranding);
+                } else {
+                    if (childElement) childElement.style.setProperty("visibility", "visible", "important");
+                }
             }
-        }
+        }).catch(logError);
 
         // Only the first title needs a button, it will affect all titles
-        if (onWatchPage) {
+        if (onWatchPage || onChannelPage) {
             void handleShowOriginalButton(titles[0], videoID, brandingLocation, showCustomBranding, promises, true);
         }
     }
@@ -104,23 +114,32 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
     return Promise.all(promises);
 }
 
-function getPossibleSelectors(onWatchPage: boolean, onEmbedPage: boolean) {
+function getPossibleSelectors(onWatchPage: boolean, onEmbedPage: boolean, onChannelPage: boolean) {
+    const embedSelector = {
+        selector: ".ytp-title-text",
+        checkVisibility: false
+    };
+    const desktopWatchSelectors = [
+        {
+            selector: getYouTubeTitleNodeSelector(),
+            checkVisibility: true
+        },
+        embedSelector,
+        {
+            selector: "ytd-video-description-header-renderer #shorts-title",
+            checkVisibility: false
+        }
+    ];
+    const desktopMiniplayerSelector = [
+        {
+            selector: ".miniplayer #info-bar",
+            checkVisibility: false
+        }
+    ];
+
     if (onWatchPage) {
         if (!onMobile()) {
-            return [
-                {
-                    selector: getYouTubeTitleNodeSelector(),
-                    checkVisibility: true
-                },
-                {
-                    selector: ".ytp-title-text",
-                    checkVisibility: false
-                },
-                {
-                    selector: "ytd-video-description-header-renderer #shorts-title",
-                    checkVisibility: false
-                }
-            ];
+            return desktopWatchSelectors;
         } else {
             return [
                 {
@@ -133,20 +152,22 @@ function getPossibleSelectors(onWatchPage: boolean, onEmbedPage: boolean) {
                 }
             ];
         }
+    } else if (onChannelPage && !onMobile()) {
+        // For channel trailers
+        return [
+            {
+                selector: "ytd-channel-video-player-renderer #content #title",
+                checkVisibility: true
+            },
+            {
+                selector: "ytd-channel-video-player-renderer .ytp-title-text",
+                checkVisibility: false
+            }
+        ].concat(desktopMiniplayerSelector);
     } else if (onEmbedPage) {
-        return [
-            {
-                selector: ".ytp-title-text",
-                checkVisibility: false
-            }
-        ];
+        return [embedSelector];
     } else {
-        return [
-            {
-                selector: ".miniplayer #info-bar",
-                checkVisibility: false
-            }
-        ];
+        return desktopMiniplayerSelector;
     }
 }
 

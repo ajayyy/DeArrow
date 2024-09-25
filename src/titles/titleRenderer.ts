@@ -9,7 +9,7 @@ import { setCurrentVideoTitle } from "./pageTitleHandler";
 import { getTitleFormatting, shouldCleanEmojis, shouldDefaultToCustom, shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { countTitleReplacement } from "../config/stats";
 import { onMobile } from "../../maze-utils/src/pageInfo";
-import { isFirefoxOrSafari } from "../../maze-utils/src";
+import { isFirefoxOrSafari, waitFor } from "../../maze-utils/src";
 import { isSafari } from "../../maze-utils/src/config";
 
 enum WatchPageType {
@@ -93,22 +93,27 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
             
             setCustomTitle(formattedTitle, element, brandingLocation);
             countTitleReplacement(videoID);
-        } else if (originalTitleElement?.textContent) {
+        } else {
             // innerText is blank when visibility hidden
-            const originalText = originalTitleElement.textContent.trim();
-            const modifiedTitle = await formatTitle(originalText, false, videoID);
-            if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
-
-            if (originalText === modifiedTitle) {
-                showOriginalTitle(element, brandingLocation);
-                return false;
+            if (originalTitleElement.textContent?.length === 0) {
+                await waitFor(() => originalTitleElement!.textContent!.length > 0, 5000).catch(() => null);
             }
 
-            setCustomTitle(modifiedTitle, element, brandingLocation);
-        } else {
-            showOriginalTitle(element, brandingLocation);
+            if (originalTitleElement.textContent) {
+                const originalText = originalTitleElement.textContent.trim();
+                const modifiedTitle = await formatTitle(originalText, false, videoID);
+                if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
+    
+                if (originalText === modifiedTitle) {
+                    showOriginalTitle(element, brandingLocation);
+                    return false;
+                }
+                
+                setCustomTitle(modifiedTitle, element, brandingLocation);
+            } else {
+                showOriginalTitle(element, brandingLocation);
+            }
         }
-
         if (originalTitleElement.parentElement?.title) {
             // Inside element should handle title fine
             originalTitleElement.parentElement.title = "";
@@ -138,8 +143,8 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     }
 }
 
-async function isOnCorrectVideo(element: HTMLElement, brandingLocation: BrandingLocation, videoID: VideoID): Promise<boolean> {
-    return brandingLocation === BrandingLocation.Watch ? getVideoID() === videoID 
+export async function isOnCorrectVideo(element: HTMLElement, brandingLocation: BrandingLocation, videoID: VideoID): Promise<boolean> {
+    return [BrandingLocation.Watch, BrandingLocation.ChannelTrailer].includes(brandingLocation) ? getVideoID() === videoID 
         : await extractVideoIDFromElement(element, brandingLocation) === videoID;
 }
 
@@ -160,11 +165,15 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
     const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
     
     titleElement.style.display = "none";
-    if (!originalTitleElement.classList.contains("ta-title-container")) {
-        originalTitleElement.style.setProperty("display", "-webkit-box", "important");
-    } else {
+    if (originalTitleElement.classList.contains("ta-title-container")) {
         // Compatibility with Tube Archivist
         originalTitleElement.style.setProperty("display", "flex", "important");
+    } else if (
+            originalTitleElement.parentElement?.classList.contains("ytd-channel-video-player-renderer")
+            || originalTitleElement.classList.contains("ytp-title-link")) {
+        originalTitleElement.style.removeProperty("display");
+    } else {
+        originalTitleElement.style.setProperty("display", "-webkit-box", "important");
     }
 
     if (Config.config!.showOriginalOnHover) {
@@ -285,6 +294,13 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
                 ".autonav-endscreen-video-title .yt-core-attributed-string", // Mobile YouTube Autoplay
                 ".video-card-title .yt-core-attributed-string", // Mobile YouTube History List
             ];
+        case BrandingLocation.ChannelTrailer:
+            return [
+                "yt-formatted-string", 
+                ".ytp-title-link.yt-uix-sessionlink",
+                ".yt-core-attributed-string",
+                "a.yt-formatted-string", // Channel trailers
+            ];
         case BrandingLocation.Endcards:
             return [".ytp-ce-video-title", ".ytp-ce-playlist-title"];
         case BrandingLocation.Autoplay:
@@ -314,6 +330,15 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
             || originalTitleElement.classList.contains("ytp-title-link")
         ? originalTitleElement.cloneNode() as HTMLElement 
         : document.createElement("span");
+
+    if (brandingLocation === BrandingLocation.ChannelTrailer && originalTitleElement.classList.contains("yt-formatted-string")) {
+        // YouTube gets confused and starts using the custom one as original
+        titleElement.className = "";
+
+        titleElement.style.color = "var(--yt-endpoint-visited-color,var(--yt-spec-text-primary))";
+        titleElement.style.textDecoration = "none";
+    }
+
     titleElement.classList.add("cbCustomTitle");
 
     if (brandingLocation === BrandingLocation.EndRecommendations

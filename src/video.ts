@@ -80,6 +80,11 @@ function newVideosLoaded(videoIDs: VideoID[]) {
     }
 }
 
+function onNavigateToChannel() {
+    // For channel trailers
+    replaceCurrentVideoBranding().catch(logError);
+}
+
 export function setupCBVideoModule(): void {
     chrome.runtime.onMessage.addListener((request: BackgroundToContentMessage) => {
         if (request.message === "update") {
@@ -94,6 +99,7 @@ export function setupCBVideoModule(): void {
         resetValues,
         windowListenerHandler,
         newVideosLoaded,
+        onNavigateToChannel,
         documentScript: chrome.runtime.getManifest().manifest_version === 2 ? documentScript : undefined,
         allowClipPage: true
     }, () => Config);

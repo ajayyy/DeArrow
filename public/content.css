@@ -493,6 +493,12 @@ ytd-compact-radio-renderer ytd-badge-supported-renderer, ytd-grid-movie-renderer
     right: 0;
 }
 
+/* Fixes channel trailer titles */
+ytd-channel-video-player-renderer #title > a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* Tooltip */
 
 .sponsorBlockTooltip {
