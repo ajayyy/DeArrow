@@ -6,9 +6,9 @@ import { ThumbnailType } from "./ThumbnailComponent";
 import { RenderedThumbnailSubmission, ThumbnailDrawerComponent } from "./ThumbnailDrawerComponent";
 import { RenderedTitleSubmission, TitleDrawerComponent } from "./TitleDrawerComponent";
 import { VideoID } from "../../maze-utils/src/video";
-import Config, { UnsubmittedSubmission } from "../config/config";
+import Config, { TitleFormatting, UnsubmittedSubmission } from "../config/config";
 import { addTitleChangeListener, removeTitleChangeListener } from "../utils/titleBar";
-import { toSentenceCase } from "../titles/titleFormatter";
+import { formatTitleInternal } from "../titles/titleFormatter";
 import { BrandingPreviewComponent } from "./BrandingPreviewComponent";
 import { getHash } from "../../maze-utils/src/hash";
 import { sendRequestToServer } from "../utils/requests";
@@ -78,7 +78,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
     const [titles, setTitles] = React.useState<RenderedTitleSubmission[]>([]);
     React.useEffect(() => {
         (async () => {
-            const originalTitle = await toSentenceCase(getCurrentPageTitle() || chrome.i18n.getMessage("OriginalTitle"), false);
+            const originalTitle = await formatTitleInternal(getCurrentPageTitle() || chrome.i18n.getMessage("OriginalTitle"), false, TitleFormatting.SentenceCase, true);
             setOriginalTitle(originalTitle);
 
             const newTitles = [{
@@ -346,7 +346,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                         props.submitClicked(selectedTitle ? {
                             ...selectedTitle,
                             original: selectedTitle.title === getCurrentPageTitle()
-                                        || (!!getCurrentPageTitle() && selectedTitle.title === await toSentenceCase(getCurrentPageTitle()!, false))
+                                        || (!!getCurrentPageTitle() && selectedTitle.title === await formatTitleInternal(getCurrentPageTitle()!, false, TitleFormatting.SentenceCase, true))
                         } : null, selectedThumbnail.current, actAsVip).then((success) => {
                             if (!success) {
                                 setCurrentlySubmitting(false);
