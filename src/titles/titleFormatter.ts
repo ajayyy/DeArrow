@@ -106,6 +106,7 @@ export async function toSentenceCase(str: string, isCustom: boolean): Promise<st
         } else if (forceKeepFormatting(word)
             || isAcronymStrict(word)
             || ((!inTitleCase || !isWordCapitalCase(word)) && trustCaps && isAcronym(word))
+            || (!inTitleCase && trustCaps && word.length === 1)
             || (!inTitleCase && isWordCapitalCase(word))
             || (isCustom && isWordCustomCapitalization(word))
             || (!isAllCaps(word) && isWordCustomCapitalization(word))
