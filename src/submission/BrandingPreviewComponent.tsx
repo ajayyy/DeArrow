@@ -1,11 +1,13 @@
 import { VideoID } from "../../maze-utils/src/video";
 import * as React from "react";
-import { formatTitleDefaultSettings } from "../titles/titleFormatter";
+import { formatTitleInternal } from "../titles/titleFormatter";
 import { BrandingResult } from "../videoBranding/videoBranding";
 import { ThumbnailType } from "./ThumbnailComponent";
 import { RenderedThumbnailSubmission } from "./ThumbnailDrawerComponent";
 import { ThumbnailSelectionComponent } from "./ThumbnailSelectionComponent";
 import { RenderedTitleSubmission } from "./TitleDrawerComponent";
+import { TitleFormatting } from "../config/config";
+import { FormattedText } from "../popup/FormattedTextComponent";
 
 export interface BrandingPreviewComponentComponentProps {
     submissions: BrandingResult;
@@ -20,18 +22,16 @@ export interface BrandingPreviewComponentComponentProps {
 }
 
 export const  BrandingPreviewComponent = (props: BrandingPreviewComponentComponentProps) => {
-    const [displayedTitle, setDisplayedTitle] = React.useState("");
+    const [sentenceCaseTitle, setSentenceCaseTitle] = React.useState("");
+    const [titleCaseTitle, setTitleCaseTitle] = React.useState("");
     const [displayedThumbnail, setDisplayedThumbnail] = React.useState(getDefaultThumbnail(props.submissions, props.thumbnails));
 
     React.useEffect(() => {
         (async () => {
-            if (props.selectedTitle?.title) {
-                setDisplayedTitle(await formatTitleDefaultSettings(props.selectedTitle.title, true));
-            } else {
-                const defaultTitle = getDefaultTitle(props.submissions, props.titles);
-                if (defaultTitle) {
-                    setDisplayedTitle(await formatTitleDefaultSettings(defaultTitle.title, true));
-                }
+            const title = props.selectedTitle?.title || getDefaultTitle(props.submissions, props.titles)?.title;
+            if (title) {
+                setSentenceCaseTitle(await formatTitleInternal(title, true, TitleFormatting.SentenceCase, false));
+                setTitleCaseTitle(await formatTitleInternal(title, true, TitleFormatting.TitleCase, false));
             }
         })();
     }, [props.selectedTitle, props.submissions, props.titles]);
@@ -55,9 +55,32 @@ export const  BrandingPreviewComponent = (props: BrandingPreviewComponentCompone
                 larger={true}
             ></ThumbnailSelectionComponent>
 
-            <div className="cbTitle cbTitlePreview">
-                {displayedTitle}
-            </div>
+            <fieldset className="cbTitlePreviewBox">
+                <span className="cbTitle cbTitlePreview">
+                    {sentenceCaseTitle}
+                </span>
+
+                <legend className="cbTitlePreviewTypeName">
+                    <FormattedText
+                        langKey={"SentenceCase"}
+                        titleFormatting={TitleFormatting.SentenceCase}
+                    />
+                </legend>
+            </fieldset>
+
+            <fieldset className="cbTitlePreviewBox">
+                <span className="cbTitle cbTitlePreview">
+                    {titleCaseTitle}
+                </span>
+
+                <legend className="cbTitlePreviewTypeName">
+                    <FormattedText
+                        langKey={"TitleCase"}
+                        titleFormatting={TitleFormatting.TitleCase}
+                    />
+                </legend>
+            </fieldset>
+
         </div>
     );
 };

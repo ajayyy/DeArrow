@@ -219,11 +219,42 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     justify-content: center;
     text-align: center;
 
-    padding-top: 0;
+    padding: 0;
     margin-top: 0;
-    font-weight: 600;
-    font-family: "YouTube Sans", "Roboto", sans-serif;
     font-size: 2rem;
+
+    border: none;
+    width: 100%;
+    transform: rotate(180deg);
+}
+
+.cbTitlePreviewBox {
+    border: rgb(152, 152, 152) 1.2px solid;
+    border-radius: 5px;
+    font-family: "YouTube Sans", "Roboto", sans-serif;
+    font-weight: 600;
+
+    margin-top: 0;
+    margin: var(--cb-thumbnail-padding);
+
+    transform: rotate(180deg);
+}
+
+.cbTitlePreviewTypeName {
+    color: var(--yt-spec-text-primary);
+
+    padding-left: 0.26em;
+    padding-right: 0.26em;
+    margin-left: 10px;
+    margin-right: auto;
+
+    transform: rotate(180deg);
+}
+
+.cbBrandingPreview .cbTitle {
+    cursor: text !important;
+
+    padding-top: 3px;
 }
 
 .cbHiddenTextBox {
@@ -297,7 +328,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     vertical-align: middle;
 }
 
-.cbTitle:not(.cbTitleSelected) {
+.cbTitle:not(.cbTitleSelected, .cbTitlePreview) {
     cursor: pointer !important;
 }
 
@@ -326,10 +357,6 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     display: flex;
     justify-content: center;
     margin-top: 10px;
-}
-
-.cbBrandingPreview .cbTitle {
-    cursor: default !important;
 }
 
 .cbNoticeButton:disabled {
