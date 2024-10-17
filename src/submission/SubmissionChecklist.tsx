@@ -208,8 +208,11 @@ function getDaysUntilNextConfirmation(): number {
             return 1;
         case 2:
             return 3;
-        default:
+        case 3:
+        case 4:
             return 7;
+        default:
+            return 30;
     }
 }
 
