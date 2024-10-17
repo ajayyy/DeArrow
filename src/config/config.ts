@@ -122,6 +122,8 @@ interface SBConfig {
     firefoxOldContentScriptRegistration: boolean;
     lastIncognitoStatus: boolean;
     showActivatedMessage: boolean;
+    confirmGuidelinesCount: number;
+    lastGuidelinesConfirmation: number;
     openMenuKey: Keybind;
     enableExtensionKey: Keybind;
 }
@@ -212,6 +214,8 @@ const syncDefaults = {
     firefoxOldContentScriptRegistration: false,
     lastIncognitoStatus: false,
     showActivatedMessage: false,
+    confirmGuidelinesCount: 0,
+    lastGuidelinesConfirmation: 0,
     openMenuKey: { key: "d", shift: true },
     enableExtensionKey: { key: "e", ctrl: true, shift: true, alt: true }
 };

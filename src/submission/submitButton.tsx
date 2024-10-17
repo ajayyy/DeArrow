@@ -12,6 +12,7 @@ import { addTitleChangeListener, getOrCreateTitleButtonContainer } from "../util
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { addCleanupListener } from "../../maze-utils/src/cleanup";
 import { shouldStoreVotes } from "../utils/configUtils";
+import { closeGuidelineChecklist, confirmGuidelines } from "./SubmissionChecklist";
 
 const submitButtonIcon = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -116,6 +117,8 @@ export class SubmitButton {
     }
 
     close(): void {
+        closeGuidelineChecklist();
+
         if (this.container) {
             // Experimental YouTube layout with description on right
             const isOnDescriptionOnRightLayout = document.querySelector("#title #description");
@@ -225,6 +228,10 @@ export class SubmitButton {
 
         if (isCurrentTimeWrong()) {
             alert(chrome.i18n.getMessage("submissionFailedServerSideAds"));
+            return false;
+        }
+
+        if (!await confirmGuidelines(title)) {
             return false;
         }
         

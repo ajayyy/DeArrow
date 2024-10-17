@@ -2,6 +2,8 @@
     --cb-selected-thumbnail-border: 0.15em;
     --cb-thumbnail-padding: 0.3em;
     --skip-notice-margin: 5px;
+
+    --cb-forground-button-color: #0e79cac2;
 }
 
 .cbCustomThumbnailCanvas.ytd-img-shadow:not(.ytp-autonav-endscreen-upnext-thumbnail, .ytp-videowall-still-image) {
@@ -225,6 +227,9 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 
     border: none;
     width: 100%;
+}
+
+.cbTitlePreview:not(.cbSubmissionChecklist .cbTitlePreview) {
     transform: rotate(180deg);
 }
 
@@ -369,7 +374,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 	font-size: 1.3em;
     padding: 10px 20px;
     border-radius: 30px;
-    background-color: #0e79cac2;
+    background-color: var(--cb-forground-button-color);
     color: white;
     border: none;
     text-decoration: none;
@@ -381,7 +386,6 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 .cbNoticeButton:hover {
 	background-color: rgba(235, 235, 235, 0.2);
     background-color: #0e78ca;
-
 }
 
 .cbNotice {
@@ -399,6 +403,10 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 
 .cbVoteButton {
     font-size: 2em;
+}
+
+.cbVoteButton.cbCancelButton {
+    font-size: 1em;
 }
 
 .cbHelpContainer {
@@ -442,6 +450,126 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 
     width: 80%;
     margin: auto;
+}
+
+.cbChecklistNotce {
+    animation: fadeIn 0.2s ease-out;
+}
+
+.cbChecklistBox {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+
+    transition: opacity 1s;
+}
+
+/* Based on https://codepen.io/avstorm/pen/LYEobqZ */
+.cbChecklistBox input[type="checkbox"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+    margin: 0;
+}
+.cbChecklistBox input[type="checkbox"]:focus {
+    outline: 0;
+}
+.cbChecklistBox input {
+    top: 0;
+    left: 0;
+    width: 24px;
+    height: 24px;
+    border: 2px solid #bfbfc0;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  }
+.cbChecklistBox:hover input {
+    border-color: #b0b0b1;
+}
+.cbChecklistBox label {
+    width: 24px;
+    height: 24px;
+    background: none;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    filter: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" version="1.1"><defs><filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -7" result="goo"/><feBlend in="SourceGraphic" in2="goo"/></filter></defs></svg>#goo');
+
+    transform: trasnlate3d(0, 0, 0);
+    pointer-events: none;
+}
+.cbChecklistBox svg {
+    position: absolute;
+    top: 5px;
+    left: 4px;
+    z-index: 1;
+    pointer-events: none;
+}
+.cbChecklistBox svg path {
+    stroke: #fff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 19;
+    stroke-dashoffset: 19;
+    transition: all 0.4s ease;
+}
+.cbChecklistBox input:checked + label {
+    animation: splash 0.6s ease forwards;
+}
+.cbChecklistBox input:checked + label + svg path {
+    stroke-dashoffset: 0;
+}
+.cbChecklistCheckboxParent {
+    position: relative;
+}
+@keyframes splash {
+    0% {
+        transform: scale(1.1);
+    }
+    40% {
+        transform: scale(1);
+        background: var(--cb-forground-button-color);
+        box-shadow: 0 -18px 0 -8px var(--cb-forground-button-color), 16px -8px 0 -8px var(--cb-forground-button-color), 16px 8px 0 -8px var(--cb-forground-button-color), 0 18px 0 -8px var(--cb-forground-button-color), -16px 8px 0 -8px var(--cb-forground-button-color), -16px -8px 0 -8px var(--cb-forground-button-color);
+    }
+    100% {
+        background: var(--cb-forground-button-color);
+        box-shadow: 0 -32px 0 -10px transparent, 28px -16px 0 -10px transparent, 28px 16px 0 -10px transparent, 0 32px 0 -10px transparent, -28px 16px 0 -10px transparent, -28px -16px 0 -10px transparent;
+    }
+}
+
+.cbCheckboxHide {
+    opacity: 0;
+}
+
+.cbChecklistTextBox {
+    padding-left: 20px;
+}
+
+.cbChecklistBoxTitle {
+    font-size: 14px;
+}
+
+.cbChecklistBoxSubtitle {
+    font-size: 11px;
+    padding-top: 5px;
+}
+
+.cbCheckAllMessage {
+    text-align: center;
+}
+
+.cbSubmissionChecklist .cbVoteButtonContainer {
+    margin-bottom: 5px;
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .cbShowOriginal {
