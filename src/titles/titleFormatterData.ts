@@ -337,7 +337,11 @@ export const allowlistedWords = new Set([
     "WWE",
     "WWF",
     "WWI",
-    "XML"
+    "XML",
+    "YouTube",
+    "YouTuber",
+    "YouTubers",
+    "YT"
 ]);
 
 export const acronymBlocklist = new Set([
