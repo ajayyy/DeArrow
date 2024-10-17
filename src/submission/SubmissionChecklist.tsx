@@ -214,5 +214,9 @@ function getDaysUntilNextConfirmation(): number {
 }
 
 function shouldConfirmGuidelines(): boolean {
-    return Date.now() - Config.config!.lastGuidelinesConfirmation > getDaysUntilNextConfirmation() * 24 * 60 * 60 * 1000;
+    if (Config.config!.vip && Config.config!.confirmGuidelinesCount === 0) {
+        return true;
+    }
+
+    return !Config.config!.vip && Date.now() - Config.config!.lastGuidelinesConfirmation > getDaysUntilNextConfirmation() * 24 * 60 * 60 * 1000;
 }
