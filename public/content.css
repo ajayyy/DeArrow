@@ -227,6 +227,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 
     border: none;
     width: 100%;
+    line-height: normal;
 }
 
 .cbTitlePreview:not(.cbSubmissionChecklist .cbTitlePreview) {
