@@ -88,7 +88,7 @@ const autoWarningChecks: AutoWarningCheck[] = [
         error: chrome.i18n.getMessage("DeArrowEmojiWarning"),
         check: (title) => {
             return {
-                found: cleanEmojis(title) !== title.trim()
+                found: cleanEmojis(title.trim()) !== title.trim()
             };
         },
         id: "emoji"
