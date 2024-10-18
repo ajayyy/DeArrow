@@ -1,6 +1,6 @@
 import { VideoID, getVideo, getVideoID, getYouTubeVideoID } from "../maze-utils/src/video";
 import { ThumbnailSubmission, ThumbnailWithRandomTimeResult, fetchVideoMetadata, isLiveSync } from "./thumbnails/thumbnailData";
-import { TitleResult, TitleSubmission } from "./titles/titleData";
+import { getCurrentPageTitle, TitleResult, TitleSubmission } from "./titles/titleData";
 import { FetchResponse, sendRealRequestToCustomServer } from "../maze-utils/src/background-request-proxy";
 import { BrandingLocation, BrandingResult, replaceCurrentVideoBranding, updateBrandingForVideo } from "./videoBranding/videoBranding";
 import { logError } from "./utils/logger";
@@ -16,6 +16,7 @@ import { getThumbnailFallbackOption, getThumbnailFallbackOptionFastCheck, should
 import { updateSubmitButton } from "./video";
 import { sendRequestToServer } from "./utils/requests";
 import { thumbnailDataCache } from "./thumbnails/thumbnailDataCache";
+import { getAutoWarning } from "./submission/autoWarning";
 
 interface VideoBrandingCacheRecord extends BrandingResult {
     lastUsed: number;
@@ -490,6 +491,8 @@ export async function submitVideoBranding(videoID: VideoID, title: TitleSubmissi
         Config.config!.firstThumbnailSubmitted = true;
     }
 
+    const wasWarned = !!title && !!getAutoWarning(title.title, getCurrentPageTitle() || "");
+
     const result = await sendRequestToServer("POST", "/api/branding", {
         userID: Config.config!.userID,
         videoID,
@@ -497,7 +500,8 @@ export async function submitVideoBranding(videoID: VideoID, title: TitleSubmissi
         thumbnail,
         downvote,
         autoLock: actAsVip,
-        videoDuration: getVideo()?.duration
+        videoDuration: getVideo()?.duration,
+        wasWarned
     });
 
     clearCache(videoID);

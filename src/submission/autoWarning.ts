@@ -95,10 +95,10 @@ const autoWarningChecks: AutoWarningCheck[] = [
     }
 ];
 
-function getAutoWarning(title: string, originalTitle: string): { id: string; text: string } | null {
+export function getAutoWarning(title: string, originalTitle: string, ignoreShown = false): { id: string; text: string } | null {
     for (const check of autoWarningChecks) {
         const { found, match } = check.check(title, originalTitle);
-        if (found && !shownWarnings.includes(check.id)) {
+        if (found && (ignoreShown || !shownWarnings.includes(check.id))) {
             return {
                 id: check.id,
                 text: check.error + (match ? `\n\n${chrome.i18n.getMessage("DetectedWord")}${match}` : "")
