@@ -10,6 +10,7 @@ import { listenForBadges, listenForMiniPlayerTitleChange, listenForTitleChange }
 import { getPlaybackFormats } from "./thumbnails/thumbnailData";
 import { replaceVideoPlayerSuggestionsBranding, setupMobileAutoplayHandler } from "./videoBranding/watchPageBrandingHandler";
 import { onMobile } from "../maze-utils/src/pageInfo";
+import { resetShownWarnings } from "./submission/autoWarning";
 
 export const submitButton = new SubmitButton();
 
@@ -48,6 +49,8 @@ function resetValues() {
     submitButton.close();
 
     clearVideoBrandingInstances();
+
+    resetShownWarnings();
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars

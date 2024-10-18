@@ -8,6 +8,7 @@ import { submitVideoBrandingAndHandleErrors } from "../dataFetching";
 import { AnimationUtils } from "../../maze-utils/src/animationUtils";
 import { VideoID } from "../../maze-utils/src/video";
 import { shouldStoreVotes } from "../utils/configUtils";
+import { showAutoWarningIfRequired } from "./autoWarning";
 
 export interface TitleComponentProps {
     submission: RenderedTitleSubmission;
@@ -84,6 +85,8 @@ export const TitleComponent = (props: TitleComponentProps) => {
     
                         setTitleChanged(newTitle !== props.submission.title);
                         setFocused(true);
+
+                        showAutoWarningIfRequired(newTitle, e.target as HTMLElement);
                     }
                 }}
                 onKeyDown={(e) => {

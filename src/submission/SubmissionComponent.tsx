@@ -24,6 +24,7 @@ import { Tooltip } from "../utils/tooltip";
 import { LicenseComponent } from "../license/LicenseComponent";
 import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
 import { FormattedText } from "../popup/FormattedTextComponent";
+import { isAutoWarningShown } from "./autoWarning";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -33,7 +34,7 @@ export interface SubmissionComponentProps {
     submitClicked: (title: TitleSubmission | null, thumbnail: ThumbnailSubmission | null, actAsVip: boolean) => Promise<boolean>;
 }
 
-interface ChatDisplayName {
+export interface ChatDisplayName {
     publicUserID: string;
     username: string | null;
 }
@@ -51,10 +52,10 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             setChatDisplayName(displayName);
 
             const values = ["userName", "deArrowWarningReason"];
-                const result = await sendRequestToServer("GET", "/api/userInfo", {
-                    publicUserID: publicUserID,
-                    values
-                });
+            const result = await sendRequestToServer("GET", "/api/userInfo", {
+                publicUserID: publicUserID,
+                values
+            });
 
             if (result.ok) {
                 const userInfo = JSON.parse(result.responseText);
@@ -341,6 +342,11 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                                 || (!selectedThumbnail.current && !selectedTitle) 
                                 || (!!selectedTitle && selectedTitle.title.toLowerCase() === chrome.i18n.getMessage("OriginalTitle").toLowerCase())}
                     onClick={async () => {
+                        if (isAutoWarningShown()) {
+                            alert(chrome.i18n.getMessage("resolveWarningFirst"));
+                            return;
+                        }
+
                         setCurrentlySubmitting(true);
 
                         props.submitClicked(selectedTitle ? {
@@ -479,7 +485,7 @@ function updateUnsubmitted(unsubmitted: UnsubmittedSubmission,
     }
 }
 
-function getChatDisplayName(chatDisplayName: ChatDisplayName | null): string {
+export function getChatDisplayName(chatDisplayName: ChatDisplayName | null): string {
     if (chatDisplayName) {
         if (chatDisplayName.username && chatDisplayName.username !== chatDisplayName.publicUserID) {
             return `${chatDisplayName.username} - ${chatDisplayName.publicUserID}`;

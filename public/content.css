@@ -334,6 +334,10 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     vertical-align: middle;
 }
 
+.cbTitle {
+    position: relative;
+}
+
 .cbTitle:not(.cbTitleSelected, .cbTitlePreview) {
     cursor: pointer !important;
 }
