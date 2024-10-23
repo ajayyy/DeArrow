@@ -762,7 +762,8 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                 image.parentElement?.appendChild?.(thumbnail);
             }
 
-            if (onMobile()) {
+            // 2024 Oct UI needs to replacement setup
+            if (onMobile() || image.parentElement?.classList?.contains("yt-thumbnail-view-model__image")) {
                 addNodeToListenFor(thumbnail, MobileFix.Replace);
             }
         } catch (e) {
