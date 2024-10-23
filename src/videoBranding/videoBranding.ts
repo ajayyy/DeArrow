@@ -238,7 +238,7 @@ export function getLinkElement(element: HTMLElement, brandingLocation: BrandingL
     switch (brandingLocation) {
         case BrandingLocation.Related:
             if (!onMobile()) {
-                const link = element.querySelector("a#thumbnail, a.reel-item-endpoint") as HTMLAnchorElement;
+                const link = element.querySelector("a#thumbnail, a.reel-item-endpoint, a.yt-lockup-metadata-view-model-wiz__title") as HTMLAnchorElement;
                 if (link) {
                     return link;
                 } else if (element.nodeName === "YTD-HERO-PLAYLIST-THUMBNAIL-RENDERER") {

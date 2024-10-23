@@ -120,6 +120,7 @@ function buildMaxLinesTitleCss(): string {
         if (!onMobile()) {
             // .ta-title-container for compatibility with Tube Archivist
             result.push(`${start} #video-title:not(.ta-title-container)`);
+            result.push(`${start} .yt-lockup-metadata-view-model-wiz__title > .yt-core-attributed-string:not(.ta-title-container)`);
         }
     }
 

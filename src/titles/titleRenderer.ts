@@ -118,6 +118,10 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
             // Inside element should handle title fine
             originalTitleElement.parentElement.title = "";
         }
+        if (originalTitleElement.parentElement?.parentElement?.title) {
+            // Inside element should handle title fine
+            originalTitleElement.parentElement.parentElement.title = "";
+        }
 
         if (!Config.config!.hideDetailsWhileFetching) {
             hideOriginalTitle(element, brandingLocation);
@@ -285,6 +289,7 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
                 "#video-title",
                 "#movie-title", // Movies in related
                 "#description #title", // Related videos in description
+                ".yt-lockup-metadata-view-model-wiz__title .yt-core-attributed-string", // New desktop related
                 ".ShortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
                 ".details .media-item-headline .yt-core-attributed-string", // Mobile YouTube
                 ".reel-item-metadata h3 .yt-core-attributed-string", // Mobile YouTube Shorts
@@ -369,7 +374,18 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
             titleElement.parentElement!.style.alignItems = "flex-start";
             if (onMobile()) titleElement.parentElement!.style.alignItems = "normal";
             titleElement.parentElement!.style.justifyContent = "space-between";
-            titleElement.parentElement!.style.width = "100%";
+
+            // For 2024 Oct new UI
+            if (titleElement.parentElement!.classList.contains("yt-lockup-metadata-view-model-wiz__title")) {
+                titleElement.parentElement!.style.maxHeight = `calc(${getComputedStyle(titleElement.parentElement!).lineHeight} * ${Math.max(1, Config.config!.titleMaxLines)}`;
+
+                const container = titleElement.closest(".yt-lockup-metadata-view-model-wiz__text-container") as HTMLElement;
+                if (container) {
+                    container.style.width = "100%";
+                }
+            } else {
+                titleElement.parentElement!.style.width = "100%";
+            }
         }
 
         if (brandingLocation === BrandingLocation.Related) {
