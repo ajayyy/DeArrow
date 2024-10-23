@@ -23,6 +23,15 @@ let timeout: NodeJS.Timeout | null = null;
 const shownWarnings: string[] = [];
 const autoWarningChecks: AutoWarningCheck[] = [
     {
+        error: chrome.i18n.getMessage("DeArrowStartLowerCaseWarning"),
+        check: (title) => {
+            return {
+                found: !!title.match(/^\p{Ll}\S+ \S+ \S+/u)
+            };
+        },
+        id: "startLowerCase"
+    },
+    {
         error: chrome.i18n.getMessage("DeArrowDiscussingWarning"),
         check: (title) => {
             const match = title.match(/^(discussing|explaining|talking about|summarizing) .\S+ .\S+/i)?.[1];
@@ -33,14 +42,6 @@ const autoWarningChecks: AutoWarningCheck[] = [
         },
         id: "discussing"
     }, {
-        error: chrome.i18n.getMessage("DeArrowStartLowerCaseWarning"),
-        check: (title) => {
-            return {
-                found: !!title.match(/^\p{Ll}\S+ \S+ \S+/u)
-            };
-        },
-        id: "startLowerCase"
-    }, {
         error: chrome.i18n.getMessage("DeArrowEndWithPeriodWarning"),
         check: (title) => {
             return {
@@ -48,16 +49,6 @@ const autoWarningChecks: AutoWarningCheck[] = [
             };
         },
         id: "endWithPeriod"
-    }, {
-        error: chrome.i18n.getMessage("DeArrowAddingAnswerWarning"),
-        check: (title, originalTitle) => {
-            // Only if ends with ? or ... and then optionally more symbols
-            return {
-                found: title.toLowerCase().startsWith(cleanPunctuation(cleanFancyText(cleanEmojis(originalTitle.toLowerCase()))))
-                    && !!originalTitle.match(/(\?|\.\.\.)[^\p{L}]*$/u)
-            };
-        },
-        id: "addingAnswer"
     }, {
         error: chrome.i18n.getMessage("DeArrowClickbaitWarning"),
         check: (title, originalTitle) => {
@@ -71,6 +62,18 @@ const autoWarningChecks: AutoWarningCheck[] = [
             };
         },
         id: "clickbait"
+    }, {
+        error: chrome.i18n.getMessage("DeArrowAddingAnswerWarning"),
+        check: (title, originalTitle) => {
+            // Only if ends with ? or ... and then optionally more symbols
+            const cleaned = cleanPunctuation(cleanFancyText(cleanEmojis(originalTitle.toLowerCase())));
+            return {
+                found: title.toLowerCase().startsWith(cleaned)
+                    && !!originalTitle.match(/(\?|\.\.\.)[^\p{L}]*$/u)
+                    && title.trim().length !== cleaned.trim().length
+            };
+        },
+        id: "addingAnswer"
     }, {
         error: chrome.i18n.getMessage("DeArrowKeepingBadOriginalWarning"),
         check: (title, originalTitle) => {
@@ -183,6 +186,10 @@ function showAutoWarningIfRequiredInternal(title: string, element: HTMLElement):
                 }
             }],
         });
+    } else {
+        activeTooltip?.close();
+        activeTooltip = null;
+        currentWarningId = null;
     }
 }
 
