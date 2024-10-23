@@ -124,7 +124,6 @@ function showAutoWarningIfRequiredInternal(title: string, element: HTMLElement):
     timeout = null;
 
     const originalTitle = getCurrentPageTitle() || "";
-    console.log(originalTitle)
     const warning = getAutoWarning(title, originalTitle);
     if (warning && warning.id !== currentWarningId) {
         activeTooltip?.close();
