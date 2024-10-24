@@ -455,6 +455,10 @@ export async function waitForThumbnailCache(videoID: VideoID): Promise<void> {
     await activeRequest.currentRequest;
 }
 
+export function isActiveThumbnailCacheRequest(videoID: VideoID): boolean {
+    return !!activeThumbnailCacheRequests[videoID];
+}
+
 export function getNumberOfThumbnailCacheRequests(): number {
     return Object.keys(activeThumbnailCacheRequests).length;
 }
