@@ -953,12 +953,12 @@ function isLiveCover(image: HTMLElement) {
     return !!image.parentElement?.querySelector(".cbLiveCover");
 }
 
-export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, blob: Blob, notifyStopRender = true) {
+export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, blob: Blob, width = 1280, height = 720, notifyStopRender = true) {
     const videoCache = thumbnailDataCache.setupCache(videoID);
     const videoObject: RenderedThumbnailVideo = {
         video: null,
-        width: 1280, // Can use arbitrary values, since the blob's image bitmap is actually used to render
-        height: 720,
+        width,
+        height,
         rendered: true,
         onReady: [],
         timestamp,

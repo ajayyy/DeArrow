@@ -191,7 +191,7 @@ async function renderCurrentFrame(props: ThumbnailComponentProps,
         if (cacheThumbnail) {
             canvasRef.current!.toBlob((blob) => {
                 if (blob) {
-                    setupPreRenderedThumbnail(props.videoID, props.time!, blob);
+                    setupPreRenderedThumbnail(props.videoID, props.time!, blob, canvasRef.current!.width, canvasRef.current!.height);
                 } else {
                     logError(`Failed to cache thumbnail for ${props.videoID} at ${props.time}`);
                 }
