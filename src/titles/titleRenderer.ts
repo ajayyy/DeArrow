@@ -532,7 +532,7 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
 
     const getHoverPlayers = () => [
         originalTitleElement.closest("#dismissible")?.querySelector?.("#mouseover-overlay") as HTMLElement,
-        document.querySelector("ytd-video-preview #player-container") as HTMLElement
+        document.querySelector("ytd-video-preview") as HTMLElement
     ];
 
     const toggleDetails = async () => {
