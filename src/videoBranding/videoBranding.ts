@@ -452,7 +452,8 @@ export function setupOptionChangeListener(): void {
             "showIconForFormattedTitles",
             "ignoreAbThumbnails",
             "showOriginalOnHover",
-            "showLiveCover"
+            "showLiveCover",
+            "onlyFormatCustomTitles"
         ];
 
         if (settingsToReload.some((name) => (changes[name] && changes[name].newValue !== changes[name].oldValue))) {

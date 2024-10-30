@@ -135,32 +135,51 @@
 						<option value="4">__MSG_FirstLetterUppercase__</option>
 						<option value="0">__MSG_CapitalizeWords__</option>
 					</select>
-				</div>
 
-				<div data-type="toggle" data-sync="shouldCleanEmojis">
-					<div class="sb-switch-container">
-						<label class="sb-switch">
-							<input id="shouldCleanEmojis" type="checkbox" checked>
-							<span class="sb-slider sb-round"></span>
-						</label>
-						<label class="sb-switch-label" for="shouldCleanEmojis">
-							__MSG_shouldCleanEmojis__
-						</label>
-					</div>
-				</div>
+					<br/>
+					<br/>
 
-				<div data-type="toggle" data-sync="onlyTitleCaseInEnglish" data-dependent-on-selector="titleFormatting" data-dependent-on-selector-value="1">
-					<div class="sb-switch-container">
-						<label class="sb-switch">
-							<input id="onlyTitleCaseInEnglish" type="checkbox" checked>
-							<span class="sb-slider sb-round"></span>
-						</label>
-						<label class="sb-switch-label" for="onlyTitleCaseInEnglish">
-							__MSG_onlyTitleCaseInEnglish__
-						</label>
+					<div data-type="toggle" data-sync="onlyFormatCustomTitles">
+						<div class="sb-switch-container">
+							<label class="sb-switch">
+								<input id="onlyFormatCustomTitles" type="checkbox" checked>
+								<span class="sb-slider sb-round"></span>
+							</label>
+							<label class="sb-switch-label" for="onlyFormatCustomTitles">
+								__MSG_onlyFormatCustomTitles__
+							</label>
+						</div>
 					</div>
 
-					<div class="small-description">__MSG_onlyTitleCaseInEnglishDescription__</div>
+					<br/>
+
+					<div data-type="toggle" data-sync="shouldCleanEmojis">
+						<div class="sb-switch-container">
+							<label class="sb-switch">
+								<input id="shouldCleanEmojis" type="checkbox" checked>
+								<span class="sb-slider sb-round"></span>
+							</label>
+							<label class="sb-switch-label" for="shouldCleanEmojis">
+								__MSG_shouldCleanEmojis__
+							</label>
+						</div>
+					</div>
+
+					<br/>
+	
+					<div data-type="toggle" data-sync="onlyTitleCaseInEnglish" data-dependent-on-selector="titleFormatting" data-dependent-on-selector-value="1">
+						<div class="sb-switch-container">
+							<label class="sb-switch">
+								<input id="onlyTitleCaseInEnglish" type="checkbox" checked>
+								<span class="sb-slider sb-round"></span>
+							</label>
+							<label class="sb-switch-label" for="onlyTitleCaseInEnglish">
+								__MSG_onlyTitleCaseInEnglish__
+							</label>
+						</div>
+	
+						<div class="small-description">__MSG_onlyTitleCaseInEnglishDescription__</div>
+					</div>
 				</div>
 
 				<div data-type="selector" data-sync="thumbnailFallback">

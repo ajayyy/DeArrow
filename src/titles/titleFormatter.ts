@@ -24,16 +24,20 @@ if (LOAD_CLD) {
  */
 
 export async function formatTitle(title: string, isCustom: boolean, videoID: VideoID | null): Promise<string> {
-    return formatTitleInternal(title, isCustom, await getTitleFormatting(videoID), await shouldCleanEmojis(videoID));
+    return formatTitleInternal(title, isCustom, await getTitleFormatting(videoID), await shouldCleanEmojis(videoID), Config.config!.onlyFormatCustomTitles);
 }
 
 export async function formatTitleDefaultSettings(title: string, isCustom: boolean): Promise<string> {
-    return await formatTitleInternal(title, isCustom, Config.config!.titleFormatting, Config.config!.shouldCleanEmojis);
+    return await formatTitleInternal(title, isCustom, Config.config!.titleFormatting, Config.config!.shouldCleanEmojis, Config.config!.onlyFormatCustomTitles);
 }
 
-export async function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: TitleFormatting, shouldCleanEmojis: boolean): Promise<string> {
+export async function formatTitleInternal(title: string, isCustom: boolean, titleFormatting: TitleFormatting, shouldCleanEmojis: boolean, onlyFormatCustomTitles = false): Promise<string> {
     if (shouldCleanEmojis) {
         title = cleanFancyText(cleanEmojis(title));
+    }
+
+    if (onlyFormatCustomTitles && !isCustom) {
+        titleFormatting = TitleFormatting.Disable;
     }
 
     switch (titleFormatting) {
