@@ -118,7 +118,7 @@ html, body {
 
 .option-group > div {
     min-height: 50px;
-    padding: 20px 0;
+    padding: 15px 0;
     border-bottom: 1px solid var(--border-color);
     border-image: linear-gradient(to right, var(--border-color), #00000000 80%)  1;
 }
@@ -280,7 +280,7 @@ input[type='number'] {
 
 .small-description {
     font-size: 13px;
-    padding: 15px 0 0 20px;
+    padding: 5px 0 0 20px;
 }
 
 .small-description td {
@@ -362,7 +362,8 @@ input[type='number'] {
 
     font-size: 14px;
 
-    display: table;
+    display: flex;
+    align-items: center;
 }
 
 .sb-switch-container .sb-switch-label {
