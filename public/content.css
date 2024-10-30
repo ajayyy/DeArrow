@@ -675,6 +675,10 @@ ytd-channel-video-player-renderer #title > a {
 	z-index: 10000;
 }
 
+.sponsorBlockTooltip.cbOnboarding {
+    max-width: 315px;
+}
+
 .sponsorBlockTooltip a {
 	color: white;
 }

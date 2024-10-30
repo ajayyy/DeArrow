@@ -45,7 +45,7 @@ export async function handleOnboarding(element: HTMLElement, videoID: VideoID,
                     displayTriangle: true,
                     center: true,
                     opacity: 1,
-                    extraClass: "rightSBTriangle",
+                    extraClass: "rightSBTriangle cbOnboarding",
                     elements: [
                         <FormattingOptionsComponent key={0}/>
                     ]
