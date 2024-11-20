@@ -500,19 +500,25 @@ export function getChatDisplayName(chatDisplayName: ChatDisplayName | null): str
 function getTips(): React.ReactElement[] {
     const tipInfo = [{
         icon: PersonIcon,
-        text: chrome.i18n.getMessage("tip1")
+        text: chrome.i18n.getMessage("tip1"),
+        forcedFormatting: null,
     }, {
         icon: QuestionIcon,
-        text: chrome.i18n.getMessage("tip2")
+        text: chrome.i18n.getMessage("tip2"),
+        forcedFormatting: null,
     }, {
         icon: ExclamationIcon,
-        text: chrome.i18n.getMessage("tip3")
+        text: chrome.i18n.getMessage("tip3"),
+        forcedFormatting: null,
     }, {
         icon: CursorIcon,
-        text: chrome.i18n.getMessage("tip4")
+        text: chrome.i18n.getMessage("tip4"),
+        forcedFormatting: null,
     }, {
         icon: FontIcon,
-        text: chrome.i18n.getMessage("tip5")
+        text: chrome.i18n.getMessage("tip5"),
+        // let the translators capitalise the tip as needed for the language
+        forcedFormatting: TitleFormatting.Disable,
     }];
 
     return tipInfo.map((tip, i) => (
@@ -521,7 +527,7 @@ function getTips(): React.ReactElement[] {
             <span className="cbTipText">
                 <FormattedText
                     text={tip.text}
-                    titleFormatting={Config.config!.titleFormatting}
+                    titleFormatting={tip.forcedFormatting ?? Config.config!.titleFormatting}
                 />
             </span>
         </div>
