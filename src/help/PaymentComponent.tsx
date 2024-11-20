@@ -146,6 +146,13 @@ export const PaymentComponent = () => {
                             placeholder="Enter license key"
                             onChange={(e) => {
                                 setRedeemEnabled(e.target.value.length > 0);
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key != "Enter") return;
+                                if (!redeemEnabled) return;
+                                applyChoices({
+                                    licenseKey: (document.getElementById("redeemCodeInput") as HTMLInputElement).value
+                                })
                             }}/>
 
                         <a
