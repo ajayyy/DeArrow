@@ -2,7 +2,7 @@ import { objectToURI } from "../../maze-utils/src";
 import { getHash } from "../../maze-utils/src/hash";
 import Config from "../config/config";
 import { getCurrentPageTitle } from "../titles/titleData";
-import { cleanEmojis, cleanFancyText, cleanPunctuation } from "../titles/titleFormatter";
+import { cleanEmojis, cleanFancyText, cleanPunctuation, isWordCustomCapitalization } from "../titles/titleFormatter";
 import { sendRequestToServer } from "../utils/requests";
 import { Tooltip } from "../utils/tooltip";
 import { ChatDisplayName, getChatDisplayName } from "./SubmissionComponent";
@@ -26,7 +26,7 @@ const autoWarningChecks: AutoWarningCheck[] = [
         error: chrome.i18n.getMessage("DeArrowStartLowerCaseWarning"),
         check: (title) => {
             return {
-                found: !!title.match(/^\p{Ll}\S+ \S+ \S+/u)
+                found: !!title.match(/^\p{Ll}\S+ \S+ \S+/u) && !isWordCustomCapitalization(title.split(" ")[0])
             };
         },
         id: "startLowerCase"

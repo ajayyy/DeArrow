@@ -277,7 +277,7 @@ function startsWithEmojiLetter(word: string): boolean {
 /**
  * Not just capital at start
  */
-function isWordCustomCapitalization(word: string): boolean {
+export function isWordCustomCapitalization(word: string): boolean {
     const capitalMatch = word.match(/[\p{Lu}]/gu);
     if (!capitalMatch) return false;
 
