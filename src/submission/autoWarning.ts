@@ -77,7 +77,7 @@ const autoWarningChecks: AutoWarningCheck[] = [
     }, {
         error: chrome.i18n.getMessage("DeArrowKeepingBadOriginalWarning"),
         check: (title, originalTitle) => {
-            const regex = /massive problem|you need|insane|crazy|wild|you won't believe this/i;
+            const regex = /massive problem|you need|insane|crazy|you won't believe this/i;
             const match = title.match(regex)?.[0];
             const found = !!title.match(regex) && !!originalTitle.match(regex);
 
