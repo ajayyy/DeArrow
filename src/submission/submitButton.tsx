@@ -265,6 +265,8 @@ export class SubmitButton {
                             selected: true
                         });
                     }
+
+                    unsubmitted.titles = unsubmitted.titles.filter((t) => t.selected);
                 }
                 
                 if (thumbnail) {
@@ -293,6 +295,8 @@ export class SubmitButton {
                             }
                         }
                     }
+
+                    unsubmitted.thumbnails = unsubmitted.thumbnails.filter((t) => t.selected);
                 }
             } else {
                 delete Config.local!.unsubmitted[getVideoID()!];
