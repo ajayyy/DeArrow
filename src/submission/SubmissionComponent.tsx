@@ -295,6 +295,11 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                                     || props.submissions.titles.findIndex((s) => s.title === t.title) !== -1) {
                                 if (existingSubmission !== -1) {
                                     unsubmitted.titles.splice(existingSubmission, 1);
+
+                                    let index = -1;
+                                    while (index = unsubmitted.titles.findIndex((s) => s.title === oldTitle), index !== -1) {
+                                        unsubmitted.titles.splice(index, 1);
+                                    }
                                 }
                             } else if (t.title !== originalTitle) {
                                 // Normal case
