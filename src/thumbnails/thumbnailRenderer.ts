@@ -529,8 +529,10 @@ function getThumbnailSelector(brandingLocation: BrandingLocation): string {
         case BrandingLocation.Watch:
         case BrandingLocation.ChannelTrailer:
             return ".ytp-cued-thumbnail-overlay-image";
-        case  BrandingLocation.UpNextPreview:
+        case BrandingLocation.UpNextPreview:
             return ".ytp-tooltip-bg";
+        case BrandingLocation.Notification:
+            return ".thumbnail-container img";
         default:
             throw new Error("Invalid branding location");
     }
@@ -876,6 +878,7 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
             || brandingLocation === BrandingLocation.Autoplay
             || brandingLocation === BrandingLocation.EmbedSuggestions
             || brandingLocation === BrandingLocation.Related
+            || brandingLocation === BrandingLocation.Notification
             || !!image.closest("ytd-grid-playlist-renderer")
             || isLiveCover(image)
             || image.parentElement?.classList.contains("ytp-cued-thumbnail-overlay")) {

@@ -11,6 +11,7 @@ import { countTitleReplacement } from "../config/stats";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { isFirefoxOrSafari, waitFor } from "../../maze-utils/src";
 import { isSafari } from "../../maze-utils/src/config";
+import { notificationToTitle, titleToNotificationFormat } from "../videoBranding/notificationHandler";
 
 enum WatchPageType {
     Video,
@@ -32,15 +33,15 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
     if (brandingLocation === BrandingLocation.Watch) {
         const currentWatchPageType = document.URL.includes("watch") ? WatchPageType.Video : WatchPageType.Miniplayer;
 
-        if (lastWatchVideoID && originalTitleElement?.textContent 
-                && videoID !== lastWatchVideoID && originalTitleElement.textContent === lastWatchTitle
+        if (lastWatchVideoID && getOriginalTitleText(originalTitleElement, brandingLocation)
+                && videoID !== lastWatchVideoID && getOriginalTitleText(originalTitleElement, brandingLocation) === lastWatchTitle
                 && lastUrlWatchPageType === currentWatchPageType) {
             // Don't reset it if it hasn't changed videos yet, will be handled by title change listener
             return false;
         }
 
         if (lastWatchVideoID !== videoID) {
-            lastWatchTitle = originalTitleElement?.textContent ?? "";
+            lastWatchTitle = getOriginalTitleText(originalTitleElement, brandingLocation);
             lastWatchVideoID = videoID;
             lastUrlWatchPageType = currentWatchPageType;
         }
@@ -72,7 +73,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
         if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
 
         const title = titleData?.title;
-        const originalTitle = originalTitleElement?.textContent?.trim?.() ?? "";
+        const originalTitle = getOriginalTitleText(originalTitleElement, brandingLocation).trim();
         if (title && await shouldUseCrowdsourcedTitles(videoID)
                 // If there are just formatting changes, and the user doesn't want those, don't replace
                 && (await getTitleFormatting(videoID) !== TitleFormatting.Disable || originalTitle.toLowerCase() !== title.toLowerCase())
@@ -81,8 +82,8 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
             const formattedTitle = await formatTitle(title, true, videoID);
             if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
 
-            if (originalTitleElement?.textContent 
-                    && originalTitleElement.textContent.trim() === formattedTitle) {
+            if (getOriginalTitleText(originalTitleElement, brandingLocation) 
+                    && getOriginalTitleText(originalTitleElement, brandingLocation).trim() === formattedTitle) {
                 showOriginalTitle(element, brandingLocation);
                 return false;
             }
@@ -95,12 +96,12 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
             countTitleReplacement(videoID);
         } else {
             // innerText is blank when visibility hidden
-            if (originalTitleElement.textContent?.length === 0) {
+            if (getOriginalTitleText(originalTitleElement, brandingLocation).length === 0) {
                 await waitFor(() => originalTitleElement!.textContent!.length > 0, 5000).catch(() => null);
             }
 
-            if (originalTitleElement.textContent) {
-                const originalText = originalTitleElement.textContent.trim();
+            if (getOriginalTitleText(originalTitleElement, brandingLocation)) {
+                const originalText = getOriginalTitleText(originalTitleElement, brandingLocation).trim();
                 const modifiedTitle = await formatTitle(originalText, false, videoID);
                 if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
     
@@ -183,7 +184,7 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
     if (Config.config!.showOriginalOnHover) {
         findShowOriginalButton(originalTitleElement, brandingLocation).then((buttonElement) => {
             if (buttonElement) {
-                buttonElement.title = originalTitleElement.textContent ?? "";
+                buttonElement.title = getOriginalTitleText(originalTitleElement, brandingLocation);
             }
         }).catch(logError);
     }
@@ -194,11 +195,11 @@ function showOriginalTitle(element: HTMLElement, brandingLocation: BrandingLocat
                 originalTitleElement.style.setProperty("display", "inline-block", "important");
             }
 
-            setCurrentVideoTitle(originalTitleElement.textContent ?? "");
+            setCurrentVideoTitle(getOriginalTitleText(originalTitleElement, brandingLocation));
             break;
         }
         default: {
-            originalTitleElement.title = originalTitleElement.textContent?.trim() ?? "";
+            originalTitleElement.title = getOriginalTitleText(originalTitleElement, brandingLocation).trim();
             break;
         }
     }
@@ -242,6 +243,10 @@ function showCustomTitle(element: HTMLElement, brandingLocation: BrandingLocatio
 function setCustomTitle(title: string, element: HTMLElement, brandingLocation: BrandingLocation) {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
+
+    if (brandingLocation === BrandingLocation.Notification) {
+        title = titleToNotificationFormat(title, originalTitleElement?.textContent ?? "");
+    }
 
     // To support extensions like Tube Archivist that add nodes
     const children = titleElement.childNodes;
@@ -314,11 +319,13 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
             return [".ytp-videowall-still-info-title"];
         case BrandingLocation.EmbedSuggestions:
             return [".ytp-suggestion-title"];
-        case  BrandingLocation.UpNextPreview:
+        case BrandingLocation.UpNextPreview:
             return [
                 ".ytp-tooltip-text-no-title",
                 ".ytp-tooltip-text"
             ];
+        case BrandingLocation.Notification:
+            return [".text yt-formatted-string"]
         default:
             throw new Error("Invalid branding location");
     }
@@ -344,11 +351,18 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
         titleElement.style.textDecoration = "none";
     }
 
+    if (brandingLocation === BrandingLocation.Notification) {
+        // For some reason you have to set before removing
+        titleElement.setAttribute("is-empty", "");
+        titleElement.removeAttribute("is-empty");
+    }
+
     titleElement.classList.add("cbCustomTitle");
 
     if (brandingLocation === BrandingLocation.EndRecommendations
             || brandingLocation === BrandingLocation.Autoplay
             || brandingLocation === BrandingLocation.EmbedSuggestions
+            || brandingLocation === BrandingLocation.Notification
             || originalTitleElement.id === "movie-title"
             || (originalTitleElement.id === "title" && originalTitleElement.parentElement?.id === "description")) {
         const container = document.createElement("div");
@@ -663,4 +677,13 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
     }
 
     return buttonElement;
+}
+
+function getOriginalTitleText(originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): string {
+    switch (brandingLocation) {
+        case BrandingLocation.Notification:
+            return notificationToTitle(originalTitleElement?.textContent ?? "");
+        default:
+            return originalTitleElement?.textContent ?? "";
+    }
 }

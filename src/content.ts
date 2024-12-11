@@ -8,6 +8,7 @@ import { cleanPage } from "./utils/pageCleaner";
 import { setupPageTitleHandler } from "./titles/pageTitleHandler";
 import { setupWatchPageBrandingCleanup } from "./videoBranding/watchPageBrandingHandler";
 import { addHotkeyListener } from "./utils/keybinds";
+import { setupNotificationHandler } from "./videoBranding/notificationHandler";
 
 cleanPage();
 addCssToPage();
@@ -21,6 +22,7 @@ addTitleChangeListener(() => void replaceCurrentVideoBranding().catch(logError))
 setupOptionChangeListener();
 setupPageTitleHandler();
 addHotkeyListener();
+setupNotificationHandler().catch(logError);
 
 setupTitlebarCleanup();
 setupWatchPageBrandingCleanup();
