@@ -1,6 +1,6 @@
 import { getYouTubeTitleNodeSelector } from "../../maze-utils/src/elements";
 import { getVideoID, isOnChannelPage, VideoID } from "../../maze-utils/src/video";
-import { getElement, isVisible, waitForElement } from "../../maze-utils/src/dom";
+import { getElement, isVisibleOrParent, waitForElement } from "../../maze-utils/src/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
@@ -72,17 +72,18 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
     // Find first invisible one, or wait for the first one to be visible
     const mainTitle = await (async () => {
         if (!onChannelPage) {
-            const firstVisible = possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility, true) as HTMLElement).filter((element) => isVisible(element, true))[0];
+            const firstVisible = possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility, true, true) as HTMLElement)
+                .filter((element) => isVisibleOrParent(element, true, true))[0];
             if (firstVisible) return firstVisible;
         }
 
         return await waitForElement(possibleSelectors[0].selector, !onClipPage, true) as HTMLElement;
     })();
-    const titles = (possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility && !onClipPage, true)).filter((e) => !!e)) as HTMLElement[];
+    const titles = (possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility && !onClipPage, true, true)).filter((e) => !!e)) as HTMLElement[];
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
     const videoID = getVideoID();
 
-    if (videoID !== null && (isVisible(mainTitle, true) || onClipPage)) {
+    if (videoID !== null && (isVisibleOrParent(mainTitle, true, true) || onClipPage)) {
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
             async () => { await replaceCurrentVideoBranding(); });
         const brandingLocation = onWatchPage ? BrandingLocation.Watch : BrandingLocation.ChannelTrailer;
