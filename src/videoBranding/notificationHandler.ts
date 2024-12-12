@@ -50,7 +50,13 @@ export async function setupNotificationHandler() {
 }
 
 const notificationFormats = [
-    "$CHANNEL$ uploaded: $TITLE$"
+    "$CHANNEL$ uploaded: $TITLE$",
+    "$CHANNEL$ premiering now: $TITLE$",
+    "$CHANNEL$ is live: $TITLE$",
+    "Watch $CHANNEL$ live in 30 minutes: $TITLE$",
+    "$CHANNEL$ premiering in 30 minutes: $TITLE$",
+    "$CHANNEL$ latasi videon: $TITLE$",
+    "$CHANNEL$ alotti livestriimin: $TITLE$"
 ];
 const channelTemplate = "$CHANNEL$";
 const titleTemplate = "$TITLE$";
