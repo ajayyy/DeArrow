@@ -178,7 +178,9 @@ export async function replaceVideoCardsBranding(elements: HTMLElement[]): Promis
 }
 
 export async function replaceVideoCardBranding(element: HTMLElement, brandingLocation: BrandingLocation,
-        verifyVideoID?: VideoID, tries = 0): Promise<[boolean, boolean]> {
+        extraParams: { verifyVideoID?: VideoID; tries?: number; dontReplaceTitle?: boolean } = {}): Promise<[boolean, boolean]> {
+    
+    extraParams.tries ??= 0;
     const link = getLinkElement(element, brandingLocation);
 
     if (link) {
@@ -186,24 +188,24 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
         const isPlaylistOrClipTitleStatus = isPlaylistOrClipTitle(element, link);
         const isMovie = element.nodeName.includes("MOVIE");
 
-        if (verifyVideoID && videoID !== verifyVideoID) {
+        if (extraParams.verifyVideoID && videoID !== extraParams.verifyVideoID) {
             // Don't need this branding update anymore, it was trying to update for a different video
             return [false, false];
         }
 
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
-            async () => { await replaceVideoCardBranding(element, brandingLocation, videoID); });
+            async () => { await replaceVideoCardBranding(element, brandingLocation, { verifyVideoID: videoID }); });
         const showCustomBranding = videoBrandingInstance.showCustomBranding;
 
         const videoPromise = replaceThumbnail(element, videoID, brandingLocation, isMovie ? {
             knownValue: false,
             originalValue: false
         } : showCustomBranding);
-        const titlePromise = !isPlaylistOrClipTitleStatus 
+        const titlePromise = !isPlaylistOrClipTitleStatus && !extraParams.dontReplaceTitle
             ? replaceTitle(element, videoID, showCustomBranding, brandingLocation) 
             : Promise.resolve(false);
 
-        if (isPlaylistOrClipTitleStatus) {
+        if (isPlaylistOrClipTitleStatus || extraParams.dontReplaceTitle) {
             // Still create title element to make sure show original button will be in the right place
             const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
             const titleElement = getOrCreateTitleElement(element, brandingLocation, originalTitleElement);
@@ -219,9 +221,10 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
 
         const result = await Promise.all(promises);
 
-        if (videoID !== await extractVideoID(link) && await extractVideoID(link) && tries < 2) {
+        if (videoID !== await extractVideoID(link) && await extractVideoID(link) && extraParams.tries < 2) {
             // Video ID changed, so try again
-            return replaceVideoCardBranding(element, brandingLocation, verifyVideoID, tries++);
+            extraParams.tries++;
+            return replaceVideoCardBranding(element, brandingLocation, extraParams);
         }
 
         if (document.hasFocus()) {
@@ -279,7 +282,7 @@ async function extractVideoID(link: HTMLAnchorElement) {
                 videoID = href.match(/\/vi\/(\S{11})/)?.[1] as VideoID;
             }
         } else {
-            const image = link.querySelector("yt-image img, img.video-thumbnail-img, yt-img-shadow img") as HTMLImageElement;
+            const image = link.querySelector(`yt-image img, img.video-thumbnail-img, yt-img-shadow:not([id="avatar"]) img`) as HTMLImageElement;
             if (image) {
                 let href = image.getAttribute("src");
                 if (!href) {

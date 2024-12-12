@@ -32,8 +32,10 @@ async function onNotificationMenuOpened() {
 function replaceNotificationBranding(notification: HTMLElement) {
     // Only if this notification format is supported
     const originalTitle = getOriginalTitleElement(notification as HTMLElement, BrandingLocation.Notification)?.textContent;
-    if (originalTitle && notificationToTitle(originalTitle)) {
-        replaceVideoCardBranding(notification as HTMLElement, BrandingLocation.Notification).catch(logError);
+    const hasThumbnail = !!notification.querySelector(".thumbnail-container img");
+    if (hasThumbnail) {
+        const validTitle = originalTitle && notificationToTitle(originalTitle);
+        replaceVideoCardBranding(notification as HTMLElement, BrandingLocation.Notification, { dontReplaceTitle: !validTitle }).catch(logError);
     }
 }
 
