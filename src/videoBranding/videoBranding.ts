@@ -194,7 +194,7 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
         }
 
         const videoBrandingInstance = getAndUpdateVideoBrandingInstances(videoID,
-            async () => { await replaceVideoCardBranding(element, brandingLocation, { verifyVideoID: videoID }); });
+            async () => { await replaceVideoCardBranding(element, brandingLocation, { ...extraParams, verifyVideoID: videoID, tries: 0 }); });
         const showCustomBranding = videoBrandingInstance.showCustomBranding;
 
         const videoPromise = replaceThumbnail(element, videoID, brandingLocation, isMovie ? {
