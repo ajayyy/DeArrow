@@ -11,6 +11,7 @@ import { getPlaybackFormats } from "./thumbnails/thumbnailData";
 import { replaceVideoPlayerSuggestionsBranding, setupMobileAutoplayHandler } from "./videoBranding/watchPageBrandingHandler";
 import { onMobile } from "../maze-utils/src/pageInfo";
 import { resetShownWarnings } from "./submission/autoWarning";
+import { getAntiTranslatedTitle } from "./titles/titleAntiTranslateData";
 
 export const submitButton = new SubmitButton();
 
@@ -80,6 +81,10 @@ function newVideosLoaded(videoIDs: VideoID[]) {
     for (const videoID of videoIDs) {
         getVideoBranding(videoID, false).catch(logError);
         getPlaybackFormats(videoID).catch(logError);
+
+        if (Config.config!.ignoreTranslatedTitles) {
+            getAntiTranslatedTitle(videoID).catch(logError);
+        }
     }
 }
 

@@ -12,6 +12,7 @@ import { onMobile } from "../../maze-utils/src/pageInfo";
 import { isFirefoxOrSafari, waitFor } from "../../maze-utils/src";
 import { isSafari } from "../../maze-utils/src/config";
 import { notificationToTitle, titleToNotificationFormat } from "../videoBranding/notificationHandler";
+import { getAntiTranslatedTitle } from "./titleAntiTranslateData";
 
 enum WatchPageType {
     Video,
@@ -102,7 +103,10 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
 
             if (getOriginalTitleText(originalTitleElement, brandingLocation)) {
                 const originalText = getOriginalTitleText(originalTitleElement, brandingLocation).trim();
-                const modifiedTitle = await formatTitle(originalText, false, videoID);
+                const originalTitle = Config.config!.ignoreTranslatedTitles
+                    ? await getAntiTranslatedTitle(videoID) ?? originalText
+                    : originalText;
+                const modifiedTitle = await formatTitle(originalTitle, false, videoID);
                 if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
     
                 if (originalText === modifiedTitle) {
