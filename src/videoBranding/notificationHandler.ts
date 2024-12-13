@@ -64,7 +64,13 @@ const notificationFormats = [
     "Watch $CHANNEL$ live in 30 minutes: $TITLE$",
     "$CHANNEL$ premiering in 30 minutes: $TITLE$",
     "$CHANNEL$ latasi videon: $TITLE$",
-    "$CHANNEL$ alotti livestriimin: $TITLE$"
+    "$CHANNEL$ alotti livestriimin: $TITLE$",
+    "$CHANNEL$ hat $TITLE$ hochgeladen",
+    "$CHANNEL$ startet gerade die Premiere von $TITLE$",
+    "$CHANNEL$ überträgt einen Livestream: $TITLE$",
+    "$CHANNEL$ ha subido: $TITLE$",
+    "$CHANNEL$ está emitiendo en directo: $TITLE$",
+    "Na kanal $CHANNEL$ został przesłany film $TITLE$"
 ];
 const channelTemplate = "$CHANNEL$";
 const titleTemplate = "$TITLE$";
