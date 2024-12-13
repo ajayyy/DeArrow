@@ -10,24 +10,24 @@ const titleAntiTranslateCache = new DataCache<VideoID, AntiTranslateData>(() => 
     title: ""
 }));
 
-export async function getAntiTranslatedTitle(video: VideoID): Promise<string | null> {
-    const cache = titleAntiTranslateCache.getFromCache(video);
+export async function getAntiTranslatedTitle(videoID: VideoID): Promise<string | null> {
+    const cache = titleAntiTranslateCache.getFromCache(videoID);
 
     if (cache) {
-        titleAntiTranslateCache.cacheUsed(video);
+        titleAntiTranslateCache.cacheUsed(videoID);
         return cache.title;
     }
 
-    const title = await getAntiTranslatedTitleFromServer(video);
+    const title = await getAntiTranslatedTitleFromServer(videoID);
     if (title) {
-        titleAntiTranslateCache.setupCache(video).title = title;
+        titleAntiTranslateCache.setupCache(videoID).title = title;
     }
 
     return title;
 }
 
-async function getAntiTranslatedTitleFromServer(video: VideoID): Promise<string | null> {
-    const response = await sendRequestToCustomServer("GET", `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${video}`);
+async function getAntiTranslatedTitleFromServer(videoID: VideoID): Promise<string | null> {
+    const response = await sendRequestToCustomServer("GET", `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoID}`);
 
     if (response.ok) {
         try {
