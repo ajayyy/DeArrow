@@ -41,11 +41,13 @@ function replaceNotificationBranding(notification: HTMLElement) {
 
 export async function setupNotificationHandler() {
     if (!onMobile() && !isOnInvidious()) {
-        const notificationButton = await waitFor(() => document.querySelector("ytd-notification-topbar-button-renderer"), 20000, 500);
-
-        if (notificationButton) {
-            notificationButton.addEventListener("click", () => void(onNotificationMenuOpened()));
-        }
+        try {
+            const notificationButton = await waitFor(() => document.querySelector("ytd-notification-topbar-button-renderer"), 20000, 500);
+    
+            if (notificationButton) {
+                notificationButton.addEventListener("click", () => void(onNotificationMenuOpened()));
+            }
+        } catch (e) { } // eslint-disable-line no-empty
     }
 }
 
