@@ -650,6 +650,12 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     align-content: center;
 }
 
+/* For notifications */
+ytd-comment-video-thumbnail-header-renderer .cbShowOriginal {
+    margin-left: 0;
+    margin-right: 16px;
+}
+
 /* For playlist titles to be properly spaced out with show original button */
 ytd-playlist-panel-video-renderer #video-title {
     width: 100%;

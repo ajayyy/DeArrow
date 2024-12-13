@@ -532,6 +532,7 @@ function getThumbnailSelector(brandingLocation: BrandingLocation): string {
         case BrandingLocation.UpNextPreview:
             return ".ytp-tooltip-bg";
         case BrandingLocation.Notification:
+        case BrandingLocation.NotificationTitle:
             return ".thumbnail-container img";
         default:
             throw new Error("Invalid branding location");
@@ -879,6 +880,7 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
             || brandingLocation === BrandingLocation.EmbedSuggestions
             || brandingLocation === BrandingLocation.Related
             || brandingLocation === BrandingLocation.Notification
+            || brandingLocation === BrandingLocation.NotificationTitle
             || !!image.closest("ytd-grid-playlist-renderer")
             || isLiveCover(image)
             || image.parentElement?.classList.contains("ytp-cued-thumbnail-overlay")) {

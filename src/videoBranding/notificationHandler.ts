@@ -17,8 +17,13 @@ async function onNotificationMenuOpened() {
             mutations.forEach((mutation) => {
                 if (mutation.addedNodes.length > 0) {
                     for (const node of mutation.addedNodes) {
-                        if (node instanceof HTMLElement && node.tagName.toLowerCase() === "ytd-notification-renderer") {
-                            replaceNotificationBranding(node);
+                        if (node instanceof HTMLElement) {
+                            if (node.tagName.toLowerCase() === "ytd-notification-renderer") {
+                                replaceNotificationBranding(node, BrandingLocation.Notification);
+                            } else if (node.tagName.toLowerCase() === "ytd-comment-video-thumbnail-header-renderer") {
+                                // At the top after clicking a notification about recieving a comment on a video
+                                replaceNotificationBranding(node, BrandingLocation.NotificationTitle);
+                            }
                         }
                     }
                 }
@@ -29,13 +34,14 @@ async function onNotificationMenuOpened() {
     mutationObserver.observe(notificationMenu, { childList: true, subtree: true });
 }
 
-function replaceNotificationBranding(notification: HTMLElement) {
+function replaceNotificationBranding(notification: HTMLElement, brandingLocation: BrandingLocation) {
     // Only if this notification format is supported
-    const originalTitle = getOriginalTitleElement(notification as HTMLElement, BrandingLocation.Notification)?.textContent;
+    const originalTitle = getOriginalTitleElement(notification as HTMLElement, brandingLocation)?.textContent;
     const hasThumbnail = !!notification.querySelector(".thumbnail-container img");
     if (hasThumbnail) {
-        const validTitle = originalTitle && notificationToTitle(originalTitle);
-        replaceVideoCardBranding(notification as HTMLElement, BrandingLocation.Notification, { dontReplaceTitle: !validTitle }).catch(logError);
+        const validTitle = brandingLocation === BrandingLocation.NotificationTitle
+            || (originalTitle && notificationToTitle(originalTitle));
+        replaceVideoCardBranding(notification as HTMLElement, brandingLocation, { dontReplaceTitle: !validTitle }).catch(logError);
     }
 }
 

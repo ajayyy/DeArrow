@@ -246,6 +246,21 @@ function setCustomTitle(title: string, element: HTMLElement, brandingLocation: B
 
     if (brandingLocation === BrandingLocation.Notification) {
         title = titleToNotificationFormat(title, originalTitleElement?.textContent ?? "");
+    } else if (brandingLocation === BrandingLocation.NotificationTitle) {
+        // Need to copy over text that surrounds the title
+        let text = "";
+        for (const child of originalTitleElement.childNodes) {
+            if (child.textContent) {
+                if (text.endsWith(`"`)) {
+                    // We found the title part
+                    text += title;
+                } else {
+                    text += child.textContent;
+                }
+            }
+        }
+
+        title = text;
     }
 
     // To support extensions like Tube Archivist that add nodes
@@ -327,6 +342,8 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
             ];
         case BrandingLocation.Notification:
             return [".text yt-formatted-string"]
+        case BrandingLocation.NotificationTitle:
+            return ["yt-formatted-string.title"]
         default:
             throw new Error("Invalid branding location");
     }
@@ -352,10 +369,13 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
         titleElement.style.textDecoration = "none";
     }
 
-    if (brandingLocation === BrandingLocation.Notification) {
-        // For some reason you have to set before removing
-        titleElement.setAttribute("is-empty", "");
-        titleElement.removeAttribute("is-empty");
+    switch (brandingLocation) {
+        case BrandingLocation.Notification:
+        case BrandingLocation.NotificationTitle:
+            // For some reason you have to set before removing
+            titleElement.setAttribute("is-empty", "");
+            titleElement.removeAttribute("is-empty");
+            break;
     }
 
     titleElement.classList.add("cbCustomTitle");
@@ -635,7 +655,11 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
             return existingButton as HTMLElement;
         }
 
-        originalTitleElement.parentElement?.appendChild(buttonElement);
+        if (brandingLocation === BrandingLocation.NotificationTitle) {
+            originalTitleElement.parentElement?.insertBefore(buttonElement, originalTitleElement.nextSibling);
+        } else {
+            originalTitleElement.parentElement?.appendChild(buttonElement);
+        }
     }
 
     if (onMobile()) {
@@ -684,6 +708,20 @@ function getOriginalTitleText(originalTitleElement: HTMLElement, brandingLocatio
     switch (brandingLocation) {
         case BrandingLocation.Notification:
             return notificationToTitle(originalTitleElement?.textContent ?? "");
+        case BrandingLocation.NotificationTitle: {
+            // Look for quotation marks
+            let foundFirstQuote = false;
+            for (const child of originalTitleElement.childNodes) {
+                if (foundFirstQuote) {
+                    return child.textContent ?? "";
+                } else if (child.textContent?.endsWith(`"`)) {
+                    foundFirstQuote = true;
+                }
+            }
+
+            // Found nothing, treat full title as original title then
+            return originalTitleElement?.textContent ?? "";
+        }
         default:
             return originalTitleElement?.textContent ?? "";
     }

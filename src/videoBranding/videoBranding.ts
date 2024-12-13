@@ -35,7 +35,8 @@ export enum BrandingLocation {
     EndRecommendations,
     EmbedSuggestions,
     UpNextPreview,
-    Notification
+    Notification,
+    NotificationTitle
 }
 
 export type ShowCustomBrandingInfo = {
@@ -264,6 +265,7 @@ export function getLinkElement(element: HTMLElement, brandingLocation: BrandingL
         case BrandingLocation.UpNextPreview:
             return element as HTMLAnchorElement;
         case BrandingLocation.Notification:
+        case BrandingLocation.NotificationTitle:
             return element.querySelector("a");
         default:
             throw new Error("Invalid branding location");
