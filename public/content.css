@@ -19,6 +19,14 @@
     object-fit: cover;
 }
 
+.shortsLockupViewModelHostThumbnailContainer .cbCustomThumbnailCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
 /* Livestream avatar cover images */
 .cbCustomThumbnailCanvas.cbLiveCover {
     display: flex !important;
