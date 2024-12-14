@@ -1,7 +1,7 @@
 import { VideoID } from "../../maze-utils/src/video";
 import Config, { TitleFormatting } from "../config/config";
 import { getTitleFormatting, shouldCleanEmojis } from "../config/channelOverrides";
-import { acronymBlocklist, allowlistedWords, fancyTextConversions, notStartOfSentence, titleCaseDetectionNotCapitalized, titleCaseNotCapitalized } from "./titleFormatterData";
+import { acronymBlocklist, allowlistedStartOfWords, allowlistedWords, fancyTextConversions, notStartOfSentence, titleCaseDetectionNotCapitalized, titleCaseNotCapitalized } from "./titleFormatterData";
 import { chromeP } from "../../maze-utils/src/browserApi";
 import type { LanguageIdentifier } from "cld3-asm";
 
@@ -316,12 +316,14 @@ function isFirstLetterCapital(word: string): boolean {
 
 function forceKeepFormatting(word: string, ignorePunctuation = true): boolean {
     let result = !!word.match(/^>/)
-        || listHasWord(allowlistedWords, word);
+        || listHasWord(allowlistedWords, word)
+        || listHasStartOfWord(allowlistedStartOfWords, word);
 
     if (ignorePunctuation) {
         const withoutPunctuation = word.replace(/[:?.!+\]]+$|^[[+:/]+/, "");
         if (word !== withoutPunctuation) {
-            result ||= listHasWord(allowlistedWords, withoutPunctuation);
+            result ||= listHasWord(allowlistedWords, withoutPunctuation)
+                || listHasStartOfWord(allowlistedStartOfWords, word);
         }
     }
 
@@ -582,6 +584,17 @@ function listHasWord(list: Set<string>, word: string): boolean {
     return list.has(word.replace(/[[「〈《【〔⦗『〖〘<({:〙〗』⦘〕】》〉」)}\]]/g, ""))
 }
 
+function listHasStartOfWord(list: Set<string>, word: string): boolean {
+    word = word.replace(/[[「〈《【〔⦗『〖〘<({:〙〗』⦘〕】》〉」)}\]]/g, "");
+
+    for (const item of list) {
+        if (word.startsWith(item)) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 export async function localizeHtmlPageWithFormatting(): Promise<void> {
     // Localize by replacing __MSG_***__ meta tags

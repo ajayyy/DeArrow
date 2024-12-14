@@ -163,7 +163,6 @@ export const allowlistedWords = new Set([
     "GTA",
     "bell hooks",
     "TOOOL",
-    "PCECD",
     "drawholic",
     "TF2",
     "L4D",
@@ -322,6 +321,36 @@ export const allowlistedWords = new Set([
     "WWF",
     "WWI",
     "XML",
+    "LGBTQIA2S+",
+    "NVFBC",
+    "DALL-E",
+    "DALL·E",
+    "iilluminaughtii",
+    "TOML",
+    "DJ",
+    "SPTV",
+    "VST",
+    "EQ"
+]);
+
+// Can be switched to a trie structure if it grows
+export const allowlistedStartOfWords = new Set([
+    "osu!",
+    "de_",
+    "cs_",
+    "ar_",
+    "as_",
+    "es_",
+    "dz_",
+    "fy_",
+    "aim_",
+    "zm_",
+    "jail_",
+    "bb_",
+    "gg_",
+    "awp_",
+    "df_",
+    "deathrun_",
 ]);
 
 export const acronymBlocklist = new Set([
