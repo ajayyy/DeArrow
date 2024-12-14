@@ -469,7 +469,7 @@ function isDelimeter(word: string): boolean {
     return (isEntirelyDelimeter(word)
         || word.match(/[:?.!\]]$/) !== null)
         && !listHasWord(allowlistedWords, word)
-        && !listHasWord(notStartOfSentence, word)
+        && !listHasWord(notStartOfSentence, word.toLowerCase())
         && (!isAcronymStrict(word) || !word.endsWith("."));
 }
 

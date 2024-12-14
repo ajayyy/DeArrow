@@ -391,7 +391,14 @@ export const notStartOfSentence = new Set([
     "v.s.",
     "vs.",
     "ft.",
-    "feat."
+    "feat.",
+    "mr.",
+    "mrs.",
+    "ms.",
+    "dr.",
+    "prof.",
+    "sr.",
+    "jr.",
 ]);
 
 /**
