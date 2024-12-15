@@ -134,6 +134,17 @@ describe("toTitleCase", () => {
         ["Pandora Hearts pocket watch of real life with lacie melody edited of - an important thing", "Pandora Hearts Pocket Watch of Real Life with Lacie Melody Edited Of - An Important Thing"],
         // in is inch so is allowlisted unless manually capitalized
         ["Pandora Hearts pocket watch in real life with lacie melody edited In", "Pandora Hearts Pocket Watch in Real Life with Lacie Melody Edited In"],
+        ["The quick brown fox jumps over the lazy/sleepy dog is a sentence", "The Quick Brown Fox Jumps Over the Lazy/Sleepy Dog Is a Sentence"],
+        ["The quick brown fox jumps over the lazy/Sleepy dog is a sentence", "The Quick Brown Fox Jumps Over the Lazy/Sleepy Dog Is a Sentence"],
+        ["The quick brown fox jumps OVER THE LAZY/SLEEPY DOG is a sentence", "The Quick Brown Fox Jumps Over the Lazy/Sleepy Dog Is a Sentence"],
+        ["The Quick Brown Fox Jumps Over the Lazy/Sleepy Dog Is a Sentence", "The Quick Brown Fox Jumps Over the Lazy/Sleepy Dog Is a Sentence"],
+        ["The quick brown fox jumps over the lazy/first-of-it's-kind dog is a sentence", "The Quick Brown Fox Jumps Over the Lazy/First-of-It's-Kind Dog Is a Sentence"],
+        ["The quick brown fox jumps over the first-of-it's-kind is a sentence", "The Quick Brown Fox Jumps Over the First-of-It's-Kind Is a Sentence"],
+        ["The quick brown fox jumps over the first-of-it's-Kind is a sentence", "The Quick Brown Fox Jumps Over the First-of-It's-Kind Is a Sentence"],
+        ["The quick brown fox jumps over the first-of-it's-kInd is a sentence", "The Quick Brown Fox Jumps Over the first-of-it's-kInd Is a Sentence"],
+        ["The quick brown fox jumps over the go-to dog is a sentence", "The Quick Brown Fox Jumps Over the Go-to Dog Is a Sentence"],
+        ["The quick brown fox jumps over the go-word dog is a sentence", "The Quick Brown Fox Jumps Over the Go-Word Dog Is a Sentence"],
+
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -229,7 +240,7 @@ describe("toSentenceCase", () => {
 describe("toSentenceCase cleanEmojis", () => {
     const titleCases: [string, string][] = [
         ["🚨 Announcement: New Series Coming!", "Announcement: New series coming"],
-        ["𝐆𝐀𝐋𝐓 𝐒𝐔𝐁 𝐓𝐑𝐀𝐈𝐍𝐒 Railfan Mini-Meetup at Leaside", "Galt sub trains railfan Mini-Meetup at leaside"],
+        ["𝐆𝐀𝐋𝐓 𝐒𝐔𝐁 𝐓𝐑𝐀𝐈𝐍𝐒 Railfan Mini-Meetup at Leaside", "Galt sub trains railfan mini-meetup at leaside"],
         ["The country of 🇨🇦 exists", "The country of 🇨🇦 exists"]
     ];
     for (const testCase of titleCases) {
@@ -275,14 +286,13 @@ describe("titleFormatter custom cases", () => {
         ["POV: Neo vs. mythiX @GAMEGUNE Frag eXecutors CS 1.6 demo", "POV: Neo vs. mythiX @GAMEGUNE Frag eXecutors CS 1.6 Demo", "POV: Neo vs. mythiX @GAMEGUNE Frag eXecutors CS 1.6 demo"], // mythiX, eXecutors
         ["POV: >cogu vs. Eurotrip >mibr CS 1.6 demo", "POV: cogu vs. Eurotrip mibr CS 1.6 Demo", "POV: cogu vs. Eurotrip mibr CS 1.6 demo"], // cogu, Eurotrip, mibr
         [">n0thing vs. nMo @CEVO-P season VIII >(de_dust2)","n0thing vs. nMo @CEVO-P Season VIII (de_dust2)","n0thing vs. nMo @CEVO-P season VIII (de_dust2)"], // n0thing, nMo, VIII, de_dust2
-        ["POV: >zet vs. a-Losers NiP CS 1.6 demo","POV: zet vs. a-Losers NiP CS 1.6 Demo","POV: zet vs. a-Losers NiP CS 1.6 demo"], // zet, a-Losers
+        ["POV: >zet vs. >a-Losers NiP CS 1.6 demo","POV: zet vs. a-Losers NiP CS 1.6 Demo","POV: zet vs. a-Losers NiP CS 1.6 demo"], // zet, a-Losers
         ["POV: >f0rest vs. Virtus.pro >fnatic CS 1.6 demo part1", "POV: f0rest vs. Virtus.pro fnatic CS 1.6 Demo Part1","POV: f0rest vs. Virtus.pro fnatic CS 1.6 demo part1"], // Virtus.pro, fnatic
         ["Announcements at >Google I/O 2023", "Announcements at Google I/O 2023", "Announcements at Google I/O 2023"], // Google sould be capitalized
         ["WWDC 2022 - iOS 16 announcement", "WWDC 2022 - iOS 16 Announcement", "WWDC 2022 - iOS 16 announcement"], // iOS should NOT be capitalized
         [`My thoughts on GM and Ford's move to abandon the CCS connector in favor of "NACS"`, `My Thoughts on GM and Ford's Move to Abandon the CCS Connector in Favor of "NACS"`, `My thoughts on GM and Ford's move to abandon the CCS connector in favor of "NACS"`],
         ["One thing: then another thing", "One Thing: Then Another Thing", "One thing: Then another thing"],
-        ["One thing: but-then another thing", "One Thing: But-then Another Thing", "One thing: But-then another thing"],
-        ["One thing: but-Then another thing", "One Thing: But-then Another Thing", "One thing: But-then another thing"],
+        ["One thing: but-then another thing", "One Thing: But-Then Another Thing", "One thing: But-then another thing"],
     ];
     for (const testCase of customTitles) {
         const [input, title, sentence] = testCase;
