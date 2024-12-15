@@ -25,6 +25,7 @@ import { LicenseComponent } from "../license/LicenseComponent";
 import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
 import { FormattedText } from "../popup/FormattedTextComponent";
 import { isAutoWarningShown } from "./autoWarning";
+import { getAntiTranslatedTitle } from "../titles/titleAntiTranslateData";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -79,7 +80,10 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
     const [titles, setTitles] = React.useState<RenderedTitleSubmission[]>([]);
     React.useEffect(() => {
         (async () => {
-            const originalTitle = await formatTitleInternal(getCurrentPageTitle() || chrome.i18n.getMessage("OriginalTitle"), false, TitleFormatting.SentenceCase, true);
+            const unformattedOriginalTitle = await getAntiTranslatedTitle(props.videoID)
+                ?? getCurrentPageTitle()
+                ?? chrome.i18n.getMessage("OriginalTitle");
+            const originalTitle = await formatTitleInternal(unformattedOriginalTitle, false, TitleFormatting.SentenceCase, true);
             setOriginalTitle(originalTitle);
 
             const newTitles = [{
