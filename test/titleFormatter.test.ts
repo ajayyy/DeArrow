@@ -81,6 +81,15 @@ describe("toCapitalizeCase", () => {
     const capitalizeCases: [string, string][] = [
         ["Go on the table with a cat", "Go On The Table With A Cat"],
         ["Go on the Table with a Cat", "Go On The Table With A Cat"],
+        ["The quick brown fox jumps over the lazy/sleepy dog is a sentence", "The Quick Brown Fox Jumps Over The Lazy/Sleepy Dog Is A Sentence"],
+        ["The quick brown fox jumps over the lazy/Sleepy dog is a sentence", "The Quick Brown Fox Jumps Over The Lazy/Sleepy Dog Is A Sentence"],
+        ["The quick brown fox jumps OVER THE LAZY/SLEEPY DOG is a sentence", "The Quick Brown Fox Jumps Over The Lazy/Sleepy Dog Is A Sentence"],
+        ["The quick brown fox jumps over the lazy/SLEEPY dog is a sentence", "The Quick Brown Fox Jumps Over The Lazy/Sleepy Dog Is A Sentence"],
+        ["The Quick Brown Fox Jumps Over the Lazy/Sleepy Dog Is a Sentence", "The Quick Brown Fox Jumps Over The Lazy/Sleepy Dog Is A Sentence"],
+        ["The quick brown fox jumps over the lazy/first-of-it's-kind dog is a sentence", "The Quick Brown Fox Jumps Over The Lazy/First-Of-It's-Kind Dog Is A Sentence"],
+        ["The quick brown fox jumps over the first-of-it's-kind is a sentence", "The Quick Brown Fox Jumps Over The First-Of-It's-Kind Is A Sentence"],
+        ["The quick brown fox jumps over the first-of-it's-Kind is a sentence", "The Quick Brown Fox Jumps Over The First-Of-It's-Kind Is A Sentence"],
+        ["The quick brown fox jumps over the first-of-it's-kInd is a sentence", "The Quick Brown Fox Jumps Over The First-Of-It's-Kind Is A Sentence"],
     ];
     for (const testCase of capitalizeCases) {
         const [input, expected] = testCase;

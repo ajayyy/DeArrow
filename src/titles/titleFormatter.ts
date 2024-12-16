@@ -220,8 +220,6 @@ async function wordToTitleCase(word: string, index: number, words: string[], par
     } else {
         return await capitalizeFirstLetter(word, isTurkiq);
     }
-
-    return "";
 }
 
 export async function toCapitalizeCase(str: string, isCustom: boolean): Promise<string> {
@@ -230,14 +228,33 @@ export async function toCapitalizeCase(str: string, isCustom: boolean): Promise<
     const { isGreek, isTurkiq } = await getLangInfo(str);
 
     let result = "";
+    let index = 0;
     for (const word of words) {
+        const trustCaps = shouldTrustCaps(mostlyAllCaps, words, index);
+
         if (forceKeepFormatting(word)
-            || (isCustom && isWordCustomCapitalization(word))
-            || (!isAllCaps(word) && isWordCustomCapitalization(word))
-            || (isFirstLetterCapital(word) &&
-                ((!mostlyAllCaps && isAcronym(word)) || isAcronymStrict(word)))
             || isYear(word)
             || (!isGreek && await greekLetterAllowed(word))) {
+            // For custom titles, allow any not just first capital
+            // For non-custom, allow any that isn't all caps
+            // Trust it with capitalization
+            result += word + " ";
+        } else if (isCompoundWord(word)) {
+            // If this is hyphenated or dashed, capitalize each part
+            const wordsInWord = word.split(/([-/])/g);
+            for (const wordInWord of wordsInWord) {
+                if (wordInWord.match(/[-/]/)) {
+                    result += wordInWord;
+                } else {
+                    result += await capitalizeFirstLetter(wordInWord, isTurkiq);
+                }
+            }
+
+            result += " ";
+        } else if ((isCustom && isWordCustomCapitalization(word))
+            || (!isAllCaps(word) && isWordCustomCapitalization(word))
+            || (isFirstLetterCapital(word) &&
+                ((trustCaps && isAcronym(word)) || isAcronymStrict(word)))) {
             // For custom titles, allow any not just first capital
             // For non-custom, allow any that isn't all caps
             // Trust it with capitalization
@@ -245,6 +262,8 @@ export async function toCapitalizeCase(str: string, isCustom: boolean): Promise<
         } else {
             result += await capitalizeFirstLetter(word, isTurkiq) + " ";
         }
+
+        index++;
     }
 
     return cleanResultingTitle(result);
