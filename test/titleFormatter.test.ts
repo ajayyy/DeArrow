@@ -137,11 +137,12 @@ describe("toTitleCase", () => {
         ["The quick brown fox jumps over the lazy/sleepy dog is a sentence", "The Quick Brown Fox Jumps Over the Lazy/Sleepy Dog Is a Sentence"],
         ["The quick brown fox jumps over the lazy/Sleepy dog is a sentence", "The Quick Brown Fox Jumps Over the Lazy/Sleepy Dog Is a Sentence"],
         ["The quick brown fox jumps OVER THE LAZY/SLEEPY DOG is a sentence", "The Quick Brown Fox Jumps Over the Lazy/Sleepy Dog Is a Sentence"],
+        ["The quick brown fox jumps over the lazy/SLEEPY dog is a sentence", "The Quick Brown Fox Jumps Over the Lazy/Sleepy Dog Is a Sentence"],
         ["The Quick Brown Fox Jumps Over the Lazy/Sleepy Dog Is a Sentence", "The Quick Brown Fox Jumps Over the Lazy/Sleepy Dog Is a Sentence"],
         ["The quick brown fox jumps over the lazy/first-of-it's-kind dog is a sentence", "The Quick Brown Fox Jumps Over the Lazy/First-of-It's-Kind Dog Is a Sentence"],
         ["The quick brown fox jumps over the first-of-it's-kind is a sentence", "The Quick Brown Fox Jumps Over the First-of-It's-Kind Is a Sentence"],
         ["The quick brown fox jumps over the first-of-it's-Kind is a sentence", "The Quick Brown Fox Jumps Over the First-of-It's-Kind Is a Sentence"],
-        ["The quick brown fox jumps over the first-of-it's-kInd is a sentence", "The Quick Brown Fox Jumps Over the first-of-it's-kInd Is a Sentence"],
+        ["The quick brown fox jumps over the first-of-it's-kInd is a sentence", "The Quick Brown Fox Jumps Over the First-of-It's-kInd Is a Sentence"],
         ["The quick brown fox jumps over the go-to dog is a sentence", "The Quick Brown Fox Jumps Over the Go-to Dog Is a Sentence"],
         ["The quick brown fox jumps over the go-word dog is a sentence", "The Quick Brown Fox Jumps Over the Go-Word Dog Is a Sentence"],
 
@@ -269,7 +270,7 @@ describe("titleFormatter custom cases", () => {
         ["Bill Swearingen - HAKC THE POLICE - DEF CON 27 conference", "Bill Swearingen - HAKC THE POLICE - DEF CON 27 Conference", "Bill Swearingen - HAKC THE POLICE - DEF CON 27 conference"], // preserve delibrate uppercases
         ["NA/TURALS: FINAL/LAP ft. Cloud9 meL & Jazzyk1ns | VCT NA game changers", "NA/TURALS: FINAL/LAP ft. Cloud9 meL & Jazzyk1ns | VCT NA Game Changers", "NA/TURALS: FINAL/LAP ft. Cloud9 meL & Jazzyk1ns | VCT NA game changers"], // keep titles, prefixes, lowercase usernames
         ["[MV] SEVENTEEN(세븐틴), >Ailee(에일리) _ Q&A", "[MV] SEVENTEEN(세븐틴), Ailee(에일리) _ Q&A", "[MV] SEVENTEEN(세븐틴), Ailee(에일리) _ Q&A"], // keep all caps in title for SEVENTEEN and [MV]
-        ["AH-dventures in LA - >4K", "AH-dventures in LA - 4K", "AH-dventures in LA - 4K"], // capitalization for pun, 4K
+        ["AH-dventures in LA - >4K", "AH-Dventures in LA - 4K", "AH-dventures in LA - 4K"], // capitalization for pun, 4K
         ["Welcome to the cunderground - GTA V: cunning stunts", "Welcome to the Cunderground - GTA V: Cunning Stunts", "Welcome to the cunderground - GTA V: Cunning stunts"], // GTA V:
         ["Achievement City, plan G(mod) - Gmod: TTT | let's play", "Achievement City, Plan G(mod) - Gmod: TTT | Let's Play", "Achievement City, plan G(mod) - Gmod: TTT | Let's play"], // Proper place, G(mod)
         ["Mad vs T1 - game 1 | round 1 Lol MSI 2023", "Mad vs T1 - Game 1 | Round 1 Lol MSI 2023", "Mad vs T1 - Game 1 | Round 1 Lol MSI 2023"], // LoL, MSI and T1
@@ -278,7 +279,7 @@ describe("titleFormatter custom cases", () => {
         ["Snapshot >23w14a", "Snapshot 23w14a", "Snapshot 23w14a"], // 23W14A
         ["Is the F-15EX secretly the best fighter jet ever made?", "Is the F-15EX Secretly the Best Fighter Jet Ever Made?", "Is the F-15EX secretly the best fighter jet ever made?"], // F-15EX
         ["US F-15s nose dive against each other | DCS", "US F-15s Nose Dive Against Each Other | DCS", "US F-15s nose dive against each other | DCS"], // DCS, F-15s
-        ["F/A-18C Hornets execute no knock raid | DCS", "F/A-18C Hornets Execute No Knock Raid | DCS", "F/A-18C Hornets execute no knock raid | DCS"], // F/A-18C, DCS
+        ["F/A-18C Hornets execute no knock raid | DCS", "F/a-18C Hornets Execute No Knock Raid | DCS", "F/A-18C Hornets execute no knock raid | DCS"], // F/A-18C, DCS
         ["CS 1.6 - zombie plague / >zm_cubeworld_mini [küplere biniyoruz]", "CS 1.6 - Zombie Plague / zm_cubeworld_mini [Küplere Biniyoruz]", "CS 1.6 - Zombie plague / zm_cubeworld_mini [küplere biniyoruz]"], // preserve zm_cubeworld_mini
         [">f0rest vs. >x6tence @IEM IV european championship", "f0rest vs. x6tence @IEM IV European Championship", "f0rest vs. x6tence @IEM IV european championship"], // two lowercase names
         [">markeloff vs SK.swe (ESWC 2010 final)", "markeloff vs SK.swe (ESWC 2010 Final)", "markeloff vs SK.swe (ESWC 2010 final)"], // keep markeloff, keep SK.swe
