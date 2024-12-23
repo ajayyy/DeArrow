@@ -50,10 +50,13 @@ export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLEleme
             if (!referenceNode.contains(titleButtonContainer)) {
                 referenceNode.appendChild(titleButtonContainer);
 
-                // Buttons on right
-                referenceNode.style.display = "flex";
-                referenceNode.style.justifyContent = "space-between";
-                referenceNode.style.alignItems = "flex-start";
+                // Not for vorapis v3
+                if (!referenceNode.classList.contains("yt-uix-button-panel")) {
+                    // Buttons on right
+                    referenceNode.style.display = "flex";
+                    referenceNode.style.justifyContent = "space-between";
+                    referenceNode.style.alignItems = "flex-start";
+                }
 
                 const header = referenceNode.querySelector("h1");
                 if (header) {
