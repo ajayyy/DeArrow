@@ -69,6 +69,7 @@ const isEnglish = typeof chrome !== "object" || chrome.i18n.getUILanguage().star
 interface SBConfig {
     userID: string | null;
     vip: boolean;
+    actAsVip: boolean;
     allowExpirements: boolean;
     showDonationLink: boolean;
     showUpsells: boolean;
@@ -163,6 +164,7 @@ function migrateOldSyncFormats(config: SBConfig) {
 const syncDefaults = {
     userID: null,
     vip: false,
+    actAsVip: true,
     allowExpirements: true,
     showDonationLink: true,
     showUpsells: true,

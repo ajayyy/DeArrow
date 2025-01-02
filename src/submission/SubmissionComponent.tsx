@@ -112,7 +112,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
         })();
     }, []);
 
-    const [actAsVip, setActAsVip] = React.useState(true);
+    const [actAsVip, setActAsVip] = React.useState(Config.config!.actAsVip);
 
     const defaultThumbnails: RenderedThumbnailSubmission[] = [{
         type: ThumbnailType.Original,
@@ -337,6 +337,7 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
                         id="actAsVip"
                         onChange={(value) => {
                             setActAsVip(value);
+                            Config.config!.actAsVip = value;
                         }}
                         value={actAsVip}
                         label={chrome.i18n.getMessage("actAsVip")}
