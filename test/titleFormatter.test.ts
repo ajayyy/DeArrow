@@ -154,7 +154,6 @@ describe("toTitleCase", () => {
         ["The quick brown fox jumps over the first-of-it's-kInd is a sentence", "The Quick Brown Fox Jumps Over the First-of-It's-kInd Is a Sentence"],
         ["The quick brown fox jumps over the go-to dog is a sentence", "The Quick Brown Fox Jumps Over the Go-to Dog Is a Sentence"],
         ["The quick brown fox jumps over the go-word dog is a sentence", "The Quick Brown Fox Jumps Over the Go-Word Dog Is a Sentence"],
-
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
@@ -182,7 +181,12 @@ describe("toTitleCase cleanEmojis", () => {
         ["5 min countdown 👩🏽‍👨🏽‍👦🏽‍👦🏽 timer (roller👩🏽‍👨🏽‍👦🏽‍👦🏽👩🏽‍👨🏽‍👦🏽‍👦🏽coaster) 👩🏽‍👨🏽‍👦🏽‍👦🏽👩🏽‍👨🏽‍👦🏽‍👦🏽", "5 Min Countdown Timer (Roller Coaster)"],
         ["😀︎😀︎😀︎ 5 min countdown timer😀︎ 😀︎😀︎😀︎ (roller😀︎😀︎😀︎coaster) 😀︎", "5 Min Countdown Timer (Roller Coaster)"],
         ["STAR☆T☆RAIN -New Arrange Ver.-", "Star T Rain -New Arrange Ver.-"],
-        ["𝐆𝐀𝐋𝐓 𝐒𝐔𝐁 𝐓𝐑𝐀𝐈𝐍𝐒 Railfan Mini-Meetup at Leaside", "Galt Sub Trains Railfan Mini-Meetup at Leaside"]
+        ["𝐆𝐀𝐋𝐓 𝐒𝐔𝐁 𝐓𝐑𝐀𝐈𝐍𝐒 Railfan Mini-Meetup at Leaside", "Galt Sub Trains Railfan Mini-Meetup at Leaside"],
+        ["Every Glitch in Super Mario Odyssey ᵃˡᵐᵒˢᵗ", "Every Glitch in Super Mario Odyssey Almost"],
+        ["A word with all the letters ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ", "A Word with All the Letters Abcdefghijklmnoprstuvwxyz"],
+        ["A word with all the letters ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘꞯʀꜱᴛᴜᴠᴡʏᴢ", "A Word with All the Letters Abcdefghijklmnopqrstuvwyz"],
+        ["A word with all the letters 𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳", "A Word with All the Letters Abcdefghijklmnopqrstuvwxyz"],
+        ["A word with all the letters ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ", "A Word with All the Letters Abcdefghijklmnopqrstuvwxyz"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;

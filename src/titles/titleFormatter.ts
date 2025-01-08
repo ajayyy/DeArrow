@@ -641,7 +641,7 @@ export function cleanFancyText(title: string): string {
         // Allow emoji variation selectors on either side of the replacement character
         // Supports emojis such as 🅱️
         title = title.replace(new RegExp(`[\u{fe00}-\u{fe0f}\u{e0100}-\u{e01ef}]?${replacement[0]}[\u{fe00}-\u{fe0f}\u{e0100}-\u{e01ef}]?`
-            , "ug"), replacement[1]);
+            , "ug"), replacement[1].toUpperCase());
     }
 
     return title.trim();
