@@ -70,7 +70,16 @@ const notificationFormats = [
     "$CHANNEL$ überträgt einen Livestream: $TITLE$",
     "$CHANNEL$ ha subido: $TITLE$",
     "$CHANNEL$ está emitiendo en directo: $TITLE$",
-    "Na kanal $CHANNEL$ został przesłany film $TITLE$"
+    "Na kanal $CHANNEL$ został przesłany film $TITLE$",
+    "$CHANNEL$ laddade upp $TITLE$",
+    "Na kanale $CHANNEL$ trwa premiera filmu: $TITLE$",
+    "Har premiär nu på $CHANNEL$: $TITLE$",
+    "$CHANNEL$ nadaje: $TITLE$",
+    "Za 30 min na kanale $CHANNEL$ premiera filmu: $TITLE$",
+    "Oglądaj transmisję na żywo „$TITLE$” na kanale $CHANNEL$ za 30 min",
+    "$CHANNEL$ est en direct : $TITLE$",
+    "$CHANNEL$ a mis en ligne $TITLE$",
+    "Première en cours sur la chaîne $CHANNEL$ : $TITLE$",
 ];
 const channelTemplate = "$CHANNEL$";
 const titleTemplate = "$TITLE$";
