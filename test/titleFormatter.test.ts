@@ -187,6 +187,7 @@ describe("toTitleCase cleanEmojis", () => {
         ["A word with all the letters ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘꞯʀꜱᴛᴜᴠᴡʏᴢ", "A Word with All the Letters Abcdefghijklmnopqrstuvwyz"],
         ["A word with all the letters 𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳", "A Word with All the Letters Abcdefghijklmnopqrstuvwxyz"],
         ["A word with all the letters ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ", "A Word with All the Letters Abcdefghijklmnopqrstuvwxyz"],
+        ["What Everyone Gets Wrong About E=mc²", "What Everyone Gets Wrong About E=mc²"],
     ];
     for (const testCase of titleCases) {
         const [input, expected] = testCase;
