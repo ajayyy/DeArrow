@@ -336,7 +336,9 @@ export async function capitalizeFirstLetter(word: string, isTurkiq: boolean): Pr
 }
 
 function isWordCapitalCase(word: string): boolean {
-    return !!word.match(/^[^\p{L}]*[\p{Lu}][^\p{Lu}]+$/u);
+    const regex = /^[^\p{L}]*[\p{Lu}][^\p{Lu}]+$/u;
+    const compoundSections = word.split(/[-/]/);
+    return !!word.match(regex) || (compoundSections.length > 1 && word.split(/[-/]/).every((w) => !!w.match(regex)));
 }
 
 function startsWithEmojiLetter(word: string): boolean {
