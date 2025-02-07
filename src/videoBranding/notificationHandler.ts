@@ -71,7 +71,7 @@ const notificationFormats = [
     "$CHANNEL$ ha subido: $TITLE$",
     "$CHANNEL$ está emitiendo en directo: $TITLE$",
     "Na kanal $CHANNEL$ został przesłany film $TITLE$",
-    "$CHANNEL$ laddade upp $TITLE$",
+    "$CHANNEL$ laddade upp:? $TITLE$",
     "Na kanale $CHANNEL$ trwa premiera filmu: $TITLE$",
     "Har premiär nu på $CHANNEL$: $TITLE$",
     "$CHANNEL$ nadaje: $TITLE$",

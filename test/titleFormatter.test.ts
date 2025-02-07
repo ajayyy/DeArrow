@@ -243,6 +243,7 @@ describe("toSentenceCase", () => {
         ["One thing: but-then another thing", "One thing: But-then another thing"],
         ["Why I Won't Buy Into The Tesla Cybertruck Hype When my Alternative is Much More Fun", "Why I won't buy into the tesla cybertruck hype when my alternative is much more fun"],
         ["Thorzone Nano Q case review", "Thorzone Nano Q case review"],
+        ["1984 Mercedes-Benz 500SEC review", "1984 Mercedes-Benz 500SEC review"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
