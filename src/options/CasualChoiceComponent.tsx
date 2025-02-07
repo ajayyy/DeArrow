@@ -117,18 +117,6 @@ function CategoryPill(props: { category: CasualVoteCategory; onDelete: () => voi
                             langKey="minimumVotes"
                         />:
                     </div>
-                    <span className="minimumVotesButton"
-                        onClick={() => {
-                            setMinimumVotes(minimumVotes + 1);
-                            Config.config!.casualModeSettings[props.category.id] = minimumVotes + 1;
-                            Config.forceSyncUpdate("casualModeSettings");
-                        }}>
-                        +
-                    </span>
-
-                    <span className="minimumVotesNumber">
-                        {minimumVotes}
-                    </span>
 
                     <span className="minimumVotesButton"
                         onClick={() => {
@@ -140,6 +128,19 @@ function CategoryPill(props: { category: CasualVoteCategory; onDelete: () => voi
                         }}>
                         -
                         {/* todo: better minus icon */}
+                    </span>
+
+                    <span className="minimumVotesNumber">
+                        {minimumVotes}
+                    </span>
+
+                    <span className="minimumVotesButton"
+                        onClick={() => {
+                            setMinimumVotes(minimumVotes + 1);
+                            Config.config!.casualModeSettings[props.category.id] = minimumVotes + 1;
+                            Config.forceSyncUpdate("casualModeSettings");
+                        }}>
+                        +
                     </span>
                 </div>
             </div>
