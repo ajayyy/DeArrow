@@ -494,6 +494,7 @@ export function setupOptionChangeListener(): void {
 
         const settingsToReload = [
             "extensionEnabled",
+            "casualMode",
             "replaceTitles",
             "replaceThumbnails",
             "useCrowdsourcedTitles",
@@ -525,6 +526,8 @@ export function setupOptionChangeListener(): void {
 
             if (changes["extensionEnabled"]) {
                 submitButton.updateIcon();
+                casualVoteButton.updateIcon();
+            } else if (changes["casualMode"]) {
                 casualVoteButton.updateIcon();
             }
         }

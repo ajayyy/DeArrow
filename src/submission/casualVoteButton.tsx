@@ -82,16 +82,12 @@ export class CasualVoteButton extends TitleButton {
     }
 
     updateIcon(): void {
-        if (Config.config!.extensionEnabled) {
-            if (this.container) {
-                this.container.style.removeProperty("display");
-            }
+        if (Config.config!.extensionEnabled && Config.config!.casualMode) {
+            this.button.style.removeProperty("display");
 
             super.updateIcon();
         } else {
-            if (this.container) {
-                this.container.style.display = "none";
-            }
+            this.button.style.display = "none";
         }
     }
 }
