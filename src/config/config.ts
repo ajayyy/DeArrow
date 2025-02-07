@@ -3,6 +3,7 @@ import { VideoID } from "../../maze-utils/src/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { logError } from "../utils/logger";
 import * as CompileConfig from "../../config.json";
+import { casualVoteCategories } from "../submission/casualVote.const";
 
 export interface Permission {
     canSubmit: boolean;
@@ -102,6 +103,8 @@ interface SBConfig {
     replaceThumbnails: boolean;
     useCrowdsourcedTitles: boolean;
     titleMaxLines: number;
+    casualMode: boolean;
+    casualModeSettings: Record<string, number>;
     channelOverrides: Record<string, ConfigurationID>;
     customConfigurations: Record<ConfigurationID, CustomConfiguration>;
     showInfoAboutRandomThumbnails: boolean;
@@ -197,6 +200,8 @@ const syncDefaults = {
     replaceThumbnails: true,
     useCrowdsourcedTitles: true,
     titleMaxLines: 3,
+    casualMode: false,
+    casualModeSettings: casualVoteCategories.reduce((acc, { id }) => { acc[id] = 1; return acc; }, {}),
     channelOverrides: {},
     customConfigurations: {},
     showInfoAboutRandomThumbnails: false,

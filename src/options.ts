@@ -18,6 +18,7 @@ import { logError } from "./utils/logger";
 import ChannelOverrides from "./options/ChannelOverrides";
 import { getLicenseKey, isActivated } from "./license/license";
 import { localizeHtmlPageWithFormatting } from "./titles/titleFormatter";
+import CasualChoice from "./options/CasualChoice";
 let embed = false;
 
 window.addEventListener('DOMContentLoaded', () => void init());
@@ -329,6 +330,9 @@ async function init() {
             }
             case "react-ChannelOverridesComponent":
                 new ChannelOverrides(optionsElements[i]);
+                break;
+            case "react-CasualChoiceComponent":
+                new CasualChoice(optionsElements[i]);
                 break;
         }
     }

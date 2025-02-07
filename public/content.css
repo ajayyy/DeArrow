@@ -185,6 +185,10 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     --sb-grey-bg-color: #64646470;
 }
 
+.casualVoteMenuInner {
+    padding: 10px;
+}
+
 .cbThumbnailImg {
     width: 100%;
 
@@ -496,8 +500,14 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     height: 24px;
     border: 2px solid #bfbfc0;
     border-radius: 50%;
-    transition: all 0.2s ease;
-  }
+    transition: all 0.2s ease, visibility 0s;
+}
+.cbChecklistBox.cbSquare input {
+    border-radius: 3px;
+}
+.cbChecklistBox.cbNoAnim input:checked {
+    background: var(--cb-forground-button-color);
+}
 .cbChecklistBox:hover input {
     border-color: #b0b0b1;
 }
@@ -529,9 +539,9 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     stroke-linejoin: round;
     stroke-dasharray: 19;
     stroke-dashoffset: 19;
-    transition: all 0.4s ease;
+    transition: all 0.4s ease, visibility 0s;
 }
-.cbChecklistBox input:checked + label {
+.cbChecklistBox:not(.cbNoAnim) input:checked + label {
     animation: splash 0.6s ease forwards;
 }
 .cbChecklistBox input:checked + label + svg path {
@@ -606,7 +616,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     filter: grayscale(1);
 }
 
-.cbShowOriginal img.cbAutoFormat:not(.cbOriginalShown) {
+.cbShowOriginal img.cbAutoFormat:not(.cbOriginalShown), .cbShowOriginal img.cbCasualTitle:not(.cbOriginalShown) {
     filter: saturate(0.5);
 }
 
@@ -625,18 +635,33 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     display: inline !important;
 }
 
-.cbMobileButton.cbSubmitButton {
+.cbMobileButton.cbTitleButton {
     margin-right: 0;
 }
 
-.cbSubmitButton svg {
+.cbTitleButton svg {
     fill: var(--yt-spec-text-primary);
     display: block;
 }
 
-.cbShowOriginal img.cbShowOriginalImage, .cbSubmitButton svg {
+.cbShowOriginal img.cbShowOriginalImage, .cbTitleButton svg {
     /* Max height also set in js  */
     height: 20px;
+}
+
+.cbCasualVoteButton {
+    margin-right: 0;
+}
+
+.cbCasualVoteTitle {
+    font-size: 22px;
+    text-align: center;
+    margin: 5px;
+}
+
+.cbCasualYesOrNo {
+    display: flex;
+    justify-content: space-around;
 }
 
 /* For autoplay */

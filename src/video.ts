@@ -12,8 +12,10 @@ import { replaceVideoPlayerSuggestionsBranding, setupMobileAutoplayHandler } fro
 import { onMobile } from "../maze-utils/src/pageInfo";
 import { resetShownWarnings } from "./submission/autoWarning";
 import { getAntiTranslatedTitle } from "./titles/titleAntiTranslateData";
+import { CasualVoteButton } from "./submission/casualVoteButton";
 
 export const submitButton = new SubmitButton();
+export const casualVoteButton = new CasualVoteButton();
 
 async function videoIDChange(videoID: VideoID | null): Promise<void> {
     if (!videoID) return;
@@ -27,10 +29,12 @@ async function videoIDChange(videoID: VideoID | null): Promise<void> {
     try {
         // To update videoID
         submitButton.render();
+        casualVoteButton.render();
 
         const branding = await getVideoBranding(videoID, true, BrandingLocation.Watch);
         if (branding && getVideoID() === videoID) {
             submitButton.setSubmissions(branding);
+            casualVoteButton.setExistingVotes(branding.casualVotes);
         }
     } catch (e) {
         logError(e);
@@ -39,15 +43,19 @@ async function videoIDChange(videoID: VideoID | null): Promise<void> {
 
 export function updateSubmitButton(branding: BrandingResult) {
     submitButton.setSubmissions(branding)
+    casualVoteButton.setExistingVotes(branding.casualVotes);
 }
 
 export function attachSubmitButtonToPage() {
+    casualVoteButton.attachToPage().catch(logError);
     submitButton.attachToPage().catch(logError);
 }
 
 function resetValues() {
     submitButton.clearSubmissions();
     submitButton.close();
+    casualVoteButton.clearExistingVotes();
+    casualVoteButton.close();
 
     clearVideoBrandingInstances();
 
@@ -67,6 +75,7 @@ function videoElementChange(newVideo: boolean) {
         listenForMiniPlayerTitleChange().catch(console.error);
 
         submitButton.render();
+        casualVoteButton.render();
     }
 }
 

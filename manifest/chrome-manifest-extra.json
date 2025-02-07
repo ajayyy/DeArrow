@@ -32,7 +32,8 @@
             "icons/logo-64.png",
             "icons/logo-128.png",
             "icons/logo-256.png",
-            "icons/logo-2r.svg"
+            "icons/logo-2r.svg",
+            "icons/logo-casual.svg"
         ],
         "matches": ["<all_urls>"]
     }],

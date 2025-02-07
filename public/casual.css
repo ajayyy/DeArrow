@@ -1,0 +1,202 @@
+.embed [data-type="react-CasualChoiceComponent"] {
+    display: none;
+}
+
+.casualChoiceContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-size: 14px;
+    --container-gap: 20px;
+    gap: var(--container-gap);
+    color: #dfdfdf;
+
+    height: auto;
+
+    border-radius: 10px;
+    border-width: 10px;
+    border: solid;
+
+    width: 300px;
+    cursor: pointer;
+
+    transition: border-color ease-in-out 0.2s, background-color ease-in-out 0.2s;
+}
+
+.casualChoiceContainer.casualMode {
+    border-color: rgba(121, 215, 152, 0.5);
+}
+.casualChoiceContainer.casualMode.selected {
+    border-color: rgba(121, 215, 152, 1);
+    background-color: rgba(0, 118, 31, 0.2);
+}
+
+.casualChoiceContainer.classicMode {
+    border-color: rgba(136, 201, 249, 0.5);
+}
+.casualChoiceContainer.classicMode.selected {
+    border-color: rgba(136, 201, 249, 1);
+    background-color: rgba(18, 19, 189, 0.2);
+}
+
+.casualChoiceTitle {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.casualChoiceLogo {
+    padding-left: 35%;
+    padding-right: 35%;
+
+    box-sizing: border-box;
+}
+
+.casualChoiceDescription {
+    font-size: 14px;
+}
+
+.casualChoiceDescription div {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+.casualChoiceDescription div:first-child {
+    margin-top: 0px;
+}
+.casualChoiceDescription div:last-child {
+    margin-bottom: 0px;
+}
+
+.casualChoicesContainer {
+    display: flex;
+    justify-content: center;
+    gap: 10%;
+    max-width: 800px;
+}
+
+.casualChoiceCategories {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    --container-gap: 20px;
+    gap: var(--container-gap);
+    width: 100%;
+}
+
+.casualChoiceContainer:not(.selected) .casualChoiceCategories {
+    display: none;
+}
+
+.casualCategoryPill {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    cursor: default;
+    width: 80%;
+    border-radius: 25px;
+    background-color: rgba(121, 215, 152, 0.5);
+
+    position: relative;
+}
+
+.casualCategoryPillContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+
+    width: 100%;
+
+    padding: 5px;
+    font-size: 16px;
+}
+
+.addButton {
+    width: 25px;
+    height: 25px;
+    font-size: 20px;
+    background-color: rgba(121, 215, 152, 0.5);
+    cursor: pointer;
+}
+
+.minimumVotes {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.minimumVotesText {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.minimumVotesButton {
+    border: solid 1px;
+    cursor: pointer;
+
+    --font-size: 14px;
+
+    font-size: var(--font-size);
+    width: var(--font-size);
+    height: var(--font-size);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1;
+
+    border-radius: 100%;
+}
+
+.casualCategoryPill .closeButton {
+    cursor: pointer;
+    position: absolute;
+    right: 5px;
+
+    padding: 5px;
+}
+
+.casualCategorySelectionAnchor {
+    position: relative;
+    width: 100%;
+    
+    /* Undo gap */
+    margin-top: calc(var(--container-gap) * -1);
+}
+
+.casualCategorySelectionParent {
+    position: absolute;
+    background-color: rgba(28, 28, 28, 0.9);
+    padding: 5px;
+    border-radius: 25px;
+
+    top: 5px;
+    left: 0;
+    right: 0;
+    width: fit-content;
+    margin: auto;
+}
+
+.casualCategorySelection {
+    font-size: 14px;
+    padding: 5px;
+    margin: 10px;
+
+    border-radius: 25px;
+    text-align: center;
+}
+
+[data-theme="light"] .casualCategorySelection {
+    color: white;
+}
+
+.casualCategorySelection:hover {
+    background-color: rgba(235, 235, 235, 0.2);
+}

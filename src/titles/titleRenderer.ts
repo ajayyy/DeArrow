@@ -3,7 +3,7 @@ import Config, { TitleFormatting } from "../config/config";
 import { getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { logError } from "../utils/logger";
 import { MobileFix, addNodeToListenFor, getOrCreateTitleButtonContainer } from "../utils/titleBar";
-import { BrandingLocation, ShowCustomBrandingInfo, extractVideoIDFromElement, getActualShowCustomBranding, toggleShowCustom } from "../videoBranding/videoBranding";
+import { BrandingLocation, ShowCustomBrandingInfo, extractVideoIDFromElement, getActualShowCustomBranding, hasCustomTitle, setShowCustomBasedOnDefault, shouldShowCasual, showThreeShowOriginalStages, toggleShowCustom } from "../videoBranding/videoBranding";
 import { cleanEmojis, formatTitle } from "./titleFormatter";
 import { setCurrentVideoTitle } from "./pageTitleHandler";
 import { getTitleFormatting, shouldCleanEmojis, shouldDefaultToCustom, shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
@@ -79,7 +79,8 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
                 // If there are just formatting changes, and the user doesn't want those, don't replace
                 && (await getTitleFormatting(videoID) !== TitleFormatting.Disable || originalTitle.toLowerCase() !== title.toLowerCase())
                 && (await getTitleFormatting(videoID) !== TitleFormatting.Disable 
-                    || await shouldCleanEmojis(videoID) || cleanEmojis(originalTitle.toLowerCase()) !== cleanEmojis(title.toLowerCase()))) {
+                    || await shouldCleanEmojis(videoID) || cleanEmojis(originalTitle.toLowerCase()) !== cleanEmojis(title.toLowerCase()))
+                && !(await shouldShowCasual(videoID, showCustomBranding, brandingLocation))) {
             const formattedTitle = await formatTitle(title, true, videoID);
             if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
 
@@ -481,7 +482,7 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
     return titleElement;
 }
 
-export async function hideAndUpdateShowOriginalButton(element: HTMLElement, brandingLocation: BrandingLocation,
+export async function hideAndUpdateShowOriginalButton(videoID: VideoID, element: HTMLElement, brandingLocation: BrandingLocation,
         showCustomBranding: ShowCustomBrandingInfo, dontHide: boolean): Promise<void> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const buttonElement = await findShowOriginalButton(originalTitleElement, brandingLocation);
@@ -490,10 +491,19 @@ export async function hideAndUpdateShowOriginalButton(element: HTMLElement, bran
         if (buttonImage) {
             if (await getActualShowCustomBranding(showCustomBranding)) {
                 buttonImage.classList.remove("cbOriginalShown");
-                buttonElement.title = chrome.i18n.getMessage("ShowOriginal");
+                if (await showThreeShowOriginalStages(videoID, originalTitleElement, brandingLocation)
+                        && !await shouldShowCasual(videoID, showCustomBranding, brandingLocation)) {
+                    buttonElement.title = chrome.i18n.getMessage("ShowFormatted");
+                } else {
+                    buttonElement.title = chrome.i18n.getMessage("ShowOriginal");
+                }
             } else {
                 buttonImage.classList.add("cbOriginalShown");
-                buttonElement.title = chrome.i18n.getMessage("ShowModified");
+                if (await hasCustomTitle(videoID, element, brandingLocation)) {
+                    buttonElement.title = chrome.i18n.getMessage("ShowModified");
+                } else {
+                    buttonElement.title = chrome.i18n.getMessage("ShowFormatted");
+                }
             }
 
             const isDefault = showCustomBranding.knownValue === null 
@@ -574,10 +584,14 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
         document.querySelector("ytd-video-preview") as HTMLElement
     ];
 
-    const toggleDetails = async () => {
+    const toggleDetails = async (value?: boolean) => {
         const videoID = buttonElement.getAttribute("videoID");
         if (videoID) {
-            await toggleShowCustom(videoID as VideoID);
+            if (value === undefined) {
+                await toggleShowCustom(videoID as VideoID, originalTitleElement, brandingLocation);
+            } else {
+                await setShowCustomBasedOnDefault(videoID as VideoID, originalTitleElement, brandingLocation, value);
+            }
 
             // Hide hover play, made visible again when mouse leaves area
             for (const player of getHoverPlayers()) {
@@ -593,7 +607,8 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
     }
 
     buttonElement.addEventListener("click", (e) => void (async (e) => {
-        if (!Config.config!.showOriginalOnHover) {
+        if (!Config.config!.showOriginalOnHover
+                || await showThreeShowOriginalStages(videoID, originalTitleElement, brandingLocation)) {
             e.preventDefault();
             e.stopPropagation();
 
@@ -603,13 +618,13 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
 
     buttonElement.addEventListener("mouseenter", () => void (async () => {
         if (Config.config!.showOriginalOnHover) {
-            await toggleDetails();
+            await toggleDetails(false);
         }
     })());
 
     buttonElement.addEventListener("mouseleave", () => void (async () => {
         if (Config.config!.showOriginalOnHover) {
-            await toggleDetails();
+            await toggleDetails(true);
         }
     })());
 

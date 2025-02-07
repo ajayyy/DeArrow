@@ -1,5 +1,6 @@
 import * as React from "react";
 import Config from "../config/config";
+import { CasualChoiceComponent } from "../options/CasualChoiceComponent";
 
 export const HelpComponent = () => {
 
@@ -57,6 +58,8 @@ export const HelpComponent = () => {
                 <p style={{marginBottom: 0, marginTop: 0}} className="center">
                     {chrome.i18n.getMessage("helpPageReviewOptions")}
                 </p>
+
+                <CasualChoiceComponent />
 
                 <iframe className="optionsFrame" src="../options/options.html#embed" style={{border: "none"}}></iframe>
 

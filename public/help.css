@@ -171,7 +171,7 @@ p,
 li,
 a,
 span,
-div {
+div:not(.casualChoicesContainer *) {
     color: var(--text);
 }
 
@@ -396,5 +396,10 @@ svg {
 }
 
 .redeem-box {
+    margin-bottom: 10px;
+}
+
+.casualChoicesContainer {
+    margin-top: 10px;
     margin-bottom: 10px;
 }
