@@ -4,6 +4,7 @@
     --skip-notice-margin: 5px;
 
     --cb-forground-button-color: #0e79cac2;
+    --cb-foreground-button-disabled-color: #0e78ca63;
 }
 
 .cbCustomThumbnailCanvas.ytd-img-shadow:not(.ytp-autonav-endscreen-upnext-thumbnail, .ytp-videowall-still-image) {
@@ -187,6 +188,9 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 
 .casualVoteMenuInner {
     padding: 10px;
+
+    --cb-forground-button-color: #1a6c30;
+    --cb-foreground-button-disabled-color: #00380f;
 }
 
 .cbThumbnailImg {
@@ -383,7 +387,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 
 .cbNoticeButton:disabled {
     cursor: default;
-    background-color: #0e78ca63 !important;
+    background-color: var(--cb-foreground-button-disabled-color) !important;
 }
 
 .cbNoticeButton {
@@ -655,8 +659,15 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 
 .cbCasualVoteTitle {
     font-size: 22px;
-    text-align: center;
-    margin: 5px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cbCasualVoteTitleLogo {
+    height: 25px;
+    padding: 5px;
 }
 
 .cbCasualVoteOriginalTitle {

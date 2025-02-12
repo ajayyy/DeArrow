@@ -30,6 +30,10 @@ export const CasualVoteComponent = (props: CasualVoteComponentProps) => {
             onMouseDown={(e) => e.stopPropagation()}>
 
             <div className="cbCasualVoteTitle">
+                <img
+                    className="cbCasualVoteTitleLogo"
+                    src={chrome.runtime.getURL("icons/logo-casual.svg")}
+                />
                 <FormattedText
                     langKey="likeOriginalTitle"
                 />
