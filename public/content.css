@@ -659,6 +659,12 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     margin: 5px;
 }
 
+.cbCasualVoteOriginalTitle {
+    font-size: 18px;
+    text-align: center;
+    margin: 5px;
+}
+
 .cbCasualYesOrNo {
     display: flex;
     justify-content: space-around;

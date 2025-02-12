@@ -3,6 +3,8 @@ import { CasualVoteInfo } from "../videoBranding/videoBranding";
 import { VideoID } from "../../maze-utils/src/video";
 import { FormattedText } from "../popup/FormattedTextComponent";
 import { casualVoteCategories } from "./casualVote.const";
+import Config from "../config/config";
+import { getCurrentPageTitle } from "../titles/titleData";
 
 export enum CasualVoteType {
     Like = 1,
@@ -30,6 +32,13 @@ export const CasualVoteComponent = (props: CasualVoteComponentProps) => {
             <div className="cbCasualVoteTitle">
                 <FormattedText
                     langKey="likeOriginalTitle"
+                />
+            </div>
+
+            <div className="cbCasualVoteOriginalTitle">
+                <FormattedText
+                    text={getCurrentPageTitle() ?? ""}
+                    titleFormatting={Config.config!.titleFormatting}
                 />
             </div>
 
