@@ -2,10 +2,12 @@ import * as React from "react";
 import { FormattedText } from "../popup/FormattedTextComponent";
 import Config from "../config/config";
 import { casualVoteCategories, CasualVoteCategory } from "../submission/casualVote.const";
+import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
 
 export const CasualChoiceComponent = () => {
     const [casualMode, setCasualMode] = React.useState(Config.config!.casualMode);
     const [activeCategories, setActiveCategories] = React.useState(Config.config!.casualModeSettings);
+    const [showOriginalWhenCasual, setShowOriginalWhenCasual] = React.useState(Config.config!.showOriginalWhenCasual);
 
     const [openAddCategoryMenu, setOpenAddCategoryMenu] = React.useState(false);
 
@@ -95,6 +97,19 @@ export const CasualChoiceComponent = () => {
                             </div>
                         </div>
                     }
+
+                    <ToggleOptionComponent
+                        id="showOriginalWhenCasual"
+                        style={{
+                            paddingTop: "15px"
+                        }}
+                        onChange={(value) => {
+                            setShowOriginalWhenCasual(value);
+                            Config.config!.showOriginalWhenCasual = value;
+                        }}
+                        value={showOriginalWhenCasual}
+                        label={chrome.i18n.getMessage("showOriginalWhenCasual")}
+                    />
                 </div>
             </div>
         </div>

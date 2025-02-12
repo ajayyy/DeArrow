@@ -200,3 +200,18 @@
 .casualCategorySelection:hover {
     background-color: rgba(235, 235, 235, 0.2);
 }
+
+.casualChoicesContainer input:checked + .sb-slider {
+    background-color: rgba(121, 215, 152, 0.5);
+}
+
+.casualChoicesContainer .sb-switch-container {
+    width: 100%;
+    display: flex;
+
+    --sb-slider-color: #495c49;
+}
+
+.casualChoicesContainer .sb-switch-container .sb-switch-label {
+    text-align: center;
+}
