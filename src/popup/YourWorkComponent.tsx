@@ -19,10 +19,11 @@ export const YourWorkComponent = ({ titleFormatting }: YourWorkComponentProps) =
     const [usernameSubmissionStatus, setUsernameSubmissionStatus] = React.useState("");
     const [titleSubmissionCount, setTitleSubmissionCount] = React.useState("");
     const [thumbnailSubmissionCount, setThumbnailSubmissionCount] = React.useState("");
+    const [casualSubmissionCount, setCasualSubmissionCount] = React.useState("");
 
     React.useEffect(() => {
         (async () => {
-            const values = ["userName", "titleSubmissionCount", "thumbnailSubmissionCount", "vip"];
+            const values = ["userName", "titleSubmissionCount", "thumbnailSubmissionCount", "casualSubmissionCount", "vip"];
             const result = await sendRequestToServer("GET", "/api/userInfo", {
                 publicUserID: await getHash(Config.config!.userID!),
                 values
@@ -33,6 +34,7 @@ export const YourWorkComponent = ({ titleFormatting }: YourWorkComponentProps) =
                 setUsername(userInfo.userName);
                 setTitleSubmissionCount(userInfo.titleSubmissionCount);
                 setThumbnailSubmissionCount(userInfo.thumbnailSubmissionCount);
+                setCasualSubmissionCount(userInfo.casualSubmissionCount);
 
                 Config.config!.vip = userInfo.vip;
             }
@@ -62,7 +64,7 @@ export const YourWorkComponent = ({ titleFormatting }: YourWorkComponentProps) =
                         </span>
                     </p>
                     <div id="setUsernameContainer" className={isSettingUsername ? " hidden" : ""}>
-                        <p id="usernameValue">{username}</p>
+                        <p id="usernameValue" className={Config.config!.casualMode ? " usernameWider" : ""}>{username}</p>
                         <button id="setUsernameButton" 
                             title={chrome.i18n.getMessage("setUsername")}
                             onClick={() => {
@@ -108,26 +110,36 @@ export const YourWorkComponent = ({ titleFormatting }: YourWorkComponentProps) =
                         </button>
                     </div>
                 </div>
-                {/* Submissions */}
-                <div id="sponsorTimesContributionsContainer" className={isSettingUsername ? " hidden" : ""}>
-                    <p className="u-mZ cb-grey-text">
-                        <FormattedText
-                            langKey="Titles"
-                            titleFormatting={titleFormatting}
-                        />:
-                    </p>
-                    <p id="sponsorTimesContributionsDisplay" className="u-mZ">{titleSubmissionCount}</p>
-                </div>
-                <div id="sponsorTimesContributionsContainer" className={isSettingUsername ? " hidden" : ""}>
-                    <p className="u-mZ cb-grey-text">
-                        <FormattedText
-                            langKey="Thumbnails"
-                            titleFormatting={titleFormatting}
-                        />:
-                    </p>
-                    <p id="sponsorTimesContributionsDisplay" className="u-mZ">{thumbnailSubmissionCount}</p>
-                </div>
+                {
+                    !Config.config!.casualMode &&
+                    <SubmissionCounts
+                        isSettingUsername={isSettingUsername}
+                        titleSubmissionCount={titleSubmissionCount}
+                        thumbnailSubmissionCount={thumbnailSubmissionCount}
+                        titleFormatting={titleFormatting}
+                    />
+                }
             </div>
+            {
+                Config.config!.casualMode &&
+                <div className="sbYourWorkCols">
+                    <SubmissionCounts
+                        isSettingUsername={isSettingUsername}
+                        titleSubmissionCount={titleSubmissionCount}
+                        thumbnailSubmissionCount={thumbnailSubmissionCount}
+                        titleFormatting={titleFormatting}
+                    />
+                    <div id="sponsorTimesContributionsContainer" className={isSettingUsername ? " hidden" : ""}>
+                        <p className="u-mZ cb-grey-text">
+                            <FormattedText
+                                langKey="CasualVotes"
+                                titleFormatting={titleFormatting}
+                            />:
+                        </p>
+                        <p id="sponsorTimesContributionsDisplay" className="u-mZ">{casualSubmissionCount}</p>
+                    </div>
+                </div>
+            }
 
             {
                 Config.config!.countReplacements && getReplacementsMessage()
@@ -137,6 +149,29 @@ export const YourWorkComponent = ({ titleFormatting }: YourWorkComponentProps) =
         </div>
     );
 };
+
+function SubmissionCounts(props: {isSettingUsername: boolean; titleSubmissionCount: string; thumbnailSubmissionCount: string; titleFormatting?: TitleFormatting}): JSX.Element {
+    return <>
+        <div id="sponsorTimesContributionsContainer" className={props.isSettingUsername ? " hidden" : ""}>
+            <p className="u-mZ cb-grey-text">
+                <FormattedText
+                    langKey="Titles"
+                    titleFormatting={props.titleFormatting}
+                />:
+            </p>
+            <p id="sponsorTimesContributionsDisplay" className="u-mZ">{props.titleSubmissionCount}</p>
+        </div>
+        <div id="sponsorTimesContributionsContainer" className={props.isSettingUsername ? " hidden" : ""}>
+            <p className="u-mZ cb-grey-text">
+                <FormattedText
+                    langKey="Thumbnails"
+                    titleFormatting={props.titleFormatting}
+                />:
+            </p>
+            <p id="sponsorTimesContributionsDisplay" className="u-mZ">{props.thumbnailSubmissionCount}</p>
+        </div>
+    </>
+}
 
 function getReplacementsMessage(): JSX.Element {
     const messageParts = chrome.i18n.getMessage("dearrowStatsMessage2")

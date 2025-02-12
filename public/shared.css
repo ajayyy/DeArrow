@@ -138,6 +138,10 @@
     max-width: 105px;
 }
 
+#usernameValue.usernameWider {
+    max-width: 262px;
+}
+
 /*
   * Set username form container with "expanded" state
   */
