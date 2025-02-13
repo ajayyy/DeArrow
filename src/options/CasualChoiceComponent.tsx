@@ -91,7 +91,7 @@ export const CasualChoiceComponent = () => {
                                     if (casualMode) e.stopPropagation();
                                     setOpenAddCategoryMenu(!openAddCategoryMenu);
                                 }}>
-                                +
+                               <img src={chrome.runtime.getURL("icons/add.svg")} alt="Add icon"/>
                             </div>
                         </div>
                     }
@@ -153,8 +153,7 @@ function CategoryPill(props: { category: CasualVoteCategory; onDelete: () => voi
                                 Config.forceSyncUpdate("casualModeSettings");
                             }
                         }}>
-                        -
-                        {/* todo: better minus icon */}
+                        <img src={chrome.runtime.getURL("icons/remove.svg")} alt="Remove icon"/>
                     </span>
 
                     <span className="minimumVotesNumber">
@@ -167,15 +166,14 @@ function CategoryPill(props: { category: CasualVoteCategory; onDelete: () => voi
                             Config.config!.casualModeSettings[props.category.id] = minimumVotes + 1;
                             Config.forceSyncUpdate("casualModeSettings");
                         }}>
-                        +
+                        <img src={chrome.runtime.getURL("icons/add.svg")} alt="Add icon"/>
                     </span>
                 </div>
             </div>
 
             <div className="closeButton"
                 onClick={props.onDelete}>
-                {/* todo: add close icon */}
-                x
+                <img src={chrome.runtime.getURL("icons/close.png")} width="10" height="10" alt="Close icon"/>
             </div>
         </div>
     );
