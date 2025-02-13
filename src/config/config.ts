@@ -3,6 +3,7 @@ import { VideoID } from "../../maze-utils/src/video";
 import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { logError } from "../utils/logger";
 import * as CompileConfig from "../../config.json";
+import { casualVoteCategories } from "../submission/casualVote.const";
 
 export interface Permission {
     canSubmit: boolean;
@@ -20,6 +21,7 @@ export interface UnsubmittedTitleSubmission {
 export interface UnsubmittedSubmission {
     thumbnails: UnsubmittedThumbnailSubmission[];
     titles: UnsubmittedTitleSubmission[];
+    casual?: boolean;
 }
 
 export enum TitleFormatting {
@@ -102,9 +104,13 @@ interface SBConfig {
     replaceThumbnails: boolean;
     useCrowdsourcedTitles: boolean;
     titleMaxLines: number;
+    casualMode: boolean;
+    casualModeSettings: Record<string, number>;
+    showOriginalWhenCasual: boolean;
     channelOverrides: Record<string, ConfigurationID>;
     customConfigurations: Record<ConfigurationID, CustomConfiguration>;
     showInfoAboutRandomThumbnails: boolean;
+    showInfoAboutCasualMode: boolean;
     showIconForFormattedTitles: boolean;
     countReplacements: boolean;
     titleReplacements: number;
@@ -197,9 +203,13 @@ const syncDefaults = {
     replaceThumbnails: true,
     useCrowdsourcedTitles: true,
     titleMaxLines: 3,
+    casualMode: false,
+    casualModeSettings: casualVoteCategories.reduce((acc, { id }) => { acc[id] = 1; return acc; }, {}),
+    showOriginalWhenCasual: false,
     channelOverrides: {},
     customConfigurations: {},
     showInfoAboutRandomThumbnails: false,
+    showInfoAboutCasualMode: true,
     showIconForFormattedTitles: true,
     countReplacements: true,
     titleReplacements: 0,

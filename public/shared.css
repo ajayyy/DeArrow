@@ -138,6 +138,10 @@
     max-width: 105px;
 }
 
+#usernameValue.usernameWider {
+    max-width: 262px;
+}
+
 /*
   * Set username form container with "expanded" state
   */
@@ -168,6 +172,10 @@
 #sponsorTimesContributionsContainer {
     padding: 8px 14px;
     border-left: 2px solid var(--sb-grey-bg-color);
+}
+
+.sbYourWorkCols > *:first-child {
+    border-left: none !important;
 }
 
 /* Options */
@@ -218,6 +226,7 @@
     display: inline-block;
     width: 40px;
     height: 24px;
+    min-width: 40px;
 }
 
 .sb-switch input { 

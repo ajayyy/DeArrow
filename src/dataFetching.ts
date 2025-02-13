@@ -2,7 +2,7 @@ import { VideoID, getVideo, getVideoID, getYouTubeVideoID } from "../maze-utils/
 import { ThumbnailSubmission, ThumbnailWithRandomTimeResult, fetchVideoMetadata, isLiveSync } from "./thumbnails/thumbnailData";
 import { getCurrentPageTitle, TitleResult, TitleSubmission } from "./titles/titleData";
 import { FetchResponse, sendRealRequestToCustomServer } from "../maze-utils/src/background-request-proxy";
-import { BrandingLocation, BrandingResult, replaceCurrentVideoBranding, updateBrandingForVideo } from "./videoBranding/videoBranding";
+import { BrandingLocation, BrandingResult, CasualVoteInfo, replaceCurrentVideoBranding, updateBrandingForVideo } from "./videoBranding/videoBranding";
 import { logError } from "./utils/logger";
 import { getHash } from "../maze-utils/src/hash";
 import Config, { ThumbnailCacheOption, ThumbnailFallbackOption } from "./config/config";
@@ -103,7 +103,8 @@ async function getTimestampFromRandomTime(videoID: VideoID, brandingData: Brandi
                         thumbnails: [],
                         titles: [],
                         randomTime: 0,
-                        videoDuration: videoDuration
+                        videoDuration: videoDuration,
+                        casualVotes: []
                     };
                 }
 
@@ -156,6 +157,11 @@ export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, brandi
     }
 }
 
+export async function getVideoCasualInfo(videoID: VideoID, brandingLocation?: BrandingLocation): Promise<CasualVoteInfo[]> {
+    const result = (await getVideoBranding(videoID, brandingLocation === BrandingLocation.Watch, brandingLocation))?.casualVotes;
+    return result ?? [];
+}
+
 export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, brandingLocation?: BrandingLocation): Promise<VideoBrandingCacheRecord | null> {
     const cachedValue = cache[videoID];
 
@@ -185,6 +191,7 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
                     thumbnails: result.thumbnails,
                     randomTime: result.randomTime,
                     videoDuration: result.videoDuration,
+                    casualVotes: result.casualVotes,
                     lastUsed: key === videoID ? Date.now() : cache[key]?.lastUsed ?? 0
                 };
             }
@@ -231,6 +238,7 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
                         thumbnails: [],
                         randomTime: null,
                         videoDuration: null,
+                        casualVotes: [],
                         lastUsed: Date.now()
                     };
                 }
@@ -301,8 +309,9 @@ async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Re
                         thumbnails: [],
                         titles: [],
                         randomTime: null,
-                        videoDuration: null
-                    };
+                        videoDuration: null,
+                        casualVotes: []
+                    } as BrandingResult;
                 }
 
                 results = json;
@@ -383,7 +392,8 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
                                 timestamp
                             }],
                             randomTime: null,
-                            videoDuration: null
+                            videoDuration: null,
+                            casualVotes: []
                         }
                     };
                 } catch (e) {
@@ -505,7 +515,20 @@ export async function submitVideoBranding(videoID: VideoID, title: TitleSubmissi
         downvote,
         autoLock: actAsVip,
         videoDuration: getVideo()?.duration,
-        wasWarned
+        wasWarned,
+        casualMode: Config.config!.casualMode
+    });
+
+    clearCache(videoID);
+    return result;
+}
+
+export async function submitVideoCasualVote(videoID: VideoID, categories: string[], downvote: boolean): Promise<FetchResponse> {
+    const result = await sendRequestToServer("POST", "/api/casual", {
+        userID: Config.config!.userID,
+        videoID,
+        categories,
+        downvote
     });
 
     clearCache(videoID);
