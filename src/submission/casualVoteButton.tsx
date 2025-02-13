@@ -7,6 +7,7 @@ import Config from "../config/config";
 import { closeGuidelineChecklist } from "./SubmissionChecklist";
 import { TitleButton } from "./titleButton";
 import { CasualVoteComponent } from "./CasualVoteComponent";
+import { CasualVoteOnboardingComponent } from "./CasualVoteOnboardingComponent";
 
 const casualVoteButtonIcon = `
 <?xml version="1.0" encoding="UTF-8"?>
@@ -33,6 +34,7 @@ export class CasualVoteButton extends TitleButton {
         closeGuidelineChecklist();
 
         super.close();
+        this.updateIcon();
     }
 
     clearExistingVotes(): void {
@@ -46,11 +48,17 @@ export class CasualVoteButton extends TitleButton {
 
     render(): void {
         if (this.root) {
-            this.root?.render(<CasualVoteComponent
-                videoID={getVideoID()!}
-                existingVotes={this.existingVotes}
-                submitClicked={(categories, downvote) => this.submitPressed(categories, downvote)}
-            />);
+            if (shouldShowCasualOnboarding()) {
+                this.root?.render(<CasualVoteOnboardingComponent close={() => this.close()} />);
+
+                Config.config!.showInfoAboutCasualMode = false;
+            } else {
+                this.root?.render(<CasualVoteComponent
+                    videoID={getVideoID()!}
+                    existingVotes={this.existingVotes}
+                    submitClicked={(categories, downvote) => this.submitPressed(categories, downvote)}
+                />);
+            }
         }
     }
 
@@ -82,7 +90,8 @@ export class CasualVoteButton extends TitleButton {
     }
 
     updateIcon(): void {
-        if (Config.config!.extensionEnabled && Config.config!.casualMode) {
+        if (Config.config!.extensionEnabled &&
+                (Config.config!.casualMode || shouldShowCasualOnboarding())) {
             this.button.style.removeProperty("display");
 
             super.updateIcon();
@@ -90,4 +99,9 @@ export class CasualVoteButton extends TitleButton {
             this.button.style.display = "none";
         }
     }
+}
+
+function shouldShowCasualOnboarding(): boolean {
+    // Check if userID not blank to ensure sync config is working
+    return !Config.config!.casualMode && Config.config!.showInfoAboutCasualMode && !!Config.config!.userID;
 }

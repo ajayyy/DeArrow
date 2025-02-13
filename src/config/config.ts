@@ -109,6 +109,7 @@ interface SBConfig {
     channelOverrides: Record<string, ConfigurationID>;
     customConfigurations: Record<ConfigurationID, CustomConfiguration>;
     showInfoAboutRandomThumbnails: boolean;
+    showInfoAboutCasualMode: boolean;
     showIconForFormattedTitles: boolean;
     countReplacements: boolean;
     titleReplacements: number;
@@ -207,6 +208,7 @@ const syncDefaults = {
     channelOverrides: {},
     customConfigurations: {},
     showInfoAboutRandomThumbnails: false,
+    showInfoAboutCasualMode: true,
     showIconForFormattedTitles: true,
     countReplacements: true,
     titleReplacements: 0,

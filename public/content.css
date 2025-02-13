@@ -405,7 +405,6 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 }
 
 .cbNoticeButton:hover {
-	background-color: rgba(235, 235, 235, 0.2);
     background-color: #0e78ca;
 }
 
@@ -679,6 +678,37 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 .cbCasualYesOrNo {
     display: flex;
     justify-content: space-around;
+}
+
+.cbCasualVoteLogoContainer {
+    display: flex;
+    justify-content: center;
+}
+
+.cbCasualVoteLogoContainer img {
+    width: 50%;
+}
+
+.cbCasualVoteDescription {
+    font-size: 14px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.cbCasualVoteDescription > div {
+    padding: 5px;
+}
+
+.casualOnboarding .cbVoteButton {
+    font-size: 18px;
+}
+
+.casualVoteMenuInner .cbNoticeButton:hover {
+    background-color: #22893e;
+}
+
+.casualOnboarding .cbCasualVoteTitle {
+    padding-top: 10px;
 }
 
 /* For autoplay */

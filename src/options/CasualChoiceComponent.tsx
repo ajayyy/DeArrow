@@ -42,6 +42,7 @@ export const CasualChoiceComponent = () => {
                 onClick={() => {
                     setCasualMode(true);
                     Config.config!.casualMode = true;
+                    Config.config!.showInfoAboutCasualMode = false;
                     setOpenAddCategoryMenu(false);
                 }}>
                 <div className="casualChoiceTitle">

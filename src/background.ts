@@ -100,6 +100,7 @@ waitFor(() => Config.isReady()).then(() => {
                 if (!Config.config!.userID) {
                     const newUserID = generateUserID();
                     Config.config!.userID = newUserID;
+                    Config.config!.showInfoAboutCasualMode = false;
                 }
     
                 Config.config!.showInfoAboutRandomThumbnails = true;
