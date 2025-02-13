@@ -57,10 +57,11 @@ export const CasualVoteComponent = (props: CasualVoteComponentProps) => {
 
             <div className="cbVoteButtonContainer">
                 <button className="cbNoticeButton cbVoteButton"
-                    disabled={currentlySubmitting || voteType === null || !voteInfoReady}
+                    disabled={currentlySubmitting || voteType === null || (!voteInfoReady && voteType === CasualVoteType.Like)}
                     onClick={() => {
                         if (voteType) {
-                            props.submitClicked([...voteInfo.current], voteType === CasualVoteType.Dislike);
+                            const downvote = voteType === CasualVoteType.Dislike;
+                            props.submitClicked(downvote ? [] : [...voteInfo.current], downvote);
     
                             setCurrentlySubmitting(true);
                         }
