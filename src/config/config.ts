@@ -21,6 +21,7 @@ export interface UnsubmittedTitleSubmission {
 export interface UnsubmittedSubmission {
     thumbnails: UnsubmittedThumbnailSubmission[];
     titles: UnsubmittedTitleSubmission[];
+    casual?: boolean;
 }
 
 export enum TitleFormatting {

@@ -596,6 +596,11 @@ export async function shouldShowCasual(videoID: VideoID, showCustomBranding: Sho
 
 export async function shouldShowCasualOnVideo(videoID: VideoID, brandingLocation: BrandingLocation): Promise<boolean> {
     if (!Config.config!.casualMode) return false;
+
+    const unsubmittedInfo = Config.local!.unsubmitted[videoID];
+    if (unsubmittedInfo && unsubmittedInfo.casual !== undefined) {
+        return unsubmittedInfo.casual;
+    }
     
     const casualInfo = await getVideoCasualInfo(videoID, brandingLocation);
     for (const category of casualInfo) {

@@ -8,6 +8,7 @@ import { closeGuidelineChecklist } from "./SubmissionChecklist";
 import { TitleButton } from "./titleButton";
 import { CasualVoteComponent } from "./CasualVoteComponent";
 import { CasualVoteOnboardingComponent } from "./CasualVoteOnboardingComponent";
+import { shouldStoreVotes } from "../utils/configUtils";
 
 const casualVoteButtonIcon = `
 <?xml version="1.0" encoding="UTF-8"?>
@@ -72,6 +73,16 @@ export class CasualVoteButton extends TitleButton {
 
         if (result && result.ok) {
             this.close();
+
+            if (shouldStoreVotes()) {
+                const unsubmitted = Config.local!.unsubmitted[getVideoID()!] ??= {
+                    thumbnails: [],
+                    titles: []
+                };
+
+                unsubmitted.casual = !downvote;
+                Config.forceLocalUpdate("unsubmitted");
+            }
 
             setTimeout(() => replaceCurrentVideoBranding().catch(logError), 1100);
 
