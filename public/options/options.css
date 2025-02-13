@@ -638,7 +638,7 @@ svg {
     }
 
     #options > div {
-        max-width: 70%;
+        max-width: 900px;
     }
 
     .tab-heading {
