@@ -1,5 +1,7 @@
 import * as React from "react";
 import { FormattedText } from "../popup/FormattedTextComponent";
+import { casualWikiLink } from "./casualVote.const";
+import { TitleFormatting } from "../config/config";
 
 export interface CasualVoteComponentProps {
     close: () => void;
@@ -29,6 +31,18 @@ export const CasualVoteOnboardingComponent = (props: CasualVoteComponentProps) =
                 {chrome.i18n.getMessage("CasualModeDescription").split("\n").map((line, index) => (
                     <div key={index}>{line}</div>
                 ))}
+
+                <div>
+                    <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={casualWikiLink}>
+                        <FormattedText
+                            langKey="LearnMore"
+                            titleFormatting={TitleFormatting.SentenceCase}
+                        />
+                    </a>
+                </div>
             </div>
 
             <div className="cbVoteButtonContainer">

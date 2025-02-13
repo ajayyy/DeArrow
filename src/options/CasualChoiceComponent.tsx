@@ -1,7 +1,7 @@
 import * as React from "react";
 import { FormattedText } from "../popup/FormattedTextComponent";
-import Config from "../config/config";
-import { casualVoteCategories, CasualVoteCategory } from "../submission/casualVote.const";
+import Config, { TitleFormatting } from "../config/config";
+import { casualVoteCategories, CasualVoteCategory, casualWikiLink } from "../submission/casualVote.const";
 import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
 
 export const CasualChoiceComponent = () => {
@@ -61,6 +61,17 @@ export const CasualChoiceComponent = () => {
                     {chrome.i18n.getMessage("CasualModeDescription").split("\n").map((line, index) => (
                         <div key={index}>{line}</div>
                     ))}
+
+                    <a style={{textDecoration: "underline"}} 
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            href={casualWikiLink}>
+                        <FormattedText
+                            langKey="LearnMore"
+                            titleFormatting={TitleFormatting.SentenceCase}
+                        />
+                    </a>
                 </div>
 
                 <div className="casualChoiceCategories">

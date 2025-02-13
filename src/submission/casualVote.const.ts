@@ -19,3 +19,5 @@ export const casualVoteCategories: CasualVoteCategory[] = [{
     id: "other",
     key: "dearrow_category_other"
 }];
+
+export const casualWikiLink = "https://wiki.sponsor.ajay.app/w/DeArrow/Casual_mode";
