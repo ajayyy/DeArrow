@@ -492,14 +492,16 @@ export async function hideAndUpdateShowOriginalButton(videoID: VideoID, element:
             if (await getActualShowCustomBranding(showCustomBranding)) {
                 buttonImage.classList.remove("cbOriginalShown");
                 if (await showThreeShowOriginalStages(videoID, originalTitleElement, brandingLocation)
-                        && !await shouldShowCasual(videoID, showCustomBranding, brandingLocation)) {
-                    buttonElement.title = chrome.i18n.getMessage("ShowFormatted");
+                        && await shouldShowCasual(videoID, showCustomBranding, brandingLocation)
+                        && await hasCustomTitle(videoID, element, brandingLocation)) {
+                    buttonElement.title = chrome.i18n.getMessage("ShowModified");
                 } else {
                     buttonElement.title = chrome.i18n.getMessage("ShowOriginal");
                 }
             } else {
                 buttonImage.classList.add("cbOriginalShown");
-                if (await hasCustomTitle(videoID, element, brandingLocation)) {
+                if (!await showThreeShowOriginalStages(videoID, originalTitleElement, brandingLocation)
+                        && await hasCustomTitle(videoID, element, brandingLocation)) {
                     buttonElement.title = chrome.i18n.getMessage("ShowModified");
                 } else {
                     buttonElement.title = chrome.i18n.getMessage("ShowFormatted");

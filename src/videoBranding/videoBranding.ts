@@ -396,17 +396,22 @@ export async function toggleShowCustom(videoID: VideoID, originalTitleElement: H
     if (videoBrandingInstances[videoID]) {
         const shouldShowCustom = await getActualShowCustomBranding(videoBrandingInstances[videoID].showCustomBranding);
         if (await showThreeShowOriginalStages(videoID, originalTitleElement, brandingLocation)) {
-            // casual -> original -> custom
+            // casual -> custom -> original
             if (videoBrandingInstances[videoID].showCustomBranding.showCasual) {
-                // Go to original
-                return await internalSetShowCustom(videoID, originalTitleElement, brandingLocation, false, false);
+                // Go to custom
+                return await internalSetShowCustom(videoID, originalTitleElement, brandingLocation, true, false);
             } else {
-                if (!shouldShowCustom) {
-                    // Go to custom
-                    return await internalSetShowCustom(videoID, originalTitleElement, brandingLocation, true, false);
+                if (shouldShowCustom) {
+                    // Go to original
+                    return await internalSetShowCustom(videoID, originalTitleElement, brandingLocation, false, false);
                 } else {
-                    // Go to casual
-                    return await internalSetShowCustom(videoID, originalTitleElement, brandingLocation, true, true);
+                    if (!Config.config!.showOriginalOnHover) {
+                        // Go to casual
+                        return await internalSetShowCustom(videoID, originalTitleElement, brandingLocation, true, true);
+                    } else {
+                        // Go to custom when clicking after hovering to show original
+                        return await internalSetShowCustom(videoID, originalTitleElement, brandingLocation, true, false);
+                    }
                 }
             }
         } else {
