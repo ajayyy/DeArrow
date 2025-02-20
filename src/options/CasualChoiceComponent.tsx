@@ -7,7 +7,8 @@ import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
 export const CasualChoiceComponent = () => {
     const [casualMode, setCasualMode] = React.useState(Config.config!.casualMode);
     const [activeCategories, setActiveCategories] = React.useState(Config.config!.casualModeSettings);
-    const [showOriginalWhenCasual, setShowOriginalWhenCasual] = React.useState(Config.config!.showOriginalWhenCasual);
+    const [showOriginalWhenCasual, setShowOriginalWhenCasual] = React.useState(Config.config!.showOriginalThumbWhenCasual);
+    const [onlyShowCasualIconForCustom, setOnlyShowCasualIconForCustom] = React.useState(Config.config!.onlyShowCasualIconForCustom);
 
     const [openAddCategoryMenu, setOpenAddCategoryMenu] = React.useState(false);
 
@@ -117,10 +118,23 @@ export const CasualChoiceComponent = () => {
                         }}
                         onChange={(value) => {
                             setShowOriginalWhenCasual(value);
-                            Config.config!.showOriginalWhenCasual = value;
+                            Config.config!.showOriginalThumbWhenCasual = value;
                         }}
                         value={showOriginalWhenCasual}
                         label={chrome.i18n.getMessage("showOriginalWhenCasual")}
+                    />
+
+                    <ToggleOptionComponent
+                        id="onlyShowCasualIconForCustom"
+                        style={{
+                            paddingTop: "15px"
+                        }}
+                        onChange={(value) => {
+                            setOnlyShowCasualIconForCustom(value);
+                            Config.config!.onlyShowCasualIconForCustom = value;
+                        }}
+                        value={onlyShowCasualIconForCustom}
+                        label={chrome.i18n.getMessage("onlyShowCasualIconForCustom")}
                     />
                 </div>
             </div>

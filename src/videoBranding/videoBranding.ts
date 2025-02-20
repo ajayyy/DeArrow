@@ -344,11 +344,12 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
         const button = await findOrCreateShowOriginalButton(element, brandingLocation, videoID);
         const image = button.querySelector("img") as HTMLImageElement;
         if (image) {
-            if (await shouldShowCasual(videoID, showCustomBranding, brandingLocation)) {
+            const shouldShowCasualTitle = await shouldShowCasual(videoID, showCustomBranding, brandingLocation);
+            if (shouldShowCasualTitle && !Config.config!.onlyShowCasualIconForCustom) {
                 image.src = casualLogo;
                 image.classList.add("cbCasualTitle");
                 image.classList.remove("cbAutoFormat");
-            } else if (!customTitle) {
+            } else if (!customTitle || (shouldShowCasualTitle && Config.config!.onlyShowCasualIconForCustom)) {
                 image.src = twoRingLogo;
                 image.classList.add("cbAutoFormat");
                 image.classList.remove("cbCasualTitle");
