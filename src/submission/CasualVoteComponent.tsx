@@ -40,10 +40,7 @@ export const CasualVoteComponent = (props: CasualVoteComponentProps) => {
             </div>
 
             <div className="cbCasualVoteOriginalTitle">
-                <FormattedText
-                    text={getCurrentPageTitle() ?? ""}
-                    titleFormatting={Config.config!.titleFormatting}
-                />
+                {getCurrentPageTitle() ?? ""}
             </div>
 
             <YesOrNo voteType={voteType} setVoteType={setVoteType} />
