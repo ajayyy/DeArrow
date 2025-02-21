@@ -9,6 +9,21 @@ export const CasualChoiceComponent = () => {
     const [activeCategories, setActiveCategories] = React.useState(Config.config!.casualModeSettings);
     const [showOriginalWhenCasual, setShowOriginalWhenCasual] = React.useState(Config.config!.showOriginalThumbWhenCasual);
     const [onlyShowCasualIconForCustom, setOnlyShowCasualIconForCustom] = React.useState(Config.config!.onlyShowCasualIconForCustom);
+    const [showCustomOnHoverIfCasual, setShowCustomOnHoverIfCasual] = React.useState(Config.config!.showCustomOnHoverIfCasual);
+    const [showOptionForShowCustomOnHoverIfCasual, setShowOptionForShowCustomOnHoverIfCasual] = React.useState(false);
+
+    React.useEffect(() => {
+        const update = () => {
+            setShowOptionForShowCustomOnHoverIfCasual(Config.config!.showOriginalOnHover);
+        }
+
+        Config.configSyncListeners.push(update);
+        update();
+
+        return () => {
+            Config.configSyncListeners = Config.configSyncListeners.filter((l) => l !== update);
+        }
+    });
 
     const [openAddCategoryMenu, setOpenAddCategoryMenu] = React.useState(false);
 
@@ -136,6 +151,22 @@ export const CasualChoiceComponent = () => {
                         value={onlyShowCasualIconForCustom}
                         label={chrome.i18n.getMessage("onlyShowCasualIconForCustom")}
                     />
+
+                    {
+                        showOptionForShowCustomOnHoverIfCasual &&
+                        <ToggleOptionComponent
+                            id="showCustomOnHoverIfCasual"
+                            style={{
+                                paddingTop: "15px"
+                            }}
+                            onChange={(value) => {
+                                setShowCustomOnHoverIfCasual(value);
+                                Config.config!.showCustomOnHoverIfCasual = value;
+                            }}
+                            value={showCustomOnHoverIfCasual}
+                            label={chrome.i18n.getMessage("showCustomOnHoverIfCasual")}
+                        />
+                    }
                 </div>
             </div>
         </div>

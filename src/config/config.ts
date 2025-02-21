@@ -99,6 +99,7 @@ interface SBConfig {
     defaultToCustom: boolean;
     alwaysShowShowOriginalButton: boolean;
     showOriginalOnHover: boolean;
+    showCustomOnHoverIfCasual: boolean;
     importedConfig: boolean;
     replaceTitles: boolean;
     replaceThumbnails: boolean;
@@ -199,6 +200,7 @@ const syncDefaults = {
     defaultToCustom: true,
     alwaysShowShowOriginalButton: false,
     showOriginalOnHover: false,
+    showCustomOnHoverIfCasual: false,
     importedConfig: false,
     replaceTitles: true,
     replaceThumbnails: true,

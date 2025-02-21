@@ -387,10 +387,13 @@ function getAndUpdateVideoBrandingInstances(videoID: VideoID, updateBranding: ()
 
 export async function setShowCustomBasedOnDefault(videoID: VideoID, originalTitleElement: HTMLElement, brandingLocation: BrandingLocation, value: boolean): Promise<void> {
     if (videoBrandingInstances[videoID]) {
+        const showThreeStages = await showThreeShowOriginalStages(videoID, originalTitleElement, brandingLocation);
+        const alwaysShowCustom = showThreeStages && Config.config!.showOriginalOnHover && Config.config!.showCustomOnHoverIfCasual;
+
         // If value true, use default, otherwise use opposite of default
         return await internalSetShowCustom(videoID, originalTitleElement, brandingLocation,
-            !!videoBrandingInstances[videoID].showCustomBranding.originalValue === value,
-                (await showThreeShowOriginalStages(videoID, originalTitleElement, brandingLocation)) ? value : undefined);
+            alwaysShowCustom || (!!videoBrandingInstances[videoID].showCustomBranding.originalValue === value),
+                showThreeStages ? value : undefined);
     }
 }
 
