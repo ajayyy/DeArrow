@@ -3,7 +3,7 @@ import { getVideoID, isOnChannelPage, VideoID } from "../../maze-utils/src/video
 import { getElement, isVisibleOrParent, waitForElement } from "../../maze-utils/src/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
-import { TitleResult } from "../titles/titleData";
+import { getCurrentPageTitle, TitleResult } from "../titles/titleData";
 import { findOrCreateShowOriginalButton, getOrCreateTitleElement, getOriginalTitleElement, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
 import { setThumbnailListener } from "../../maze-utils/src/thumbnailManagement";
 import Config, { ThumbnailCacheOption } from "../config/config";
@@ -30,6 +30,7 @@ export interface BrandingResult {
 export interface CasualVoteInfo {
     id: string;
     count: number;
+    title?: string;
 }
 
 export enum BrandingLocation {
@@ -607,8 +608,10 @@ export async function shouldShowCasualOnVideo(videoID: VideoID, brandingLocation
     if (unsubmittedInfo && unsubmittedInfo.casual !== undefined) {
         return unsubmittedInfo.casual;
     }
-    
-    const casualInfo = await getVideoCasualInfo(videoID, brandingLocation);
+
+    const currentPageTitle = getCurrentPageTitle();
+    const casualInfo = (await getVideoCasualInfo(videoID, brandingLocation))
+        .filter((v) => !v.title || v.title === currentPageTitle);
     for (const category of casualInfo) {
         const configAmount = Config.config!.casualModeSettings[category.id];
         if (configAmount && category.count >= configAmount) {

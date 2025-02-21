@@ -528,7 +528,8 @@ export async function submitVideoCasualVote(videoID: VideoID, categories: string
         userID: Config.config!.userID,
         videoID,
         categories,
-        downvote
+        downvote,
+        title: getCurrentPageTitle()
     });
 
     clearCache(videoID);
