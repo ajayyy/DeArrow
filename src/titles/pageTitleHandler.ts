@@ -11,7 +11,8 @@ export function setCurrentVideoTitle(title: string) {
 
     if (title === targetTitle) return;
 
-    changePageTitleNow(title);
+	const currentTitle = document.querySelector("#title > h1") as HTMLElement | null;
+	changePageTitleNow(currentTitle?.innerText || title);
     targetTitle = title;
 }
 
