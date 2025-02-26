@@ -667,6 +667,7 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
 
         if (brandingLocation === BrandingLocation.Endcards) {
             buttonElement.style.margin = originalStyle.margin;
+            buttonElement.style.marginLeft = "0px";
         }
 
         // Verify again it doesn't already exist
