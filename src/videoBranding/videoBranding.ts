@@ -346,7 +346,7 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
         const image = button.querySelector("img") as HTMLImageElement;
         if (image) {
             const shouldShowCasualTitle = await shouldShowCasual(videoID, showCustomBranding, brandingLocation);
-            if (shouldShowCasualTitle && !Config.config!.onlyShowCasualIconForCustom) {
+            if (shouldShowCasualTitle && (customTitle || !Config.config!.onlyShowCasualIconForCustom)) {
                 image.src = casualLogo;
                 image.classList.add("cbCasualTitle");
                 image.classList.remove("cbAutoFormat");
