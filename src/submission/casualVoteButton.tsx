@@ -101,13 +101,17 @@ export class CasualVoteButton extends TitleButton {
     }
 
     updateIcon(): void {
-        if (Config.config!.extensionEnabled &&
-                (Config.config!.casualMode || shouldShowCasualOnboarding())) {
-            this.button.style.removeProperty("display");
-
-            super.updateIcon();
+        if (this.button) {
+            if (Config.config!.extensionEnabled &&
+                    (Config.config!.casualMode || shouldShowCasualOnboarding())) {
+                this.button.style.removeProperty("display");
+    
+                super.updateIcon();
+            } else {
+                this.button.style.display = "none";
+            }
         } else {
-            this.button.style.display = "none";
+            console.log("being called")
         }
     }
 }
