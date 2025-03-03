@@ -110,8 +110,6 @@ export class CasualVoteButton extends TitleButton {
             } else {
                 this.button.style.display = "none";
             }
-        } else {
-            console.log("being called")
         }
     }
 }
