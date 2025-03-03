@@ -614,7 +614,7 @@ export async function shouldShowCasualOnVideo(videoID: VideoID, brandingLocation
 
     const currentPageTitle = getCurrentPageTitle();
     const casualInfo = (await getVideoCasualInfo(videoID, brandingLocation))
-        .filter((v) => !v.title || v.title === currentPageTitle);
+        .filter((v) => !v.title || v.title.toLowerCase() === currentPageTitle?.toLowerCase());
     for (const category of casualInfo) {
         const configAmount = Config.config!.casualModeSettings[category.id];
         if (configAmount && category.count >= configAmount) {
