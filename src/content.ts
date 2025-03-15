@@ -9,22 +9,25 @@ import { setupPageTitleHandler } from "./titles/pageTitleHandler";
 import { setupWatchPageBrandingCleanup } from "./videoBranding/watchPageBrandingHandler";
 import { addHotkeyListener } from "./utils/keybinds";
 import { setupNotificationHandler } from "./videoBranding/notificationHandler";
+import { onYouTubeCableTV } from "../maze-utils/src/pageInfo";
 
-cleanPage();
-addCssToPage();
-setupCBVideoModule();
-
-startThumbnailListener();
-listenForBadges().catch(logError);
-listenForTitleChange().catch(logError);
-listenForMiniPlayerTitleChange().catch(logError);
-addTitleChangeListener(() => void replaceCurrentVideoBranding().catch(logError));
-setupOptionChangeListener();
-setupPageTitleHandler();
-addHotkeyListener();
-setupNotificationHandler().catch(logError);
-
-setupTitlebarCleanup();
-setupWatchPageBrandingCleanup();
-
-runCompatibilityFunctions();
+if ( !onYouTubeCableTV() ) {
+    cleanPage();
+    addCssToPage();
+    setupCBVideoModule();
+    
+    startThumbnailListener();
+    listenForBadges().catch(logError);
+    listenForTitleChange().catch(logError);
+    listenForMiniPlayerTitleChange().catch(logError);
+    addTitleChangeListener(() => void replaceCurrentVideoBranding().catch(logError));
+    setupOptionChangeListener();
+    setupPageTitleHandler();
+    addHotkeyListener();
+    setupNotificationHandler().catch(logError);
+    
+    setupTitlebarCleanup();
+    setupWatchPageBrandingCleanup();
+    
+    runCompatibilityFunctions();
+}
