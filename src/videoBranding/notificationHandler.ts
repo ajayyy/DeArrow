@@ -65,6 +65,7 @@ const notificationFormats = [
     "$CHANNEL$ premiering in 30 minutes: $TITLE$",
     "$CHANNEL$ latasi videon: $TITLE$",
     "$CHANNEL$ alotti livestriimin: $TITLE$",
+    "$CHANNEL$ hat ein Video hochgeladen: $TITLE$",
     "$CHANNEL$ hat $TITLE$ hochgeladen",
     "$CHANNEL$ startet gerade die Premiere von $TITLE$",
     "$CHANNEL$ überträgt einen Livestream: $TITLE$",
