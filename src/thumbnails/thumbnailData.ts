@@ -266,7 +266,7 @@ export async function fetchVideoDataDesktopClient(videoID: VideoID): Promise<Inn
             const duration = response?.videoDetails?.lengthSeconds ? parseInt(response.videoDetails.lengthSeconds) : null;
             const channelId = response?.videoDetails?.channelId ?? null;
             const author = response?.videoDetails?.author ?? null;
-            const isLive = response?.videoDetails?.isLive ?? response?.videoDetails?.isLiveContent ?? null;
+            const isLive = response?.videoDetails?.isLive ?? null;
             const isUpcoming = response?.videoDetails?.isUpcoming ?? null;
             const playabilityStatus = response?.playabilityStatus?.status ?? null;
 
