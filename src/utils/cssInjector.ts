@@ -14,11 +14,16 @@ export function addCssToPage() {
     const head = document.getElementsByTagName("head")[0] || document.documentElement;
 
     // Add css related to hiding branding boxes by default
-    const style = document.createElement("style");
-    style.className = "cb-css";
-    style.innerHTML = buildHideThumbnailCss() + buildHideTitleCss();
+    const titleStyle = document.createElement("style");
+    titleStyle.className = "cb-css";
+    titleStyle.innerHTML = buildHideTitleCss();
 
-    head.appendChild(style);
+    const thumbStyle = document.createElement("style");
+    thumbStyle.className = "cb-css";
+    thumbStyle.innerHTML = buildHideThumbnailCss();
+
+    head.appendChild(titleStyle);
+    head.appendChild(thumbStyle);
 
     const onLoad = async () => {
         await waitFor(() => Config.isReady());
@@ -49,7 +54,19 @@ export function addCssToPage() {
         window.addEventListener("DOMContentLoaded", onLoad);
     }
 
-    waitFor(() => Config.isReady()).then(() => addMaxTitleLinesCssToPage()).catch(logError);
+    waitFor(() => Config.isReady()).then(() => {
+        addMaxTitleLinesCssToPage();
+        
+        if (!Config.config!.extensionEnabled || !Config.config!.replaceTitles) {
+            titleStyle.remove();
+        }
+
+        console.log(Config.config!.extensionEnabled, Config.config!.replaceThumbnails)
+
+        if (!Config.config!.extensionEnabled || !Config.config!.replaceThumbnails) {
+            thumbStyle.remove();
+        }
+    }).catch(logError);
 }
 
 export function addMaxTitleLinesCssToPage() {
