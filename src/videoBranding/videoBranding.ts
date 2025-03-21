@@ -2,7 +2,7 @@ import { getYouTubeTitleNodeSelector } from "../../maze-utils/src/elements";
 import { getVideoID, isOnChannelPage, VideoID } from "../../maze-utils/src/video";
 import { getElement, isVisibleOrParent, waitForElement } from "../../maze-utils/src/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
-import { replaceThumbnail } from "../thumbnails/thumbnailRenderer";
+import { getThumbnailImageSelector, replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { getCurrentPageTitle, TitleResult } from "../titles/titleData";
 import { findOrCreateShowOriginalButton, getOrCreateTitleElement, getOriginalTitleElement, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
 import { setThumbnailListener } from "../../maze-utils/src/thumbnailManagement";
@@ -246,6 +246,13 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
         }
 
         return result;
+    } else {
+        // Make sure thumbnail doesn't get hidden if link isn't found
+
+        const originalThumbnail = element.querySelector(getThumbnailImageSelector(brandingLocation));
+        if (originalThumbnail) {
+            originalThumbnail.classList.add("cb-visible");
+        }
     }
 
     return [false, false];

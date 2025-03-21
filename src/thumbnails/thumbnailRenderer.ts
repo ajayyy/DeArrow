@@ -514,7 +514,7 @@ function createVideo(existingVideo: HTMLVideoElement | null, url: string, timest
     return video;
 }
 
-function getThumbnailSelector(brandingLocation: BrandingLocation): string {
+export function getThumbnailImageSelector(brandingLocation: BrandingLocation): string {
     switch (brandingLocation) {
         case BrandingLocation.Related:
             return getThumbnailImageSelectors();
@@ -569,7 +569,7 @@ function applyThumbnailDesaturation(thumbnail: HTMLImageElement | HTMLElement) {
 
 export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, brandingLocation: BrandingLocation,
         showCustomBranding: ShowCustomBrandingInfo, timestamp?: number): Promise<boolean> {
-    const thumbnailSelector = getThumbnailSelector(brandingLocation);
+    const thumbnailSelector = getThumbnailImageSelector(brandingLocation);
     const image = await waitFor(() => element.querySelector(thumbnailSelector) as HTMLImageElement).catch(() => null);
     if (!image) {
         // Could be video with autoplay, so no thumbnail
