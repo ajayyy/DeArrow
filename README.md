@@ -6,18 +6,18 @@
 
 <p align="center">
   <b>Download:</b>
-  <a href="https://chrome.google.com/webstore/detail/dearrow-better-titles-and/enamippconapkdmgfgjchkhakpfinmaj">Chrome/Chromium</a> |
-  <a href="https://addons.mozilla.org/en-US/firefox/addon/dearrow/">Firefox</a> |
+  <a href="[https://chrome.google.com/webstore/detail/dearrow-better-titles-and/enamippconapkdmgfgjchkhakpfinmaj](https://github.com/majick/DeArrow-GPL/releases)">Chromium</a> |
+  <a href="[https://addons.mozilla.org/en-US/firefox/addon/dearrow/](https://github.com/majick/DeArrow-GPL/releases)">Firefox</a> |
   <a href="https://apps.apple.com/app/dearrow-for-youtube/id6451469297">Safari for MacOS and iOS</a> |
-  <a href="https://github.com/ajayyy/DeArrow/wiki/Android">Android</a> |
-  <a href="https://dearrow.ajay.app/payment">Buy</a> |
+  <a href=""><s>Android</s> is cancer</a> |
+  <a href=""><s>Buy</s> LOL</a> |
   <a href="https://dearrow.ajay.app">Website</a> |
   <a href="https://dearrow.ajay.app/stats">Stats</a>
 </p>
 
-DeArrow is a browser extension for crowdsourcing better titles and thumbnails on YouTube.
+DeArrow is a browser extension for crowdsourcing better titles and thumbnails on YouTube. It is GPL but the original dude is trying to sell it for actual real live money dollars.
 
-The goal of DeArrow is to make titles accurate and reduce sensationalism.
+The goal of DeArrow is to make titles accurate and reduce sensationalism. The goal of DeArrow-GPL is to do that and not charge money for fucking GPL code. Shit or get off the pot, dude.
 
 Titles can be any arbitrary text. Thumbnails are screenshots from specific timestamps in the video. These are user submitted and voted on.
 
@@ -44,7 +44,7 @@ Lastly, it adds a "show original" button if anything was changed, allowing you t
 
 | Name | URL |
 | --- | --- |
-| Extension | https://github.com/ajayyy/DeArrow |
+| Extension | [https://github.com/ajayyy/DeArrow](https://github.com/majick/DeArrow-GPL) |
 | Shared Library With SponsorBlock | https://github.com/ajayyy/maze-utils |
 | Translations | https://github.com/ajayyy/ExtensionTranslations |
 | Safari | https://github.com/ajayyy/DeArrowSafari |
@@ -55,20 +55,11 @@ Lastly, it adds a "show original" button if anything was changed, allowing you t
 
 
 ### Group Policy Options
-
-See the [Firefox Managed Storage](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/managed), [Chrome Admin Settings](https://www.chromium.org/administrators/configuring-policy-for-extensions/) and [Edge ExtensionSettings](https://learn.microsoft.com/en-us/deployedge/microsoft-edge-manage-extensions-ref-guide) pages for more info. This [uBlock Origin wiki page](https://github.com/gorhill/uBlock/wiki/Deploying-uBlock-Origin) might also help.
-
-It is possible to inject a license key using group policy/managed storage to be able to have the extension auto-activated even when you reset the settings on each install.
-
-```json
-{
-  "licenseKey": "your license key here"
-}
-```
+Blah blah blah, dude had some weird enterprise license injection crap here. Elided.
 
 ### Building
 
-You must have [Node.js 16](https://nodejs.org/) and npm installed.
+You must have [Node.js 16](https://nodejs.org/) and npm installed.  Actually don't use node 16 which is like ten zillion years old.
 
 1. Clone with submodules
 
@@ -97,5 +88,5 @@ git submodule update --init --recursive
 ### Credit
 
 Built on the base of [SponsorBlock](https://github.com/ajayyy/SponsorBlock) licensed under GPL 3.0.
-
+Due to the fact that it's GPL, brother just has to cope with a free fork. Can't have it both ways.
 Logo based on Twemoji licensed under CC-BY 4.0.
