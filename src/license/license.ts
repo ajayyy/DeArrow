@@ -1,53 +1,25 @@
-import { sendRequestToServer } from "../utils/requests";
-import Config from "../config/config";
 
 export function isActivated() {
-    return Config.config!.activated 
-        || freeTrialActive();
+    return true;
 }
 
 export function freeTrialActive() {
-    const timeLeft = getFreeTrialTimeLeft();
-    return timeLeft !== null && timeLeft > 0 && !Config.config!.freeTrialEnded;
+    return true;
 }
 
 export function getFreeTrialTimeLeft() {
-    return Config.config!.freeTrialStart !== null ? Config.config!.freeTrialDuration - (Date.now() - Config.config!.freeTrialStart) : null;
+    return Infinity;
 }
 
 export function isFreeAccessRequestActive() {
-    const timeLeft = getFreeAccessRequestTimeLeft();
-    return timeLeft !== null && timeLeft > 0;
+    return false;
 }
 
 export function getFreeAccessRequestTimeLeft() {
-    return Config.config!.freeAccessRequestStart !== null ? Config.config!.freeAccessWaitingPeriod - (Date.now() - Config.config!.freeAccessRequestStart) : null;
+    return Infinity;
 }
 
 export async function getLicenseKey(): Promise<string | null> {
-    if (Config.config!.licenseKey !== null) {
-        return Config.config!.licenseKey;
-    } else if (Config.config!.freeActivation && Config.config!.userID) {
-        const licenseKey = await generateLicenseKey("free");
-        Config.config!.licenseKey = licenseKey;
-
-        return licenseKey;
-    }
-
-    return null;
-}
-
-async function generateLicenseKey(type: "free") {
-    const result = await sendRequestToServer("GET", `/api/generateToken/${type}`, {
-        key: Date.now()
-    });
-
-    if (result.status === 200) {
-        const json = JSON.parse(result.responseText);
-
-        return json.licenseKey ?? null;
-    }
-
     return null;
 }
 
