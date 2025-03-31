@@ -61,8 +61,6 @@ export function addCssToPage() {
             titleStyle.remove();
         }
 
-        console.log(Config.config!.extensionEnabled, Config.config!.replaceThumbnails)
-
         if (!Config.config!.extensionEnabled || !Config.config!.replaceThumbnails) {
             thumbStyle.remove();
         }
