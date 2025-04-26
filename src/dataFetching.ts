@@ -8,7 +8,7 @@ import { getHash } from "../maze-utils/src/hash";
 import Config, { ThumbnailCacheOption, ThumbnailFallbackOption } from "./config/config";
 import { generateUserID } from "../maze-utils/src/setup";
 import { BrandingUUID } from "./videoBranding/videoBranding";
-import { objectToURI, timeoutPomise } from "../maze-utils/src";
+import { extensionUserAgent, objectToURI, timeoutPomise } from "../maze-utils/src";
 import { isCachedThumbnailLoaded, setupPreRenderedThumbnail, thumbnailCacheDownloaded } from "./thumbnails/thumbnailRenderer";
 import * as CompileConfig from "../config.json";
 import { alea } from "seedrandom";
@@ -516,7 +516,8 @@ export async function submitVideoBranding(videoID: VideoID, title: TitleSubmissi
         autoLock: actAsVip,
         videoDuration: getVideo()?.duration,
         wasWarned,
-        casualMode: Config.config!.casualMode
+        casualMode: Config.config!.casualMode,
+        userAgent: extensionUserAgent(),
     });
 
     clearCache(videoID);
@@ -529,7 +530,8 @@ export async function submitVideoCasualVote(videoID: VideoID, categories: string
         videoID,
         categories,
         downvote,
-        title: getCurrentPageTitle()
+        title: getCurrentPageTitle(),
+        userAgent: extensionUserAgent(),
     });
 
     clearCache(videoID);
