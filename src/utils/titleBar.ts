@@ -43,6 +43,12 @@ export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLEleme
         if (!titleButtonContainer || titleButtonContainer.parentElement !== referenceNode) {
             titleButtonContainer ??= referenceNode.querySelector(".cbTitleButtonContainer") as HTMLElement;
             if (!titleButtonContainer) {
+                // Make sure there are no extra button containers
+                const existingContainers = document.querySelectorAll(".cbTitleButtonContainer");
+                for (const container of existingContainers) {
+                    container.remove();
+                }
+
                 titleButtonContainer = document.createElement("div");
                 titleButtonContainer.classList.add("cbTitleButtonContainer");
             }
