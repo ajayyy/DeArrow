@@ -14,7 +14,14 @@ export async function handleOnboarding(element: HTMLElement, videoID: VideoID,
     if (Config.config!.showInfoAboutRandomThumbnails && await getActualShowCustomBranding(showCustomBranding) && element && videoID
             && brandingLocation === BrandingLocation.Related && document.URL === "https://www.youtube.com/"
             && !CompileConfig.debug) {
-        
+
+        if (Config.config!.thumbnailFallback !== Config.syncDefaults.thumbnailFallback
+                || Config.config!.titleFormatting !== Config.syncDefaults.titleFormatting) {
+            // Defaults were already changed
+            Config.config!.showInfoAboutRandomThumbnails = false;
+            return;
+        }
+
         const ignoreTitleChange = Config.config!.titleFormatting === TitleFormatting.Disable;
 
         // Both title and thumbnail changed due to random time or title format
