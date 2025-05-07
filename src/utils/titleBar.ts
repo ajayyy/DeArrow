@@ -28,7 +28,7 @@ export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLEleme
         return titleButtonContainer;
     }
 
-    const titleNode = forceTitleNode ?? await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
+    const titleNode = forceTitleNode ?? await waitForElement(getYouTubeTitleNodeSelector(), true, true, true) as HTMLElement;
 
     // Experimental YouTube layout with description on right
     const isOnDescriptionOnRightLayout = titleNode?.parentElement?.querySelector("#description");
@@ -187,7 +187,7 @@ function setupRemovalListener(referenceNode: HTMLElement) {
 
 let badgeListener: MutationObserver | null = null;
 export async function listenForBadges() {
-    const titleNode = await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
+    const titleNode = await waitForElement(getYouTubeTitleNodeSelector(), true, true, true) as HTMLElement;
     const referenceNode = titleNode?.parentElement;
 
     if (referenceNode) {
@@ -224,7 +224,7 @@ function moveBadge(badge: HTMLElement) {
 let titleChangeObserver: MutationObserver | null = null;
 const titleChangeListeners: (() => void)[] = [];
 export async function listenForTitleChange() {
-    const titleNode = await waitForElement(getYouTubeTitleNodeSelector(), true) as HTMLElement;
+    const titleNode = await waitForElement(getYouTubeTitleNodeSelector(), true, true, true) as HTMLElement;
     titleChangeObserver = setupTextChangeListener(titleChangeObserver, titleNode, true);
 }
 

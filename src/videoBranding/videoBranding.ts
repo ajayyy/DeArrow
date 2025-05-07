@@ -89,7 +89,7 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
             if (firstVisible) return firstVisible;
         }
 
-        return await waitForElement(possibleSelectors[0].selector, !onClipPage, true) as HTMLElement;
+        return await waitForElement(possibleSelectors[0].selector, !onClipPage, true, true) as HTMLElement;
     })();
     const titles = (possibleSelectors.map((selector) => getElement(selector.selector, selector.checkVisibility && !onClipPage, true, true)).filter((e) => !!e)) as HTMLElement[];
     const promises: [Promise<boolean>, Promise<boolean>] = [Promise.resolve(false), Promise.resolve(false)]
