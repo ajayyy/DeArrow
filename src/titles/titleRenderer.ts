@@ -586,6 +586,19 @@ async function createShowOriginalButton(element: HTMLElement, originalTitleEleme
         document.querySelector("ytd-video-preview") as HTMLElement
     ];
 
+    const hideHoverPlayers = () => {
+        // Hide hover play, made visible again when mouse leaves area
+        for (const player of getHoverPlayers()) {
+            if (player) {
+                player.style.display = "none";
+                const hoverPlayerVideo = player.querySelector("video");
+                if (hoverPlayerVideo) {
+                    hoverPlayerVideo.pause();
+                }
+            }
+        }
+    };
+
     const toggleDetails = async (value?: boolean) => {
         const videoID = buttonElement.getAttribute("videoID");
         if (videoID) {
@@ -595,16 +608,7 @@ async function createShowOriginalButton(element: HTMLElement, originalTitleEleme
                 await setShowCustomBasedOnDefault(videoID as VideoID, originalTitleElement, brandingLocation, value);
             }
 
-            // Hide hover play, made visible again when mouse leaves area
-            for (const player of getHoverPlayers()) {
-                if (player) {
-                    player.style.display = "none";
-                    const hoverPlayerVideo = player.querySelector("video");
-                    if (hoverPlayerVideo) {
-                        hoverPlayerVideo.pause();
-                    }
-                }
-            }
+            hideHoverPlayers();
         }
     }
 
@@ -643,6 +647,15 @@ async function createShowOriginalButton(element: HTMLElement, originalTitleEleme
             await toggleDetails(true);
         }
     })());
+    if (Config.config!.showOriginalOnHover && Config.config!.showOriginalOnHoverOfVideo) {
+        element.addEventListener("mousemove", () => {
+            if (!chrome.runtime?.id) return; // Extension context invalidated
+
+            if (Config.config!.showOriginalOnHover && Config.config!.showOriginalOnHoverOfVideo) {
+                hideHoverPlayers();
+            }
+        });
+    }
 
     if (originalTitleElement.parentElement) {
         originalTitleElement.parentElement.addEventListener("mouseleave", () => {
