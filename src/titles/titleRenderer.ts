@@ -533,7 +533,7 @@ export async function findOrCreateShowOriginalButton(element: HTMLElement, brand
         videoID: VideoID): Promise<HTMLElement> {
     const originalTitleElement = getOriginalTitleElement(element, brandingLocation);
     const buttonElement = await findShowOriginalButton(originalTitleElement, brandingLocation) 
-        ?? await createShowOriginalButton(originalTitleElement, brandingLocation, videoID);
+        ?? await createShowOriginalButton(element, originalTitleElement, brandingLocation, videoID);
 
     buttonElement.setAttribute("videoID", videoID);
     buttonElement.style.removeProperty("display");
@@ -544,7 +544,7 @@ export async function findOrCreateShowOriginalButton(element: HTMLElement, brand
     return buttonElement;
 }
 
-async function createShowOriginalButton(originalTitleElement: HTMLElement,
+async function createShowOriginalButton(element: HTMLElement, originalTitleElement: HTMLElement,
         brandingLocation: BrandingLocation, videoID: VideoID): Promise<HTMLElement> {
     const buttonElement = document.createElement("button");
     // Style set here for when css disappears during updates
@@ -619,13 +619,27 @@ async function createShowOriginalButton(originalTitleElement: HTMLElement,
     })(e));
 
     buttonElement.addEventListener("mouseenter", () => void (async () => {
-        if (Config.config!.showOriginalOnHover) {
+        if (Config.config!.showOriginalOnHover && !Config.config!.showOriginalOnHoverOfVideo) {
             await toggleDetails(false);
         }
     })());
-
     buttonElement.addEventListener("mouseleave", () => void (async () => {
-        if (Config.config!.showOriginalOnHover) {
+        if (Config.config!.showOriginalOnHover && !Config.config!.showOriginalOnHoverOfVideo) {
+            await toggleDetails(true);
+        }
+    })());
+
+    element.addEventListener("mouseenter", () => void (async () => {
+        if (!chrome.runtime?.id) return; // Extension context invalidated
+
+        if (Config.config!.showOriginalOnHover && Config.config!.showOriginalOnHoverOfVideo) {
+            await toggleDetails(false);
+        }
+    })());
+    element.addEventListener("mouseleave", () => void (async () => {
+        if (!chrome.runtime?.id) return; // Extension context invalidated
+
+        if (Config.config!.showOriginalOnHover && Config.config!.showOriginalOnHoverOfVideo) {
             await toggleDetails(true);
         }
     })());
