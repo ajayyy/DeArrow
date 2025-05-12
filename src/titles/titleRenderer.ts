@@ -80,7 +80,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
                 && (await getTitleFormatting(videoID) !== TitleFormatting.Disable || originalTitle.toLowerCase() !== title.toLowerCase())
                 && (await getTitleFormatting(videoID) !== TitleFormatting.Disable 
                     || await shouldCleanEmojis(videoID) || cleanEmojis(originalTitle.toLowerCase()) !== cleanEmojis(title.toLowerCase()))
-                && !(await shouldShowCasual(videoID, showCustomBranding, brandingLocation))) {
+                && (!await shouldShowCasual(videoID, showCustomBranding, brandingLocation) || originalTitle.toLowerCase() === title.toLowerCase())) {
             const formattedTitle = await formatTitle(title, true, videoID);
             if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
 
