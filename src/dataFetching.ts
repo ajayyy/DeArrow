@@ -1,7 +1,7 @@
 import { VideoID, getVideo, getVideoID, getYouTubeVideoID } from "../maze-utils/src/video";
 import { ThumbnailSubmission, ThumbnailWithRandomTimeResult, fetchVideoMetadata, isLiveSync } from "./thumbnails/thumbnailData";
 import { getCurrentPageTitle, TitleResult, TitleSubmission } from "./titles/titleData";
-import { FetchResponse, sendRealRequestToCustomServer } from "../maze-utils/src/background-request-proxy";
+import { FetchResponse, FetchResponseBinary, sendBinaryRequestToCustomServer } from "../maze-utils/src/background-request-proxy";
 import { BrandingLocation, BrandingResult, CasualVoteInfo, replaceCurrentVideoBranding, updateBrandingForVideo } from "./videoBranding/videoBranding";
 import { logError } from "./utils/logger";
 import { getHash } from "../maze-utils/src/hash";
@@ -348,10 +348,10 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
             const isLive = !!isLiveSync(videoID);
             const request = await sendRequestToThumbnailCache(videoID, time, title, officialImage, isLive, generateNow || isLive);
     
-            if (request.status === 200) {
+            if (request.status === 200 && request.headers) {
                 try {
-                    const timestamp = parseFloat(request.headers.get("x-timestamp") as string);
-                    const title = request.headers.get("x-title");
+                    const timestamp = parseFloat(request.headers["x-timestamp"]);
+                    const title = request.headers["x-title"];
                     
                     if (activeThumbnailCacheRequests[videoID]
                         && activeThumbnailCacheRequests[videoID].shouldRerequest 
@@ -372,7 +372,9 @@ async function fetchBrandingFromThumbnailCache(videoID: VideoID, time?: number, 
                         return null;
                     }
     
-                    setupPreRenderedThumbnail(videoID, timestamp, await request.blob());
+                    setupPreRenderedThumbnail(videoID, timestamp, 
+                        (request.responseBinary instanceof Blob) ? 
+                            request.responseBinary : new Blob([new Uint8Array(request.responseBinary).buffer]));
                     delete activeThumbnailCacheRequests[videoID];
     
                     return {
@@ -568,7 +570,7 @@ export async function submitVideoBrandingAndHandleErrors(title: TitleSubmission 
 }
 
 export function sendRequestToThumbnailCache(videoID: string, time?: number, title?: string,
-        officialTime = false, isLivestream = false, generateNow = false): Promise<Response> {
+        officialTime = false, isLivestream = false, generateNow = false): Promise<FetchResponseBinary> {
     const data = {
         videoID,
         officialTime,
@@ -584,7 +586,7 @@ export function sendRequestToThumbnailCache(videoID: string, time?: number, titl
         data["title"] = title;
     }
     
-    return sendRealRequestToCustomServer("GET", `${Config.config?.thumbnailServerAddress}/api/v1/getThumbnail`, data);
+    return sendBinaryRequestToCustomServer("GET", `${Config.config?.thumbnailServerAddress}/api/v1/getThumbnail`, data);
 }
 
 export function getThumbnailUrl(videoID: string, time: number): string {
