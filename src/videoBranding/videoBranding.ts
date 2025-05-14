@@ -129,7 +129,7 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
 
 function getPossibleSelectors(onWatchPage: boolean, onEmbedPage: boolean, onChannelPage: boolean) {
     const embedSelector = {
-        selector: ".ytp-title-text",
+        selector: ".ytp-title-text, .ytPlayerOverlayVideoDetailsRendererTitle",
         checkVisibility: false
     };
     const desktopWatchSelectors = [
