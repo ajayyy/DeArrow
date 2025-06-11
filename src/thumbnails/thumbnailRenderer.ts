@@ -671,7 +671,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
         }
 
         try {
-            const thumbnail = await createThumbnailImageElement(existingImageElement, videoID, width, height, brandingLocation, timestamp ?? null, false, async () => {
+            const thumbnail = await createThumbnailImageElement(existingImageElement, videoID, width, height, brandingLocation, timestamp ?? null, false, () => {
                 return isOnCorrectVideo(element, brandingLocation, videoID);
             }, async (thumbnail, url, timestamp) => {
                 await displayThumbnail(thumbnail, url, getThumbnailUrl(videoID, timestamp), true);
