@@ -3,7 +3,7 @@ import { logError } from "./utils/logger";
 import { ChannelIDInfo, checkIfNewVideoID, getVideoID, isOnYTTV, setupVideoModule, VideoID } from "../maze-utils/src/video"
 import Config from "./config/config";
 import { SubmitButton } from "./submission/submitButton";
-import { BrandingLocation, BrandingResult, clearVideoBrandingInstances, replaceCurrentVideoBranding } from "./videoBranding/videoBranding";
+import { BrandingLocation, BrandingResult, clearVideoBrandingInstances, replaceCurrentVideoBranding, updateBrandingForAllVideos } from "./videoBranding/videoBranding";
 import { getVideoBranding } from "./dataFetching";
 import * as documentScript from "../dist/js/document.js";
 import { listenForBadges, listenForMiniPlayerTitleChange, listenForTitleChange } from "./utils/titleBar";
@@ -129,6 +129,13 @@ export function setupCBVideoModule(): void {
             setTimeout(() => {
                 replaceCurrentVideoBranding().catch(logError);
             }, 100);
+        });
+
+        window.addEventListener("resize", () => {
+            // Fix related videos becoming blank
+            setTimeout(() => {
+                updateBrandingForAllVideos();
+            }, 500);
         })
     }
 }
