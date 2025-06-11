@@ -480,6 +480,18 @@ export async function updateBrandingForVideo(videoID: VideoID): Promise<void> {
     }
 }
 
+export function updateBrandingForAllVideos(): void {
+    for (const videoID in videoBrandingInstances) {
+        const updateBrandingCallbacks = videoBrandingInstances[videoID].updateBrandingCallbacks;
+        // They will be added back to the array
+        videoBrandingInstances[videoID].updateBrandingCallbacks = [];
+
+        for (const updateBranding of updateBrandingCallbacks) {
+            updateBranding().catch(logError);
+        }
+    }
+}
+
 export function clearVideoBrandingInstances(): void {
     const visibleVideoIDs = [...document.querySelectorAll(".cbButton")].map((e) => e.getAttribute("videoid"));
 
