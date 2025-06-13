@@ -68,7 +68,7 @@ It is possible to inject a license key using group policy/managed storage to be 
 
 ### Building
 
-You must have [Node.js 16](https://nodejs.org/) and npm installed.
+You must have [Node.js 22](https://nodejs.org/) and npm installed.
 
 1. Clone with submodules
 
