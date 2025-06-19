@@ -1,5 +1,5 @@
 import { VideoID, getVideo, getVideoID, getYouTubeVideoID } from "../maze-utils/src/video";
-import { ThumbnailSubmission, ThumbnailWithRandomTimeResult, fetchVideoMetadata, isLiveSync } from "./thumbnails/thumbnailData";
+import { ThumbnailSubmission, ThumbnailWithRandomTimeResult } from "./thumbnails/thumbnailData";
 import { getCurrentPageTitle, TitleResult, TitleSubmission } from "./titles/titleData";
 import { FetchResponse, FetchResponseBinary, sendBinaryRequestToCustomServer } from "../maze-utils/src/background-request-proxy";
 import { BrandingLocation, BrandingResult, CasualVoteInfo, replaceCurrentVideoBranding, updateBrandingForVideo } from "./videoBranding/videoBranding";
@@ -17,6 +17,7 @@ import { updateSubmitButton } from "./video";
 import { sendRequestToServer } from "./utils/requests";
 import { thumbnailDataCache } from "./thumbnails/thumbnailDataCache";
 import { getAutoWarning } from "./submission/autoWarning";
+import { fetchVideoMetadata, isLiveSync } from "../maze-utils/src/metadataFetcher";
 
 interface VideoBrandingCacheRecord extends BrandingResult {
     lastUsed: number;

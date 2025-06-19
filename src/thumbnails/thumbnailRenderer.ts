@@ -1,4 +1,4 @@
-import { Format, fetchChannelnfo, fetchVideoMetadata, getPlaybackFormats, isLiveOrUpcoming } from "./thumbnailData";
+import { fetchChannelnfo } from "./thumbnailData";
 import { VideoID } from "../../maze-utils/src/video";
 import { getNumberOfThumbnailCacheRequests, getThumbnailUrl, getVideoThumbnailIncludingUnsubmitted, isActiveThumbnailCacheRequest, isFetchingFromThumbnailCache, queueThumbnailCacheRequest, waitForThumbnailCache } from "../dataFetching";
 import { log, logError } from "../utils/logger";
@@ -16,6 +16,7 @@ import { isSafari } from "../../maze-utils/src/config";
 import { RenderedThumbnailVideo, ThumbnailVideo, thumbnailDataCache } from "./thumbnailDataCache";
 import { isOnCorrectVideo } from "../titles/titleRenderer";
 import * as CompileConfig from "../../config.json";
+import { fetchVideoMetadata, Format, getPlaybackFormats, isLiveOrUpcoming } from "../../maze-utils/src/metadataFetcher";
 
 const activeRendersMax = isFirefoxOrSafari() ? 3 : 6;
 const activeRenders: Record<VideoID, Promise<RenderedThumbnailVideo | null>> = {};

@@ -6,7 +6,7 @@ import { FormattingOptionsComponent } from "../popup/FormattingOptionsComponent"
 import { Tooltip } from "../utils/tooltip";
 import { BrandingLocation, ShowCustomBrandingInfo, getActualShowCustomBranding } from "./videoBranding";
 import * as CompileConfig from "../../config.json"
-import { isLiveOrUpcoming } from "../thumbnails/thumbnailData";
+import { isLiveOrUpcoming } from "../../maze-utils/src/metadataFetcher";
 
 export async function handleOnboarding(element: HTMLElement, videoID: VideoID,
         brandingLocation: BrandingLocation, showCustomBranding: ShowCustomBrandingInfo, result: [boolean, boolean]): Promise<void> {

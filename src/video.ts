@@ -7,12 +7,12 @@ import { BrandingLocation, BrandingResult, clearVideoBrandingInstances, replaceC
 import { getVideoBranding } from "./dataFetching";
 import * as documentScript from "../dist/js/document.js";
 import { listenForBadges, listenForMiniPlayerTitleChange, listenForTitleChange } from "./utils/titleBar";
-import { getPlaybackFormats } from "./thumbnails/thumbnailData";
 import { replaceVideoPlayerSuggestionsBranding, setupMobileAutoplayHandler } from "./videoBranding/watchPageBrandingHandler";
 import { onMobile } from "../maze-utils/src/pageInfo";
 import { resetShownWarnings } from "./submission/autoWarning";
 import { getAntiTranslatedTitle } from "./titles/titleAntiTranslateData";
 import { CasualVoteButton } from "./submission/casualVoteButton";
+import { getPlaybackFormats } from "../maze-utils/src/metadataFetcher";
 
 export const submitButton = new SubmitButton();
 export const casualVoteButton = new CasualVoteButton();

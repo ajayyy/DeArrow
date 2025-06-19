@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CustomThumbnailResult, ThumbnailSubmission, isLiveSync } from "../thumbnails/thumbnailData";
+import { CustomThumbnailResult, ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { getCurrentPageTitle, TitleSubmission } from "../titles/titleData";
 import { BrandingResult } from "../videoBranding/videoBranding";
 import { ThumbnailType } from "./ThumbnailComponent";
@@ -26,6 +26,7 @@ import { ToggleOptionComponent } from "../popup/ToggleOptionComponent";
 import { FormattedText } from "../popup/FormattedTextComponent";
 import { isAutoWarningShown } from "./autoWarning";
 import { getAntiTranslatedTitle } from "../titles/titleAntiTranslateData";
+import { isLiveSync } from "../../maze-utils/src/metadataFetcher";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
