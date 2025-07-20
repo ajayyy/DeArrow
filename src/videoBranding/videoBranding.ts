@@ -10,7 +10,6 @@ import Config, { ThumbnailCacheOption } from "../config/config";
 import { logError } from "../utils/logger";
 import { getVideoCasualInfo, getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { handleOnboarding } from "./onboarding";
-import { cleanEmojis, cleanResultingTitle } from "../titles/titleFormatter";
 import { shouldDefaultToCustom, shouldDefaultToCustomFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { addMaxTitleLinesCssToPage } from "../utils/cssInjector";
@@ -190,7 +189,7 @@ export async function replaceVideoCardsBranding(elements: HTMLElement[]): Promis
 
 export async function replaceVideoCardBranding(element: HTMLElement, brandingLocation: BrandingLocation,
         extraParams: { verifyVideoID?: VideoID; tries?: number; dontReplaceTitle?: boolean } = {}): Promise<[boolean, boolean]> {
-    
+
     extraParams.tries ??= 0;
     const link = getLinkElement(element, brandingLocation);
 
@@ -602,8 +601,7 @@ function waitForImageSrc(image: HTMLImageElement): Promise<void> {
 async function hasCustomTitleWithOriginalTitle(videoID: VideoID, originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): Promise<boolean> {
     const title = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
     const originalTitle = originalTitleElement?.textContent;
-    const customTitle = title && !title.original 
-        && (!originalTitle || (cleanResultingTitle(cleanEmojis(title.title))).toLowerCase() !== (cleanResultingTitle(cleanEmojis(originalTitle))).toLowerCase())
+    const customTitle = title
         && await shouldUseCrowdsourcedTitles(videoID);
 
     return !!customTitle;
