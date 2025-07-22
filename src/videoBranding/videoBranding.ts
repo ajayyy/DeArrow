@@ -3,7 +3,7 @@ import { getVideoID, isOnChannelPage, VideoID } from "../../maze-utils/src/video
 import { getElement, isVisibleOrParent, waitForElement } from "../../maze-utils/src/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { getThumbnailImageSelector, replaceThumbnail } from "../thumbnails/thumbnailRenderer";
-import { getCurrentPageTitle, TitleResult } from "../titles/titleData";
+import { TitleResult } from "../titles/titleData";
 import { findOrCreateShowOriginalButton, getOrCreateTitleElement, getOriginalTitleElement, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
 import { setThumbnailListener } from "../../maze-utils/src/thumbnailManagement";
 import Config, { ThumbnailCacheOption } from "../config/config";
