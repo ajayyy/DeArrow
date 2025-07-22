@@ -199,11 +199,6 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     cursor: pointer;
 }
 
-/* For mixes to have background as they have card stacks displying behind them */
-.cbMixBg {
-    background-color: black;
-}
-
 .cbBrandingPreview .cbThumbnailImg {
     cursor: default;
 }
@@ -861,7 +856,11 @@ ytd-channel-video-player-renderer #title > a {
 }
 
 /* These now have a "mix" image in the background, so need a background */
-ytd-playlist-video-thumbnail-renderer, ytd-playlist-video-renderer a#thumbnail, ytd-compact-radio-renderer a#thumbnail {
+ytd-playlist-video-thumbnail-renderer,
+ytd-playlist-video-renderer a#thumbnail,
+ytd-playlist-video-renderer .yt-thumbnail-view-model__image
+ytd-compact-radio-renderer a#thumbnail,
+ytd-compact-radio-renderer .yt-thumbnail-view-model__image {
     background-color: black;
 }
 ytd-playlist-video-thumbnail-renderer {
