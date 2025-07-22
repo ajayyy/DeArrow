@@ -21,6 +21,7 @@ import { fetchVideoMetadata, isLiveSync } from "../maze-utils/src/metadataFetche
 
 interface VideoBrandingCacheRecord extends BrandingResult {
     lastUsed: number;
+    fullReply: boolean; // If false, it is just a reply from the thumbnail cache server
 }
 
 interface ActiveThumbnailCacheRequestInfo {
@@ -34,7 +35,7 @@ interface ActiveThumbnailCacheRequestInfo {
 const cache: Record<VideoID, VideoBrandingCacheRecord> = {};
 const cacheLimit = 10000;
 
-const activeRequests: Record<VideoID, Promise<Record<VideoID, BrandingResult> | null>> = {};
+const activeRequests: Record<VideoID, [Promise<Record<VideoID, BrandingResult> | null>, Promise<Record<VideoID, BrandingResult> | null>]> = {};
 const activeThumbnailCacheRequests: Record<VideoID, ActiveThumbnailCacheRequestInfo> = {};
 
 export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, brandingLocation?: BrandingLocation,
@@ -50,7 +51,7 @@ export async function getVideoThumbnailIncludingUnsubmitted(videoID: VideoID, br
         };
     }
 
-    const brandingData = await getVideoBranding(videoID, brandingLocation === BrandingLocation.Watch, brandingLocation);
+    const brandingData = await getVideoBranding(videoID, brandingLocation === BrandingLocation.Watch, false, brandingLocation);
     const result = brandingData?.thumbnails[0];
     if (!result || (!result.locked && result.votes < 0)) {
         if (returnRandomTime) {
@@ -150,7 +151,7 @@ export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, brandi
         };
     }
 
-    const result = (await getVideoBranding(videoID, brandingLocation === BrandingLocation.Watch, brandingLocation))?.titles[0];
+    const result = (await getVideoBranding(videoID, brandingLocation === BrandingLocation.Watch, false, brandingLocation))?.titles[0];
     if (!result || (!result.locked && result.votes < 0)) {
         return null;
     } else {
@@ -159,14 +160,14 @@ export async function getVideoTitleIncludingUnsubmitted(videoID: VideoID, brandi
 }
 
 export async function getVideoCasualInfo(videoID: VideoID, brandingLocation?: BrandingLocation): Promise<CasualVoteInfo[]> {
-    const result = (await getVideoBranding(videoID, brandingLocation === BrandingLocation.Watch, brandingLocation))?.casualVotes;
+    const result = (await getVideoBranding(videoID, brandingLocation === BrandingLocation.Watch, true, brandingLocation))?.casualVotes;
     return result ?? [];
 }
 
-export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, brandingLocation?: BrandingLocation): Promise<VideoBrandingCacheRecord | null> {
+export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, waitForFullReply: boolean, brandingLocation?: BrandingLocation): Promise<VideoBrandingCacheRecord | null> {
     const cachedValue = cache[videoID];
 
-    if (cachedValue) {
+    if (cachedValue && (!waitForFullReply || cachedValue.fullReply)) {
         return cachedValue;
     }
 
@@ -175,17 +176,17 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
         queryByHash = true;
     }
 
-    activeRequests[videoID] ??= (async () => {
+    activeRequests[videoID] ??= (() => {
         const shouldGenerateBranding = Config.config!.thumbnailCacheUse === ThumbnailCacheOption.OnAllPages 
             || (brandingLocation !== BrandingLocation.Watch && Config.config!.thumbnailCacheUse !== ThumbnailCacheOption.Disable);
         const shouldGenerateNow = checkShouldGenerateNow(brandingLocation);
 
         const results = fetchBranding(queryByHash, videoID);
         const thumbnailCacheResults = shouldGenerateBranding ? 
-            fetchBrandingFromThumbnailCache(videoID, undefined, undefined, undefined, shouldGenerateNow) 
+            fetchBrandingFromThumbnailCache(videoID, undefined, undefined, undefined, shouldGenerateNow) //todo: this?
             : Promise.resolve(null);
 
-        const handleResults = (results: Record<VideoID, BrandingResult>) => {
+        const handleResults = (results: Record<VideoID, BrandingResult>, fullReply: boolean) => {
             for (const [key, result] of Object.entries(results)) {
                 cache[key] = {
                     titles: result.titles,
@@ -193,7 +194,8 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
                     randomTime: result.randomTime,
                     videoDuration: result.videoDuration,
                     casualVotes: result.casualVotes,
-                    lastUsed: key === videoID ? Date.now() : cache[key]?.lastUsed ?? 0
+                    lastUsed: key === videoID ? Date.now() : cache[key]?.lastUsed ?? 0,
+                    fullReply
                 };
             }
     
@@ -215,7 +217,7 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
 
             if (results) {
                 const oldResults = cache[videoID];
-                handleResults(results);
+                handleResults(results, true);
 
                 if (results[videoID]) {
                     const thumbnail = results[videoID].thumbnails[0];
@@ -240,7 +242,8 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
                         randomTime: null,
                         videoDuration: null,
                         casualVotes: [],
-                        lastUsed: Date.now()
+                        lastUsed: Date.now(),
+                        fullReply: true
                     };
                 }
 
@@ -259,23 +262,31 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, b
                 if (await getThumbnailFallbackOption(videoID) === ThumbnailFallbackOption.RandomTime && !mainFetchDone) {
                     thumbnailCacheFetchDone = true;
 
-                    handleResults(results);
+                    handleResults(results, true);
                 }
             }
         }).catch(logError);
 
-        const fastest = await Promise.race([results, thumbnailCacheResults]);
-        if (fastest) {
-            return fastest;
-        } else {
-            // Always take results of thumbnail cache results is null
-            return results;
-        }
+        return [(async () => {
+            const fastest = await Promise.race([results, thumbnailCacheResults]);
+
+            if (fastest) {
+                return fastest;
+            } else {
+                // Always take results of thumbnail cache results is null
+                return results;
+            }
+        })(), results];
     })();
-    activeRequests[videoID].catch(() => delete activeRequests[videoID]);
+    activeRequests[videoID][0].catch(() => delete activeRequests[videoID]);
 
     try {
-        await Promise.race([timeoutPomise(Config.config?.fetchTimeout).catch(() => ({})), activeRequests[videoID]]);
+        const timeout = timeoutPomise(Config.config?.fetchTimeout).catch(() => ({}));
+        if (waitForFullReply) {
+            await Promise.race([timeout, activeRequests[videoID][1]]);
+        } else {
+            await Promise.race([timeout, activeRequests[videoID][0]]);
+        }
         delete activeRequests[videoID];
     
         return cache[videoID];

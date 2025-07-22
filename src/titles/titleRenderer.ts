@@ -80,7 +80,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
                 && (await getTitleFormatting(videoID) !== TitleFormatting.Disable || originalTitle.toLowerCase() !== title.toLowerCase())
                 && (await getTitleFormatting(videoID) !== TitleFormatting.Disable 
                     || await shouldCleanEmojis(videoID) || cleanEmojis(originalTitle.toLowerCase()) !== cleanEmojis(title.toLowerCase()))
-                && (!await shouldShowCasual(videoID, showCustomBranding, brandingLocation) 
+                && (!await shouldShowCasual(videoID, element, showCustomBranding, brandingLocation) 
                     || (originalTitle.toLowerCase() === title.toLowerCase() && await getTitleFormatting(videoID) !== TitleFormatting.Disable))) {
             const formattedTitle = await formatTitle(title, true, videoID);
             if (!await isOnCorrectVideo(element, brandingLocation, videoID)) return false;
@@ -493,7 +493,7 @@ export async function hideAndUpdateShowOriginalButton(videoID: VideoID, element:
             if (await getActualShowCustomBranding(showCustomBranding)) {
                 buttonImage.classList.remove("cbOriginalShown");
                 if (await showThreeShowOriginalStages(videoID, originalTitleElement, brandingLocation)
-                        && await shouldShowCasual(videoID, showCustomBranding, brandingLocation)
+                        && await shouldShowCasual(videoID, element, showCustomBranding, brandingLocation)
                         && await hasCustomTitle(videoID, element, brandingLocation)) {
                     buttonElement.title = chrome.i18n.getMessage("ShowModified");
                 } else {

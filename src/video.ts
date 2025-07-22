@@ -4,7 +4,7 @@ import { ChannelIDInfo, checkIfNewVideoID, getVideoID, isOnYTTV, setupVideoModul
 import Config from "./config/config";
 import { SubmitButton } from "./submission/submitButton";
 import { BrandingLocation, BrandingResult, clearVideoBrandingInstances, replaceCurrentVideoBranding, updateBrandingForAllVideos } from "./videoBranding/videoBranding";
-import { getVideoBranding } from "./dataFetching";
+import { getVideoBranding, getVideoCasualInfo } from "./dataFetching";
 import * as documentScript from "../dist/js/document.js";
 import { listenForBadges, listenForMiniPlayerTitleChange, listenForTitleChange } from "./utils/titleBar";
 import { replaceVideoPlayerSuggestionsBranding, setupMobileAutoplayHandler } from "./videoBranding/watchPageBrandingHandler";
@@ -31,10 +31,14 @@ async function videoIDChange(videoID: VideoID | null): Promise<void> {
         submitButton.render();
         casualVoteButton.render();
 
-        const branding = await getVideoBranding(videoID, true, BrandingLocation.Watch);
+        const branding = await getVideoBranding(videoID, true, false, BrandingLocation.Watch);
         if (branding && getVideoID() === videoID) {
             submitButton.setSubmissions(branding);
-            casualVoteButton.setExistingVotes(branding.casualVotes);
+
+            const casualVotes = await getVideoCasualInfo(videoID, BrandingLocation.Watch);
+            if (casualVotes) {
+                casualVoteButton.setExistingVotes(casualVotes);
+            }
         }
     } catch (e) {
         logError(e);
@@ -88,7 +92,7 @@ function windowListenerHandler(event: MessageEvent) {
 function newVideosLoaded(videoIDs: VideoID[]) {
     // Pre-cache the data for these videos
     for (const videoID of videoIDs) {
-        getVideoBranding(videoID, false).catch(logError);
+        getVideoBranding(videoID, false, false).catch(logError);
         getPlaybackFormats(videoID).catch(logError);
 
         if (Config.config!.ignoreTranslatedTitles) {

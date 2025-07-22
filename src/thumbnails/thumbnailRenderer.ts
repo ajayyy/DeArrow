@@ -587,7 +587,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
 
     if (showCustomBranding.knownValue === false || !Config.config!.extensionEnabled 
             || shouldReplaceThumbnailsFastCheck(videoID) === false
-            || (Config.config!.showOriginalThumbWhenCasual && await shouldShowCasual(videoID, showCustomBranding, brandingLocation))) {
+            || (Config.config!.showOriginalThumbWhenCasual && await shouldShowCasual(videoID, element, showCustomBranding, brandingLocation))) {
         resetToShowOriginalThumbnail(image, brandingLocation);
 
         if (Config.config!.extensionEnabled && await shouldReplaceThumbnails(videoID)) {
