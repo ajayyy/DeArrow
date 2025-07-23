@@ -1,7 +1,7 @@
 import { objectToURI } from "../../maze-utils/src";
+import { getCurrentPageTitle } from "../../maze-utils/src/elements";
 import { getHash } from "../../maze-utils/src/hash";
 import Config from "../config/config";
-import { getCurrentPageTitle } from "../titles/titleData";
 import { cleanEmojis, cleanFancyText, cleanPunctuation, isWordCustomCapitalization } from "../titles/titleFormatter";
 import { sendRequestToServer } from "../utils/requests";
 import { Tooltip } from "../utils/tooltip";

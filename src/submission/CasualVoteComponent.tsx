@@ -3,7 +3,7 @@ import { CasualVoteInfo } from "../videoBranding/videoBranding";
 import { VideoID } from "../../maze-utils/src/video";
 import { FormattedText } from "../popup/FormattedTextComponent";
 import { casualVoteCategories } from "./casualVote.const";
-import { getCurrentPageTitle } from "../titles/titleData";
+import { getCurrentPageTitle } from "../../maze-utils/src/elements";
 
 export enum CasualVoteType {
     Like = 1,
