@@ -103,7 +103,8 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
                 await waitFor(() => originalTitleElement!.textContent!.length > 0, 5000).catch(() => null);
             }
 
-            if (getOriginalTitleText(originalTitleElement, brandingLocation)) {
+            if (getOriginalTitleText(originalTitleElement, brandingLocation) 
+                    && (!await shouldShowCasual(videoID, element, showCustomBranding, brandingLocation) || Config.config!.formatCasualTitles)) {
                 const originalText = getOriginalTitleText(originalTitleElement, brandingLocation).trim();
                 const originalTitle = Config.config!.ignoreTranslatedTitles
                     ? await getAntiTranslatedTitle(videoID) ?? originalText
@@ -119,6 +120,7 @@ export async function replaceTitle(element: HTMLElement, videoID: VideoID, showC
                 setCustomTitle(modifiedTitle, element, brandingLocation);
             } else {
                 showOriginalTitle(element, brandingLocation);
+                return false;
             }
         }
         if (originalTitleElement.parentElement?.title) {

@@ -9,6 +9,7 @@ export const CasualChoiceComponent = () => {
     const [activeCategories, setActiveCategories] = React.useState(Config.config!.casualModeSettings);
     const [showOriginalWhenCasual, setShowOriginalWhenCasual] = React.useState(Config.config!.showOriginalThumbWhenCasual);
     const [onlyShowCasualIconForCustom, setOnlyShowCasualIconForCustom] = React.useState(Config.config!.onlyShowCasualIconForCustom);
+    const [formatCasualTitles, setFormatCasualTitles] = React.useState(Config.config!.formatCasualTitles);
     const [showCustomOnHoverIfCasual, setShowCustomOnHoverIfCasual] = React.useState(Config.config!.showCustomOnHoverIfCasual);
     const [showOptionForShowCustomOnHoverIfCasual, setShowOptionForShowCustomOnHoverIfCasual] = React.useState(false);
 
@@ -150,6 +151,19 @@ export const CasualChoiceComponent = () => {
                         }}
                         value={onlyShowCasualIconForCustom}
                         label={chrome.i18n.getMessage("onlyShowCasualIconForCustom")}
+                    />
+
+                    <ToggleOptionComponent
+                        id="formatCasualTitles"
+                        style={{
+                            paddingTop: "15px"
+                        }}
+                        onChange={(value) => {
+                            setFormatCasualTitles(!value);
+                            Config.config!.formatCasualTitles = !value;
+                        }}
+                        value={!formatCasualTitles}
+                        label={chrome.i18n.getMessage("dontFormatCasualTitles")}
                     />
 
                     {

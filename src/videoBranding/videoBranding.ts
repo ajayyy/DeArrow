@@ -6,12 +6,12 @@ import { getThumbnailImageSelector, replaceThumbnail } from "../thumbnails/thumb
 import { TitleResult } from "../titles/titleData";
 import { findOrCreateShowOriginalButton, getOrCreateTitleElement, getOriginalTitleElement, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
 import { setThumbnailListener } from "../../maze-utils/src/thumbnailManagement";
-import Config, { ThumbnailCacheOption } from "../config/config";
+import Config, { ThumbnailCacheOption, TitleFormatting } from "../config/config";
 import { logError } from "../utils/logger";
 import { getVideoCasualInfo, getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { handleOnboarding } from "./onboarding";
 import { cleanEmojis, cleanResultingTitle } from "../titles/titleFormatter";
-import { shouldDefaultToCustom, shouldDefaultToCustomFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
+import { getTitleFormatting, shouldDefaultToCustom, shouldDefaultToCustomFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { addMaxTitleLinesCssToPage } from "../utils/cssInjector";
 import { casualVoteButton, submitButton } from "../video";
@@ -414,8 +414,13 @@ export async function toggleShowCustom(videoID: VideoID, originalTitleElement: H
                 return await internalSetShowCustom(videoID, originalTitleElement, brandingLocation, true, false);
             } else {
                 if (shouldShowCustom) {
-                    // Go to original
-                    return await internalSetShowCustom(videoID, originalTitleElement, brandingLocation, false, false);
+                    if (Config.config!.formatCasualTitles && await getTitleFormatting(videoID) !== TitleFormatting.Disable) {
+                        // Go to original
+                        return await internalSetShowCustom(videoID, originalTitleElement, brandingLocation, false, false);
+                    } else {
+                        // Go back to casual
+                        return await internalSetShowCustom(videoID, originalTitleElement, brandingLocation, true, true);
+                    }
                 } else {
                     if (!Config.config!.showOriginalOnHover) {
                         // Go to casual
@@ -539,7 +544,8 @@ export function setupOptionChangeListener(): void {
             "ignoreAbThumbnails",
             "showOriginalOnHover",
             "showLiveCover",
-            "onlyFormatCustomTitles"
+            "onlyFormatCustomTitles",
+            "formatCasualTitles"
         ];
 
         if (settingsToReload.some((name) => (changes[name] && changes[name].newValue !== changes[name].oldValue))) {
