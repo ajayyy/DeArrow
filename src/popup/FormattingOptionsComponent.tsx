@@ -17,7 +17,8 @@ export const FormattingOptionsComponent = ({
         [titleFormatting, setTitleFormatting] = React.useState(Config.config!.titleFormatting);
     }
 
-    const [onlyFormatCustomTitles, setOnlyFormatCustomTitles] = React.useState(Config.config!.onlyFormatCustomTitles);
+    const [formatCustomTitles, setFormatCustomTitles] = React.useState(Config.config!.formatCustomTitles);
+    const [formatOriginalTitles, setFormatOriginalTitles] = React.useState(Config.config!.formatOriginalTitles);
     const [shouldCleanEmojis, setShouldCleanEmojis] = React.useState(Config.config!.shouldCleanEmojis);
     const [onlyTitleCaseInEnglish, setOnlyTitleCaseInEnglish] = React.useState(Config.config!.onlyTitleCaseInEnglish);
     const [thumbnailFallback, setThumbnailFallback] = React.useState(String(Config.config!.thumbnailFallback));
@@ -60,20 +61,6 @@ export const FormattingOptionsComponent = ({
                 titleFormatting={titleFormatting!}
             />
 
-            {/* Only format custom titles */}
-            <ToggleOptionComponent
-                id="onlyFormatCustomTitles"
-                style={{
-                    paddingTop: "15px"
-                }}
-                onChange={(value) => {
-                    setOnlyFormatCustomTitles(value);
-                    Config.config!.onlyFormatCustomTitles = value;
-                }}
-                value={onlyFormatCustomTitles}
-                label={chrome.i18n.getMessage("onlyFormatCustomTitles")}
-                titleFormatting={titleFormatting!}
-            />
             {/* Should Clean Emojis */}
             <ToggleOptionComponent
                 id="shouldCleanEmojis"
@@ -86,6 +73,34 @@ export const FormattingOptionsComponent = ({
                 }}
                 value={shouldCleanEmojis}
                 label={chrome.i18n.getMessage("shouldCleanEmojis")}
+                titleFormatting={titleFormatting!}
+            />
+            {/* Format original titles */}
+            <ToggleOptionComponent
+                id="formatOriginalTitles"
+                style={{
+                    paddingTop: "15px"
+                }}
+                onChange={(value) => {
+                    setFormatOriginalTitles(value);
+                    Config.config!.formatOriginalTitles = value;
+                }}
+                value={formatOriginalTitles}
+                label={chrome.i18n.getMessage("formatOriginalTitles")}
+                titleFormatting={titleFormatting!}
+            />
+            {/* Format custom titles */}
+            <ToggleOptionComponent
+                id="formatCustomTitles"
+                style={{
+                    paddingTop: "15px"
+                }}
+                onChange={(value) => {
+                    setFormatCustomTitles(value);
+                    Config.config!.formatCustomTitles = value;
+                }}
+                value={formatCustomTitles}
+                label={chrome.i18n.getMessage("formatCustomTitles")}
                 titleFormatting={titleFormatting!}
             />
             {

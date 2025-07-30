@@ -82,7 +82,8 @@ interface SBConfig {
     keepUnsubmittedInPrivate: boolean;
     thumbnailSaturationLevel: number;
     titleFormatting: TitleFormatting;
-    onlyFormatCustomTitles: boolean;
+    formatCustomTitles: boolean;
+    formatOriginalTitles: boolean;
     shouldCleanEmojis: boolean;
     onlyTitleCaseInEnglish: boolean;
     serverAddress: string;
@@ -168,7 +169,12 @@ class ConfigClass extends ProtoConfig<SBConfig, SBStorage> {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
 function migrateOldSyncFormats(config: SBConfig) {
-    
+    if (config["onlyFormatCustomTitles"]) {
+        config.formatCustomTitles = true;
+        config.formatOriginalTitles = false;
+
+        chrome.storage.sync.remove("onlyFormatCustomTitles").catch(logError);
+    }
 }
 
 const syncDefaults = {
@@ -185,7 +191,8 @@ const syncDefaults = {
     keepUnsubmittedInPrivate: false,
     thumbnailSaturationLevel: 100,
     titleFormatting: isEnglish ? TitleFormatting.TitleCase : TitleFormatting.Disable,
-    onlyFormatCustomTitles: false,
+    formatCustomTitles: true,
+    formatOriginalTitles: true,
     shouldCleanEmojis: true,
     onlyTitleCaseInEnglish: false,
     serverAddress: CompileConfig.serverAddress,

@@ -544,7 +544,8 @@ export function setupOptionChangeListener(): void {
             "ignoreAbThumbnails",
             "showOriginalOnHover",
             "showLiveCover",
-            "onlyFormatCustomTitles",
+            "formatCustomTitles",
+            "formatOriginalTitles",
             "formatCasualTitles"
         ];
 
