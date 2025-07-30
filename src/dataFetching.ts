@@ -189,6 +189,10 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, w
 
         const handleResults = (results: Record<VideoID, BrandingResult>, fullReply: boolean) => {
             for (const [key, result] of Object.entries(results)) {
+                if (result.titles.length > 0) {
+                    result.titles.forEach((title) => title.title = title.title.replace(/‹/ug, "<"));
+                }
+
                 cache[key] = {
                     titles: result.titles,
                     thumbnails: result.thumbnails,
@@ -220,12 +224,17 @@ export async function getVideoBranding(videoID: VideoID, queryByHash: boolean, w
                 const oldResults = cache[videoID];
                 handleResults(results, true);
 
-                if (results[videoID]) {
-                    const thumbnail = results[videoID].thumbnails[0];
-                    const title = results[videoID].titles[0];
+                const currentResult = results[videoID];
+                if (currentResult) {
+                    if (currentResult.titles.length > 0) {
+                        currentResult.titles.forEach((title) => title.title = title.title.replace(/‹/ug, "<"));
+                    }
+
+                    const thumbnail = currentResult.thumbnails[0];
+                    const title = currentResult.titles[0];
 
                     const timestamp = thumbnail && !thumbnail.original ? thumbnail.timestamp 
-                        : await getTimestampFromRandomTime(videoID, results[videoID]);
+                        : await getTimestampFromRandomTime(videoID, currentResult);
 
                     // Fetch for a cached thumbnail if it is either not loaded yet, or has an out of date title
                     if (timestamp !== null
