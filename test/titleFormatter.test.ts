@@ -254,12 +254,13 @@ describe("toSentenceCase", () => {
 });
 
 describe("toSentenceCase cleanEmojis", () => {
-    const titleCases: [string, string][] = [
+    const sentenceCases: [string, string][] = [
         ["🚨 Announcement: New Series Coming!", "Announcement: New series coming"],
         ["𝐆𝐀𝐋𝐓 𝐒𝐔𝐁 𝐓𝐑𝐀𝐈𝐍𝐒 Railfan Mini-Meetup at Leaside", "Galt sub trains railfan mini-meetup at leaside"],
-        ["The country of 🇨🇦 exists", "The country of 🇨🇦 exists"]
+        ["The country of 🇨🇦 exists", "The country of 🇨🇦 exists"],
+        ["𝗧𝗘𝗧𝗥𝗜𝗦 𝗧𝗛𝗘𝗠𝗘, but it's in 𝗔 𝗠𝗮𝗷𝗼𝗿. some more words to bypass shouldTrustCaps", "Tetris theme, but it's in A Major. Some more words to bypass shouldTrustCaps"]
     ];
-    for (const testCase of titleCases) {
+    for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
         it(input, async () => {
             expect(await formatTitleInternal(input, false, TitleFormatting.SentenceCase, true)).toBe(expected);
