@@ -330,7 +330,17 @@ export const allowlistedWords = new Set([
     "DJ",
     "SPTV",
     "VST",
-    "EQ"
+    "EQ",
+    "JWST",
+    "HP",
+    "STM",
+    "ESP",
+    "TCP",
+    "TCP/IP",
+    "FTP",
+    "UDP",
+    "DSKY",
+    "DRO",
 ]);
 
 // Can be switched to a trie structure if it grows
