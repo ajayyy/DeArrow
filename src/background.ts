@@ -133,7 +133,7 @@ async function isPaywallEnabled(): Promise<boolean> {
             return json.enabled;
         }
     } catch (e) {
-        logError(e);
+        logError("Caught error while checking feature flags", e);
     }
 
     return false;

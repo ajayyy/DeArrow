@@ -1,5 +1,7 @@
 import { sendRequestToServer } from "../utils/requests";
 import Config from "../config/config";
+import { FetchResponse } from "../../maze-utils/src/background-request-proxy";
+import { logError } from "../utils/logger";
 
 export function isActivated() {
     return Config.config!.activated 
@@ -38,9 +40,15 @@ export async function getLicenseKey(): Promise<string | null> {
 }
 
 async function generateLicenseKey(type: "free") {
-    const result = await sendRequestToServer("GET", `/api/generateToken/${type}`, {
-        key: Date.now()
-    });
+    let result: FetchResponse
+    try {
+        result = await sendRequestToServer("GET", `/api/generateToken/${type}`, {
+            key: Date.now()
+        });
+    } catch (e) {
+        logError("Caught an error while requesting to generate a license key", e);
+        return null;
+    }
 
     if (result.status === 200) {
         const json = JSON.parse(result.responseText);

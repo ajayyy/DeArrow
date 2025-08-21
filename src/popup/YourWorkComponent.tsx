@@ -2,11 +2,13 @@ import * as React from "react";
 import Config, { TitleFormatting } from "../config/config";
 import { sendRequestToServer } from "../utils/requests";
 import { getHash } from "../../maze-utils/src/hash";
-import { getErrorMessage } from "../../maze-utils/src/formating";
+import { formatJSErrorMessage, getShortErrorMessage } from "../../maze-utils/src/formating";
 import PencilIcon from "../svgIcons/pencilIcon";
 import ClipboardIcon from "../svgIcons/clipboardIcon";
 import CheckIcon from "../svgIcons/checkIcon";
 import { FormattedText } from "./FormattedTextComponent";
+import { FetchResponse, logRequest } from "../../maze-utils/src/background-request-proxy";
+import { logError } from "../utils/logger";
 
 interface YourWorkComponentProps {
     titleFormatting?: TitleFormatting;
@@ -24,10 +26,16 @@ export const YourWorkComponent = ({ titleFormatting }: YourWorkComponentProps) =
     React.useEffect(() => {
         (async () => {
             const values = ["userName", "titleSubmissionCount", "thumbnailSubmissionCount", "casualSubmissionCount", "vip"];
-            const result = await sendRequestToServer("GET", "/api/userInfo", {
-                publicUserID: await getHash(Config.config!.userID!),
-                values
-            });
+            let result: FetchResponse;
+            try {
+                result = await sendRequestToServer("GET", "/api/userInfo", {
+                    publicUserID: await getHash(Config.config!.userID!),
+                    values
+                });
+            } catch (e) {
+                logError("Caught error while fetching user info", e);
+                return;
+            }
 
             if (result.ok) {
                 const userInfo = JSON.parse(result.responseText);
@@ -37,6 +45,8 @@ export const YourWorkComponent = ({ titleFormatting }: YourWorkComponentProps) =
                 setCasualSubmissionCount(userInfo.casualSubmissionCount);
 
                 Config.config!.vip = userInfo.vip;
+            } else {
+                logRequest(result, "CB", "user info");
             }
         })();
     }, []);
@@ -99,10 +109,12 @@ export const YourWorkComponent = ({ titleFormatting }: YourWorkComponentProps) =
                                             setUsername(newUsername);
                                             setIsSettingUsername(!isSettingUsername);
                                         } else {
-                                            setUsernameSubmissionStatus(getErrorMessage(result.status, result.responseText));
+                                            logRequest(result, "CB", "username update");
+                                            setUsernameSubmissionStatus(getShortErrorMessage(result.status, result.responseText));
                                         }
                                     }).catch((e) => {
-                                        setUsernameSubmissionStatus(`${chrome.i18n.getMessage("Error")}: ${e}`);
+                                        logError("Caught error while requesting username update", e);
+                                        setUsernameSubmissionStatus(formatJSErrorMessage(e));
                                     });
                                 }
                             }}>

@@ -28,6 +28,8 @@ import { isAutoWarningShown } from "./autoWarning";
 import { getAntiTranslatedTitle } from "../titles/titleAntiTranslateData";
 import { isLiveSync } from "../../maze-utils/src/metadataFetcher";
 import { getCurrentPageTitle } from "../../maze-utils/src/elements";
+import { FetchResponse, logRequest } from "../../maze-utils/src/background-request-proxy";
+import { formatJSErrorMessage, getLongErrorMessage } from "../../maze-utils/src/formating";
 
 export interface SubmissionComponentProps {
     videoID: VideoID;
@@ -55,24 +57,33 @@ export const SubmissionComponent = (props: SubmissionComponentProps) => {
             setChatDisplayName(displayName);
 
             const values = ["userName", "deArrowWarningReason"];
-            const result = await sendRequestToServer("GET", "/api/userInfo", {
-                publicUserID: publicUserID,
-                values
-            });
+            let result: FetchResponse;
+            try {
+                result = await sendRequestToServer("GET", "/api/userInfo", {
+                    publicUserID: publicUserID,
+                    values
+                });
+            } catch (e) {
+                logError("Caught error while attempting to fetch username and active warnings", e);
+                return;
+            }
 
             if (result.ok) {
                 const userInfo = JSON.parse(result.responseText);
                 username = userInfo.userName;
 
+                setChatDisplayName({
+                    publicUserID,
+                    username
+                });
+
                 if (userInfo.deArrowWarningReason) {
                     createWarningTooltip(userInfo.deArrowWarningReason, displayName);
                 }
+            } else {
+                logRequest(result, "CB", "username and active warnings");
             }
 
-            setChatDisplayName({
-                publicUserID,
-                username
-            });
         }).catch(logError);
     }, []);
 
@@ -569,16 +580,24 @@ function createWarningTooltip(reason: string, name: ChatDisplayName) {
             buttons: [{
                 name: chrome.i18n.getMessage("GotIt"),
                 listener: async () => {
-                    const result = await sendRequestToServer("POST", "/api/warnUser", {
-                        userID: Config.config!.userID,
-                        enabled: false,
-                        type: 1
-                    });
+                    let result: FetchResponse;
+                    try {
+                        result = await sendRequestToServer("POST", "/api/warnUser", {
+                            userID: Config.config!.userID,
+                            enabled: false,
+                            type: 1
+                        });
+                    } catch (e) {
+                        logError("Caught error while attempting to acknowlege active warning", e);
+                        alert(formatJSErrorMessage(e));
+                        return;
+                    }
 
                     if (result.ok) {
                         tooltip?.close();
                     } else {
-                        alert(`${chrome.i18n.getMessage("warningError")} ${result.status}`);
+                        logRequest(result, "CB", "warning acknowledgement");
+                        alert(getLongErrorMessage(result.status, result.responseText));
                     }
                 }
             }, {

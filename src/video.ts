@@ -76,7 +76,7 @@ function videoElementChange(newVideo: boolean) {
 
         listenForBadges().catch(logError);
         listenForTitleChange().catch(logError);
-        listenForMiniPlayerTitleChange().catch(console.error);
+        listenForMiniPlayerTitleChange().catch(logError);
 
         submitButton.render();
         casualVoteButton.render();

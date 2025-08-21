@@ -19,6 +19,7 @@ import ChannelOverrides from "./options/ChannelOverrides";
 import { getLicenseKey, isActivated } from "./license/license";
 import { localizeHtmlPageWithFormatting } from "./titles/titleFormatter";
 import CasualChoice from "./options/CasualChoice";
+import { logRequest } from "../maze-utils/src/background-request-proxy";
 let embed = false;
 
 window.addEventListener('DOMContentLoaded', () => void init());
@@ -84,7 +85,7 @@ async function init() {
                 sharingText!.classList.toggle("hidden");
             });
         }
-    }).catch(console.error);
+    }).catch(logError);
     
     // Set all of the toggle options to the correct option
     const optionsContainer = document.getElementById("options")!;
@@ -568,6 +569,9 @@ function activatePrivateTextChange(element: HTMLElement) {
                     publicUserID: getHash(Config.config![option]!),
                     values: ["warnings", "banned"]
                 }).then((result) => {
+                    if (!result.ok) {
+                        logRequest(result, "CB", "new user's info");
+                    }
                     const userInfo = JSON.parse(result.responseText);
                     if (userInfo.warnings > 0 || userInfo.banned) {
                         setButton!.classList.add("hidden");
