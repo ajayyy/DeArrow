@@ -119,10 +119,6 @@ function buildHideTitleCss(): string {
         }
     }
 
-    if (onMobile()) {
-        result.push(".compact-media-item-headline .yt-core-attributed-string:not(.cbCustomTitle)");
-    }
-
     return `${result.join(", ")} { display: none !important; }\n`;
 }
 
