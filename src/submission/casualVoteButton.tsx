@@ -9,6 +9,9 @@ import { TitleButton } from "./titleButton";
 import { CasualVoteComponent } from "./CasualVoteComponent";
 import { CasualVoteOnboardingComponent } from "./CasualVoteOnboardingComponent";
 import { shouldStoreVotes } from "../utils/configUtils";
+import { FetchResponse } from "../../maze-utils/src/background-request-proxy";
+import { formatJSErrorMessage, getLongErrorMessage } from "../../maze-utils/src/formating";
+import { logRequest } from "../../maze-utils/src/background-request-proxy";
 
 const casualVoteButtonIcon = `
 <?xml version="1.0" encoding="UTF-8"?>
@@ -69,7 +72,14 @@ export class CasualVoteButton extends TitleButton {
             return false;
         }
 
-        const result = await submitVideoCasualVote(getVideoID()!, categories, downvote);
+        let result: FetchResponse;
+        try {
+            result = await submitVideoCasualVote(getVideoID()!, categories, downvote);
+        } catch (e) {
+            logError("Caught error while submitting casual title vote", e);
+            alert(formatJSErrorMessage(e));
+            return false;
+        }
 
         if (result && result.ok) {
             this.close();
@@ -88,14 +98,8 @@ export class CasualVoteButton extends TitleButton {
 
             return true;
         } else {
-            const text = result.responseText;
-
-            if (text.includes("<head>")) {
-                alert(chrome.i18n.getMessage("502"));
-            } else {
-                alert(text);
-            }
-
+            logRequest(result, "CB", "casual title vote");
+            alert(getLongErrorMessage(result.status, result.responseText));
             return false;
         }
     }
