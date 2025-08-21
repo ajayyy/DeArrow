@@ -628,8 +628,9 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 }
 
 /* General case, endcards */
-*:hover > *:not(.ytp-ce-element) > * > .cbShowOriginal:not(.cbMobile),
+*:hover > *:not(.ytp-ce-element, .ytp-autonav-suggestion-card) > * > .cbShowOriginal:not(.cbMobile),
         .ytp-ce-element:hover > * > .cbShowOriginal:not(.cbMobile),
+        .ytp-autonav-suggestion-card:hover > * > .cbShowOriginal:not(.cbMobile),
         .cbShowOriginal.cbDontHide, .cbShowOriginal.cbMobileDontHide {
     display: inline !important;
 }

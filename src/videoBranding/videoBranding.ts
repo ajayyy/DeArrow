@@ -40,6 +40,7 @@ export enum BrandingLocation {
     Endcards,
     Autoplay,
     EndRecommendations,
+    EndAutonav,
     EmbedSuggestions,
     UpNextPreview,
     Notification,
@@ -281,6 +282,7 @@ export function getLinkElement(element: HTMLElement, brandingLocation: BrandingL
         case BrandingLocation.EndRecommendations:
         case BrandingLocation.EmbedSuggestions:
         case BrandingLocation.UpNextPreview:
+        case BrandingLocation.EndAutonav:
             return element as HTMLAnchorElement;
         case BrandingLocation.Notification:
         case BrandingLocation.NotificationTitle:

@@ -339,6 +339,7 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
         case BrandingLocation.Endcards:
             return [".ytp-ce-video-title", ".ytp-ce-playlist-title"];
         case BrandingLocation.Autoplay:
+        case BrandingLocation.EndAutonav:
             return [".ytp-autonav-endscreen-upnext-title"];
         case BrandingLocation.EndRecommendations:
             return [".ytp-videowall-still-info-title"];
@@ -393,11 +394,18 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
             || brandingLocation === BrandingLocation.Autoplay
             || brandingLocation === BrandingLocation.EmbedSuggestions
             || brandingLocation === BrandingLocation.Notification
+            || brandingLocation === BrandingLocation.EndAutonav
             || originalTitleElement.id === "movie-title"
             || (originalTitleElement.id === "title" && originalTitleElement.parentElement?.id === "description")) {
         const container = document.createElement("div");
         container.appendChild(titleElement);
-        originalTitleElement.parentElement?.prepend(container);
+
+        if (brandingLocation === BrandingLocation.EndAutonav) {
+            // Add it in right place
+            originalTitleElement.parentElement?.insertBefore(container, originalTitleElement.nextSibling);
+        } else {
+            originalTitleElement.parentElement?.prepend(container);
+        }
 
         // Move original title element over to this element
         container.prepend(originalTitleElement);

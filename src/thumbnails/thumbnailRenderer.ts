@@ -522,6 +522,7 @@ export function getThumbnailImageSelector(brandingLocation: BrandingLocation): s
         case BrandingLocation.Endcards:
             return ".ytp-ce-covering-image";
         case BrandingLocation.Autoplay:
+        case BrandingLocation.EndAutonav:
             return "div.ytp-autonav-endscreen-upnext-thumbnail";
         case BrandingLocation.EndRecommendations:
             return "div.ytp-videowall-still-image";
@@ -553,6 +554,7 @@ function getThumbnailBox(image: HTMLElement, brandingLocation: BrandingLocation)
             }
         case BrandingLocation.Autoplay:
         case BrandingLocation.UpNextPreview:
+        case BrandingLocation.EndAutonav:
             return image;
         default:
             return image.parentElement!;
@@ -750,7 +752,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                 thumbnail.classList.add("ytp-videowall-still-image");
                 thumbnail.style.marginLeft = "auto";
                 thumbnail.style.marginRight = "auto";
-            } else if (brandingLocation === BrandingLocation.Autoplay) {
+            } else if (brandingLocation === BrandingLocation.Autoplay || brandingLocation === BrandingLocation.EndAutonav) {
                 thumbnail.classList.add("ytp-autonav-endscreen-upnext-thumbnail");
             } else if (brandingLocation === BrandingLocation.UpNextPreview) {
                 thumbnail.classList.add("ytp-tooltip-bg");
@@ -776,7 +778,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                 thumbnail.style.removeProperty("height");
             }
 
-            if (brandingLocation === BrandingLocation.Autoplay) {
+            if (brandingLocation === BrandingLocation.Autoplay || brandingLocation === BrandingLocation.EndAutonav) {
                 // For autoplay, the thumbnail is placed inside the image div, which has the image as the background image
                 // This is because hiding the entire div would hide the video duration
                 image.prepend(thumbnail);
@@ -880,6 +882,7 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
 
     if (onMobile()
             || brandingLocation === BrandingLocation.Autoplay
+            || brandingLocation === BrandingLocation.EndAutonav
             || brandingLocation === BrandingLocation.EmbedSuggestions
             || brandingLocation === BrandingLocation.Related
             || brandingLocation === BrandingLocation.Notification
