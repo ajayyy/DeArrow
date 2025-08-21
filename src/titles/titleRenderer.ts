@@ -322,6 +322,7 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
                 ".shortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
                 ".details .media-item-headline .yt-core-attributed-string", // Mobile YouTube
                 ".reel-item-metadata h3 .yt-core-attributed-string", // Mobile YouTube Shorts
+                ".shortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // Mobile YouTube Shorts
                 ".details > .yt-core-attributed-string", // Mobile YouTube Channel Feature
                 ".compact-media-item-headline .yt-core-attributed-string", // Mobile YouTube Compact,
                 ".amsterdam-playlist-title .yt-core-attributed-string", // Mobile YouTube Playlist Header,
@@ -720,7 +721,7 @@ async function createShowOriginalButton(element: HTMLElement, originalTitleEleme
         buttonElement.classList.add("cbMobile");
 
         // Add hover to show
-        const box = buttonElement.closest(".details, .compact-media-item-metadata, .reel-item-metadata");
+        const box = buttonElement.closest(".details, .compact-media-item-metadata, .reel-item-metadata, .shortsLockupViewModelHost");
         if (box) {
             let readyToHide = false;
             box.addEventListener("touchstart", () => {
