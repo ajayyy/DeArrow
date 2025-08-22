@@ -10,7 +10,6 @@ import Config, { ThumbnailCacheOption, TitleFormatting } from "../config/config"
 import { logError } from "../utils/logger";
 import { getVideoCasualInfo, getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { handleOnboarding } from "./onboarding";
-import { cleanEmojis, cleanResultingTitle } from "../titles/titleFormatter";
 import { getTitleFormatting, shouldDefaultToCustom, shouldDefaultToCustomFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 import { addMaxTitleLinesCssToPage } from "../utils/cssInjector";
@@ -63,7 +62,7 @@ export interface VideoBrandingInstance {
     updateBrandingCallbacks: Array<() => Promise<void>>;
 }
 
-export const brandingBoxSelector = !onMobile() 
+export const brandingBoxSelector = !onMobile()
     ? "ytd-rich-grid-media, ytd-video-renderer, ytd-movie-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer, ytd-compact-playlist-renderer, ytd-playlist-renderer, ytd-grid-playlist-renderer, ytd-grid-show-renderer, ytd-structured-description-video-lockup-renderer, ytd-hero-playlist-thumbnail-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model"
     : "ytm-video-with-context-renderer, ytm-compact-radio-renderer, ytm-reel-item-renderer, ytm-channel-featured-video-renderer, ytm-compact-video-renderer, ytm-playlist-video-renderer, .playlist-immersive-header-content, ytm-compact-playlist-renderer, ytm-video-card-renderer, ytm-vertical-list-renderer, ytm-playlist-panel-video-renderer, ytm-shorts-lockup-view-model";
 
@@ -103,7 +102,7 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
         const showCustomBranding = videoBrandingInstance.showCustomBranding;
 
         // Replace each title and return true only if all true
-        promises[0] = Promise.all(titles.map((title) => 
+        promises[0] = Promise.all(titles.map((title) =>
             replaceTitle(title, videoID, showCustomBranding, brandingLocation)))
         .then((results) => results.every((result) => result));
 
@@ -191,7 +190,7 @@ export async function replaceVideoCardsBranding(elements: HTMLElement[]): Promis
 
 export async function replaceVideoCardBranding(element: HTMLElement, brandingLocation: BrandingLocation,
         extraParams: { verifyVideoID?: VideoID; tries?: number; dontReplaceTitle?: boolean } = {}): Promise<[boolean, boolean]> {
-    
+
     extraParams.tries ??= 0;
     const link = getLinkElement(element, brandingLocation);
 
@@ -215,7 +214,7 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
             showCasual: Config.config!.casualMode
         } : showCustomBranding);
         const titlePromise = !isPlaylistOrClipTitleStatus && !extraParams.dontReplaceTitle
-            ? replaceTitle(element, videoID, showCustomBranding, brandingLocation) 
+            ? replaceTitle(element, videoID, showCustomBranding, brandingLocation)
             : Promise.resolve(false);
 
         if (isPlaylistOrClipTitleStatus || extraParams.dontReplaceTitle) {
@@ -312,7 +311,7 @@ async function extractVideoID(link: HTMLAnchorElement) {
                     await waitForImageSrc(image);
                     href = image.getAttribute("src");
                 }
-    
+
                 if (href) {
                     videoID = href.match(/\/vi\/(\S{11})/)?.[1] as VideoID;
                 }
@@ -325,7 +324,7 @@ async function extractVideoID(link: HTMLAnchorElement) {
 
 export async function extractVideoIDFromElement(element: HTMLElement, brandingLocation: BrandingLocation): Promise<VideoID | null> {
     const link = getLinkElement(element, brandingLocation);
-    if (link) { 
+    if (link) {
         return await extractVideoID(link);
     } else {
         return null;
@@ -333,7 +332,7 @@ export async function extractVideoIDFromElement(element: HTMLElement, brandingLo
 }
 
 function isPlaylistOrClipTitle(element: HTMLElement, link: HTMLAnchorElement) {
-    return (link.href?.match(/list=/)?.[0] !== undefined 
+    return (link.href?.match(/list=/)?.[0] !== undefined
             && link.href?.match(/index=/)?.[0] === undefined)
         || link.href?.match(/\/clip\//)?.[0] !== undefined;
 }
@@ -350,7 +349,7 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
         if (!customTitle && !Config.config!.showIconForFormattedTitles && !await promises[1]) {
             return;
         }
-        
+
         const button = await findOrCreateShowOriginalButton(element, brandingLocation, videoID);
         const image = button.querySelector("img") as HTMLImageElement;
         if (image) {
@@ -462,7 +461,7 @@ async function internalSetShowCustom(videoID: VideoID, originalTitleElement: HTM
  * If a video is currently at the default state, it will be updated to it's newest state
  */
 async function updateCurrentlyDefaultShowCustom(videoID: VideoID): Promise<void> {
-    if (videoBrandingInstances[videoID] 
+    if (videoBrandingInstances[videoID]
             && [null, videoBrandingInstances[videoID].showCustomBranding.originalValue]
                     .includes(videoBrandingInstances[videoID].showCustomBranding.knownValue)) {
 
@@ -570,7 +569,7 @@ export function setupOptionChangeListener(): void {
             }
         }
 
-        if (changes.titleMaxLines 
+        if (changes.titleMaxLines
                 && changes.titleMaxLines.newValue !== changes.titleMaxLines.oldValue) {
             addMaxTitleLinesCssToPage();
         }
@@ -610,9 +609,7 @@ function waitForImageSrc(image: HTMLImageElement): Promise<void> {
 
 async function hasCustomTitleWithOriginalTitle(videoID: VideoID, originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): Promise<boolean> {
     const title = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
-    const originalTitle = originalTitleElement?.textContent;
-    const customTitle = title && !title.original 
-        && (!originalTitle || (cleanResultingTitle(cleanEmojis(title.title))).toLowerCase() !== (cleanResultingTitle(cleanEmojis(originalTitle))).toLowerCase())
+    const customTitle = title
         && await shouldUseCrowdsourcedTitles(videoID);
 
     return !!customTitle;
@@ -623,7 +620,7 @@ export async function hasCustomTitle(videoID: VideoID, element: HTMLElement, bra
 }
 
 export function getActualShowCustomBranding(showCustomBranding: ShowCustomBrandingInfo): Promise<boolean> {
-    return showCustomBranding.knownValue === null 
+    return showCustomBranding.knownValue === null
         ? showCustomBranding.actualValue
         : Promise.resolve(showCustomBranding.knownValue);
 }
