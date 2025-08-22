@@ -1,5 +1,5 @@
 import { TitleFormatting } from "../src/config/config";
-import { capitalizeFirstLetter, cleanPunctuation, formatTitleInternal, isAcronym, isAcronymStrict, isInTitleCase, isMostlyAllCaps, toCapitalizeCase, toSentenceCase, toTitleCase } from "../src/titles/titleFormatter";
+import { capitalizeFirstLetter, cleanFancyText, cleanPunctuation, formatTitleInternal, isAcronym, isAcronymStrict, isInTitleCase, isMostlyAllCaps, toCapitalizeCase, toSentenceCase, toTitleCase } from "../src/titles/titleFormatter";
 
 describe("Acronym Tests", () => {
     const acronymCases: [string, boolean][] = [
@@ -254,12 +254,13 @@ describe("toSentenceCase", () => {
 });
 
 describe("toSentenceCase cleanEmojis", () => {
-    const titleCases: [string, string][] = [
+    const sentenceCases: [string, string][] = [
         ["🚨 Announcement: New Series Coming!", "Announcement: New series coming"],
         ["𝐆𝐀𝐋𝐓 𝐒𝐔𝐁 𝐓𝐑𝐀𝐈𝐍𝐒 Railfan Mini-Meetup at Leaside", "Galt sub trains railfan mini-meetup at leaside"],
-        ["The country of 🇨🇦 exists", "The country of 🇨🇦 exists"]
+        ["The country of 🇨🇦 exists", "The country of 🇨🇦 exists"],
+        ["𝗧𝗘𝗧𝗥𝗜𝗦 𝗧𝗛𝗘𝗠𝗘, but it's in 𝗔 𝗠𝗮𝗷𝗼𝗿. some more words to bypass shouldTrustCaps", "Tetris theme, but it's in A Major. Some more words to bypass shouldTrustCaps"]
     ];
-    for (const testCase of titleCases) {
+    for (const testCase of sentenceCases) {
         const [input, expected] = testCase;
         it(input, async () => {
             expect(await formatTitleInternal(input, false, TitleFormatting.SentenceCase, true)).toBe(expected);
@@ -337,6 +338,26 @@ describe("cleanPunctuation", () => {
         const [input, expected] = testCase;
         it(input, () => {
             expect(cleanPunctuation(input)).toBe(expected);
+        });
+    }
+});
+
+describe("cleanFancyText", () => {
+    const titleCases: [string, string][] = [
+        ["𝐆𝐀𝐋𝐓 𝐒𝐔𝐁 𝐓𝐑𝐀𝐈𝐍𝐒 Railfan Mini-Meetup at Leaside", "GALT SUB TRAINS Railfan Mini-Meetup at Leaside"],
+        ["Every Glitch in Super Mario Odyssey ᵃˡᵐᵒˢᵗ", "Every Glitch in Super Mario Odyssey almost"],
+        ["A word with all the letters ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ", "A word with all the letters abcdefghijklmnoprstuvwxyz"],
+        ["A word with all the letters ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘꞯʀꜱᴛᴜᴠᴡʏᴢ", "A word with all the letters ABCDEFGHIJKLMNOPQRSTUVWYZ"],
+        ["A word with all the letters 𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳", "A word with all the letters abcdefghijklmnopqrstuvwxyz"],
+        ["A word with all the letters ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ", "A word with all the letters abcdefghijklmnopqrstuvwxyz"],
+        ["𝗧𝗘𝗧𝗥𝗜𝗦 𝗧𝗛𝗘𝗠𝗘, but it's in 𝗔 𝗠𝗮𝗷𝗼𝗿.", "TETRIS THEME, but it's in A Major."],
+        ["𝘁𝗮𝗹𝗸𝗶𝗻𝗴 𝘁𝗮𝗹𝗸𝗶𝗻𝗴 𝘁𝗮𝗹𝗸𝗶𝗻𝗴", "talking talking talking"],
+        
+    ];
+    for (const testCase of titleCases) {
+        const [input, expected] = testCase;
+        it(input, async () => {
+            expect(await cleanFancyText(input)).toBe(expected);
         });
     }
 });
