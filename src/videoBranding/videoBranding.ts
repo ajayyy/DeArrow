@@ -263,7 +263,7 @@ export function getLinkElement(element: HTMLElement, brandingLocation: BrandingL
     switch (brandingLocation) {
         case BrandingLocation.Related:
             if (!onMobile()) {
-                const link = element.querySelector("a#thumbnail, a.reel-item-endpoint, a.yt-lockup-metadata-view-model-wiz__title, a.yt-lockup-metadata-view-model-wiz__title-link, a.yt-lockup-view-model-wiz__content-image") as HTMLAnchorElement;
+                const link = element.querySelector("a#thumbnail, a.reel-item-endpoint, a.yt-lockup-metadata-view-model__title, a.yt-lockup-metadata-view-model__title-link, a.yt-lockup-view-model__content-image, a.yt-lockup-metadata-view-model-wiz__title") as HTMLAnchorElement;
                 if (link) {
                     return link;
                 } else if (element.nodeName === "YTD-HERO-PLAYLIST-THUMBNAIL-RENDERER") {
@@ -334,7 +334,8 @@ export async function extractVideoIDFromElement(element: HTMLElement, brandingLo
 
 function isPlaylistOrClipTitle(element: HTMLElement, link: HTMLAnchorElement) {
     return (link.href?.match(/list=/)?.[0] !== undefined 
-            && link.href?.match(/index=/)?.[0] === undefined)
+            && link.href?.match(/index=/)?.[0] === undefined
+            && link.href?.match(/start_radio=/)?.[0] === undefined)
         || link.href?.match(/\/clip\//)?.[0] !== undefined;
 }
 

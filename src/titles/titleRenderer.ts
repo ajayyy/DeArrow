@@ -318,6 +318,7 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
                 "#movie-title", // Movies in related
                 "#description #title", // Related videos in description
                 ".yt-lockup-metadata-view-model-wiz__title .yt-core-attributed-string", // New desktop related
+                ".yt-lockup-metadata-view-model__title .yt-core-attributed-string", // New desktop related
                 ".ShortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
                 ".shortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
                 ".details .media-item-headline .yt-core-attributed-string", // Mobile YouTube
@@ -428,10 +429,10 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
             titleElement.parentElement!.style.justifyContent = "space-between";
 
             // For 2024 Oct new UI
-            if (titleElement.parentElement!.classList.contains("yt-lockup-metadata-view-model-wiz__title")) {
+            if (titleElement.parentElement!.classList.contains("yt-lockup-metadata-view-model__title")) {
                 titleElement.parentElement!.style.maxHeight = `calc(${getComputedStyle(titleElement.parentElement!).lineHeight} * ${Math.max(1, Config.config!.titleMaxLines)}`;
 
-                const container = titleElement.closest(".yt-lockup-metadata-view-model-wiz__text-container") as HTMLElement;
+                const container = titleElement.closest(".yt-lockup-metadata-view-model__text-container") as HTMLElement;
                 if (container) {
                     container.style.width = "100%";
                 }
