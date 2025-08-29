@@ -318,8 +318,6 @@ function isOfficialTime(): boolean {
 async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Record<VideoID, BrandingResult> | null> {
     let results: Record<VideoID, BrandingResult> | null = null;
 
-    // i usually hate try/catches that catch the nearly the whole function...
-    // ... but this one just seems to.. make sense?   - mini_bomba
     try {
         if (queryByHash) {
             const request = await sendRequestToServer("GET", `/api/branding/${(await getHash(videoID, 1)).slice(0, 4)}`, {
