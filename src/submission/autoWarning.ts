@@ -1,8 +1,10 @@
 import { objectToURI } from "../../maze-utils/src";
+import { logRequest } from "../../maze-utils/src/background-request-proxy";
 import { getCurrentPageTitle } from "../../maze-utils/src/elements";
 import { getHash } from "../../maze-utils/src/hash";
 import Config from "../config/config";
 import { cleanEmojis, cleanFancyText, cleanPunctuation, isWordCustomCapitalization } from "../titles/titleFormatter";
+import { logError } from "../utils/logger";
 import { sendRequestToServer } from "../utils/requests";
 import { Tooltip } from "../utils/tooltip";
 import { ChatDisplayName, getChatDisplayName } from "./SubmissionComponent";
@@ -163,19 +165,27 @@ function showAutoWarningIfRequiredInternal(title: string, element: HTMLElement):
                     const publicUserID = await getHash(Config.config!.userID!);
 
                     const values = ["userName"];
-                    const result = await sendRequestToServer("GET", "/api/userInfo", {
-                        publicUserID: publicUserID,
-                        values
-                    });
+                    let name: ChatDisplayName = {
+                        publicUserID,
+                        username: null
+                    };
+                    try {
+                        const result = await sendRequestToServer("GET", "/api/userInfo", {
+                            publicUserID: publicUserID,
+                            values
+                        });
 
-                    let name: ChatDisplayName | null = null;
-
-                    if (result.ok) {
-                        const userInfo = JSON.parse(result.responseText);
-                        name = {
-                            publicUserID,
-                            username: userInfo.userName
-                        };
+                        if (result.ok) {
+                            const userInfo = JSON.parse(result.responseText);
+                            name = {
+                                publicUserID,
+                                username: userInfo.userName
+                            };
+                        } else {
+                            logRequest(result, "CB", "username for chat");
+                        }
+                    } catch (e) {
+                        logError("Caught error while attempting to fetch user's username before opening the help chat", e);
                     }
 
                     window.open(`https://chat.sponsor.ajay.app/#${objectToURI("", {
