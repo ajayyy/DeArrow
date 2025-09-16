@@ -869,7 +869,7 @@ ytd-playlist-video-thumbnail-renderer {
 }
 
 /* Making the duration of videos on mobile YouTube appear */
-.video-thumbnail-overlay-bottom-left-right-group {
+.video-thumbnail-overlay-bottom-left-right-group, .videoThumbnailGroupOverlayBottomLeftRightGroup {
     z-index: 1;
 }
 
