@@ -1,5 +1,5 @@
 import { getYouTubeTitleNodeSelector } from "../../maze-utils/src/elements";
-import { getVideoID, isOnChannelPage, VideoID } from "../../maze-utils/src/video";
+import { extractVideoID, getVideoID, isOnChannelPage, VideoID } from "../../maze-utils/src/video";
 import { getElement, isVisibleOrParent, waitForElement } from "../../maze-utils/src/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { getThumbnailImageSelector, replaceThumbnail } from "../thumbnails/thumbnailRenderer";
@@ -292,37 +292,6 @@ export function getLinkElement(element: HTMLElement, brandingLocation: BrandingL
     }
 }
 
-async function extractVideoID(link: HTMLAnchorElement) {
-    const videoIDRegex = link.href?.match?.(/(?:\?|&)v=(\S{11})|\/shorts\/(\S{11})/);
-    let videoID = (videoIDRegex?.[1] || videoIDRegex?.[2]) as VideoID;
-
-    if (!videoID) {
-        const imgBackground = link.querySelector(".ytp-tooltip-bg") as HTMLElement;
-        if (imgBackground) {
-            const href = imgBackground.style.backgroundImage?.match(/url\("(.+)"\)/)?.[1];
-            if (href) {
-                videoID = href.match(/\/vi\/(\S{11})/)?.[1] as VideoID;
-            }
-        } else {
-            const image = link.querySelector(`yt-image img, img.video-thumbnail-img, yt-img-shadow:not([id="avatar"]) img`) as HTMLImageElement;
-            if (image) {
-                let href = image.getAttribute("src");
-                if (!href) {
-                    // wait source to be setup
-                    await waitForImageSrc(image);
-                    href = image.getAttribute("src");
-                }
-    
-                if (href) {
-                    videoID = href.match(/\/vi\/(\S{11})/)?.[1] as VideoID;
-                }
-            }
-        }
-    }
-
-    return videoID;
-}
-
 export async function extractVideoIDFromElement(element: HTMLElement, brandingLocation: BrandingLocation): Promise<VideoID | null> {
     const link = getLinkElement(element, brandingLocation);
     if (link) { 
@@ -576,37 +545,6 @@ export function setupOptionChangeListener(): void {
             addMaxTitleLinesCssToPage();
         }
     });
-}
-
-const imagesWaitingFor = new Map<HTMLImageElement, Promise<void>>();
-function waitForImageSrc(image: HTMLImageElement): Promise<void> {
-    const existingPromise = imagesWaitingFor.get(image);
-    if (!existingPromise) {
-        const result = new Promise<void>((resolve) => {
-            const observer = new MutationObserver((mutations) => {
-                if (!chrome.runtime?.id) return;
-
-                for (const mutation of mutations) {
-                    if (mutation.attributeName === "src"
-                            && image.src !== "") {
-                        observer.disconnect();
-                        resolve();
-
-                        imagesWaitingFor.delete(image);
-                        break;
-                    }
-                }
-            });
-
-            observer.observe(image, { attributes: true });
-        });
-
-        imagesWaitingFor.set(image, result);
-
-        return result;
-    }
-
-    return existingPromise;
 }
 
 async function hasCustomTitleWithOriginalTitle(videoID: VideoID, originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): Promise<boolean> {
