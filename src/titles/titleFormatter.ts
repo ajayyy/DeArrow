@@ -401,6 +401,11 @@ function forceKeepFormatting(word: string, ignorePunctuation = true): boolean {
         return true;
     }
 
+    // Don't capitalize subreddits
+    if (word.startsWith("r/")) {
+        return true;
+    }
+
     return result;
 }
 
