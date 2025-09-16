@@ -1,0 +1,20 @@
+name: Temp deploy
+
+on: 
+  workflow_dispatch:
+
+jobs:
+
+  deploy-ghp:
+    name: Deploy to github pages
+    permissions:
+      id-token: write
+      pages: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
