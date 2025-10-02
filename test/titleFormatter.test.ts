@@ -68,6 +68,11 @@ describe("isInTitleCase", () => {
     const inTitleCaseCases: [string[], boolean][] = [
         [["Go", "on", "the", "Table", "with", "a", "Cat"], true],
         [["Go", "on", "the", "table", "with", "a", "cat"], false],
+        [["Go", "On", "The", "Table", "With", "A", "cAtt"], false],
+        [["Go", "On", "The", "Table", "With", "A", "Catt"], true],
+        [["go", "on", "the", "table", "with", "a", "cat"], false],
+        [["GG", "On", "The", "5", "Wi", "A", "Cat"], true],
+        [["Beating", "Pokemon", "Ruby/Sapphire", "with", "just", "a", "Zubat"], false],
     ];
     for (const testCase of inTitleCaseCases) {
         const [input, expected] = testCase;
