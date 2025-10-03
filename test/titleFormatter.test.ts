@@ -249,6 +249,8 @@ describe("toSentenceCase", () => {
         ["Why I Won't Buy Into The Tesla Cybertruck Hype When my Alternative is Much More Fun", "Why I won't buy into the tesla cybertruck hype when my alternative is much more fun"],
         ["Thorzone Nano Q case review", "Thorzone Nano Q case review"],
         ["1984 Mercedes-Benz 500SEC review", "1984 Mercedes-Benz 500SEC review"],
+        ["If Trump isn’t dying, why is he being treated like a Make-A-Wish kid?", "If Trump isn’t dying, why is he being treated like a Make-A-Wish kid?"],
+        ["If Trump isn’t dying, why is he being treated like a MAKE-A-WISH kid?", "If Trump isn’t dying, why is he being treated like a make-a-wish kid?"],
     ];
     for (const testCase of sentenceCases) {
         const [input, expected] = testCase;

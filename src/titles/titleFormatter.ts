@@ -109,9 +109,9 @@ export async function toSentenceCase(str: string, isCustom: boolean): Promise<st
             result += await capitalizeFirstLetter(word, isTurkiq) + " ";
         } else if (forceKeepFormatting(word)
             || isAcronymStrict(word)
-            || ((!inTitleCase || !isWordCapitalCase(word)) && trustCaps && isAcronym(word))
+            || ((!inTitleCase || !isWordCapitalCase(word, false)) && trustCaps && isAcronym(word))
             || (!inTitleCase && trustCaps && word.length === 1)
-            || (!inTitleCase && isWordCapitalCase(word))
+            || (!inTitleCase && isWordCapitalCase(word, true))
             || (isCustom && isWordCustomCapitalization(word))
             || (!isAllCaps(word) && isWordCustomCapitalization(word))
             || (!isGreek && await greekLetterAllowed(word))) {
@@ -345,8 +345,8 @@ export async function capitalizeFirstLetter(word: string, isTurkiq: boolean): Pr
     return result.join("");
 }
 
-function isWordCapitalCase(word: string): boolean {
-    const regex = /^[^\p{L}]*[\p{Lu}][^\p{Lu}]+$/u;
+function isWordCapitalCase(word: string, allowSingleWords: boolean): boolean {
+    const regex = allowSingleWords ? /^[^\p{L}]*[\p{Lu}][^\p{Lu}]*$/u : /^[^\p{L}]*[\p{Lu}][^\p{Lu}]+$/u;
     const compoundSections = word.split(/[-/]/);
     return !!word.match(regex) || (compoundSections.length > 1 && word.split(/[-/]/).every((w) => !!w.match(regex)));
 }
