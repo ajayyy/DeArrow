@@ -430,7 +430,8 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
 
             // For 2024 Oct new UI
             if (titleElement.parentElement!.classList.contains("yt-lockup-metadata-view-model__title")) {
-                titleElement.parentElement!.style.maxHeight = `calc(${getComputedStyle(titleElement.parentElement!).lineHeight} * ${Math.max(1, Config.config!.titleMaxLines)}`;
+                titleElement.parentElement!.classList.add("cbTitle24");
+                titleElement.parentElement!.parentElement!.style.setProperty("--cb-max-height", `calc(${getComputedStyle(titleElement.parentElement!).lineHeight} * ${Math.max(1, Config.config!.titleMaxLines)})`)
 
                 const container = titleElement.closest(".yt-lockup-metadata-view-model__text-container") as HTMLElement;
                 if (container) {

@@ -856,6 +856,13 @@ ytd-channel-video-player-renderer #title > a {
     background-color: transparent !important;
 }
 
+.yt-lockup-metadata-view-model__title.cbTitle24 {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    max-height: var(--cb-max-height) !important;
+}
+
 /* These now have a "mix" image in the background, so need a background */
 ytd-playlist-video-thumbnail-renderer,
 ytd-playlist-video-renderer a#thumbnail,
