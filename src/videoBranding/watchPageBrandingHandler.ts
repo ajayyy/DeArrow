@@ -19,6 +19,8 @@ let endscreenAutonavObserver: MutationObserver | null = null;
 let endscreenAutonavObserverElement: HTMLElement | null = null;
 let endscreenAutonavSuggestionObserver: MutationObserver | null = null;
 let endscreenAutonavSuggestionObserverElement: HTMLElement | null = null;
+let modernEndRecommendations = false;
+const endRecommendationsCardSelector = ".ytp-videowall-still, .ytp-modern-videowall-still";
 
 let waiting = false;
 let mutationObserver: MutationObserver | null = null;
@@ -40,8 +42,11 @@ export async function replaceVideoPlayerSuggestionsBranding(): Promise<void> {
 
         const endcardSelector = ".ytp-ce-element";
         const autoplaySelector = ".ytp-autonav-endscreen-countdown-overlay";
-        const endRecommendationsSelector = ".html5-endscreen:not(.autonav-endscreen)";
+        const endRecommendationsSelectorModern = ".ytp-fullscreen-grid";
+        const endRecommendationsSelectorOld = ".html5-endscreen:not(.autonav-endscreen)";
         const autonavSelector = ".html5-endscreen.autonav-endscreen";
+
+        modernEndRecommendations = !!refNode.querySelector(endRecommendationsSelectorModern);
 
         // Setup initial listeners
         {
@@ -57,9 +62,18 @@ export async function replaceVideoPlayerSuggestionsBranding(): Promise<void> {
                 setupAutoplayObserver(initialAutoplayElement);
             }
 
-            const initialEndRecommendationsElement = refNode.querySelector(endRecommendationsSelector) as HTMLElement;
+            const initialEndRecommendationsElement = (modernEndRecommendations
+                ? refNode.querySelector(endRecommendationsSelectorModern)
+                : refNode.querySelector(endRecommendationsSelectorOld)) as HTMLElement;
             if (initialEndRecommendationsElement) {
                 setupRecommendationsObserver(initialEndRecommendationsElement);
+
+                if (modernEndRecommendations) {
+                    const elements = initialEndRecommendationsElement.querySelectorAll(endRecommendationsCardSelector);
+                    for (const element of elements) {
+                        setupVideoBrandReplacement(element as HTMLElement, BrandingLocation.EndRecommendations);
+                    }
+                }
             }
 
             const initialAutonavElement = refNode.querySelector(autonavSelector) as HTMLElement;
@@ -69,7 +83,6 @@ export async function replaceVideoPlayerSuggestionsBranding(): Promise<void> {
             }
 
         }
-
 
         observerElement = refNode as HTMLElement;
         mutationObserver = new MutationObserver((mutations) => {
@@ -86,7 +99,8 @@ export async function replaceVideoPlayerSuggestionsBranding(): Promise<void> {
                         if (node instanceof HTMLElement) {
                             if (node.matches(autoplaySelector)) {
                                 setupAutoplayObserver(node);
-                            } else if (node.matches(endRecommendationsSelector)) {
+                            } else if ((modernEndRecommendations && node.matches(endRecommendationsSelectorModern))
+                                    || (!modernEndRecommendations && node.matches(endRecommendationsSelectorOld))) {
                                 setupRecommendationsObserver(node);
                             }  else if (node.matches(autonavSelector)) {
                                 setupAutonavSuggestionsObserver(node);
@@ -195,14 +209,14 @@ export function setupAutoplayObserver(element: HTMLElement): void {
 }
 
 export function setupRecommendationsObserver(element: HTMLElement): void {
-    const refNode = element.querySelector(".ytp-endscreen-content") as HTMLElement;
+    const refNode = element.querySelector(".ytp-endscreen-content, .ytp-fullscreen-grid-stills-container") as HTMLElement;
 
     if (!endRecommendationsObserver || endRecommendationsObserverElement !== element && refNode) {
         if (endRecommendationsObserver) endRecommendationsObserver.disconnect();
 
         endRecommendationsObserverElement = element as HTMLElement;
         endRecommendationsObserver = new MutationObserver((mutations) => observe(mutations,
-            ".ytp-videowall-still", BrandingLocation.EndRecommendations, CheckType.AddedNodes));
+            endRecommendationsCardSelector, BrandingLocation.EndRecommendations, CheckType.AddedNodes));
 
         endRecommendationsObserver.observe(refNode, {
             childList: true

@@ -343,7 +343,7 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
         case BrandingLocation.EndAutonav:
             return [".ytp-autonav-endscreen-upnext-title"];
         case BrandingLocation.EndRecommendations:
-            return [".ytp-videowall-still-info-title"];
+            return [".ytp-videowall-still-info-title", ".ytp-modern-videowall-still-info-title"];
         case BrandingLocation.EmbedSuggestions:
             return [".ytp-suggestion-title"];
         case BrandingLocation.UpNextPreview:

@@ -86,7 +86,8 @@ function buildHideThumbnailCss(): string {
     const result: string[] = [
         ".ytp-ce-covering-image:not(.cb-visible)", // Endcards
         "div.ytp-autonav-endscreen-upnext-thumbnail:not(.cb-visible)", // Autoplay
-        "div.ytp-videowall-still-image:not(.cb-visible)" // End recommendations
+        "div.ytp-videowall-still-image:not(.cb-visible)", // End recommendations
+        "div.ytp-modern-videowall-still-image:not(.cb-visible)" // End recommendations
     ];
 
     const boxesToHide = brandingBoxSelector.split(", ").concat([

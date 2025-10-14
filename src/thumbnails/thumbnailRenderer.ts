@@ -525,7 +525,7 @@ export function getThumbnailImageSelector(brandingLocation: BrandingLocation): s
         case BrandingLocation.EndAutonav:
             return "div.ytp-autonav-endscreen-upnext-thumbnail";
         case BrandingLocation.EndRecommendations:
-            return "div.ytp-videowall-still-image";
+            return "div.ytp-videowall-still-image, div.ytp-modern-videowall-still-image";
         case BrandingLocation.EmbedSuggestions:
             return ".ytp-suggestion-image";
         case BrandingLocation.Watch:
@@ -750,6 +750,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
 
             if (brandingLocation === BrandingLocation.EndRecommendations) {
                 thumbnail.classList.add("ytp-videowall-still-image");
+                thumbnail.classList.add("ytp-modern-videowall-still-image");
                 thumbnail.style.marginLeft = "auto";
                 thumbnail.style.marginRight = "auto";
             } else if (brandingLocation === BrandingLocation.Autoplay || brandingLocation === BrandingLocation.EndAutonav) {
@@ -778,7 +779,9 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                 thumbnail.style.removeProperty("height");
             }
 
-            if (brandingLocation === BrandingLocation.Autoplay || brandingLocation === BrandingLocation.EndAutonav) {
+            if (brandingLocation === BrandingLocation.Autoplay
+                    || brandingLocation === BrandingLocation.EndAutonav
+                    || brandingLocation === BrandingLocation.EndRecommendations) {
                 // For autoplay, the thumbnail is placed inside the image div, which has the image as the background image
                 // This is because hiding the entire div would hide the video duration
                 image.prepend(thumbnail);
@@ -887,6 +890,7 @@ function resetToShowOriginalThumbnail(image: HTMLImageElement, brandingLocation:
             || brandingLocation === BrandingLocation.Related
             || brandingLocation === BrandingLocation.Notification
             || brandingLocation === BrandingLocation.NotificationTitle
+            || brandingLocation === BrandingLocation.EndRecommendations
             || !!image.closest("ytd-grid-playlist-renderer")
             || isLiveCover(image)
             || image.parentElement?.classList.contains("ytp-cued-thumbnail-overlay")) {
