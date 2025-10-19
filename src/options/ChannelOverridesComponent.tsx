@@ -108,6 +108,7 @@ export const ChannelOverridesComponent = () => {
                         id="configurationName"
                         value={configurationName}
                         placeholder={chrome.i18n.getMessage("ConfigurationName")}
+                        style={{width: document.getElementById("channelOverrides")?.clientWidth || undefined}}
                         onChange={(e) => {
                             const newName = e.target.value;
                             getConfig(selectedConfigurationID)!.name = newName;

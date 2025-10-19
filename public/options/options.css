@@ -782,6 +782,10 @@ svg {
     cursor: pointer;
 }
 
+#configurationName {
+    min-width: 200px;
+}
+
 .sb-optionContainer .reset-button {
     padding-left: 10px;
     display: inline;
