@@ -868,7 +868,8 @@ ytd-playlist-video-thumbnail-renderer,
 ytd-playlist-video-renderer a#thumbnail,
 ytd-playlist-video-renderer .yt-thumbnail-view-model__image
 ytd-compact-radio-renderer a#thumbnail,
-ytd-compact-radio-renderer .yt-thumbnail-view-model__image {
+ytd-compact-radio-renderer .yt-thumbnail-view-model__image,
+yt-collections-stack yt-thumbnail-view-model {
     background-color: black;
 }
 ytd-playlist-video-thumbnail-renderer {
