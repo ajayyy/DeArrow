@@ -335,6 +335,7 @@ export const allowlistedWords = new Set([
     "DSKY",
     "DRO",
     "MCSR",
+    "ELO",
 ]);
 
 // Can be switched to a trie structure if it grows
