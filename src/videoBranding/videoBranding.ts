@@ -12,7 +12,7 @@ import { getVideoCasualInfo, getVideoTitleIncludingUnsubmitted } from "../dataFe
 import { handleOnboarding } from "./onboarding";
 import { cleanEmojis, cleanResultingTitle } from "../titles/titleFormatter";
 import { getTitleFormatting, shouldDefaultToCustom, shouldDefaultToCustomFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
-import { onMobile } from "../../maze-utils/src/pageInfo";
+import { isOnV3Extension, onMobile } from "../../maze-utils/src/pageInfo";
 import { addMaxTitleLinesCssToPage } from "../utils/cssInjector";
 import { casualVoteButton, submitButton } from "../video";
 import { waitFor } from "../../maze-utils/src";
@@ -63,8 +63,9 @@ export interface VideoBrandingInstance {
     updateBrandingCallbacks: Array<() => Promise<void>>;
 }
 
-export const brandingBoxSelector = !onMobile() 
+export const brandingBoxSelector = !onMobile()
     ? "ytd-rich-grid-media, ytd-video-renderer, ytd-movie-renderer, ytd-compact-video-renderer, ytd-compact-radio-renderer, ytd-compact-movie-renderer, ytd-playlist-video-renderer, ytd-playlist-panel-video-renderer, ytd-grid-video-renderer, ytd-grid-movie-renderer, ytd-rich-grid-slim-media, ytd-radio-renderer, ytd-reel-item-renderer, ytd-compact-playlist-renderer, ytd-playlist-renderer, ytd-grid-playlist-renderer, ytd-grid-show-renderer, ytd-structured-description-video-lockup-renderer, ytd-hero-playlist-thumbnail-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model"
+        + ".lohp-large-shelf-container, .lohp-medium-shelf, .yt-lockup-video, .related-video" // Vorapis v3
     : "ytm-video-with-context-renderer, ytm-compact-radio-renderer, ytm-reel-item-renderer, ytm-channel-featured-video-renderer, ytm-compact-video-renderer, ytm-playlist-video-renderer, .playlist-immersive-header-content, ytm-compact-playlist-renderer, ytm-video-card-renderer, ytm-vertical-list-renderer, ytm-playlist-panel-video-renderer, ytm-shorts-lockup-view-model";
 
 export const watchPageThumbnailSelector = ".ytp-cued-thumbnail-overlay";
@@ -264,7 +265,10 @@ export function getLinkElement(element: HTMLElement, brandingLocation: BrandingL
         case BrandingLocation.Related:
             if (!onMobile()) {
                 const link = element.querySelector("a#thumbnail, a.reel-item-endpoint, a.yt-lockup-metadata-view-model__title, a.yt-lockup-metadata-view-model__title-link, a.yt-lockup-view-model__content-image, a.yt-lockup-metadata-view-model-wiz__title") as HTMLAnchorElement;
-                if (link) {
+
+                if (isOnV3Extension() && element.tagName === "A") {
+                    return element as HTMLAnchorElement;
+                } else if (link) {
                     return link;
                 } else if (element.nodeName === "YTD-HERO-PLAYLIST-THUMBNAIL-RENDERER") {
                     return element.closest("a") as HTMLAnchorElement;

@@ -8,7 +8,7 @@ import { cleanEmojis, formatTitle } from "./titleFormatter";
 import { setCurrentVideoTitle } from "./pageTitleHandler";
 import { getTitleFormatting, shouldCleanEmojis, shouldDefaultToCustom, shouldReplaceTitles, shouldReplaceTitlesFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { countTitleReplacement } from "../config/stats";
-import { onMobile } from "../../maze-utils/src/pageInfo";
+import { isOnV3Extension, onMobile } from "../../maze-utils/src/pageInfo";
 import { isFirefoxOrSafari, waitFor } from "../../maze-utils/src";
 import { isSafari } from "../../maze-utils/src/config";
 import { notificationToTitle, titleToNotificationFormat } from "../videoBranding/notificationHandler";
@@ -307,29 +307,43 @@ export function getOriginalTitleElement(element: HTMLElement, brandingLocation: 
 function getTitleSelector(brandingLocation: BrandingLocation): string[] {
     switch (brandingLocation) {
         case BrandingLocation.Watch:
-            return [
-                "yt-formatted-string", 
-                ".ytp-title-link.yt-uix-sessionlink",
-                ".yt-core-attributed-string"
-            ];
+            if (!isOnV3Extension()) {
+                return [
+                    "yt-formatted-string", 
+                    ".ytp-title-link.yt-uix-sessionlink",
+                    ".yt-core-attributed-string"
+                ];
+            } else {
+                return [
+                    ".watch-title-text-container"
+                ];
+            }
         case BrandingLocation.Related:
-            return [
-                "#video-title",
-                "#movie-title", // Movies in related
-                "#description #title", // Related videos in description
-                ".yt-lockup-metadata-view-model-wiz__title .yt-core-attributed-string", // New desktop related
-                ".yt-lockup-metadata-view-model__title .yt-core-attributed-string", // New desktop related
-                ".ShortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
-                ".shortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
-                ".details .media-item-headline .yt-core-attributed-string", // Mobile YouTube
-                ".reel-item-metadata h3 .yt-core-attributed-string", // Mobile YouTube Shorts
-                ".shortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // Mobile YouTube Shorts
-                ".details > .yt-core-attributed-string", // Mobile YouTube Channel Feature
-                ".compact-media-item-headline .yt-core-attributed-string", // Mobile YouTube Compact,
-                ".amsterdam-playlist-title .yt-core-attributed-string", // Mobile YouTube Playlist Header,
-                ".autonav-endscreen-video-title .yt-core-attributed-string", // Mobile YouTube Autoplay
-                ".video-card-title .yt-core-attributed-string", // Mobile YouTube History List
-            ];
+            if (!isOnV3Extension()) {
+                return [
+                    "#video-title",
+                    "#movie-title", // Movies in related
+                    "#description #title", // Related videos in description
+                    ".yt-lockup-metadata-view-model-wiz__title .yt-core-attributed-string", // New desktop related
+                    ".yt-lockup-metadata-view-model__title .yt-core-attributed-string", // New desktop related
+                    ".ShortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
+                    ".shortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
+                    ".details .media-item-headline .yt-core-attributed-string", // Mobile YouTube
+                    ".reel-item-metadata h3 .yt-core-attributed-string", // Mobile YouTube Shorts
+                    ".shortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // Mobile YouTube Shorts
+                    ".details > .yt-core-attributed-string", // Mobile YouTube Channel Feature
+                    ".compact-media-item-headline .yt-core-attributed-string", // Mobile YouTube Compact,
+                    ".amsterdam-playlist-title .yt-core-attributed-string", // Mobile YouTube Playlist Header,
+                    ".autonav-endscreen-video-title .yt-core-attributed-string", // Mobile YouTube Autoplay
+                    ".video-card-title .yt-core-attributed-string", // Mobile YouTube History List
+                ];
+            } else {
+                return [
+                    ".title",
+                    ".yt-uix-tile-link",
+                    ".lohp-video-link"
+                ];
+            }
         case BrandingLocation.ChannelTrailer:
             return [
                 "yt-formatted-string", 
@@ -406,15 +420,21 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
             || brandingLocation === BrandingLocation.Notification
             || brandingLocation === BrandingLocation.EndAutonav
             || originalTitleElement.id === "movie-title"
-            || (originalTitleElement.id === "title" && originalTitleElement.parentElement?.id === "description")) {
+            || (originalTitleElement.id === "title" && originalTitleElement.parentElement?.id === "description")
+            || (isOnV3Extension() && brandingLocation !== BrandingLocation.Watch)) {
         const container = document.createElement("div");
         container.appendChild(titleElement);
 
-        if (brandingLocation === BrandingLocation.EndAutonav) {
+        if (brandingLocation === BrandingLocation.EndAutonav || isOnV3Extension()) {
             // Add it in right place
             originalTitleElement.parentElement?.insertBefore(container, originalTitleElement.nextSibling);
         } else {
             originalTitleElement.parentElement?.prepend(container);
+        }
+
+        if (isOnV3Extension()) {
+            container.style.marginRight = getComputedStyle(originalTitleElement).marginRight;
+            originalTitleElement.style.marginRight = "0px";
         }
 
         // Move original title element over to this element
@@ -446,7 +466,7 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
                 if (container) {
                     container.style.width = "100%";
                 }
-            } else {
+            } else if (!isOnV3Extension()) {
                 titleElement.parentElement!.style.width = "100%";
             }
         }

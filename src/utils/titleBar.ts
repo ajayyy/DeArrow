@@ -2,7 +2,7 @@ import { getYouTubeTitleNodeSelector } from "../../maze-utils/src/elements";
 import { getOriginalTitleElement } from "../titles/titleRenderer";
 import { BrandingLocation, replaceCurrentVideoBranding } from "../videoBranding/videoBranding";
 import { isVisible, waitForElement } from "../../maze-utils/src/dom";
-import { onMobile } from "../../maze-utils/src/pageInfo";
+import { isOnV3Extension, onMobile } from "../../maze-utils/src/pageInfo";
 import { logError } from "./logger";
 import { waitFor } from "../../maze-utils/src";
 import { getYouTubeTitleNode } from "../../maze-utils/src/elements";
@@ -36,7 +36,8 @@ export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLEleme
     // First case is for "proper description" userscript
     const referenceNode = titleNode?.classList?.contains?.("ytd-video-primary-info-renderer")
             || titleNode?.classList?.contains?.("slim-video-information-title")
-            || isOnDescriptionOnRightLayout 
+            || isOnDescriptionOnRightLayout
+            || isOnV3Extension()
         ? titleNode : titleNode?.parentElement;
 
     if (referenceNode) {
@@ -58,12 +59,13 @@ export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLEleme
             if (!referenceNode.contains(titleButtonContainer)) {
                 referenceNode.appendChild(titleButtonContainer);
 
-                // Not for vorapis v3
-                if (!referenceNode.classList.contains("yt-uix-button-panel")) {
-                    // Buttons on right
-                    referenceNode.style.display = "flex";
-                    referenceNode.style.justifyContent = "space-between";
-                    referenceNode.style.alignItems = "flex-start";
+                // Buttons on right
+                referenceNode.style.setProperty("display", "flex", "important");
+                referenceNode.style.justifyContent = "space-between";
+                referenceNode.style.alignItems = "flex-start";
+
+                if (isOnV3Extension()) {
+                    referenceNode.style.setProperty("--yt-spec-text-primary", "var(--color-black-text)");
                 }
 
                 const header = referenceNode.querySelector("h1");
