@@ -388,8 +388,17 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
             titleElement.removeAttribute("is-empty");
             break;
     }
-
+    
     titleElement.classList.add("cbCustomTitle");
+
+    const antiTranslateInstalled = document.querySelector(`script[data-ytantitranslatesettings]`);
+    if (antiTranslateInstalled) {
+        titleElement.classList.remove("yt-core-attributed-string");
+
+        if (!Config.config!.ignoreTranslatedTitles) {
+            Config.config!.ignoreTranslatedTitles = true;
+        }
+    }
 
     if (brandingLocation === BrandingLocation.EndRecommendations
             || brandingLocation === BrandingLocation.Autoplay
