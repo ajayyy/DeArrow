@@ -336,6 +336,7 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
                     ".amsterdam-playlist-title .yt-core-attributed-string", // Mobile YouTube Playlist Header,
                     ".autonav-endscreen-video-title .yt-core-attributed-string", // Mobile YouTube Autoplay
                     ".video-card-title .yt-core-attributed-string", // Mobile YouTube History List
+                    ".YtmCompactMediaItemHeadline .yt-core-attributed-string"
                 ];
             } else {
                 return [
@@ -760,7 +761,7 @@ async function createShowOriginalButton(element: HTMLElement, originalTitleEleme
         buttonElement.classList.add("cbMobile");
 
         // Add hover to show
-        const box = buttonElement.closest(".details, .compact-media-item-metadata, .reel-item-metadata, .shortsLockupViewModelHost");
+        const box = buttonElement.closest(".details, .compact-media-item-metadata, .reel-item-metadata, .shortsLockupViewModelHost, .YtmCompactMediaItemMetadata");
         if (box) {
             let readyToHide = false;
             box.addEventListener("touchstart", () => {

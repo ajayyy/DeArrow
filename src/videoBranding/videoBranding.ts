@@ -281,7 +281,7 @@ export function getLinkElement(element: HTMLElement, brandingLocation: BrandingL
                 }
             } else {
                 // Big thumbnails, compact thumbnails, shorts, channel feature, playlist header
-                return element.querySelector("a.media-item-thumbnail-container, a.compact-media-item-image, a.reel-item-endpoint, :scope > a, .amsterdam-playlist-thumbnail-wrapper > a") as HTMLAnchorElement;
+                return element.querySelector("a.media-item-thumbnail-container, a.compact-media-item-image, a.reel-item-endpoint, :scope > a, .amsterdam-playlist-thumbnail-wrapper > a, a.YtmCompactMediaItemMetadataContent") as HTMLAnchorElement;
             }
         case BrandingLocation.Endcards:
             return element.querySelector("a.ytp-ce-covering-overlay") as HTMLAnchorElement;
