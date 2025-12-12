@@ -16,5 +16,10 @@
         "content.css",
         "shared.css"
     ]
-  }]
+  }],
+  "browser_specific_settings": {
+    "safari": {
+      "strict_min_version": "14.0"
+    }
+  }
 }
