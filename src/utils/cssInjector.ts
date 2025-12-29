@@ -1,8 +1,8 @@
 import { isFirefoxOrSafari, waitFor } from "../../maze-utils/src";
 import Config from "../config/config";
-import { brandingBoxSelector, watchPageThumbnailSelector } from "../videoBranding/videoBranding";
+import { watchPageThumbnailSelector } from "../videoBranding/videoBranding";
 import { logError } from "./logger";
-import { getThumbnailElements } from "../../maze-utils/src/thumbnail-selectors";
+import { brandingBoxSelector, getThumbnailElements } from "../../maze-utils/src/thumbnail-selectors";
 import { onMobile } from "../../maze-utils/src/pageInfo";
 
 const cssFiles = [
