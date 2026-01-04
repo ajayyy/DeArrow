@@ -1,6 +1,6 @@
 import { fetchChannelnfo } from "./thumbnailData";
 import { VideoID } from "../../maze-utils/src/video";
-import { getNumberOfThumbnailCacheRequests, getThumbnailUrl, getVideoThumbnailIncludingUnsubmitted, isActiveThumbnailCacheRequest, isFetchingFromThumbnailCache, queueThumbnailCacheRequest, waitForThumbnailCache } from "../dataFetching";
+import { getThumbnailUrl, getVideoThumbnailIncludingUnsubmitted, isActiveThumbnailCacheRequest, queueThumbnailCacheRequest, waitForThumbnailCache } from "../dataFetching";
 import { log, logError } from "../utils/logger";
 import { BrandingLocation, ShowCustomBrandingInfo, getActualShowCustomBranding, shouldShowCasual } from "../videoBranding/videoBranding";
 import { isFirefoxOrSafari, timeoutPomise, waitFor } from "../../maze-utils/src";
@@ -188,7 +188,7 @@ export async function renderThumbnail(videoID: VideoID, width: number,
             }
 
             const videoInfo: RenderedThumbnailVideo = {
-                blob: blobResult,
+                blobUrl: URL.createObjectURL(blobResult),
                 video: saveVideo ? video : null,
                 width: video.videoWidth,
                 height: video.videoHeight,
@@ -409,36 +409,6 @@ export async function createThumbnailImageElement(existingElement: HTMLImageElem
         }
     }
 
-    let waitingForFetchTries = 0;
-    while (isFetchingFromThumbnailCache(videoID, timestamp)) {
-        // Wait for the thumbnail to be fetched from the cache before trying local generation
-        try {
-            const promises = [
-                waitForThumbnailCache(videoID),
-                timeoutPomise(Config.config!.startLocalRenderTimeout).catch(() => ({}))
-            ];
-
-            // If we know about it, we don't want to return early without using the timeout
-            if (shouldReplaceThumbnailsFastCheck(videoID) === null) {
-                promises.push(shouldReplaceThumbnails(videoID));
-            }
-
-            await Promise.race(promises);
-
-            if (isFetchingFromThumbnailCache(videoID, timestamp) 
-                    && getNumberOfThumbnailCacheRequests() > 3 && waitingForFetchTries < 5
-                    && shouldReplaceThumbnailsFastCheck(videoID) !== false) {
-                waitingForFetchTries++;
-                log(videoID, "Lots of thumbnail cache requests in progress, waiting a little longer");
-            } else {
-                break;
-            }
-        } catch (e) {
-            // Go on and do a local render
-            break;
-        }
-    }
-
     if (!await stillValid()) {
         return null;
     }
@@ -453,8 +423,7 @@ export async function createThumbnailImageElement(existingElement: HTMLImageElem
             return;
         }
 
-        const url = URL.createObjectURL(canvasInfo.blob);
-        ready(image, url, timestamp);
+        ready(image, canvasInfo.blobUrl, timestamp);
     }
 
     const activeRender = activeRenders[videoID] ?? renderThumbnail(videoID, width, height, saveVideo, timestamp, true).finally(() => {
@@ -983,7 +952,7 @@ function isLiveCover(image: HTMLElement) {
     return !!image.parentElement?.querySelector(".cbLiveCover");
 }
 
-export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, blob: Blob, width = 1280, height = 720, notifyStopRender = true) {
+export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, blobUrl: string, width = 1280, height = 720, notifyStopRender = true) {
     const videoCache = thumbnailDataCache.setupCache(videoID);
     const videoObject: RenderedThumbnailVideo = {
         video: null,
@@ -992,7 +961,7 @@ export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, b
         rendered: true,
         onReady: [],
         timestamp,
-        blob,
+        blobUrl,
         fromThumbnailCache: true
     }
     videoCache.video.push(videoObject);
@@ -1004,7 +973,7 @@ export function setupPreRenderedThumbnail(videoID: VideoID, timestamp: number, b
     const unrendered = videoCache.video.filter(v => v.timestamp === timestamp && !v.rendered);
     if (unrendered.length > 0) {
         for (const video of unrendered) {
-            (video as RenderedThumbnailVideo).blob = blob;
+            (video as RenderedThumbnailVideo).blobUrl = blobUrl;
             video.rendered = true;
 
             for (const callback of video.onReady) {
