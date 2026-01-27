@@ -126,16 +126,19 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
 }
 
 function getPossibleSelectors(onWatchPage: boolean, onEmbedPage: boolean, onChannelPage: boolean) {
-    const embedSelector = {
+    const embedSelectors = [{
+        selector: ".ytp-title-text",
+        checkVisibility: false
+    }, {
         selector: ".ytPlayerOverlayVideoDetailsRendererTitle",
         checkVisibility: false
-    };
+    }];
     const desktopWatchSelectors = [
         {
             selector: getYouTubeTitleNodeSelector(),
             checkVisibility: true
         },
-        embedSelector,
+        ...embedSelectors,
         {
             selector: "ytd-video-description-header-renderer #shorts-title",
             checkVisibility: false
@@ -176,7 +179,7 @@ function getPossibleSelectors(onWatchPage: boolean, onEmbedPage: boolean, onChan
             }
         ].concat(desktopMiniplayerSelector);
     } else if (onEmbedPage) {
-        return [embedSelector];
+        return embedSelectors;
     } else {
         return desktopMiniplayerSelector;
     }
