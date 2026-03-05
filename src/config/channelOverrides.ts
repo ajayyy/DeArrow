@@ -65,7 +65,7 @@ async function checkChannelOverrideOption<T>(videoID: VideoID | null, option: st
     if (!videoID) return Config.config![option];
 
     const overrideTypes = getUsedOverrideTypes();
-    const channelIdentifiers: string[] = [];
+    const channelIdentifiers: string[] = [videoID];
 
     if (overrideTypes.name) {
         const id = await getChannelNameFromVideo(videoID);
@@ -113,7 +113,7 @@ function fastChannelOverrideOption<T>(videoID: VideoID | null, option: string): 
     }
 
     const overrideTypes = getUsedOverrideTypes();
-    const channelIdentifiers: string[] = [];
+    const channelIdentifiers: string[] = [videoID];
 
     if (overrideTypes.name) {
         const id = getChannelNameFromVideo(videoID).peek();
