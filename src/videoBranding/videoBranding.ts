@@ -5,7 +5,7 @@ import { ThumbnailResult } from "../thumbnails/thumbnailData";
 import { getThumbnailImageSelector, replaceThumbnail } from "../thumbnails/thumbnailRenderer";
 import { TitleResult } from "../titles/titleData";
 import { findOrCreateShowOriginalButton, getOrCreateTitleElement, getOriginalTitleElement, hideAndUpdateShowOriginalButton as hideAndUpdateShowOriginalButton, replaceTitle } from "../titles/titleRenderer";
-import { setThumbnailListener } from "../../maze-utils/src/thumbnailManagement";
+import { removeHandledThumbnail, setThumbnailListener } from "../../maze-utils/src/thumbnailManagement";
 import Config, { ThumbnailCacheOption, TitleFormatting } from "../config/config";
 import { logError } from "../utils/logger";
 import { getVideoCasualInfo, getVideoTitleIncludingUnsubmitted } from "../dataFetching";
@@ -254,6 +254,8 @@ export async function replaceVideoCardBranding(element: HTMLElement, brandingLoc
         if (originalThumbnail) {
             originalThumbnail.classList.add("cb-visible");
         }
+
+        removeHandledThumbnail(element);
     }
 
     return [false, false];
