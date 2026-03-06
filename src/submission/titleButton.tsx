@@ -139,8 +139,6 @@ export class TitleButton {
             && document.getElementById("unhook-yt")
             && getComputedStyle(popupNode.parentElement).display === "none";
 
-        console.log(popupNode, rightPanelHiddenWithUnhook)
-
         if (!popupNode
                 || popupNode.childElementCount < 2
                 || isOnDescriptionOnRightLayout
