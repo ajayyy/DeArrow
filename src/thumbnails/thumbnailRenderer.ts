@@ -748,6 +748,14 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                 image.prepend(thumbnail);
                 image.style.removeProperty("display");
                 image.classList.add("cb-visible");
+
+                // remove existing cb images if they exist
+                const thumbnails = image.querySelectorAll(".cbCustomThumbnailCanvas");
+                for (const thumb of thumbnails) {
+                    if (thumb !== thumbnail) {
+                        thumb.remove();
+                    }
+                }
             } else {
                 if (!isOnV3Extension()) {
                     image.parentElement?.appendChild?.(thumbnail);
