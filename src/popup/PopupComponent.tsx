@@ -364,7 +364,7 @@ function ChannelOverridesMenu(props: ChannelOverridesMenuProps): JSX.Element {
                         } else if (!Config.config!.channelOverrides[props.videoData.videoID]) {
                             // If nothing set for this video, default to setting for the channel
                             setSelectedOverrideAction("forThisChannel");
-                            updateChannelOverrideSetting(props.videoData, selectedOverrideAction, configID)
+                            updateChannelOverrideSetting(props.videoData, "forThisChannel", configID)
                         }
                     }}
                     value={configID ?? "null"}
