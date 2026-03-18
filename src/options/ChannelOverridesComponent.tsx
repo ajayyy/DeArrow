@@ -140,18 +140,16 @@ export const ChannelOverridesComponent = () => {
                             setChannelListText(newText);
 
                             const channels = newText.split("\n").map((channel) => channel.trim()).filter((channel) => channel !== "");
-                            if (channels.length > 0) {
-                                for (const [channelID, id] of Object.entries(Config.config!.channelOverrides)) {
-                                    if (id === selectedConfigurationID) {
-                                        if (!channels.includes(channelID)) {
-                                            delete Config.config!.channelOverrides[channelID];
-                                        }
+                            for (const [channelID, id] of Object.entries(Config.config!.channelOverrides)) {
+                                if (id === selectedConfigurationID) {
+                                    if (!channels.includes(channelID)) {
+                                        delete Config.config!.channelOverrides[channelID];
                                     }
                                 }
+                            }
 
-                                for (const channel of channels) {
-                                    Config.config!.channelOverrides[channel] = selectedConfigurationID;
-                                }
+                            for (const channel of channels) {
+                                Config.config!.channelOverrides[channel] = selectedConfigurationID;
                             }
 
                             forceUpdateOverrides();
