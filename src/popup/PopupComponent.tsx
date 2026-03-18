@@ -9,7 +9,7 @@ import { isActivated } from "../license/license";
 import { LicenseComponent } from "../license/LicenseComponent";
 import { FormattedText } from "./FormattedTextComponent";
 import { SelectOptionComponent } from "./SelectOptionComponent";
-import { getChannelOverrideID, VideoOverrideData } from "../config/channelOverrides";
+import { getChannelOverrideID, getOverrideOptionForConfigID, setOverrideOrOriginal, VideoOverrideData } from "../config/channelOverrides";
 
 type ChannelOverridesAction = "forJustThisVideo" | "forThisChannel" | null;
 interface ChannelOverridesOption {
@@ -42,6 +42,7 @@ export const PopupComponent = () => {
     const [replaceTitles, setReplaceTitles] = React.useState(Config.config!.replaceTitles);
     const [replaceThumbnails, setReplaceThumbnails] = React.useState(Config.config!.replaceThumbnails);
     const [titleFormatting, setTitleFormatting] = React.useState(Config.config!.titleFormatting);
+    const [configID, setConfigID] = React.useState<ConfigurationID | null>(null);
 
     const [videoData, setVideoOverrideData] = React.useState<VideoOverrideData | null>(null);
     React.useEffect(() => {
@@ -51,6 +52,11 @@ export const PopupComponent = () => {
             }
         });
     }, []);
+
+    React.useEffect(() => {
+        setReplaceTitles(getOverrideOptionForConfigID(configID ?? null, "replaceTitles")!);
+        setReplaceThumbnails(getOverrideOptionForConfigID(configID ?? null, "replaceThumbnails")!);
+    }, [configID]);
 
     return (
         <>
@@ -92,6 +98,8 @@ export const PopupComponent = () => {
                             videoData?.videoID &&
                                 <ChannelOverridesButton
                                     videoData={videoData}
+                                    configID={configID}
+                                    setConfigID={setConfigID}
                                     titleFormatting={titleFormatting}
                                 />
                         }
@@ -143,7 +151,7 @@ export const PopupComponent = () => {
                         id="replaceTitles"
                         onChange={(value) => {
                             setReplaceTitles(value);
-                            Config.config!.replaceTitles = value;
+                            setOverrideOrOriginal(configID, "replaceTitles", value);
                         }}
                         value={replaceTitles}
                         label={chrome.i18n.getMessage("replaceTitles")}
@@ -157,7 +165,7 @@ export const PopupComponent = () => {
                         }}
                         onChange={(value) => {
                             setReplaceThumbnails(value);
-                            Config.config!.replaceThumbnails = value;
+                            setOverrideOrOriginal(configID, "replaceThumbnails", value);
                         }}
                         value={replaceThumbnails}
                         label={chrome.i18n.getMessage("replaceThumbnails")}
@@ -165,6 +173,7 @@ export const PopupComponent = () => {
                     />
 
                     <FormattingOptionsComponent
+                        configID={configID}
                         titleFormatting={titleFormatting}
                         setTitleFormatting={setTitleFormatting}
                     />
@@ -232,7 +241,14 @@ export const PopupComponent = () => {
     );
 };
 
-function ChannelOverridesButton(props: { videoData: VideoOverrideData; titleFormatting: TitleFormatting }): JSX.Element {
+interface ChannelOverridesButtonProps {
+    videoData: VideoOverrideData;
+    configID: ConfigurationID | null;
+    setConfigID: (c: ConfigurationID | null) => void;
+    titleFormatting: TitleFormatting;
+}
+
+function ChannelOverridesButton(props: ChannelOverridesButtonProps): JSX.Element {
     const [menuOpen, setMenuOpen] = React.useState(false);
     const channelOverrideId = getChannelOverrideID(props.videoData);
 
@@ -273,26 +289,39 @@ function ChannelOverridesButton(props: { videoData: VideoOverrideData; titleForm
                 </span>
             </label>
 
-            <ChannelOverridesMenu open={menuOpen} videoData={props.videoData} titleFormatting={props.titleFormatting} />
+            <ChannelOverridesMenu open={menuOpen}
+                videoData={props.videoData}
+                configID={props.configID}
+                setConfigID={props.setConfigID}
+                titleFormatting={props.titleFormatting} 
+            />
         </>
     );
 }
 
 const channelOverridesOptions: ChannelOverridesOption[] = [{
-        name: "forJustThisVideo",
-        active: (d) => getChannelOverrideID(d, { onlyVideo: true }) !== null
-    }, {
-        name: "forThisChannel",
-        active: (d) => getChannelOverrideID(d, { onlyChannelID: true }) !== null
-    }];
+    name: "forJustThisVideo",
+    active: (d) => getChannelOverrideID(d, { onlyVideo: true }) !== null
+}, {
+    name: "forThisChannel",
+    active: (d) => getChannelOverrideID(d, { onlyChannelID: true }) !== null
+}];
 
-function ChannelOverridesMenu(props: { open: boolean; videoData: VideoOverrideData; titleFormatting: TitleFormatting }): JSX.Element {
-    const [configID, setConfigID] = React.useState<ConfigurationID | null>(null);
+interface ChannelOverridesMenuProps {
+    open: boolean;
+    videoData: VideoOverrideData;
+    configID: ConfigurationID | null;
+    setConfigID: (c: ConfigurationID | null) => void;
+    titleFormatting: TitleFormatting;
+}
+
+function ChannelOverridesMenu(props: ChannelOverridesMenuProps): JSX.Element {
     const [selectedOverrideAction, setSelectedOverrideAction] = React.useState<ChannelOverridesAction>(null);
     const [allConfigurations, setAllConfigurations] = React.useState(Object.entries(Config.config!.customConfigurations));
+    const configID = props.configID;
 
     React.useEffect(() => {
-        setConfigID(getChannelOverrideID(props.videoData));
+        props.setConfigID(getChannelOverrideID(props.videoData));
     }, [props.videoData]);
 
     React.useEffect(() => {
@@ -317,7 +346,7 @@ function ChannelOverridesMenu(props: { open: boolean; videoData: VideoOverrideDa
                         }
                         
                         const configID = value === "null" ? null : value as ConfigurationID;
-                        setConfigID(configID);
+                        props.setConfigID(configID);
                         if (configID === null) {
                             setSelectedOverrideAction(null);
                         }
@@ -357,7 +386,7 @@ function ChannelOverridesMenu(props: { open: boolean; videoData: VideoOverrideDa
                                 updateChannelOverrideSetting(props.videoData, s, configID);
                             }
                         } else if (s !== null) {
-                            setConfigID(getChannelOverrideID(props.videoData));
+                            props.setConfigID(getChannelOverrideID(props.videoData));
                         }
 
                         setSelectedOverrideAction(s);

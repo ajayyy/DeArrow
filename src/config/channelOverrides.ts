@@ -149,6 +149,19 @@ function checkChannelOverrideOptionBase<T>(option: string, channelIdentifiers: s
     return null;
 }
 
+export function getOverrideOptionForConfigID(configID: ConfigurationID | null, option: string) {
+    return (configID ? Config.config!.customConfigurations[configID]?.[option] : null) ?? Config.config![option];
+}
+
+export function setOverrideOrOriginal(configID: ConfigurationID | null | undefined, option: string, value: unknown) {
+    if (configID && Config.config!.customConfigurations[configID]) {
+        Config.config!.customConfigurations[configID][option] = value;
+        Config.forceSyncUpdate("customConfigurations");
+    } else {
+        Config.config![option] = value;
+    }
+}
+
 /**
  * Checks if it this variable has any custom config, if not it will return the known value
  */
