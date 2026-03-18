@@ -100,6 +100,7 @@ module.exports = env => {
             help: path.join(__dirname, srcDir + 'help/help.tsx'),
             payment: path.join(__dirname, srcDir + 'help/payment.tsx'),
             unactivatedWarning: path.join(__dirname, srcDir + 'unactivatedWarning.ts'),
+            paymentInject: path.join(__dirname, srcDir + 'paymentInject.ts'),
         },
         output: {
             path: path.join(__dirname, '../dist/js'),

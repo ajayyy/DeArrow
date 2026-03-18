@@ -1,6 +1,5 @@
 import * as React from "react";
-import { sendRequestToServer } from "../utils/requests";
-import { askBackgroundToRegisterNeededContentScripts, askBackgroundToSetupAlarms, freeTrialActive, isFreeAccessRequestActive } from "../license/license";
+import { askBackgroundToRegisterNeededContentScripts, askBackgroundToSetupAlarms, freeTrialActive, isFreeAccessRequestActive, shouldAllowLicenseKey } from "../license/license";
 import Config from "../config/config";
 import { objectToURI } from "../../maze-utils/src";
 import { waitFor } from "../../maze-utils/src";
@@ -25,7 +24,7 @@ let openedTab = false;
 waitFor(() => Config.isReady()).then(() => {
     if (Config.config!.activated && !openedTab) {
         openedTab = true;
-        chrome.runtime.sendMessage({ "message": "openHelp" }, () => window.close());
+        window.location.replace(chrome.runtime.getURL("/help.html"));
     }
 });
 
@@ -35,7 +34,7 @@ Config.configSyncListeners.push((changes) => {
         Config.config!.activated = true;
         openedTab = true;
 
-        chrome.runtime.sendMessage({ "message": "openHelp" }, () => window.close());
+        window.location.replace(chrome.runtime.getURL("/help.html"));
     }
 });
 
@@ -254,20 +253,3 @@ export const PaymentComponent = () => {
         </>
     );
 };
-
-async function shouldAllowLicenseKey(licenseKey: string): Promise<boolean> {
-    try {
-        const result = await sendRequestToServer("GET", `/api/verifyToken`, {
-            licenseKey: licenseKey
-        });
-
-        if (result.status === 200) {
-            const json = JSON.parse(result.responseText);
-            return json.allowed;
-        } else {
-            return true;
-        }
-    } catch (e) { } // eslint-disable-line no-empty
-
-    return true;
-}

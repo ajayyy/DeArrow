@@ -14,6 +14,17 @@
             ],
             "all_frames": true,
             "run_at": "document_start"
+        },
+        {
+            "world": "ISOLATED",
+            "js": [
+                "./js/paymentInject.js"
+            ],
+            "matches": [
+                "https://dearrow.ajay.app/*"
+            ],
+            "all_frames": false,
+            "run_at": "document_start"
         }
     ],
     "web_accessible_resources": [{

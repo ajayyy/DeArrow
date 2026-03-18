@@ -4,6 +4,7 @@ import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { logError } from "../utils/logger";
 import * as CompileConfig from "../../config.json";
 import { casualVoteCategories } from "../submission/casualVote.const";
+import { chromeP } from "../../maze-utils/src/browserApi";
 
 export interface Permission {
     canSubmit: boolean;
@@ -149,7 +150,7 @@ interface SBStorage {
 
 class ConfigClass extends ProtoConfig<SBConfig, SBStorage> {
     resetToDefault() {
-        chrome.storage.sync.set({
+        chromeP.storage.sync.set({
             ...this.syncDefaults,
             userID: this.config!.userID,
             licenseKey: this.config!.licenseKey,
@@ -161,7 +162,7 @@ class ConfigClass extends ProtoConfig<SBConfig, SBStorage> {
             firefoxOldContentScriptRegistration: this.config!.firefoxOldContentScriptRegistration
         }).catch(logError);
 
-        chrome.storage.local.set({
+        chromeP.storage.local.set({
             ...this.localDefaults,
         }).catch(logError);
     }

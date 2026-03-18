@@ -25,6 +25,15 @@
         "content.css",
         "shared.css"
     ]
+  }, {
+    "run_at": "document_start",
+    "all_frames": false,
+    "matches": [
+        "https://dearrow.ajay.app/*"
+    ],
+    "js": [
+        "./js/paymentInject.js"
+    ]
   }],
   "background": {
     "persistent": false

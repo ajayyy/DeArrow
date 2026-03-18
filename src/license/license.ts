@@ -116,3 +116,20 @@ export function askBackgroundToSetupAlarms(): Promise<void> {
         message: "setupAlarms",
     }, resolve));
 }
+
+export async function shouldAllowLicenseKey(licenseKey: string): Promise<boolean> {
+    try {
+        const result = await sendRequestToServer("GET", `/api/verifyToken`, {
+            licenseKey: licenseKey
+        });
+
+        if (result.status === 200) {
+            const json = JSON.parse(result.responseText);
+            return json.allowed;
+        } else {
+            return true;
+        }
+    } catch (e) { } // eslint-disable-line no-empty
+
+    return true;
+}
