@@ -344,7 +344,7 @@ function ChannelOverridesMenu(props: ChannelOverridesMenuProps): JSX.Element {
                             chrome.runtime.sendMessage({ message: "openConfig", hash: "newProfile" });
                             return;
                         }
-                        
+
                         const configID = value === "null" ? null : value as ConfigurationID;
                         props.setConfigID(configID);
                         if (configID === null) {
@@ -361,6 +361,10 @@ function ChannelOverridesMenu(props: ChannelOverridesMenuProps): JSX.Element {
                                     }
                                 }
                             }
+                        } else if (!Config.config!.channelOverrides[props.videoData.videoID]) {
+                            // If nothing set for this video, default to setting for the channel
+                            setSelectedOverrideAction("forThisChannel");
+                            updateChannelOverrideSetting(props.videoData, selectedOverrideAction, configID)
                         }
                     }}
                     value={configID ?? "null"}
