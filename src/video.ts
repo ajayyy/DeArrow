@@ -12,7 +12,7 @@ import { onMobile } from "../maze-utils/src/pageInfo";
 import { resetShownWarnings } from "./submission/autoWarning";
 import { getAntiTranslatedTitle } from "./titles/titleAntiTranslateData";
 import { CasualVoteButton } from "./submission/casualVoteButton";
-import { getPlaybackFormats } from "../maze-utils/src/metadataFetcher";
+import { fetchOembed, getChannelNameFromVideo, getPlaybackFormats, getUcidFromVideo } from "../maze-utils/src/metadataFetcher";
 
 export const submitButton = new SubmitButton();
 export const casualVoteButton = new CasualVoteButton();
@@ -107,10 +107,24 @@ function onNavigateToChannel() {
 }
 
 export function setupCBVideoModule(): void {
-    chrome.runtime.onMessage.addListener((request: BackgroundToContentMessage) => {
+    chrome.runtime.onMessage.addListener((request: BackgroundToContentMessage, sender, sendResponse) => {
         if (request.message === "update") {
             checkIfNewVideoID().catch(logError);
+        } else if (request.message === "getVideoData") {
+            void (async () => {
+                const videoID = getVideoID();
+                sendResponse({
+                    videoID,
+                    channelName: videoID ? await getChannelNameFromVideo(videoID) : null,
+                    channelID: videoID ? await getUcidFromVideo(videoID) : null,
+                    channelHandle: videoID ? (await fetchOembed(videoID))?.parsed.channelHandle : null
+                });
+            })();
+
+            return true;
         }
+
+        return false;
     });
 
     setupVideoModule({

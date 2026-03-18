@@ -7,6 +7,9 @@
     --sb-red-bg-color: #cc1717;
     --cb-switch-color: #0e79ca;
 
+    --sb-skip-profile-bg: #292828;
+    --sb-skip-profile-highlighted: rgb(127, 0, 0);
+
     /* Options */
     --color-scheme: dark;
     --background: #333333;
@@ -78,8 +81,10 @@
     border-radius: 8px;
     background-color: var(--sb-grey-bg-color);
     justify-content: space-evenly;
-    overflow: hidden;
     display: flex;
+
+    position: relative;
+    z-index: 1;
 }
 
 .sbControlsMenu-item {
@@ -224,4 +229,75 @@
 
 .option-button:hover:not(.disabled) {
     background-color: #0e79ca;
+}
+
+.sbPopupButton {
+  width: 16px;
+  fill: var(--sb-main-fg-color);
+}
+
+#skipProfileMenu {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+
+  background-color: var(--sb-skip-profile-bg);
+  border-radius: 10px;
+  padding: 10px;
+
+  transform: translateX(-50%);
+}
+
+#skipProfileActions {
+  padding-top: 10px;
+}
+
+.skipOptionAction {
+  transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  font-size: 14px;
+  padding: 5px;
+  margin: 5px;
+
+  background-color: var(--sb-skip-profile-option-bg);
+  border-radius: 5px;
+
+  cursor: help;
+  user-select: none;
+
+  border-color: transparent;
+  border-width: 2px;
+  border-style: solid;
+}
+.skipOptionAction:not(.highlighted, .disabled):hover {
+  background-color: var(--sb-grey-bg-color);
+}
+.skipOptionAction.selected {
+  border-color: var(--sb-red-bg-color);
+}
+.skipOptionAction.highlighted {
+  border-color: var(--sb-skip-profile-highlighted);
+}
+.skipOptionAction:not(.highlighted, .disabled) {
+  cursor: pointer;
+}
+.skipOptionAction.disabled {
+  color: var(--sb-skip-profile-disabled);
+}
+
+/*
+ * Whitelist add/remove icon
+ */
+.SBWhitelistIcon > path {
+  fill: var(--sb-main-fg-color);
+}
+.SBWhitelistIcon.rotated {
+  transform: rotate(45deg);
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

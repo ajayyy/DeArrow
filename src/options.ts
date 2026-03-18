@@ -27,7 +27,12 @@ window.addEventListener('DOMContentLoaded', () => void init());
 async function init() {
     // selected tab
     if (location.hash != "") {
-        const substr = location.hash.slice(1);
+        let substr = location.hash.slice(1);
+        if (substr === "newProfile") {
+            // Also count as channel overrides tab
+            substr = "channel-allowlist";
+        }
+
         let menuItem = document.querySelector(`[data-for='${substr}']`);
         if (menuItem == null)
             menuItem = document.querySelector(`[data-for='behavior']`);
