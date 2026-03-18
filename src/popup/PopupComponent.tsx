@@ -251,13 +251,13 @@ function ChannelOverridesButton(props: { videoData: VideoOverrideData }): JSX.El
                     <path d="M24 10H14V0h-4v10H0v4h10v10h4V14h10z" />
                 </svg>
                 <span id="whitelistChannel" className={!(!menuOpen && !channelOverrideId) ? " hidden" : ""}>
-                    {chrome.i18n.getMessage("addChannelToSkipProfile")}
+                    {chrome.i18n.getMessage("addChannelToOverride")}
                 </span>
                 <span id="whitelistChannel" className={!(!menuOpen && channelOverrideId) ? " hidden" : ""}>
-                    {chrome.i18n.getMessage("editActiveSkipProfile")}
+                    {chrome.i18n.getMessage("editActiveOverride")}
                 </span>
                 <span id="unwhitelistChannel" className={!menuOpen ? " hidden" : ""}>
-                    {chrome.i18n.getMessage("closeSkipProfileMenu")}
+                    {chrome.i18n.getMessage("closeOverrideMenu")}
                 </span>
             </label>
 

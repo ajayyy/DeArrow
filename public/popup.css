@@ -97,7 +97,7 @@
     cursor: pointer;
     border: none;
     flex: 1;
-    padding: 10px 15px;
+    padding: 10px 5px;
     transition: background-color 0.2s ease-in-out;
 }
 
