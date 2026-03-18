@@ -1,5 +1,5 @@
 import * as React from "react";
-import Config, { ConfigurationID } from "../config/config";
+import Config, { ConfigurationID, TitleFormatting } from "../config/config";
 import { showDonationLink } from "../utils/configUtils";
 import { YourWorkComponent } from "./YourWorkComponent";
 import { ToggleOptionComponent } from "./ToggleOptionComponent";
@@ -23,6 +23,7 @@ interface ChannelOverrideRadioButtonsProps {
     disabled: boolean;
     configID: ConfigurationID | null;
     videoData: VideoOverrideData;
+    titleFormatting: TitleFormatting;
 }
 
 interface ChannelOverrideActionComponentProps {
@@ -32,6 +33,7 @@ interface ChannelOverrideActionComponentProps {
     disabled: boolean;
     overridden: boolean;
     label: string;
+    titleFormatting: TitleFormatting;
 }
 
 
@@ -90,6 +92,7 @@ export const PopupComponent = () => {
                             videoData?.videoID &&
                                 <ChannelOverridesButton
                                     videoData={videoData}
+                                    titleFormatting={titleFormatting}
                                 />
                         }
                         {/* github: mbledkowski/toggle-switch */}
@@ -229,7 +232,7 @@ export const PopupComponent = () => {
     );
 };
 
-function ChannelOverridesButton(props: { videoData: VideoOverrideData }): JSX.Element {
+function ChannelOverridesButton(props: { videoData: VideoOverrideData; titleFormatting: TitleFormatting }): JSX.Element {
     const [menuOpen, setMenuOpen] = React.useState(false);
     const channelOverrideId = getChannelOverrideID(props.videoData);
 
@@ -251,17 +254,26 @@ function ChannelOverridesButton(props: { videoData: VideoOverrideData }): JSX.El
                     <path d="M24 10H14V0h-4v10H0v4h10v10h4V14h10z" />
                 </svg>
                 <span id="whitelistChannel" className={!(!menuOpen && !channelOverrideId) ? " hidden" : ""}>
-                    {chrome.i18n.getMessage("addChannelToOverride")}
+                    <FormattedText
+                        langKey="addChannelToOverride"
+                        titleFormatting={props.titleFormatting}
+                    />
                 </span>
                 <span id="whitelistChannel" className={!(!menuOpen && channelOverrideId) ? " hidden" : ""}>
-                    {chrome.i18n.getMessage("editActiveOverride")}
+                    <FormattedText
+                        langKey="editActiveOverride"
+                        titleFormatting={props.titleFormatting}
+                    />
                 </span>
                 <span id="unwhitelistChannel" className={!menuOpen ? " hidden" : ""}>
-                    {chrome.i18n.getMessage("closeOverrideMenu")}
+                    <FormattedText
+                        langKey="closeOverrideMenu"
+                        titleFormatting={props.titleFormatting}
+                    />
                 </span>
             </label>
 
-            <ChannelOverridesMenu open={menuOpen} videoData={props.videoData} />
+            <ChannelOverridesMenu open={menuOpen} videoData={props.videoData} titleFormatting={props.titleFormatting} />
         </>
     );
 }
@@ -274,7 +286,7 @@ const channelOverridesOptions: ChannelOverridesOption[] = [{
         active: (d) => getChannelOverrideID(d, { onlyChannelID: true }) !== null
     }];
 
-function ChannelOverridesMenu(props: { open: boolean; videoData: VideoOverrideData }): JSX.Element {
+function ChannelOverridesMenu(props: { open: boolean; videoData: VideoOverrideData; titleFormatting: TitleFormatting }): JSX.Element {
     const [configID, setConfigID] = React.useState<ConfigurationID | null>(null);
     const [selectedOverrideAction, setSelectedOverrideAction] = React.useState<ChannelOverridesAction>(null);
     const [allConfigurations, setAllConfigurations] = React.useState(Object.entries(Config.config!.customConfigurations));
@@ -296,6 +308,8 @@ function ChannelOverridesMenu(props: { open: boolean; videoData: VideoOverrideDa
                 <SelectOptionComponent
                     id="sbSkipProfileSelection"
                     label={chrome.i18n.getMessage("SelectASkipProfile")}
+                    applyFormattingToOptions={true}
+                    titleFormatting={props.titleFormatting}
                     onChange={(value) => {
                         if (value === "new") {
                             chrome.runtime.sendMessage({ message: "openConfig", hash: "newProfile" });
@@ -351,6 +365,7 @@ function ChannelOverridesMenu(props: { open: boolean; videoData: VideoOverrideDa
                     disabled={configID === null}
                     configID={configID}
                     videoData={props.videoData}
+                    titleFormatting={props.titleFormatting}
                 />
             </div>
         </div>
@@ -388,6 +403,7 @@ function ChannelOverrideRadioButtons(props: ChannelOverrideRadioButtonsProps): J
                 overridden={overridden}
                 disabled={props.disabled || overridden}
                 key={option.name}
+                titleFormatting={props.titleFormatting}
                 setSelected={(s) => {
                     props.setSelected(s ? option.name : null, true);
                 }}/>
@@ -427,7 +443,11 @@ function ChannelOverrideActionComponent(props: ChannelOverrideActionComponentPro
                     props.setSelected(!props.selected);
                 }
             }}>
-            {props.label}
+            
+            <FormattedText
+                text={props.label}
+                titleFormatting={props.titleFormatting}
+            />
         </div>
     );
 }
