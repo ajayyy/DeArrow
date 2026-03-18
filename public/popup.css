@@ -305,3 +305,8 @@
 .hidden {
     display: none;
 }
+
+.configurationName {
+    font-size: 20px;
+    padding-bottom: 20px;
+}

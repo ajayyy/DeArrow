@@ -146,6 +146,15 @@ export const PopupComponent = () => {
                         </button>
                     </div>
 
+                    {configID &&
+                        <div className="configurationName">
+                            <FormattedText
+                                text={Config.config!.customConfigurations[configID]?.name}
+                                titleFormatting={titleFormatting}
+                            />
+                        </div>
+                    }
+
                     {/* Replace titles/thumbnails */}
                     <ToggleOptionComponent
                         id="replaceTitles"
