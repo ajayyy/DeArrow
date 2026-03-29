@@ -22,7 +22,7 @@
     "@typescript-eslint/parser": "^5.39.0",
     "chromedriver": "^135.0.1",
     "concurrently": "^7.4.0",
-    "copy-webpack-plugin": "^11.0.0",
+    "copy-webpack-plugin": "^14.0.0",
     "eslint": "^8.24.0",
     "eslint-plugin-react": "^7.31.8",
     "fork-ts-checker-webpack-plugin": "^7.2.13",
