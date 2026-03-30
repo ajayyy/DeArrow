@@ -94,6 +94,7 @@ module.exports = env => {
         entry: {
             background: path.join(__dirname, srcDir + 'background.ts'),
             content: path.join(__dirname, srcDir + 'content.ts'),
+            nebula: path.join(__dirname, srcDir + 'nebula.ts'),
             documentScriptInjector: path.join(__dirname, srcDir + 'documentScriptInjector.ts'),
             options: path.join(__dirname, srcDir + 'options.ts'),
             popup: path.join(__dirname, srcDir + 'popup/popup.tsx'),

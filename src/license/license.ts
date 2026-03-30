@@ -87,6 +87,21 @@ export function getContentScripts(activated?: boolean): CustomContentScript[] {
                 "content.css",
                 "shared.css"
             ]
+        }, {
+            id: "nebula2",
+            runAt: "document_start",
+            matches: [
+                "https://nebula.tv/*",
+                "https://*.nebula.tv/*"
+            ],
+            allFrames: false,
+            js: [
+                "./js/nebula.js"
+            ],
+            css: [
+                "content.css",
+                "shared.css"
+            ]
         }];
     } else {
         return [{
