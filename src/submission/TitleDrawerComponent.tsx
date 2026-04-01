@@ -7,6 +7,7 @@ export interface TitleDrawerComponentProps {
     onSelectOrUpdate: (title: RenderedTitleSubmission, oldTitle: string, index: number) => void;
     onDeselect: (index: number) => void;
     onUpvote: (index: number) => void;
+    onDownvote?: (index: number) => void;
     selectedTitleIndex: number;
     upvotedTitleIndex: number;
     actAsVip: boolean;
@@ -50,6 +51,9 @@ function getTitles(props: TitleDrawerComponentProps,
                 onUpvote={() => {
                     props.onUpvote(i);
                 }}
+                onDownvote={props.onDownvote ? () => {
+                    props.onDownvote!(i);
+                } : undefined}
                 onVote={props.onVote}
                 actAsVip={props.actAsVip}
                 key={i}

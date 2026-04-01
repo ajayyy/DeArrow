@@ -16,6 +16,7 @@ export interface TitleComponentProps {
     upvoted: boolean;
     onSelectOrUpdate: (title: string, oldTitle: string) => void;
     onUpvote: () => void;
+    onDownvote?: () => void;
     onDeselect: () => void;
     actAsVip: boolean;
     videoID: VideoID;
@@ -171,6 +172,7 @@ export const TitleComponent = (props: TitleComponentProps) => {
                                 stopAnimation();
                                 if (success) {
                                     setDownvoted(true);
+                                    props.onDownvote?.();
                                 }
                             });
                         } else {

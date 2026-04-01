@@ -616,6 +616,25 @@ export function sendRequestToThumbnailCache(videoID: string, time?: number, titl
     return sendBinaryRequestToCustomServer("GET", `${Config.config?.thumbnailServerAddress}/api/v1/getThumbnail`, data);
 }
 
+export function sendRequestToNebulaThumbnailCache(videoSlug: string, time?: number, title?: string,
+        officialTime = false, generateNow = false): Promise<FetchResponseBinary> {
+    const data: Record<string, unknown> = {
+        videoSlug,
+        officialTime,
+        generateNow
+    };
+
+    if (time != null) {
+        data["time"] = time;
+    }
+
+    if (title) {
+        data["title"] = title;
+    }
+
+    return sendBinaryRequestToCustomServer("GET", `${Config.config?.thumbnailServerAddress}/api/v1/getNebulaThumbnail`, data);
+}
+
 export function getThumbnailUrl(videoID: string, time: number): string {
     return objectToURI(`${Config.config?.thumbnailServerAddress}/api/v1/getThumbnail`, {
         videoID,

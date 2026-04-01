@@ -1,5 +1,6 @@
 import * as React from "react";
 import { objectToURI } from "../../maze-utils/src";
+import { AnimationUtils } from "../../maze-utils/src/animationUtils";
 import { getFormattedTime } from "../../maze-utils/src/formating";
 import { getHash } from "../../maze-utils/src/hash";
 import { VideoID } from "../../maze-utils/src/video";
@@ -16,7 +17,7 @@ import FontIcon from "../svgIcons/fontIcon";
 import PersonIcon from "../svgIcons/personIcon";
 import QuestionIcon from "../svgIcons/questionIcon";
 import UpvoteIcon from "../svgIcons/upvoteIcon";
-import { ThumbnailSubmission } from "../thumbnails/thumbnailData";
+import { ThumbnailResult, ThumbnailSubmission } from "../thumbnails/thumbnailData";
 import { formatTitleInternal } from "../titles/titleFormatter";
 import { RenderedTitleSubmission, TitleDrawerComponent } from "../submission/TitleDrawerComponent";
 import { TitleResult } from "../titles/titleData";
@@ -30,10 +31,13 @@ export interface NebulaTitleEditorComponentProps {
     originalThumbnailUrl: string | null;
     videoElement: HTMLVideoElement | null;
     serverTitles: TitleResult[];
+    serverThumbnails: ThumbnailResult[];
+    thumbnailBlobUrls: Record<string, string>;
     initialUpvotedTitleIndex: number;
     onCustomTitleChange: (title: string | null) => void;
     onCustomThumbnailChange: (thumbnail: ThumbnailSubmission | null, previewDataUrl?: string | null) => void;
     onTitleVote: (title: TitleResult, downvote: boolean) => Promise<boolean>;
+    onThumbnailVote: (thumbnail: ThumbnailSubmission, downvote: boolean) => Promise<boolean>;
     onClose: () => void;
 }
 
@@ -70,6 +74,8 @@ export const NebulaTitleEditorComponent = (props: NebulaTitleEditorComponentProp
     ]);
     const [selectedTitleIndex, setSelectedTitleIndex] = React.useState(props.initialCustomTitle ? 1 : 0);
     const [upvotedTitleIndex, setUpvotedTitleIndex] = React.useState(props.initialUpvotedTitleIndex);
+    const [upvotedThumbnailKey, setUpvotedThumbnailKey] = React.useState<string | null>(null);
+    const [downvotedThumbnailKey, setDownvotedThumbnailKey] = React.useState<string | null>(null);
     const [selectedThumbnail, setSelectedThumbnail] = React.useState<ThumbnailSubmission | null>(
         props.initialCustomThumbnail ?? { original: true }
     );
@@ -212,6 +218,27 @@ export const NebulaTitleEditorComponent = (props: NebulaTitleEditorComponentProp
         setSelectedThumbnail({ original: true });
     };
 
+    const getThumbnailKey = (t: ThumbnailSubmission): string => t.original ? "original" : String(t.timestamp);
+
+    const handleThumbnailVote = (thumbnail: ThumbnailSubmission, downvote: boolean, buttonElement: HTMLElement) => {
+        const key = getThumbnailKey(thumbnail);
+        const stopAnimation = AnimationUtils.applyLoadingAnimation(buttonElement, 0.3);
+        props.onThumbnailVote(thumbnail, downvote).then((success) => {
+            stopAnimation();
+            if (success) {
+                if (downvote) {
+                    setDownvotedThumbnailKey(key);
+                    if (upvotedThumbnailKey === key) setUpvotedThumbnailKey(null);
+                } else {
+                    setUpvotedThumbnailKey(key);
+                    setDownvotedThumbnailKey(null);
+                }
+            }
+        }).catch(() => {
+            stopAnimation();
+        });
+    };
+
     const canSubmit = titleChanged || thumbnailChanged;
 
     return (
@@ -260,9 +287,6 @@ export const NebulaTitleEditorComponent = (props: NebulaTitleEditorComponentProp
 
             <div className="cbNebulaEditorSecondaryColumn">
                 <div className="cbThumbnailDrawer">
-                    <div className="cbNebulaLocalOnlyNotice">
-                        {chrome.i18n.getMessage("nebulaThumbnailLocalOnly") || "Thumbnails are local only on Nebula — your selection is only visible to you and is not shared with other users."}
-                    </div>
                     <div
                         className={`cbThumbnail${selectedThumbnail?.original ? " cbThumbnailSelected" : ""}`}
                         onClick={onOriginalClick}>
@@ -273,6 +297,28 @@ export const NebulaTitleEditorComponent = (props: NebulaTitleEditorComponentProp
                         }
                         <div style={{ fontWeight: "bold", textAlign: "center", marginTop: "4px" }}>
                             {chrome.i18n.getMessage("Original") || "Original"}
+                        </div>
+                        <div className="cbVoteButtons">
+                            <button
+                                className="cbButton"
+                                type="button"
+                                title={chrome.i18n.getMessage("upvote") || "Upvote"}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    handleThumbnailVote({ original: true }, false, event.currentTarget as HTMLElement);
+                                }}>
+                                <UpvoteIcon selected={upvotedThumbnailKey === "original"} />
+                            </button>
+                            <button
+                                className="cbButton"
+                                type="button"
+                                title={chrome.i18n.getMessage("downvote") || "Downvote"}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    handleThumbnailVote({ original: true }, true, event.currentTarget as HTMLElement);
+                                }}>
+                                <DownvoteIcon selected={downvotedThumbnailKey === "original"} />
+                            </button>
                         </div>
                     </div>
 
@@ -288,12 +334,66 @@ export const NebulaTitleEditorComponent = (props: NebulaTitleEditorComponentProp
                         </div>
                     </div>
 
-                    {/* Server thumbnail submissions are not shown on Nebula:
-                        timestamps cannot be rendered into images without unauthenticated
-                        video stream access, so there is nothing useful to display or vote on. */}
-
+                    {/* Server-submitted thumbnails */}
                     {
-                        selectedThumbnail && !selectedThumbnail.original ?
+                        props.serverThumbnails
+                            .filter((t): t is import("../thumbnails/thumbnailData").CustomThumbnailResult => !t.original)
+                            .map((t, index) => {
+                                const blobUrl = props.thumbnailBlobUrls[String(t.timestamp)];
+                                const timeLabel = getFormattedTime(t.timestamp) || String(t.timestamp);
+                                const isSelected = !selectedThumbnail?.original && selectedCurrentTime === t.timestamp;
+                                return (
+                                    <div
+                                        key={`server-${index}`}
+                                        className={`cbThumbnail${isSelected ? " cbThumbnailSelected" : ""}`}
+                                        onClick={() => {
+                                            setSelectedCurrentTime(t.timestamp);
+                                            setSelectedThumbnail({ original: false, timestamp: t.timestamp });
+                                            if (blobUrl) {
+                                                setSelectedTimestampPreviewDataUrl(blobUrl);
+                                            }
+                                        }}>
+                                        {
+                                            blobUrl
+                                                ? <img className="cbThumbnailImg" src={blobUrl}></img>
+                                                : <div className="cbThumbnailImg cbThumbnailPlaceholder">
+                                                    <span>{timeLabel}</span>
+                                                  </div>
+                                        }
+                                        <div style={{ fontWeight: "bold", textAlign: "center", marginTop: "4px" }}>
+                                            {timeLabel}
+                                        </div>
+                                        <div className="cbVoteButtons">
+                                            <button
+                                                className="cbButton"
+                                                type="button"
+                                                title={chrome.i18n.getMessage("upvote") || "Upvote"}
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    handleThumbnailVote({ original: false, timestamp: t.timestamp }, false, event.currentTarget as HTMLElement);
+                                                }}>
+                                                <UpvoteIcon selected={upvotedThumbnailKey === String(t.timestamp)} />
+                                            </button>
+                                            <button
+                                                className="cbButton"
+                                                type="button"
+                                                title={chrome.i18n.getMessage("downvote") || "Downvote"}
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    handleThumbnailVote({ original: false, timestamp: t.timestamp }, true, event.currentTarget as HTMLElement);
+                                                }}>
+                                                <DownvoteIcon selected={downvotedThumbnailKey === String(t.timestamp)} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                    }
+
+                    {/* User's newly-selected timestamp (only if not already in server list) */}
+                    {
+                        selectedThumbnail && !selectedThumbnail.original
+                            && !props.serverThumbnails.some((t) => !t.original && (t as { timestamp: number }).timestamp === selectedCurrentTime) ?
                             <div
                                 className="cbThumbnail cbThumbnailSelected"
                                 onClick={() => {
@@ -312,12 +412,26 @@ export const NebulaTitleEditorComponent = (props: NebulaTitleEditorComponentProp
                                     {timestampLabel}
                                 </div>
 
-                                <div className="cbVoteButtons" style={{ visibility: "hidden" }}>
-                                    <button className="cbButton" type="button" title={chrome.i18n.getMessage("upvote") || "Upvote"} onClick={(event) => event.stopPropagation()}>
-                                        <UpvoteIcon />
+                                <div className="cbVoteButtons">
+                                    <button
+                                        className="cbButton"
+                                        type="button"
+                                        title={chrome.i18n.getMessage("upvote") || "Upvote"}
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            handleThumbnailVote({ original: false, timestamp: selectedCurrentTime }, false, event.currentTarget as HTMLElement);
+                                        }}>
+                                        <UpvoteIcon selected={upvotedThumbnailKey === String(selectedCurrentTime)} />
                                     </button>
-                                    <button className="cbButton" type="button" title={chrome.i18n.getMessage("downvote") || "Downvote"} onClick={(event) => event.stopPropagation()}>
-                                        <DownvoteIcon />
+                                    <button
+                                        className="cbButton"
+                                        type="button"
+                                        title={chrome.i18n.getMessage("downvote") || "Downvote"}
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            handleThumbnailVote({ original: false, timestamp: selectedCurrentTime }, true, event.currentTarget as HTMLElement);
+                                        }}>
+                                        <DownvoteIcon selected={downvotedThumbnailKey === String(selectedCurrentTime)} />
                                     </button>
                                 </div>
                             </div>
@@ -337,6 +451,9 @@ export const NebulaTitleEditorComponent = (props: NebulaTitleEditorComponentProp
                         }}
                         onUpvote={(index) => {
                             setUpvotedTitleIndex(index);
+                        }}
+                        onDownvote={() => {
+                            setUpvotedTitleIndex(-1);
                         }}
                         onVote={(submission, downvote) => {
                             // Find the matching server TitleResult for the submission

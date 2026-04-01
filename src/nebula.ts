@@ -1,11 +1,11 @@
 import * as React from "react";
 import { waitFor } from "../maze-utils/src";
 import { Root, createRoot } from "react-dom/client";
-import Config from "./config/config";
+import Config, { ThumbnailCacheOption } from "./config/config";
 import { NebulaTitleEditorComponent } from "./nebula/NebulaTitleEditorComponent";
-import { ThumbnailSubmission } from "./thumbnails/thumbnailData";
+import { ThumbnailResult, ThumbnailSubmission } from "./thumbnails/thumbnailData";
 import { logError } from "./utils/logger";
-import { fetchBranding, submitVideoBranding, clearCache } from "./dataFetching";
+import { fetchBranding, submitVideoBranding, clearCache, sendRequestToNebulaThumbnailCache } from "./dataFetching";
 import { VideoID } from "../maze-utils/src/video";
 import { formatTitleDefaultSettings } from "./titles/titleFormatter";
 import { formatJSErrorMessage, getLongErrorMessage } from "../maze-utils/src/formating";
@@ -47,6 +47,8 @@ const editButtonIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 
 
 const activeAnchorProcesses = new WeakSet<HTMLAnchorElement>();
 const runtimeThumbnailPreviewBySlug = new Map<string, string>();
+const serverThumbnailBlobBySlug = new Map<string, string>();
+const activeNebulaThumbnailRequests = new Set<string>();
 const showOriginalOverrides = new Set<string>();
 
 const SERVER_TITLE_TTL_MS = 5 * 60 * 1000; // 5 minutes
@@ -303,7 +305,54 @@ async function fetchNebulaServerBranding(videoSlug: string): Promise<void> {
 
     if (branding) {
         serverBrandingBySlug.set(videoSlug, { branding, fetchedAt: Date.now() });
+
+        // Fetch the thumbnail image from the cache server if available
+        const topThumbnail = branding.thumbnails?.[0];
+        if (topThumbnail && !topThumbnail.original && Number.isFinite(topThumbnail.timestamp)) {
+            const title = branding.titles?.[0]?.title;
+            fetchNebulaThumbnailFromCache(videoSlug, topThumbnail.timestamp, title).catch(logError);
+        }
+
         scheduleProcessing(); // Re-run to apply the newly fetched title
+    }
+}
+
+async function fetchNebulaThumbnailFromCache(videoSlug: string, timestamp: number, title?: string): Promise<void> {
+    if (Config.config!.thumbnailCacheUse === ThumbnailCacheOption.Disable) {
+        return;
+    }
+
+    if (activeNebulaThumbnailRequests.has(videoSlug) || serverThumbnailBlobBySlug.has(videoSlug)) {
+        return;
+    }
+
+    activeNebulaThumbnailRequests.add(videoSlug);
+
+    try {
+        const isWatchPage = getCurrentVideoSlugFromLocation() === videoSlug;
+        const request = await sendRequestToNebulaThumbnailCache(
+            videoSlug, timestamp, title, true, isWatchPage
+        );
+
+        if (request.status === 200 && request.responseBinary) {
+            const blob = (request.responseBinary instanceof Blob)
+                ? request.responseBinary
+                : new Blob([new Uint8Array(request.responseBinary).buffer]);
+            const blobUrl = URL.createObjectURL(blob);
+
+            // Revoke the old blob URL to avoid memory leaks
+            const oldBlobUrl = serverThumbnailBlobBySlug.get(videoSlug);
+            if (oldBlobUrl) {
+                URL.revokeObjectURL(oldBlobUrl);
+            }
+
+            serverThumbnailBlobBySlug.set(videoSlug, blobUrl);
+            scheduleProcessing();
+        }
+    } catch (e) {
+        logError(`Failed to fetch Nebula thumbnail for ${videoSlug}:`, e);
+    } finally {
+        activeNebulaThumbnailRequests.delete(videoSlug);
     }
 }
 
@@ -492,6 +541,16 @@ function openYouTubeStyleTitleEditor(titleElement: HTMLElement, videoSlug: strin
     // Get server branding data for the editor
     const serverBranding = getServerBranding(videoSlug);
     const serverTitles: TitleResult[] = serverBranding?.titles ?? [];
+    const serverThumbnails: ThumbnailResult[] = serverBranding?.thumbnails ?? [];
+
+    // Build a map of blob URLs for server thumbnails already fetched from the cache
+    const thumbnailBlobUrls: Record<string, string> = {};
+    const topBlobUrl = serverThumbnailBlobBySlug.get(videoSlug);
+    if (topBlobUrl && serverThumbnails.length > 0) {
+        const top = serverThumbnails[0];
+        const key = top.original ? "original" : String(top.timestamp);
+        thumbnailBlobUrls[key] = topBlobUrl;
+    }
 
     // Calculate initial upvoted indices from unsubmitted data
     const unsubmittedData = Config.local?.unsubmitted?.[videoSlug];
@@ -521,6 +580,8 @@ function openYouTubeStyleTitleEditor(titleElement: HTMLElement, videoSlug: strin
         originalThumbnailUrl,
         videoElement,
         serverTitles,
+        serverThumbnails,
+        thumbnailBlobUrls,
         initialUpvotedTitleIndex,
         onCustomTitleChange: (newTitle: string | null) => {
             if (shouldStoreVotes()) {
@@ -576,10 +637,27 @@ function openYouTubeStyleTitleEditor(titleElement: HTMLElement, videoSlug: strin
                 runtimeThumbnailPreviewBySlug.delete(videoSlug);
             }
 
-            // Nebula thumbnail submissions are not sent to the server:
-            // the server stores only a timestamp, and without unauthenticated video
-            // stream access there is no way for other users to render that frame.
-            // Thumbnails are local-only on Nebula.
+            // Submit thumbnail to server
+            if (thumbnail) {
+                submitVideoBranding(videoSlug as VideoID, null, thumbnail, false, false, "Nebula")
+                    .then((result) => {
+                        if (result && result.ok) {
+                            serverBrandingBySlug.delete(videoSlug);
+                            clearCache(videoSlug as VideoID);
+
+                            setTimeout(() => {
+                                serverBrandingBySlug.delete(videoSlug);
+                                fetchNebulaServerBranding(videoSlug).catch(logError);
+                            }, 1100);
+                        } else {
+                            alert(getLongErrorMessage(result.status, result.responseText));
+                        }
+                    })
+                    .catch((e) => {
+                        logError(e);
+                        alert(formatJSErrorMessage(e));
+                    });
+            }
 
             scheduleProcessing();
         },
@@ -631,6 +709,43 @@ function openYouTubeStyleTitleEditor(titleElement: HTMLElement, videoSlug: strin
                         Config.forceLocalUpdate("unsubmitted");
                     }
                 }
+            }
+
+            // Refresh from server
+            setTimeout(() => {
+                serverBrandingBySlug.delete(videoSlug);
+                fetchNebulaServerBranding(videoSlug).catch(logError);
+            }, 1100);
+
+            scheduleProcessing();
+            return true;
+        },
+        onThumbnailVote: async (thumbnail: ThumbnailSubmission, downvote: boolean): Promise<boolean> => {
+            let result: FetchResponse;
+            try {
+                result = await submitVideoBranding(
+                    videoSlug as VideoID, null, thumbnail, downvote, false, "Nebula"
+                );
+            } catch (e) {
+                logError(e);
+                alert(formatJSErrorMessage(e));
+                return false;
+            }
+
+            if (!result || !result.ok) {
+                alert(getLongErrorMessage(result.status, result.responseText));
+                return false;
+            }
+
+            // Update local unsubmitted state
+            if (!downvote) {
+                if (shouldStoreVotes()) {
+                    saveLocalCustomThumbnail(videoSlug, thumbnail);
+                    Config.forceLocalUpdate("unsubmitted");
+                }
+            } else {
+                clearLocalCustomThumbnail(videoSlug);
+                runtimeThumbnailPreviewBySlug.delete(videoSlug);
             }
 
             // Refresh from server
@@ -1165,11 +1280,18 @@ function processWatchPageThumbnail(videoSlug: string) {
 }
 
 function getActiveThumbnailPreview(videoSlug: string): string | null {
-    if (!shouldReplaceThumbnails() || !getLocalCustomThumbnail(videoSlug)) {
+    if (!shouldReplaceThumbnails()) {
         return null;
     }
 
-    return runtimeThumbnailPreviewBySlug.get(videoSlug) ?? null;
+    // Local editor preview takes priority (only when we have the actual preview image in memory)
+    const localEditorPreview = runtimeThumbnailPreviewBySlug.get(videoSlug);
+    if (localEditorPreview && getLocalCustomThumbnail(videoSlug)) {
+        return localEditorPreview;
+    }
+
+    // Fall back to server-fetched thumbnail from cache
+    return serverThumbnailBlobBySlug.get(videoSlug) ?? null;
 }
 
 function applyThumbnailToImage(imageElement: HTMLImageElement, customThumbnailUrl: string | null) {
