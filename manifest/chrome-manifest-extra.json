@@ -55,6 +55,8 @@
         "https://sponsor.ajay.app/*",
         "https://dearrow-thumb.ajay.app/*",
         "https://dearrow.ajay.app/*",
+        "https://nebula.tv/*",
+        "https://*.nebula.tv/*",
         "https://*.youtube.com/*",
         "https://www.youtube-nocookie.com/embed/*"
     ],

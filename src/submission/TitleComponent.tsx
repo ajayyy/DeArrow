@@ -16,9 +16,12 @@ export interface TitleComponentProps {
     upvoted: boolean;
     onSelectOrUpdate: (title: string, oldTitle: string) => void;
     onUpvote: () => void;
+    onDownvote?: () => void;
     onDeselect: () => void;
     actAsVip: boolean;
     videoID: VideoID;
+    /** Optional override for voting — when provided, replaces the built-in YouTube-specific voting logic */
+    onVote?: (submission: RenderedTitleSubmission, downvote: boolean) => Promise<boolean>;
 }
 
 const maxTitleLength = 110;
@@ -116,31 +119,42 @@ export const TitleComponent = (props: TitleComponentProps) => {
                         e.stopPropagation();
 
                         const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
-                        submitVideoBrandingAndHandleErrors(props.submission, null, false, props.actAsVip).then(() => {
-                            stopAnimation();
-                            setDownvoted(false);
 
-                            props.onUpvote();
-                        });
+                        if (props.onVote) {
+                            props.onVote(props.submission, false).then((success) => {
+                                stopAnimation();
+                                if (success) {
+                                    setDownvoted(false);
+                                    props.onUpvote();
+                                }
+                            });
+                        } else {
+                            submitVideoBrandingAndHandleErrors(props.submission, null, false, props.actAsVip).then(() => {
+                                stopAnimation();
+                                setDownvoted(false);
 
-                        if (shouldStoreVotes()) {
-                            const unsubmitted = Config.local!.unsubmitted[props.videoID] ??= {
-                                thumbnails: [],
-                                titles: []
-                            };
-                            unsubmitted.titles.forEach((t) => t.selected = false);
+                                props.onUpvote();
+                            });
 
-                            const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === props.submission.title);
-                            if (unsubmittedTitle) {
-                                unsubmittedTitle.selected = true;
-                            } else {
-                                unsubmitted.titles.push({
-                                    title: props.submission.title,
-                                    selected: true
-                                })
+                            if (shouldStoreVotes()) {
+                                const unsubmitted = Config.local!.unsubmitted[props.videoID] ??= {
+                                    thumbnails: [],
+                                    titles: []
+                                };
+                                unsubmitted.titles.forEach((t) => t.selected = false);
+
+                                const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === props.submission.title);
+                                if (unsubmittedTitle) {
+                                    unsubmittedTitle.selected = true;
+                                } else {
+                                    unsubmitted.titles.push({
+                                        title: props.submission.title,
+                                        selected: true
+                                    })
+                                }
+
+                                Config.forceLocalUpdate("unsubmitted");
                             }
-
-                            Config.forceLocalUpdate("unsubmitted");
                         }
                     }}>
                     <UpvoteIcon selected={props.upvoted} />
@@ -152,22 +166,33 @@ export const TitleComponent = (props: TitleComponentProps) => {
                         e.stopPropagation();
 
                         const stopAnimation = AnimationUtils.applyLoadingAnimation(e.currentTarget, 0.3);
-                        submitVideoBrandingAndHandleErrors(props.submission, null, true, props.actAsVip).then(() => {
-                            stopAnimation();
-                            setDownvoted(true);
-                        });
 
-                        const unsubmitted = Config.local!.unsubmitted[props.videoID];
-                        if (unsubmitted) {
-                            const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === props.submission.title);
-                            if (unsubmittedTitle) {
-                                unsubmitted.titles.splice(unsubmitted.titles.indexOf(unsubmittedTitle), 1);
-
-                                if (unsubmitted.titles.length === 0 && unsubmitted.thumbnails.length === 0) {
-                                    delete Config.local!.unsubmitted[props.videoID];
+                        if (props.onVote) {
+                            props.onVote(props.submission, true).then((success) => {
+                                stopAnimation();
+                                if (success) {
+                                    setDownvoted(true);
+                                    props.onDownvote?.();
                                 }
+                            });
+                        } else {
+                            submitVideoBrandingAndHandleErrors(props.submission, null, true, props.actAsVip).then(() => {
+                                stopAnimation();
+                                setDownvoted(true);
+                            });
 
-                                Config.forceLocalUpdate("unsubmitted");
+                            const unsubmitted = Config.local!.unsubmitted[props.videoID];
+                            if (unsubmitted) {
+                                const unsubmittedTitle = unsubmitted.titles.find((t) => t.title === props.submission.title);
+                                if (unsubmittedTitle) {
+                                    unsubmitted.titles.splice(unsubmitted.titles.indexOf(unsubmittedTitle), 1);
+
+                                    if (unsubmitted.titles.length === 0 && unsubmitted.thumbnails.length === 0) {
+                                        delete Config.local!.unsubmitted[props.videoID];
+                                    }
+
+                                    Config.forceLocalUpdate("unsubmitted");
+                                }
                             }
                         }
                     }}>

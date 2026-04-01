@@ -241,6 +241,157 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     line-height: normal;
 }
 
+.cbNebulaSubmitMenu .cbTitlePreview {
+    font-size: 20px;
+}
+
+.cbNebulaSubmitMenu {
+    --cb-nebula-muted-text: var(--secondary-label, rgba(127, 127, 127, 0.9));
+    --cb-nebula-border: rgba(127, 127, 127, 0.45);
+    --cb-nebula-surface: rgba(127, 127, 127, 0.14);
+    --cb-nebula-hover-surface: rgba(127, 127, 127, 0.22);
+    --cb-nebula-card-radius: 10px;
+
+    color: var(--cb-nebula-text, inherit);
+}
+
+.cbNebulaSubmitMenu .cbTitle {
+    font-size: 16px;
+    color: inherit;
+}
+
+.cbNebulaSubmitMenu .cbTipText {
+    font-size: 14px;
+    color: var(--cb-nebula-muted-text);
+}
+
+.cbNebulaSubmitMenu .submissionMenuInner {
+    padding: 14px;
+}
+
+.cbNebulaSubmitMenu .cbTitle,
+.cbNebulaSubmitMenu .cbThumbnail,
+.cbNebulaSubmitMenu .cbTitlePreviewBox,
+.cbNebulaSubmitMenu .cbHelpContainer,
+.cbNebulaSubmitMenu .sbYourWorkBox {
+    background-color: var(--cb-nebula-surface);
+    border-color: var(--cb-nebula-border);
+    border-radius: var(--cb-nebula-card-radius);
+}
+
+.cbNebulaSubmitMenu .cbTitlePreviewBox {
+    border-width: 1px;
+}
+
+.cbNebulaSubmitMenu .cbTitlePreviewTypeName {
+    color: #ffffff;
+}
+
+.cbNebulaSubmitMenu .cbThumbnail.cbThumbnailSelected,
+.cbNebulaSubmitMenu .cbTitleSelected {
+    border-color: currentColor;
+    background-color: var(--cb-nebula-hover-surface);
+}
+
+.cbNebulaSubmitMenu .cbLine {
+    width: 100%;
+    border-top-color: var(--cb-nebula-border);
+}
+
+.cbNebulaSubmitMenu .cbHelpContainer {
+    width: 100%;
+    border: 1px solid var(--cb-nebula-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    box-sizing: border-box;
+}
+
+.cbNebulaSubmitMenu .cbHelpContainer,
+.cbNebulaSubmitMenu .cbHelpContainer .cbTipText,
+.cbNebulaSubmitMenu .cbHelpContainer .cbTipIcon {
+    color: #ffffff;
+    fill: #ffffff;
+}
+
+.cbNebulaSubmitMenu .cbNoticeButton {
+    background-color: var(--cb-nebula-surface);
+    color: inherit;
+    font-size: 1.05em;
+    font-weight: 600;
+    border-radius: 999px;
+    border: 1px solid var(--cb-nebula-border);
+}
+
+.cbNebulaSubmitMenu .cbNoticeButton:hover {
+    background-color: var(--cb-nebula-hover-surface);
+}
+
+.cbNebulaSubmitMenu .cbNoticeButton:disabled {
+    background-color: transparent !important;
+    opacity: 0.55;
+}
+
+.cbNebulaSubmitMenu .cbVoteButton.cbCancelButton {
+    background-color: var(--cb-nebula-surface);
+}
+
+.cbNebulaSubmitMenu .cbButton {
+    color: inherit;
+}
+
+.cbNebulaSubmitMenu .cbTipIcon {
+    opacity: 0.9;
+}
+
+.cbNebulaSubmitMenu .submissionMenuInner.cbNebulaEditorLayout {
+    display: grid;
+    grid-template-columns: minmax(250px, 330px) minmax(0, 1fr);
+    column-gap: 16px;
+    row-gap: 10px;
+    align-items: start;
+}
+
+.cbNebulaSubmitMenu .cbNebulaEditorPrimaryColumn,
+.cbNebulaSubmitMenu .cbNebulaEditorSecondaryColumn {
+    min-width: 0;
+}
+
+.cbNebulaSubmitMenu .cbNebulaBrandingPreview {
+    margin-top: 0;
+}
+
+.cbNebulaSubmitMenu .cbNebulaBrandingPreview .cbThumbnail {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.cbNebulaSubmitMenu .cbNebulaBrandingPreview .cbTitlePreviewBox {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.cbNebulaSubmitMenu .cbNebulaEditorSecondaryColumn .cbThumbnailDrawer {
+    margin-top: 0;
+}
+
+.cbThumbnailPlaceholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--cb-nebula-surface, rgba(127, 127, 127, 0.14));
+    border: 1px dashed var(--cb-nebula-border, rgba(127, 127, 127, 0.45));
+    font-size: 14px;
+    color: var(--cb-nebula-muted-text, rgba(127, 127, 127, 0.9));
+    min-height: 80px;
+}
+
+@media (max-width: 1000px) {
+    .cbNebulaSubmitMenu .submissionMenuInner.cbNebulaEditorLayout {
+        grid-template-columns: 1fr;
+        row-gap: 12px;
+    }
+}
+
 /* Vorapis v3 compatibility */
 #watch7-headline .cbTitlePreview {
     font-size: 20px;

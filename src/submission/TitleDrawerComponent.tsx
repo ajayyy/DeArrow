@@ -7,10 +7,13 @@ export interface TitleDrawerComponentProps {
     onSelectOrUpdate: (title: RenderedTitleSubmission, oldTitle: string, index: number) => void;
     onDeselect: (index: number) => void;
     onUpvote: (index: number) => void;
+    onDownvote?: (index: number) => void;
     selectedTitleIndex: number;
     upvotedTitleIndex: number;
     actAsVip: boolean;
     videoID: VideoID;
+    /** Optional override for voting — when provided, replaces the built-in YouTube-specific voting logic */
+    onVote?: (submission: RenderedTitleSubmission, downvote: boolean) => Promise<boolean>;
 }
 
 export interface RenderedTitleSubmission {
@@ -48,6 +51,10 @@ function getTitles(props: TitleDrawerComponentProps,
                 onUpvote={() => {
                     props.onUpvote(i);
                 }}
+                onDownvote={props.onDownvote ? () => {
+                    props.onDownvote!(i);
+                } : undefined}
+                onVote={props.onVote}
                 actAsVip={props.actAsVip}
                 key={i}
                 submission={props.existingSubmissions[i]}

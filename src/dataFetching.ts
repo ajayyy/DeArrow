@@ -315,13 +315,14 @@ function isOfficialTime(): boolean {
     return Config.config?.serverAddress === Config.syncDefaults.serverAddress && !CompileConfig.debug;
 }
 
-async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Record<VideoID, BrandingResult> | null> {
+export async function fetchBranding(queryByHash: boolean, videoID: VideoID, service = "YouTube"): Promise<Record<VideoID, BrandingResult> | null> {
     let results: Record<VideoID, BrandingResult> | null = null;
 
     try {
         if (queryByHash) {
             const request = await sendRequestToServer("GET", `/api/branding/${(await getHash(videoID, 1)).slice(0, 4)}`, {
-                fetchAll: true
+                fetchAll: true,
+                service
             });
 
             if (request.ok || request.status === 404) {
@@ -344,7 +345,8 @@ async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Re
         } else {
             const request = await sendRequestToServer("GET", "/api/branding", {
                 videoID,
-                fetchAll: true
+                fetchAll: true,
+                service
             });
 
             if (request.ok || request.status === 404) {
@@ -524,7 +526,7 @@ export function clearCache(videoID: VideoID) {
 }
 
 export async function submitVideoBranding(videoID: VideoID, title: TitleSubmission | null,
-        thumbnail: ThumbnailSubmission | null, downvote = false, actAsVip = false): Promise<FetchResponse> {
+        thumbnail: ThumbnailSubmission | null, downvote = false, actAsVip = false, service = "YouTube"): Promise<FetchResponse> {
 
     if (thumbnail && !downvote && !Config.config!.firstThumbnailSubmitted) {
         Config.config!.firstThumbnailSubmitted = true;
@@ -543,6 +545,7 @@ export async function submitVideoBranding(videoID: VideoID, title: TitleSubmissi
         wasWarned,
         casualMode: Config.config!.casualMode,
         userAgent: extensionUserAgent(),
+        service,
     });
 
     clearCache(videoID);
@@ -611,6 +614,25 @@ export function sendRequestToThumbnailCache(videoID: string, time?: number, titl
     }
     
     return sendBinaryRequestToCustomServer("GET", `${Config.config?.thumbnailServerAddress}/api/v1/getThumbnail`, data);
+}
+
+export function sendRequestToNebulaThumbnailCache(videoSlug: string, time?: number, title?: string,
+        officialTime = false, generateNow = false): Promise<FetchResponseBinary> {
+    const data: Record<string, unknown> = {
+        videoSlug,
+        officialTime,
+        generateNow
+    };
+
+    if (time != null) {
+        data["time"] = time;
+    }
+
+    if (title) {
+        data["title"] = title;
+    }
+
+    return sendBinaryRequestToCustomServer("GET", `${Config.config?.thumbnailServerAddress}/api/v1/getNebulaThumbnail`, data);
 }
 
 export function getThumbnailUrl(videoID: string, time: number): string {

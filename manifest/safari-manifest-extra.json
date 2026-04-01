@@ -16,6 +16,20 @@
         "content.css",
         "shared.css"
     ]
+  }, {
+    "run_at": "document_start",
+    "matches": [
+        "https://nebula.tv/*",
+        "https://*.nebula.tv/*"
+    ],
+    "all_frames": false,
+    "js": [
+        "./js/nebula.js"
+    ],
+    "css": [
+      "content.css",
+      "shared.css"
+    ]
   }],
   "browser_specific_settings": {
     "safari": {
