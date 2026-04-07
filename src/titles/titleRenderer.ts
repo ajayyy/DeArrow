@@ -326,6 +326,7 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
                     "#description #title", // Related videos in description
                     ".yt-lockup-metadata-view-model-wiz__title .yt-core-attributed-string", // New desktop related
                     ".yt-lockup-metadata-view-model__title .yt-core-attributed-string", // New desktop related
+                    ".ytLockupMetadataViewModelTitle .yt-core-attributed-string", // 2026 April desktop homepage
                     ".ShortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
                     ".shortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
                     ".details .media-item-headline .yt-core-attributed-string", // Mobile YouTube
@@ -459,11 +460,12 @@ function createTitleElement(element: HTMLElement, originalTitleElement: HTMLElem
             titleElement.parentElement!.style.justifyContent = "space-between";
 
             // For 2024 Oct new UI
-            if (titleElement.parentElement!.classList.contains("yt-lockup-metadata-view-model__title")) {
+            if (titleElement.parentElement!.classList.contains("yt-lockup-metadata-view-model__title")
+                || titleElement.parentElement!.classList.contains("ytLockupMetadataViewModelTitle")) {
                 titleElement.parentElement!.classList.add("cbTitle24");
                 titleElement.parentElement!.parentElement!.style.setProperty("--cb-max-height", `calc(${getComputedStyle(titleElement.parentElement!).lineHeight} * ${Math.max(1, Config.config!.titleMaxLines)})`)
 
-                const container = titleElement.closest(".yt-lockup-metadata-view-model__text-container") as HTMLElement;
+                const container = titleElement.closest(".yt-lockup-metadata-view-model__text-container, .ytLockupMetadataViewModelTextContainer") as HTMLElement;
                 if (container) {
                     container.style.width = "100%";
                 }
