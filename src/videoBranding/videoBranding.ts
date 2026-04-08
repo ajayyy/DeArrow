@@ -265,7 +265,7 @@ export function getLinkElement(element: HTMLElement, brandingLocation: BrandingL
     switch (brandingLocation) {
         case BrandingLocation.Related:
             if (!onMobile()) {
-                const link = element.querySelector("a#thumbnail, a.reel-item-endpoint, a.yt-lockup-metadata-view-model__title, a.yt-lockup-metadata-view-model__title-link, a.yt-lockup-view-model__content-image, a.yt-lockup-metadata-view-model-wiz__title") as HTMLAnchorElement;
+                const link = element.querySelector("a#thumbnail, a.reel-item-endpoint, a.yt-lockup-metadata-view-model__title, a.yt-lockup-metadata-view-model__title-link, a.yt-lockup-view-model__content-image, a.ytLockupViewModelContentImage, a.yt-lockup-metadata-view-model-wiz__title") as HTMLAnchorElement;
 
                 if (isOnV3Extension()) {
                     if (element.tagName === "A") {
