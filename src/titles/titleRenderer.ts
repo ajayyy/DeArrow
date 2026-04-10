@@ -326,7 +326,7 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
                     "#description #title", // Related videos in description
                     ".yt-lockup-metadata-view-model-wiz__title .yt-core-attributed-string", // New desktop related
                     ".yt-lockup-metadata-view-model__title .yt-core-attributed-string", // New desktop related
-                    ".ytLockupMetadataViewModelTitle .yt-core-attributed-string", // 2026 April desktop homepage
+                    ".ytLockupMetadataViewModelTitle .ytAttributedStringHost", // 2026 April desktop homepage
                     ".ShortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
                     ".shortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
                     ".details .media-item-headline .yt-core-attributed-string", // Mobile YouTube
