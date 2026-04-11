@@ -727,7 +727,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                 thumbnail.style.height = image.style.height;
             }
 
-            if (onMobile() && !image.classList.contains("amsterdam-playlist-thumbnail")) {
+            if (onMobile() && !image.parentElement!.classList.contains("ytPageHeaderViewModelHeadlineImage")) {
                 thumbnail.style.position = "absolute";
                 thumbnail.style.top = "0";
 
@@ -735,7 +735,7 @@ export async function replaceThumbnail(element: HTMLElement, videoID: VideoID, b
                 thumbnail.style.marginRight = "auto";
                 thumbnail.style.left = "0";
                 thumbnail.style.right = "0";
-            } else if (image.classList.contains("amsterdam-playlist-thumbnail")) {
+            } else if (image.parentElement!.classList.contains("ytPageHeaderViewModelHeadlineImage")) {
                 // Playlist header on mobile
                 thumbnail.style.removeProperty("height");
             }

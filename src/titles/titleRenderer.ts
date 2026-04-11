@@ -311,7 +311,8 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
                 return [
                     "yt-formatted-string", 
                     ".ytp-title-link.yt-uix-sessionlink",
-                    ".yt-core-attributed-string"
+                    ".yt-core-attributed-string",
+                    ".ytAttributedStringHost" // 2025 April Mobile
                 ];
             } else {
                 return [
@@ -332,14 +333,16 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
                     ".ShortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
                     ".shortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // New desktop shorts
                     ".details .media-item-headline .yt-core-attributed-string", // Mobile YouTube
+                    ".details .media-item-headline .ytAttributedStringHost", // 2026 April Mobile YouTube
                     ".reel-item-metadata h3 .yt-core-attributed-string", // Mobile YouTube Shorts
-                    ".shortsLockupViewModelHostMetadataTitle .yt-core-attributed-string", // Mobile YouTube Shorts
                     ".details > .yt-core-attributed-string", // Mobile YouTube Channel Feature
+                    ".details > .ytAttributedStringHost", // 2026 April Mobile YouTube Channel Feature
                     ".compact-media-item-headline .yt-core-attributed-string", // Mobile YouTube Compact,
+                    ".YtmCompactMediaItemHeadline .ytAttributedStringHost", // 2026 April Mobile YouTube Compact,
                     ".amsterdam-playlist-title .yt-core-attributed-string", // Mobile YouTube Playlist Header,
+                    ".ytPageHeaderViewModelTitle .ytAttributedStringHost", // 2026 April Mobile YouTube Playlist Header,
                     ".autonav-endscreen-video-title .yt-core-attributed-string", // Mobile YouTube Autoplay
-                    ".video-card-title .yt-core-attributed-string", // Mobile YouTube History List
-                    ".YtmCompactMediaItemHeadline .yt-core-attributed-string"
+                    ".autonav-endscreen-video-title .ytAttributedStringHost", // 2026 April Mobile YouTube Autoplay
                 ];
             } else {
                 return [
