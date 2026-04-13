@@ -10,7 +10,6 @@ import Config, { ThumbnailCacheOption, TitleFormatting } from "../config/config"
 import { logError } from "../utils/logger";
 import { getVideoCasualInfo, getVideoTitleIncludingUnsubmitted } from "../dataFetching";
 import { handleOnboarding } from "./onboarding";
-import { cleanEmojis, cleanResultingTitle } from "../titles/titleFormatter";
 import { getTitleFormatting, shouldDefaultToCustom, shouldDefaultToCustomFastCheck, shouldUseCrowdsourcedTitles } from "../config/channelOverrides";
 import { isOnV3Extension, onMobile } from "../../maze-utils/src/pageInfo";
 import { addMaxTitleLinesCssToPage } from "../utils/cssInjector";
@@ -558,10 +557,7 @@ export function setupOptionChangeListener(): void {
 
 async function hasCustomTitleWithOriginalTitle(videoID: VideoID, originalTitleElement: HTMLElement, brandingLocation: BrandingLocation): Promise<boolean> {
     const title = await getVideoTitleIncludingUnsubmitted(videoID, brandingLocation);
-    const originalTitle = originalTitleElement?.textContent;
-    const customTitle = title && !title.original 
-        && (!originalTitle || (cleanResultingTitle(cleanEmojis(title.title))).toLowerCase() !== (cleanResultingTitle(cleanEmojis(originalTitle))).toLowerCase())
-        && await shouldUseCrowdsourcedTitles(videoID);
+    const customTitle = title && await shouldUseCrowdsourcedTitles(videoID);
 
     return !!customTitle;
 }
