@@ -127,6 +127,9 @@ export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]>
 
 function getPossibleSelectors(onWatchPage: boolean, onEmbedPage: boolean, onChannelPage: boolean) {
     const embedSelectors = [{
+        selector: ".ytmVideoInfoVideoTitle",
+        checkVisibility: false
+    }, {
         selector: ".ytp-title-text",
         checkVisibility: false
     }, {

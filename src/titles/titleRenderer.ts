@@ -357,6 +357,7 @@ function getTitleSelector(brandingLocation: BrandingLocation): string[] {
                 ".ytp-title-link.yt-uix-sessionlink",
                 ".yt-core-attributed-string",
                 "a.yt-formatted-string", // Channel trailers
+                ".ytAttributedStringHost" // 2025 April Embed
             ];
         case BrandingLocation.Endcards:
             return [".ytp-ce-video-title", ".ytp-ce-playlist-title"];
