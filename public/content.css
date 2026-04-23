@@ -88,7 +88,7 @@
 }
 
 .cbThumbnail.cbThumbnailSelected {
-    border-color: var(--yt-spec-text-primary);
+    border-color: var(--cb-main-text-color);
 }
 
 .cbBrandingPreview .cbThumbnail {
@@ -181,8 +181,8 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 }
 
 .submissionMenuInner .sbYourWorkBox {
-    --sb-main-fg-color: var(--yt-spec-text-primary);
-    --sb-grey-fg-color: var(--yt-spec-text-primary);
+    --sb-main-fg-color: var(--cb-main-text-color);
+    --sb-grey-fg-color: var(--cb-main-text-color);
     --sb-grey-bg-color: #64646470;
 }
 
@@ -220,7 +220,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 }
 
 .cbTitleSelected {
-    border-color: var(--yt-spec-text-primary);
+    border-color: var(--cb-main-text-color);
 }
 
 .cbTitleTextHint {
@@ -266,7 +266,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 }
 
 .cbTitlePreviewTypeName {
-    color: var(--yt-spec-text-primary);
+    color: var(--cb-main-text-color);
 
     padding-left: 0.26em;
     padding-right: 0.26em;
@@ -292,7 +292,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
     margin-top: 3em;
 	background-color: rgba(28, 28, 28, 0.9);
     backdrop-filter: blur(10px);
-    --yt-spec-text-primary: white;
+    --cb-main-text-color: white;
 
     width: var(--ytd-watch-flexy-sidebar-width, 400px);
     margin-left: auto;
@@ -305,8 +305,8 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 #cbSubmitMenu {
     z-index: 10000;
     font-size: 12px;
-    color: var(--yt-spec-text-primary);
-    fill: var(--yt-spec-text-primary);
+    color: var(--cb-main-text-color);
+    fill: var(--cb-main-text-color);
 
     width: 100%;
     border-radius: 5px;
@@ -469,7 +469,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 
 .cbLine {
     border: 0;
-    border-top: 1px solid var(--yt-spec-text-primary);
+    border-top: 1px solid var(--cb-main-text-color);
 
     width: 80%;
     margin: auto;
@@ -648,7 +648,7 @@ ytd-compact-playlist-renderer .ytd-compact-playlist-renderer #video-title:not(.c
 }
 
 .cbTitleButton svg {
-    fill: var(--yt-spec-text-primary);
+    fill: var(--cb-main-text-color);
     display: block;
 }
 

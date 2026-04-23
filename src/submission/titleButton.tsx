@@ -73,6 +73,11 @@ export class TitleButton {
                     this.updateIcon();
                     this.button.draggable = false;
 
+                    const mainColor = this.getPageTextColor();
+                    if (mainColor) {
+                        this.button.style.setProperty("--cb-main-text-color", mainColor)
+                    }
+
                     this.button.addEventListener("click", (e) => {
                         if (!chrome.runtime?.id) return;
                         e.stopPropagation();
@@ -152,6 +157,11 @@ export class TitleButton {
                 this.container = document.createElement('span');
                 this.container.id = "cbSubmitMenu";
 
+                const mainColor = this.getPageTextColor();
+                if (mainColor) {
+                    this.container.style.setProperty("--cb-main-text-color", mainColor)
+                }
+
                 if (isOnDescriptionOnRightLayout) {
                     this.container.style.marginTop = referenceNode.parentElement?.offsetHeight + "px";
 
@@ -181,6 +191,10 @@ export class TitleButton {
         } else {
             this.close();
         }
+    }
+
+    private getPageTextColor(): string | undefined {
+        return getComputedStyle(document.querySelector("ytd-watch-metadata")!)?.color;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
