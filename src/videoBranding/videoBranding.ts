@@ -383,7 +383,7 @@ export async function setShowCustomBasedOnDefault(videoID: VideoID, originalTitl
 
         // If value true, use default, otherwise use opposite of default
         return await internalSetShowCustom(videoID, originalTitleElement, brandingLocation,
-            alwaysShowCustom || (!!videoBrandingInstances[videoID].showCustomBranding.originalValue === value),
+            alwaysShowCustom || (await shouldDefaultToCustom(videoID) === value),
                 showThreeStages ? value : undefined);
     }
 }
