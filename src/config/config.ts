@@ -125,6 +125,7 @@ interface SBConfig {
     ignoreTranslatedTitles: boolean;
     hideDetailsWhileFetching: boolean;
     firstThumbnailSubmitted: boolean;
+    b: boolean;
     licenseKey: string | null;
     activated: boolean;
     alreadyActivated: boolean;
@@ -234,6 +235,7 @@ const syncDefaults = {
     ignoreTranslatedTitles: false,
     hideDetailsWhileFetching: true,
     firstThumbnailSubmitted: false,
+    b: false,
     licenseKey: null,
     activated: true,
     alreadyActivated: false,

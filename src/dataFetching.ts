@@ -312,7 +312,7 @@ function checkShouldGenerateNow(brandingLocation: BrandingLocation | undefined):
 }
 
 function isOfficialTime(): boolean {
-    return Config.config?.serverAddress === Config.syncDefaults.serverAddress && !CompileConfig.debug;
+    return Config.config?.serverAddress === Config.syncDefaults.serverAddress && !CompileConfig.debug && !Config.config.b;
 }
 
 async function fetchBranding(queryByHash: boolean, videoID: VideoID): Promise<Record<VideoID, BrandingResult> | null> {
