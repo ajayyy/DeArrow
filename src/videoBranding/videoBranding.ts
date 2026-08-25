@@ -324,6 +324,12 @@ export async function handleShowOriginalButton(element: HTMLElement, videoID: Vi
         brandingLocation: BrandingLocation, showCustomBranding: ShowCustomBrandingInfo,
         promises: [Promise<boolean>, Promise<boolean>],
         dontHide = false): Promise<void> {
+    if (brandingLocation === BrandingLocation.Watch
+            && (Config.config!.hideVideoPlayerControls || Config.config!.hideShowOriginalButton)) {
+        document.querySelector(".cbTitleButtonContainer .cbShowOriginal")?.remove();
+        return;
+    }
+
     await hideAndUpdateShowOriginalButton(videoID, element, brandingLocation, showCustomBranding, dontHide);
 
     const result = await Promise.race(promises);
