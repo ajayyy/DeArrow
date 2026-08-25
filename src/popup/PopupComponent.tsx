@@ -105,7 +105,7 @@ export const PopupComponent = () => {
                                 />
                         }
                         {
-                            videoData?.videoID &&
+                            videoData?.videoID && !Config.config!.hidePopupSubmissionButton &&
                                 <button id="openSubmissionMenu"
                                     className="sbControlsMenu-item"
                                     title={chrome.i18n.getMessage("OpenSubmissionMenu")}

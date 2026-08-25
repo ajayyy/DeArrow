@@ -102,6 +102,7 @@ interface SBConfig {
     hideSubmissionButton: boolean;
     hideCasualVoteButton: boolean;
     hideShowOriginalButton: boolean;
+    hidePopupSubmissionButton: boolean;
     defaultToCustom: boolean;
     alwaysShowShowOriginalButton: boolean;
     showOriginalOnHover: boolean;
@@ -216,6 +217,7 @@ const syncDefaults = {
     hideSubmissionButton: false,
     hideCasualVoteButton: false,
     hideShowOriginalButton: false,
+    hidePopupSubmissionButton: true,
     defaultToCustom: true,
     alwaysShowShowOriginalButton: false,
     showOriginalOnHover: false,
