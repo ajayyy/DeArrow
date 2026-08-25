@@ -4,9 +4,9 @@
 <head>
   <title>__MSG_Options__ - DeArrow</title>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="../icons/logo.svg" type="image/png">
-  
+
   <link href="options.css" rel="stylesheet"/>
   <link href="../shared.css" rel="stylesheet"/>
   <link href="../casual.css" rel="stylesheet">
@@ -62,8 +62,8 @@
 			<div id="createdBy" class="titleBar">
 				<div>
 					<img src="../icons/newprofilepic.jpg" height="30" class="profilepiccircle" alt="profile picture of creator"/>
-					__MSG_createdBy__ 
-					<a href="https://ajay.app">Ajay Ramachandran</a> 
+					__MSG_createdBy__
+					<a href="https://ajay.app">Ajay Ramachandran</a>
 				</div>
 				<a href="https://sponsor.ajay.app/donate" target="_blank" rel="noopener" class="hidden" id="sbDonate">(__MSG_Donate__)</a>
 			</div>
@@ -184,7 +184,7 @@
 					</div>
 
 					<br/>
-	
+
 					<div data-type="toggle" data-sync="onlyTitleCaseInEnglish" data-dependent-on-selector="titleFormatting" data-dependent-on-selector-value="1">
 						<div class="sb-switch-container">
 							<label class="sb-switch">
@@ -195,7 +195,7 @@
 								__MSG_onlyTitleCaseInEnglish__
 							</label>
 						</div>
-	
+
 						<div class="small-description">__MSG_onlyTitleCaseInEnglishDescription__</div>
 					</div>
 				</div>
@@ -222,7 +222,7 @@
 
 					<div data-type="toggle" data-sync="showLiveCover" data-dependent-on-selector="thumbnailFallback" data-dependent-on-selector-value="0" data-dependent-on-selector-value-2="3">
 						<br/>
-						
+
 						<div class="sb-switch-container">
 							<label class="sb-switch">
 								<input id="showLiveCover" type="checkbox" checked>
@@ -282,7 +282,7 @@
 						<span class="optionLabel">__MSG_titleMaxLines__</span>
 						<input type="number" step="1" min="1" style="width: 50px;">
 					</label>
-	
+
 					<div class="small-description">__MSG_titleMaxLinesDescription__</div>
 				</div>
 
@@ -305,7 +305,7 @@
 							__MSG_keepUnsubmitted__
 						</label>
 					</div>
-	
+
 					<div class="small-description">__MSG_whatKeepUnsubmitted__</div>
 				</div>
 
@@ -325,6 +325,54 @@
 
 			<div id="interface" class="option-group hidden">
 
+				<div data-type="toggle" data-toggle-type="reverse" data-sync="hideVideoPlayerControls">
+					<div class="sb-switch-container">
+						<label class="sb-switch">
+							<input id="hideVideoPlayerControls" type="checkbox" checked>
+							<span class="sb-slider sb-round"></span>
+						</label>
+						<label class="sb-switch-label" for="hideVideoPlayerControls">
+							Show buttons below the player
+						</label>
+					</div>
+				</div>
+
+				<div class="button-visibility-child" data-type="toggle" data-toggle-type="reverse" data-sync="hideSubmissionButton">
+					<div class="sb-switch-container">
+						<label class="sb-switch">
+							<input id="hideSubmissionButton" type="checkbox" checked>
+							<span class="sb-slider sb-round"></span>
+						</label>
+						<label class="sb-switch-label" for="hideSubmissionButton">
+							Show submission button
+						</label>
+					</div>
+				</div>
+
+				<div class="button-visibility-child" data-type="toggle" data-toggle-type="reverse" data-sync="hideCasualVoteButton">
+					<div class="sb-switch-container">
+						<label class="sb-switch">
+							<input id="hideCasualVoteButton" type="checkbox" checked>
+							<span class="sb-slider sb-round"></span>
+						</label>
+						<label class="sb-switch-label" for="hideCasualVoteButton">
+							Show casual-vote button
+						</label>
+					</div>
+				</div>
+
+				<div class="button-visibility-child" data-type="toggle" data-toggle-type="reverse" data-sync="hideShowOriginalButton">
+					<div class="sb-switch-container">
+						<label class="sb-switch">
+							<input id="hideShowOriginalButton" type="checkbox" checked>
+							<span class="sb-slider sb-round"></span>
+						</label>
+						<label class="sb-switch-label" for="hideShowOriginalButton">
+							Show original/modified toggle
+						</label>
+					</div>
+				</div>
+
 				<div data-type="toggle" data-sync="alwaysShowShowOriginalButton">
 					<div class="sb-switch-container">
 						<label class="sb-switch">
@@ -332,11 +380,23 @@
 							<span class="sb-slider sb-round"></span>
 						</label>
 						<label class="sb-switch-label" for="alwaysShowShowOriginalButton">
-							__MSG_alwaysShowShowOriginalButton__
+							Always show original/modified toggles on video listings
 						</label>
 					</div>
 
-					<div class="small-description">__MSG_whatAlwaysShowShowOriginalButton__</div>
+					<div class="small-description">Keep these toggles visible on thumbnails instead of only on hover.</div>
+				</div>
+
+				<div data-type="toggle" data-sync="showIconForFormattedTitles">
+					<div class="sb-switch-container">
+						<label class="sb-switch">
+							<input id="showIconForFormattedTitles" type="checkbox" checked>
+							<span class="sb-slider sb-round"></span>
+						</label>
+						<label class="sb-switch-label" for="showIconForFormattedTitles">
+							Show original/modified toggle for auto-formatted titles
+						</label>
+					</div>
 				</div>
 
 				<div data-type="toggle" data-sync="showOriginalOnHover">
@@ -349,7 +409,7 @@
 							__MSG_showOriginalOnHover__
 						</label>
 					</div>
-					
+
 					<div data-type="toggle" data-sync="showOriginalOnHoverOfVideo" data-dependent-on="showOriginalOnHover">
 						<br/>
 
@@ -364,18 +424,6 @@
 						</div>
 
 						<div class="small-description">__MSG_showOriginalOnHoverOfVideoDescription__</div>
-					</div>
-				</div>
-
-				<div data-type="toggle" data-sync="showIconForFormattedTitles">
-					<div class="sb-switch-container">
-						<label class="sb-switch">
-							<input id="showIconForFormattedTitles" type="checkbox" checked>
-							<span class="sb-slider sb-round"></span>
-						</label>
-						<label class="sb-switch-label" for="showIconForFormattedTitles">
-							__MSG_showIconForFormattedTitles__
-						</label>
 					</div>
 				</div>
 
@@ -425,12 +473,12 @@
 
 			<div id="keybinds" class="option-group hidden">
 
-				<div data-type="keybind-change" data-sync="enableExtensionKey">	
+				<div data-type="keybind-change" data-sync="enableExtensionKey">
 					<label class="optionLabel">__MSG_enableDeArrowKey__:</label>
 					<div class="inline"></div>
 				</div>
 
-				<div data-type="keybind-change" data-sync="openMenuKey">	
+				<div data-type="keybind-change" data-sync="openMenuKey">
 					<label class="optionLabel">__MSG_openDeArrowMenu__:</label>
 					<div class="inline"></div>
 				</div>
@@ -443,12 +491,12 @@
 					<div class="option-button trigger-button">
 						__MSG_changeUserID__
 					</div>
-	
+
 					<div class="small-description">__MSG_whatChangeUserID__</div>
-	
+
 					<div class="option-hidden-section hidden spacing indent">
 						<input class="option-text-box" type="text">
-	
+
 						<div class="option-button text-change-set inline low-profile">
 							__MSG_setUserID__
 						</div>
@@ -457,7 +505,7 @@
 
 				<div data-type="private-text-change" data-sync="*" data-confirm-message="exportOptionsWarning">
 					<h2>__MSG_exportOptions__</h2>
-					
+
 					<div>
 						<div class="option-button trigger-button inline">
 							__MSG_exportOptionsCopy__
@@ -470,12 +518,12 @@
 						</label>
 						<input id="importOptions" type="file" class="upload-button hidden" />
 					</div>
-	
+
 					<div class="small-description">__MSG_whatExportOptions__</div>
-	
-					<div class="option-hidden-section hidden spacing indent">	
+
+					<div class="option-hidden-section hidden spacing indent">
 						<textarea class="option-text-box" rows="10" style="width:80%"></textarea>
-	
+
 						<div class="option-button text-change-set">
 							__MSG_setOptions__
 						</div>
@@ -484,7 +532,7 @@
 
 				<div data-type="private-text-change" data-sync-type="local" data-sync="*" data-confirm-message="exportOptionsWarning">
 					<h2>__MSG_exportOtherData__</h2>
-					
+
 					<div>
 						<div class="option-button trigger-button inline">
 							__MSG_exportOptionsCopy__
@@ -497,10 +545,10 @@
 						</label>
 						<input id="importLocalOptions" type="file" class="upload-button hidden" />
 					</div>
-	
-					<div class="option-hidden-section hidden spacing indent">	
+
+					<div class="option-hidden-section hidden spacing indent">
 						<textarea class="option-text-box" rows="10" style="width:80%"></textarea>
-	
+
 						<div class="option-button text-change-set">
 							__MSG_setOptions__
 						</div>
@@ -551,7 +599,7 @@
 							__MSG_countReplacements__
 						</label>
 					</div>
-	
+
 					<div class="small-description">__MSG_countReplacementsDescription__</div>
 				</div>
 
@@ -559,24 +607,24 @@
 					<div class="option-button trigger-button">
 						__MSG_copyDebugInformation__
 					</div>
-	
+
 					<div class="small-description">__MSG_copyDebugInformationOptions__</div>
 				</div>
 
 				<div data-type="text-change" data-sync="serverAddress" data-dependent-on="testingServer" data-dependent-on-inverted="true">
 					<label class="optionLabel inline">
 						<span class="optionLabel">__MSG_dataFetchingServerAddress__:</span>
-	
+
 						<input class="option-text-box" type="text" style="margin-right:10px">
 					</label>
 
 					<div class="small-description">__MSG_dataFetchingServerAddressDescription__</div>
-	
+
 					<div class="next-line">
 						<div class="option-button text-change-set inline">
 							__MSG_save__
 						</div>
-		
+
 						<div class="option-button text-change-reset inline">
 							__MSG_reset__
 						</div>
@@ -586,7 +634,7 @@
 				<div data-type="text-change" data-sync="thumbnailServerAddress" data-dependent-on="testingServer" data-dependent-on-inverted="true">
 					<label class="optionLabel inline">
 						<span class="optionLabel">__MSG_thumbnailCacheServerAddress__:</span>
-	
+
 						<input class="option-text-box" type="text" style="margin-right:10px">
 					</label>
 
@@ -594,7 +642,7 @@
 						<div class="option-button text-change-set inline">
 							__MSG_save__
 						</div>
-		
+
 						<div class="option-button text-change-reset inline">
 							__MSG_reset__
 						</div>

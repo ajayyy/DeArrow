@@ -21,7 +21,8 @@ export class SubmitButton extends TitleButton {
     submissions: BrandingResult;
 
     constructor() {
-        super(submitButtonIcon, chrome.i18n.getMessage("OpenSubmissionMenu"), "cbSubmitButton");
+        super(submitButtonIcon, chrome.i18n.getMessage("OpenSubmissionMenu"), "cbSubmitButton",
+            () => Config.config!.hideSubmissionButton);
         this.submissions = {
             thumbnails: [],
             titles: [],
