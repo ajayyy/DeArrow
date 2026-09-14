@@ -734,7 +734,9 @@ async function createShowOriginalButton(element: HTMLElement, originalTitleEleme
                     player.style.removeProperty("display");
 
                     const hoverPlayerVideo = player.querySelector("video");
-                    if (hoverPlayerVideo && hoverPlayerVideo.paused) {
+                    if (hoverPlayerVideo && hoverPlayerVideo.paused
+                            && !location.pathname.match(/watch|shorts|live/)
+                    ) {
                         hoverPlayerVideo.play().catch(logError);
                     }
                 }
