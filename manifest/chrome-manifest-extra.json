@@ -49,7 +49,8 @@
             "icons/add.svg",
             "icons/remove.svg"
         ],
-        "matches": ["<all_urls>"]
+        "matches": ["<all_urls>"],
+        "use_dynamic_url": true
     }],
     "host_permissions": [
         "https://sponsor.ajay.app/*",
