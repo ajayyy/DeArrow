@@ -30,7 +30,8 @@ export class CasualVoteButton extends TitleButton {
     existingVotes: CasualVoteInfo[];
 
     constructor() {
-        super(casualVoteButtonIcon, chrome.i18n.getMessage("OpenCasualVoteMenu"), "cbCasualVoteButton", true);
+        super(casualVoteButtonIcon, chrome.i18n.getMessage("OpenCasualVoteMenu"), "cbCasualVoteButton",
+            () => Config.config!.hideCasualVoteButton, true);
         this.existingVotes = [];
     }
 

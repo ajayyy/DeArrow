@@ -1,3 +1,3 @@
 export interface BackgroundToContentMessage {
-    message: "update";
+    message: "update" | "getVideoData" | "openSubmissionMenu";
 }
