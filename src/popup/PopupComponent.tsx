@@ -10,6 +10,7 @@ import { LicenseComponent } from "../license/LicenseComponent";
 import { FormattedText } from "./FormattedTextComponent";
 import { SelectOptionComponent } from "./SelectOptionComponent";
 import { getChannelOverrideID, getOverrideOptionForConfigID, setOverrideOrOriginal, VideoOverrideData } from "../config/channelOverrides";
+import PencilIcon from "../svgIcons/pencilIcon";
 
 type ChannelOverridesAction = "forJustThisVideo" | "forThisChannel" | null;
 interface ChannelOverridesOption {
@@ -102,6 +103,21 @@ export const PopupComponent = () => {
                                     setConfigID={setConfigID}
                                     titleFormatting={titleFormatting}
                                 />
+                        }
+                        {
+                            videoData?.videoID && !Config.config!.hidePopupSubmissionButton &&
+                                <button id="openSubmissionMenu"
+                                    className="sbControlsMenu-item"
+                                    title={chrome.i18n.getMessage("OpenSubmissionMenu")}
+                                    onClick={() => {
+                                        void sendMessage({ message: "openSubmissionMenu" }).then(() => window.close());
+                                    }}>
+                                    <PencilIcon className="SBWhitelistIcon sbControlsMenu-itemIcon" style={{ width: 23, height: 23 }} />
+                                    <FormattedText
+                                        langKey="OpenSubmissionMenu"
+                                        titleFormatting={titleFormatting}
+                                    />
+                                </button>
                         }
                         {/* github: mbledkowski/toggle-switch */}
                         <label id="disableExtension" htmlFor="toggleSwitch" className="toggleSwitchContainer sbControlsMenu-item">

@@ -122,9 +122,21 @@ export function setupCBVideoModule(): void {
             })();
 
             return true;
+        } else if (request.message === "openSubmissionMenu") {
+            submitButton.openOrClose().catch(logError).finally(() => sendResponse({}));
+            return true;
         }
 
         return false;
+    });
+
+    Config.configSyncListeners.push((changes) => {
+        if (changes.hideVideoPlayerControls || changes.hideSubmissionButton || changes.hideCasualVoteButton) {
+            attachSubmitButtonToPage();
+        }
+        if (changes.hideVideoPlayerControls || changes.hideShowOriginalButton) {
+            replaceCurrentVideoBranding().catch(logError);
+        }
     });
 
     setupVideoModule({

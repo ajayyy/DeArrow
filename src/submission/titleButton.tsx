@@ -39,11 +39,13 @@ export class TitleButton {
     className: string;
 
     displayFloating: boolean;
+    isHidden: () => boolean;
 
-    constructor(buttonIcon: string, buttonTitle: string, className: string, displayFloating = false) {
+    constructor(buttonIcon: string, buttonTitle: string, className: string, isHidden: () => boolean, displayFloating = false) {
         this.buttonIcon = buttonIcon;
         this.buttonTitle = buttonTitle;
         this.className = className;
+        this.isHidden = isHidden;
         this.displayFloating = displayFloating;
 
         addCleanupListener(() => {
@@ -54,6 +56,12 @@ export class TitleButton {
     }
 
     async attachToPage(): Promise<void> {
+        if (Config.config!.hideVideoPlayerControls || this.isHidden()) {
+            this.button?.remove();
+            this.close();
+            return;
+        }
+
         if (!getVideo()) {
             log("Not attaching submit button, no video");
             return;
