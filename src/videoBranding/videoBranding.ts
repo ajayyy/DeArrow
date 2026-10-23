@@ -1,4 +1,5 @@
 import { getYouTubeTitleNodeSelector } from "../../maze-utils/src/elements";
+import { isYouTubeShortsPage, shortsTitleSelector } from "../utils/youtubeShortsTitle";
 import { extractVideoID, getVideoID, isOnChannelPage, VideoID } from "../../maze-utils/src/video";
 import { getElement, isVisibleOrParent, waitForElement } from "../../maze-utils/src/dom";
 import { ThumbnailResult } from "../thumbnails/thumbnailData";
@@ -74,7 +75,7 @@ const videoBrandingInstances: Record<VideoID, VideoBrandingInstance> = {}
 
 export async function replaceCurrentVideoBranding(): Promise<[boolean, boolean]> {
     const onClipPage = document.URL.includes("/clip/");
-    const onWatchPage = document.URL.includes("/watch") || onClipPage;
+    const onWatchPage = document.URL.includes("/watch") || onClipPage || isYouTubeShortsPage(document.URL);
     const onChannelPage = isOnChannelPage();
     const onEmbedPage = document.URL.includes("/embed/");
     const possibleSelectors = getPossibleSelectors(onWatchPage, onEmbedPage, onChannelPage);
@@ -143,7 +144,7 @@ function getPossibleSelectors(onWatchPage: boolean, onEmbedPage: boolean, onChan
         },
         ...embedSelectors,
         {
-            selector: "ytd-video-description-header-renderer #shorts-title",
+            selector: shortsTitleSelector,
             checkVisibility: false
         }
     ];
