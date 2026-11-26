@@ -5,7 +5,7 @@ import { isVisible, waitForElement } from "../../maze-utils/src/dom";
 import { isOnV3Extension, onMobile } from "../../maze-utils/src/pageInfo";
 import { logError } from "./logger";
 import { waitFor } from "../../maze-utils/src";
-import { getYouTubeTitleNode } from "../../maze-utils/src/elements";
+import { getYouTubeTitleSelectorWithShorts } from "./youtubeShortsTitle";
 import { addCleanupListener } from "../../maze-utils/src/cleanup";
 
 export enum MobileFix {
@@ -28,7 +28,7 @@ export async function getOrCreateTitleButtonContainer(forceTitleNode?: HTMLEleme
         return titleButtonContainer;
     }
 
-    const titleNode = forceTitleNode ?? await waitForElement(getYouTubeTitleNodeSelector(), true, true, true) as HTMLElement;
+    const titleNode = forceTitleNode ?? await waitForElement(getYouTubeTitleSelectorWithShorts(getYouTubeTitleNodeSelector()), true, true, true) as HTMLElement;
 
     // Experimental YouTube layout with description on right
     const isOnDescriptionOnRightLayout = titleNode?.parentElement?.querySelector("#description");
@@ -191,7 +191,7 @@ function setupRemovalListener(referenceNode: HTMLElement) {
 
 let badgeListener: MutationObserver | null = null;
 export async function listenForBadges() {
-    const titleNode = await waitForElement(getYouTubeTitleNodeSelector(), true, true, true) as HTMLElement;
+    const titleNode = await waitForElement(getYouTubeTitleSelectorWithShorts(getYouTubeTitleNodeSelector()), true, true, true) as HTMLElement;
     const referenceNode = titleNode?.parentElement;
 
     if (referenceNode) {
@@ -228,7 +228,7 @@ function moveBadge(badge: HTMLElement) {
 let titleChangeObserver: MutationObserver | null = null;
 const titleChangeListeners: (() => void)[] = [];
 export async function listenForTitleChange() {
-    const titleNode = await waitForElement(getYouTubeTitleNodeSelector(), true, true, true) as HTMLElement;
+    const titleNode = await waitForElement(getYouTubeTitleSelectorWithShorts(getYouTubeTitleNodeSelector()), true, true, true) as HTMLElement;
     titleChangeObserver = setupTextChangeListener(titleChangeObserver, titleNode, true);
 }
 
@@ -255,7 +255,7 @@ function setupTextChangeListener(mutationObserver: MutationObserver | null, elem
                 if (!chrome.runtime?.id) return;
 
                 if (onMobile() && lookForOriginalTitleElement) {
-                    const newElement = getYouTubeTitleNode();
+                    const newElement = document.querySelector(getYouTubeTitleSelectorWithShorts(getYouTubeTitleNodeSelector())) as HTMLElement | null;
                     if (newElement && element !== newElement) {
                         setupTextChangeListener(mutationObserver, newElement, lookForOriginalTitleElement);
                         return;
