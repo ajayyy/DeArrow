@@ -123,6 +123,17 @@ html, body {
     border-image: linear-gradient(to right, var(--border-color), #00000000 80%)  1;
 }
 
+.option-group > div.button-visibility-child {
+    padding-left: 24px;
+}
+
+.option-group > div.button-visibility-child.disabled {
+    opacity: 0.5;
+}
+
+.option-group > div.button-visibility-child.disabled .sb-slider {
+    cursor: default;
+}
 .categoryExtraOptions {
     padding-bottom: 20px;
 }

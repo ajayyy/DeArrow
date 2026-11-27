@@ -22,6 +22,12 @@ import CasualChoice from "./options/CasualChoice";
 import { logRequest } from "../maze-utils/src/background-request-proxy";
 let embed = false;
 
+const buttonVisibilityOptions = [
+    "hideSubmissionButton",
+    "hideCasualVoteButton",
+    "hideShowOriginalButton"
+];
+
 window.addEventListener('DOMContentLoaded', () => void init());
 
 async function init() {
@@ -153,6 +159,14 @@ async function init() {
 
                     // See if anything extra must be run
                     switch (option) {
+                        case "hideVideoPlayerControls":
+                            syncButtonVisibilityOptions(true);
+                            break;
+                        case "hideSubmissionButton":
+                        case "hideCasualVoteButton":
+                        case "hideShowOriginalButton":
+                            syncButtonVisibilityOptions();
+                            break;
                         case "supportInvidious":
                             void invidiousOnClick(checkbox, option);
                             break;
@@ -343,6 +357,8 @@ async function init() {
         }
     }
 
+    syncButtonVisibilityOptions();
+
     // Tab interaction
     const tabElements = document.getElementsByClassName("tab-heading");
     for (let i = 0; i < tabElements.length; i++) {
@@ -367,6 +383,34 @@ async function init() {
     window.addEventListener("scroll", () => createStickyHeader());
 
     optionsContainer!.classList.add("sb-animated");
+}
+
+function syncButtonVisibilityOptions(masterClicked = false): void {
+    const options = buttonVisibilityOptions.map((option) => ({
+        option,
+        checkbox: document.querySelector(`[data-sync='${option}'] input`) as HTMLInputElement
+    }));
+    const master = document.querySelector("[data-sync='hideVideoPlayerControls'] input") as HTMLInputElement;
+
+    if (masterClicked && master.checked && options.every(({ checkbox }) => !checkbox.checked)) {
+        for (const { option, checkbox } of options) {
+            checkbox.checked = true;
+            Config.config![option] = false;
+        }
+    }
+
+    const selectedCount = options.filter(({ checkbox }) => checkbox.checked).length;
+    if (selectedCount === 0) {
+        Config.config!.hideVideoPlayerControls = true;
+    }
+
+    const disabled = Config.config!.hideVideoPlayerControls;
+    master.checked = !disabled && selectedCount > 0;
+
+    for (const { checkbox } of options) {
+        checkbox.disabled = disabled;
+        checkbox.closest(".button-visibility-child")?.classList.toggle("disabled", disabled);
+    }
 }
 
 function createStickyHeader() {
